@@ -4,7 +4,7 @@
 
 TODO
 
-The propulsion package has been tested under ROS Noetic for Ubuntu 20.04.
+
 
 ### License
 
