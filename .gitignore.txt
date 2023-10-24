@@ -72,5 +72,5 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Burst Stuff
-Library/PackageCache/com.unity.burst@1.8.8/.Runtime
+Library/PackageCache/com.unity.burst@1.8.8/.Runtime/*
 
