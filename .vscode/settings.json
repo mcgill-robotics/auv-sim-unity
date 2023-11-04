@@ -52,5 +52,13 @@
         "temp/":true,
         "Temp/":true
     },
-    "ros.distro": "noetic"
+    "ros.distro": "noetic",
+    "python.autoComplete.extraPaths": [
+        "/home/potenza/AUV-2024/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/potenza/AUV-2024/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
 }
