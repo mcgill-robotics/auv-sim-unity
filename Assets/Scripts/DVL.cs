@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
-using RosMessageTypes.dead_reckon_report;
+using auv_msgs.DeadReckonReport;
 
 public class DVLPublisher : MonoBehaviour {
    ROSConnection roscon;
@@ -23,7 +23,7 @@ public class DVLPublisher : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
       roscon = ROSConnection.GetOrCreateInstance();
-      ros.RegisterPublisher<dead_reckon_report>(topicName); 
+      roscon.RegisterPublisher<DeadReckonReport>(topicName); 
     }
 
     // Update is called once per frame
