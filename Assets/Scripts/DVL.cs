@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
-using auv_msgs.DeadReckonReport;
 
 public class DVLPublisher : MonoBehaviour {
    ROSConnection roscon;
-   public string topicName = "dead_reckon_report";
+   public string topicName = "/dead_reckon_report";
 
     public GameObject auv;
 
@@ -17,13 +16,13 @@ public class DVLPublisher : MonoBehaviour {
     public float pitch;
     public float yaw;
 
- //   public dead_reckon_report msg;
+   public RosMessageTypes.Auv.DeadReckonReportMsg msg;
 
 
     // Start is called before the first frame update
     void Start() {
       roscon = ROSConnection.GetOrCreateInstance();
-      roscon.RegisterPublisher<DeadReckonReport>(topicName); 
+      roscon.RegisterPublisher<RosMessageTypes.Auv.DeadReckonReportMsg>(topicName); 
     }
 
     // Update is called once per frame
