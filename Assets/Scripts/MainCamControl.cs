@@ -21,9 +21,9 @@ public class MainCamControl : MonoBehaviour
         float zAxisValue = Input.GetAxis("Vertical");
         float yAxisValue = Input.GetAxis("Mouse ScrollWheel");
         if(Input.GetMouseButton(0)) {
-		    cam.transform.Rotate(new Vector3(Input.GetAxis("Mouse Y")*7 , -Input.GetAxis("Mouse X") * 2, 0));
+		    cam.transform.Rotate(new Vector3(Input.GetAxis("Mouse Y") , -Input.GetAxis("Mouse X"), 0));
         }
-        cam.transform.Translate(new Vector3(xAxisValue/5, yAxisValue*2, zAxisValue/5));
+        cam.transform.Translate(new Vector3(xAxisValue/15, yAxisValue, zAxisValue/15));
 
         
 
