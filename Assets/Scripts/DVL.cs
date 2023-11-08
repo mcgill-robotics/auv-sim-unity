@@ -27,11 +27,12 @@ public class DVLPublisher : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-      x = auv.transform.position.x;
-      y = auv.transform.position.y;
-      z = auv.transform.position.z;
-      roll = auv.transform.rotation.eulerAngles.x;
-      pitch = auv.transform.rotation.eulerAngles.y;
-      yaw = auv.transform.rotation.eulerAngles.z;
+      msg.x = auv.transform.position.x;
+      msg.y = auv.transform.position.y;
+      msg.z = auv.transform.position.z;
+      msg.roll = auv.transform.rotation.eulerAngles.x;
+      msg.pitch = auv.transform.rotation.eulerAngles.y;
+      msg.yaw = auv.transform.rotation.eulerAngles.z;
+      roscon.Publish("/dead_reckon_report", msg);
     }
 }
