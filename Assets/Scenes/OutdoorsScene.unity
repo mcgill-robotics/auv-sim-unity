@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2161.763, g: 2113.596, b: 2784.9146, a: 1}
+  m_IndirectSpecularColor: {r: 2160.3967, g: 2112.0022, b: 2783.0159, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3127,7 +3127,7 @@ GameObject:
   - component: {fileID: 1886102463}
   - component: {fileID: 1886102462}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: DVLPublisher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
