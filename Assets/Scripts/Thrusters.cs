@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 
-public class thrusters : MonoBehaviour {
+public class Thrusters : MonoBehaviour {
     ROSConnection roscon;
 
     public string subTopicName = "/thruster_report";
