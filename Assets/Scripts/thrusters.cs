@@ -10,7 +10,7 @@ public class thrusters : MonoBehaviour {
 
     double[] forces = new double[8];    
 
-    void thrusterCallback(RosMessageTypes.Auv.ThrusterReportMsg msg) {
+    void thrusterCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg) {
         forces[0] = msg.SURGE_PORT;
         forces[1] = msg.SURGE_STAR;
         forces[2] = msg.SWAY_BOW;
@@ -24,7 +24,7 @@ public class thrusters : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         roscon = ROSConnection.GetOrCreateInstance();
-        roscon.Subscribe<RosMessageTypes.Auv.ThrusterReportMsg>(subTopicName, thrusterCallback);
+        roscon.Subscribe<RosMessageTypes.Auv.ThrusterForcesMsg>(subTopicName, thrusterCallback);
     }
 
     // Update is called once per frame
