@@ -1,23 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.Robotics.ROSTCPConnector;
+// using System.Collections;
+// using System.Collections.Generic;
+// using UnityEngine;
+// using Unity.Robotics.ROSTCPConnector;
 
-/* TO-DO */
+// /* TO-DO */
 
-public class DepthSensor : MonoBehaviour {
-    ROSConnection roscon;
+// public class DepthSensor : MonoBehaviour {
+//     ROSConnection roscon;
 
-    public string pubTopicName = "/SOME_NAME";
+//     public string pubTopicName = "/SOME_NAME";
 
-    // Start is called before the first frame update
-    void Start() {
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.RegisterPublisher<>(pubTopicName);
-    }
+//     // Start is called before the first frame update
+//     void Start() {
+//         roscon = ROSConnection.GetOrCreateInstance();
+//         roscon.RegisterPublisher<>(pubTopicName);
+//     }
 
-    // Update is called once per frame
-    void Update() {
+//     // Update is called once per frame
+//     void Update() {
         
-    }
-}
+//     }
+// }

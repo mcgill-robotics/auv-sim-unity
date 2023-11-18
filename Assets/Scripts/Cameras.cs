@@ -5,19 +5,19 @@ using Unity.Robotics.ROSTCPConnector;
 
 /* TO-DO */
 
-public class Cameras : MonoBehaviour {
-    ROSConnection roscon;
+// public class Cameras : MonoBehaviour {
+//     ROSConnection roscon;
 
-    public string pubTopicName = "/SOME_NAME";
+//     public string pubTopicName = "/SOME_NAME";
 
-    // Start is called before the first frame update
-    void Start() {
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.RegisterPublisher<>(pubTopicName);
-    }
+//     // Start is called before the first frame update
+//     void Start() {
+//         roscon = ROSConnection.GetOrCreateInstance();
+//         roscon.RegisterPublisher<>(pubTopicName);
+//     }
 
-    // Update is called once per frame
-    void Update() {
+//     // Update is called once per frame
+//     void Update() {
         
-    }
-}
+//     }
+// }
