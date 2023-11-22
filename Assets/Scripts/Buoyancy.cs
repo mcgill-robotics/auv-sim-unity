@@ -1,18 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Buoyancy : MonoBehaviour
 {
-	public float underwaterDrag;
-	public float airDrag;
-	public float underwaterAngularDrag;
-	public float airAngularDrag;
 	Rigidbody auv;
-	bool underwater;
-	public float waterHeight;
-	public float floatPower;	
-
+	public float buoyancyForce;
 
 
     // Start is called before the first frame update
@@ -24,33 +19,12 @@ public class Buoyancy : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        float level = transform.position.y - waterHeight;
-        
-        if (level < 0) {
-auv.AddForceAtPosition(Vector3.up * floatPower* Mathf.Abs(level), transform.position, ForceMode.Force);
-       	 if (!underwater) {
-			underwater = true;
-			SwitchState(true);
-        	}
-        	else if (underwater) {
-        		underwater = false;
-        		SwitchState(false);
-        	}
-        
-    	}
+        float level = auv.transform.position.y;
+        if (level > -auv.transform.localScale.x / 4)
+        {
+            auv.AddForceAtPosition(Vector3.up * buoyancyForce * Math.Abs(level)/(auv.transform.localScale.x / 4), transform.position, ForceMode.Force);
+        } else {
+            auv.AddForceAtPosition(Vector3.up * buoyancyForce, transform.position, ForceMode.Force);
+        }
     }
-    
-    void SwitchState(bool underwater) {
-    	if (underwater) {
-    		auv.drag = underwaterDrag;
-    		auv.angularDrag = underwaterAngularDrag;
-    	}
-    	else {
-		auv.drag = airDrag;
-		auv.angularDrag = airAngularDrag;
-	}
-    
-    
-    }
-    
 }
