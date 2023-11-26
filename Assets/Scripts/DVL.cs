@@ -33,6 +33,6 @@ public class DVLPublisher : MonoBehaviour {
       msg.roll = auv.transform.rotation.eulerAngles.x;
       msg.pitch = auv.transform.rotation.eulerAngles.y;
       msg.yaw = auv.transform.rotation.eulerAngles.z;
-      roscon.Publish("/dead_reckon_report", msg);
+      roscon.Publish(topicName, msg);
     }
 }
