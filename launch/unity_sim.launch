@@ -1,0 +1,3 @@
+<launch>
+    <node name="unity_bridge_py" pkg="auv-sim-unity" type="unity_bridge.py" output="screen"></node> 
+</launch>
