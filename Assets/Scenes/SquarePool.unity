@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2158.26, g: 2108.6956, b: 2775.8518, a: 1}
+  m_IndirectSpecularColor: {r: 2160.3733, g: 2111.9866, b: 2782.9846, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2466,6 +2466,7 @@ GameObject:
   - component: {fileID: 1226931471}
   - component: {fileID: 1226931470}
   - component: {fileID: 1226931476}
+  - component: {fileID: 1226931478}
   m_Layer: 0
   m_Name: Diana
   m_TagString: Untagged
@@ -2617,7 +2618,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1226931469}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ba04a4037578127db0775e2f83e0c3c, type: 3}
   m_Name: 
@@ -2660,6 +2661,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1226931478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226931469}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17f2cd4078169b44d8f5677d78a6b821, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  subTopicName: /thruster_report
 --- !u!1 &1311353824
 GameObject:
   m_ObjectHideFlags: 0
