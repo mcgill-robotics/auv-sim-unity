@@ -1,3 +1,4 @@
 <launch>
-    <node name="unity_bridge_py" pkg="auv-sim-unity" type="unity_bridge.py" output="screen"></node> 
+    <include file="$(find ros_tcp_endpoint)/launch/endpoint.launch"></include>
+    <node name="unity_bridge" pkg="auv-sim-unity" type="unity_bridge.py" output="screen"></node> 
 </launch>
