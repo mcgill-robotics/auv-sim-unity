@@ -1,23 +1,29 @@
-// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-// using Unity.Robotics.ROSTCPConnector;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.Robotics.ROSTCPConnector;
+using RosMessageTypes.Std.
 
-// /* TO-DO */
+public class Imu : MonoBehaviour {
 
-// public class Imu : MonoBehaviour {
-//     ROSConnection roscon;
+    public GameObject auv;
+    ROSConnection roscon;
 
-//     public string pubTopicName = "/SOME_NAME";
+    public string pubImuDataTopic = "/unity/sbg/imu_data";
+    public string pubEkfQuatTopic = "/unity/sbg/ekf_quat";
 
-//     // Start is called before the first frame update
-//     void Start() {
-//         roscon = ROSConnection.GetOrCreateInstance();
-//         roscon.RegisterPublisher<>(pubTopicName);
-//     }
+    // public RosMessageTypes.AuvSimUnity.SbgImuDataMsg data_msg;
+    // public RosMessageTypes.AuvSimUnity.SbgEkfQuatMsg ekf_msg;
 
-//     // Update is called once per frame
-//     void Update() {
+    // Start is called before the first frame update
+    void Start() {
+        roscon = ROSConnection.GetOrCreateInstance();
+        // roscon.RegisterPublisher<RosMessageTypes.AuvSimUnity.SbgImuDataMsg>(pubImuDataTopic);
+        // roscon.RegisterPublisher<RosMessageTypes.AuvSimUnity.SbgEkfQuatMsg>(pubEkfQuatTopic);
+    }
+
+    // Update is called once per frame
+    void Update() {
         
-//     }
-// }
+    }
+}
