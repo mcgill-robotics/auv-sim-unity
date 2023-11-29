@@ -13,40 +13,52 @@ namespace RosMessageTypes.Auv
         public const string k_RosMessageName = "auv_msgs/UnityState";
         public override string RosMessageName => k_RosMessageName;
 
-        public Geometry.PoseMsg pose;
-        public Geometry.TwistMsg twist;
+        public Geometry.Vector3Msg position;
+        public Geometry.QuaternionMsg orientation;
+        public Geometry.Vector3Msg velocity;
+        public Geometry.Vector3Msg angular_velocity;
 
         public UnityStateMsg()
         {
-            this.pose = new Geometry.PoseMsg();
-            this.twist = new Geometry.TwistMsg();
+            this.position = new Geometry.Vector3Msg();
+            this.orientation = new Geometry.QuaternionMsg();
+            this.velocity = new Geometry.Vector3Msg();
+            this.angular_velocity = new Geometry.Vector3Msg();
         }
 
-        public UnityStateMsg(Geometry.PoseMsg pose, Geometry.TwistMsg twist)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity)
         {
-            this.pose = pose;
-            this.twist = twist;
+            this.position = position;
+            this.orientation = orientation;
+            this.velocity = velocity;
+            this.angular_velocity = angular_velocity;
         }
 
         public static UnityStateMsg Deserialize(MessageDeserializer deserializer) => new UnityStateMsg(deserializer);
 
         private UnityStateMsg(MessageDeserializer deserializer)
         {
-            this.pose = Geometry.PoseMsg.Deserialize(deserializer);
-            this.twist = Geometry.TwistMsg.Deserialize(deserializer);
+            this.position = Geometry.Vector3Msg.Deserialize(deserializer);
+            this.orientation = Geometry.QuaternionMsg.Deserialize(deserializer);
+            this.velocity = Geometry.Vector3Msg.Deserialize(deserializer);
+            this.angular_velocity = Geometry.Vector3Msg.Deserialize(deserializer);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
-            serializer.Write(this.pose);
-            serializer.Write(this.twist);
+            serializer.Write(this.position);
+            serializer.Write(this.orientation);
+            serializer.Write(this.velocity);
+            serializer.Write(this.angular_velocity);
         }
 
         public override string ToString()
         {
             return "UnityStateMsg: " +
-            "\npose: " + pose.ToString() +
-            "\ntwist: " + twist.ToString();
+            "\nposition: " + position.ToString() +
+            "\norientation: " + orientation.ToString() +
+            "\nvelocity: " + velocity.ToString() +
+            "\nangular_velocity: " + angular_velocity.ToString();
         }
 
 #if UNITY_EDITOR
