@@ -13,6 +13,7 @@ import quaternion
 DEG_PER_RAD = (180 / np.pi)
 
 def cb_unity_state(msg):
+    # UnityState - NED
     pose_x = msg.position[0]
     pose_y = msg.position[1]
     pose_z = msg.position[2]
@@ -34,18 +35,18 @@ def cb_unity_state(msg):
 
     # DVL - NWU
     if isDVLActive:
-        # Position
-        position_NWU_auv = np.array([pose_x, pose_y, pose_z])
+        # POSITION
+        # Convert x, y, z from NED to NWU
+        position_NWU_auv = quaternion.rotate_vectors(q_NED_NWU, np.array([pose_x, pose_y, pose_z]))
         position_auv_dvlref = quaternion.rotate_vectors(q_NWU_dvlref.inverse(), position_NWU_auv)
         dvl_offset_NWU = quaternion.rotate_vectors(q_NWU_dvlref, np.array([auv_dvl_offset_x, auv_dvl_offset_y, auv_dvl_offset_z]))
         position_dvl_dvlref = position_auv_dvlref + dvl_offset_NWU
 
-        # Orientation
-        q_NWU_auv = np.quaternion(pose_quat_w, pose_quat_x, pose_quat_y, pose_quat_z)
+        # ORIENTATION
+        # Convert quaternion from NED to NWU
+        q_NWU_auv = np.quaternion(pose_quat_w, pose_quat_x, pose_quat_y, pose_quat_z) * q_NED_NWU
         q_dvlref_dvl = q_NWU_dvlref.inverse() * q_NWU_auv * q_dvl_auv.inverse()
-        # euler_dvlref_auv = quaternion.as_euler_angles(q_dvlref_dvl)
         euler_dvlref_dvl = transformations.euler_from_quaternion([q_dvlref_dvl.x, q_dvlref_dvl.y, q_dvlref_dvl.z, q_dvlref_dvl.w])
-
 
         dvl_msg = DeadReckonReport()
 
@@ -69,14 +70,11 @@ def cb_unity_state(msg):
         sbg_data_msg.gyro = Vector3(twist_angular_x[0], twist_angular_y[1], twist_angular_z[2])
         pub_imu_data_sensor.publish(sbg_data_msg)
 
-    # DEPTH SENSOR
+    # DEPTH SENSOR - NWU
     if isDepthSensorActive:
         depth_msg = Float64()
-        depth_msg.data = pose_z
+        depth_msg.data = -pose_z
         pub_depth_sensor.publish(depth_msg)
-
-    
-
 
 
 if __name__ == '__main__':
@@ -98,6 +96,7 @@ if __name__ == '__main__':
     q_imu_auv_z = rospy.get_param("~q_imu_auv_z")
 
     # REFERENCE FRAME DEFINITIONS
+    q_NWU_NED = np.quaternion(0, 1, 0, 0)
     q_NED_NWU = np.quaternion(0, 1, 0, 0)
     q_NWU_dvlref = np.quaternion(0,1,0,0)
 
