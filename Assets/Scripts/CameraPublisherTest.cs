@@ -6,11 +6,6 @@
 // using RosMessageTypes.BuiltinInterfaces;
 // using System.Collections;
  
-// /// <summary>
-// ///
-// /// </summary>
- 
-// [RequireComponent(typeof(ROSClockSubscriber))]
 // public class CameraPublisherTest : MonoBehaviour
 // {
 //     ROSConnection ros;
@@ -39,8 +34,6 @@
 //     private uint image_step = 4;
 //     TimeMsg lastTime;
  
-//     private ROSClockSubscriber clock;
- 
 //     private ImageMsg img_msg;
 //     private CameraInfoMsg infoCamera;
  
@@ -49,7 +42,7 @@
 //     void Start()
 //     {
 //         // start the ROS connection
-//         ros = ROSConnection.instance;
+//         ros = ROSConnection.GetOrCreateInstance();
  
 //         if(ros)
 //         {
@@ -57,7 +50,6 @@
 //             ros.RegisterPublisher<CompressedImageMsg>(CompressedImageTopic);
  
 //             ros.RegisterPublisher<CameraInfoMsg>(camInfoTopic);
-//             clock = GetComponent<ROSClockSubscriber>();
 //         }
 //         else
 //         {
@@ -92,11 +84,6 @@
 //             img_msg.encoding = "rgba8";
  
 //             infoCamera = CameraInfoGenerator.ConstructCameraInfoMessage(target_camera, header);
- 
-//         }
-//         else
-//         {
-//             Debug.Log("No camera found.");
 //         }
 //     }
  
@@ -108,14 +95,13 @@
  
 //             if (timeElapsed > (1 / pubMsgFrequency))
 //             {
-//                 header.stamp = clock._time;
 //                 infoCamera.header = header;
  
 //                 img_msg.header = header;
 //                 img_msg.data = get_frame_raw();
            
-//                 ros.Send(imageTopic, img_msg);
-//                 ros.Send(camInfoTopic, infoCamera);
+//                 ros.Publish(imageTopic, img_msg);
+//                 ros.Publish(camInfoTopic, infoCamera);
  
 //                 timeElapsed = 0;
 //             }
