@@ -1,66 +1,110 @@
-// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-// using UnityEngine.Rendering;
-// using Unity.Robotics.ROSTCPConnector;
-// using RosMessageTypes.Sensor;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Rendering;
+using Unity.Robotics.ROSTCPConnector;
+using RosMessageTypes.Sensor;
+using RosMessageTypes.Std;
+using RosMessageTypes.BuiltinInterfaces;
 
-// public class CameraPublisher : MonoBehaviour {
-//     ROSConnection roscon;
-//     public Camera downCam;
-//     public Camera frontCam;
-
-//     public int downCamFPS;
-//     public int frontCamFPS;
+public class CameraPublisher : MonoBehaviour {
+    ROSConnection roscon;
+    public Camera downCam;
+    public Camera frontCam;
+    public int downCamFPS;
+    public int frontCamFPS;
     
-//     public string downCamImageTopic = "/vision/down_cam/image_raw";
-//     public string downCamInfoTopic = "/vision/down_cam/camera_info";
-//     public string frontCamImageTopic = "/vision/front_cam/image_raw";
-//     public string frontCamDepthTopic = "/vision/front_cam/aligned_depth_to_color/image_raw";
-//     public string frontCamInfoTopic = "/vision/front_cam/aligned_depth_to_color/camera_info";
+    public string downCamImageTopic = "/vision/down_cam/image_raw";
+    public string downCamInfoTopic = "/vision/down_cam/camera_info";
+    public string frontCamImageTopic = "/vision/front_cam/image_raw";
+    public string frontCamDepthTopic = "/vision/front_cam/aligned_depth_to_color/image_raw";
+    public string frontCamInfoTopic = "/vision/front_cam/aligned_depth_to_color/camera_info";
 
-//     public int imageWidth;
-//     public int imageHeight;
+    private uint image_step = 4;
 
-//     RenderTexture renderTexture;
-//     Texture2D texture;
+    public int imageWidth;
+    public int imageHeight;
+    RenderTexture renderTexture;
+    Texture2D texture;
 
-//     // Start is called before the first frame update
-//     void Start() {
-//         roscon = ROSConnection.GetOrCreateInstance();
+    // Start is called before the first frame update
+    void Start() {
+        roscon = ROSConnection.GetOrCreateInstance();
 
-//         roscon.RegisterPublisher<ImageMsg>(downCamImageTopic);
-//         roscon.RegisterPublisher<ImageMsg>(frontCamImageTopic);
-//         roscon.RegisterPublisher<ImageMsg>(frontCamDepthTopic);
+        roscon.RegisterPublisher<ImageMsg>(downCamImageTopic);
+        roscon.RegisterPublisher<ImageMsg>(frontCamImageTopic);
+        roscon.RegisterPublisher<ImageMsg>(frontCamDepthTopic);
 
-//         InvokeRepeating("PublishDownCam", 0f, 1f / downCamFPS);
-//         InvokeRepeating("PublishFrontCam", 0f, 1f / frontCamFPS);
+        InvokeRepeating("PublishDownCam", 0f, 1f / downCamFPS);
+        InvokeRepeating("PublishFrontCam", 0f, 1f / frontCamFPS);
 
-//     }
+    }
 
-//     void SendImage(Camera sensorCamera, string topicName) {
-//         var oldRT = RenderTexture.active;
-//         RenderTexture.active = sensorCamera.targetTexture;
-//         sensorCamera.Render();
-        
-//         // Copy the pixels from the GPU into a texture so we can work with them
-//         // For more efficiency you should reuse this texture, instead of creating and disposing them every time
-//         Texture2D camText = new Texture2D(sensorCamera.targetTexture.width, sensorCamera.targetTexture.height);
-//         camText.ReadPixels(new Rect(0, 0, sensorCamera.targetTexture.width, sensorCamera.targetTexture.height), 0, 0);
-//         camText.Apply();
-//         RenderTexture.active = oldRT;
-        
-//         // Encode the texture as an ImageMsg, and send to ROS
-//         ImageMsg imageMsg = camText.ToImageMsg();
-//         RosConnection.GetOrCreateInstance().Publish(topicName, imageMsg);
-//         camText.Dispose();
-//     }
+    void SendImage(Camera sensorCamera, string topicName) {
+        RenderTexture renderTexture = new RenderTexture(sensorCamera.pixelWidth, sensorCamera.pixelHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
+        renderTexture.Create();
 
-//     void PublishFrontCam() {
-//         SendImage(frontCam, frontCamImageTopic);
-//     }
+        int frame_width = renderTexture.width;
+        int frame_height = renderTexture.height;
 
-//     void PublishDownCam() {
-//         SendImage(downCam, downCamImageTopic);
-//     }
-// }
+        Rect frame = new Rect(0, 0, frame_width, frame_height);
+ 
+        Texture2D cameraTexture = new Texture2D(frame_width, frame_height, TextureFormat.RGBA32, false);
+
+        HeaderMsg header = new HeaderMsg();
+
+        ImageMsg img_msg = new ImageMsg();
+
+        img_msg.width = (uint) frame_width;
+        img_msg.height = (uint) frame_height;
+        img_msg.step = image_step * (uint) frame_width;
+        img_msg.encoding = "rgba8";
+
+        sensorCamera.targetTexture = renderTexture;
+        RenderTexture lastTexture = RenderTexture.active;
+ 
+        RenderTexture.active = renderTexture;
+        sensorCamera.Render();
+ 
+        cameraTexture.ReadPixels(frame, 0, 0);
+        cameraTexture.Apply();
+ 
+        sensorCamera.targetTexture = lastTexture;
+        sensorCamera.targetTexture = null;
+
+        img_msg.header = header;
+        img_msg.data = cameraTexture.GetRawTextureData();
+    
+        roscon.Publish(topicName, img_msg);
+    }
+
+    // void SendCameraInfo() {
+    //     // TODO
+    //     // Create a new CameraInfoMsg
+    //     CameraInfoMsg cameraInfoMsg = new CameraInfoMsg
+    //     {
+    //         header = new HeaderMsg { frame_id = frameId },
+    //         width = Screen.width,
+    //         height = Screen.height,
+    //         distortion_model = "plumb_bob",
+    //         D = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0 },
+    //         K = new double[] { 525.0, 0.0, Screen.width / 2.0, 0.0, 525.0, Screen.height / 2.0, 0.0, 0.0, 1.0 },
+    //         R = new double[] { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 },
+    //         P = new double[] { 525.0, 0.0, Screen.width / 2.0, 0.0, 0.0, 525.0, Screen.height / 2.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
+    //         binning_x = 0,
+    //         binning_y = 0,
+    //         roi = new RegionOfInterestMsg(),
+    //     };
+
+    //     // Publish the CameraInfoMsg
+    //     cameraInfoPublisher.Publish(cameraInfoMsg);
+    // }
+
+    void PublishFrontCam() {
+        SendImage(frontCam, frontCamImageTopic);
+    }
+
+    void PublishDownCam() {
+        SendImage(downCam, downCamImageTopic);
+    }
+}
