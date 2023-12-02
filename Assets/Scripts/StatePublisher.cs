@@ -7,6 +7,9 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 public class StatePublisher : MonoBehaviour {
     private ROSConnection roscon;
     public string stateTopicName = "/unity/state";
+    public bool isDVLActive = true;
+    public bool isDepthSensorActive = true;
+    public bool isIMUActive = true;
 
     public GameObject auv;
 
@@ -20,10 +23,13 @@ public class StatePublisher : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-      msg.position = auv.transform.position.To<FLU>();
-      msg.orientation = auv.transform.rotation.To<FLU>();
-      msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<FLU>();
-      msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<FLU>();
+      msg.position = auv.transform.position.To<NED>();
+      msg.orientation = auv.transform.rotation.To<NED>();
+      msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<NED>();
+      msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<NED>();
+      msg.isDVLActive = isDVLActive;
+      msg.isDepthSensorActive = isDepthSensorActive;
+      msg.isIMUActive = isIMUActive;
 
       roscon.Publish(stateTopicName, msg);
     }
