@@ -9,7 +9,6 @@ public class Buoyancy : MonoBehaviour
 	Rigidbody auv;
 	public float buoyancyForce;
 
-
     // Start is called before the first frame update
     void Start()
     {

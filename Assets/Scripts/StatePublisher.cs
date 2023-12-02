@@ -13,7 +13,7 @@ public class StatePublisher : MonoBehaviour {
 
     public GameObject auv;
 
-    private RosMessageTypes.Auv.UnityStateMsg msg;
+    private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
 
     // Start is called before the first frame update
     void Start() {
