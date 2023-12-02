@@ -5,35 +5,37 @@
 // using Unity.Robotics.ROSTCPConnector;
 // using RosMessageTypes.Sensor;
 
-// /* TO-DO */
-
-// public class Cameras : MonoBehaviour {
+// public class CameraPublisher : MonoBehaviour {
 //     ROSConnection roscon;
 //     public Camera downCam;
+//     public Camera frontCam;
 
+//     public int downCamFPS;
+//     public int frontCamFPS;
     
-//     public string pubDownCamRaw = "/vision/down_cam/image_raw";
-//     public string pubDownCamDepth = "/vision/front_cam/aligned_depth_to_color/camera_info";
-
-//     public ImageMsg msgDownCamRaw;
-//     public ImageMsg msgDownCamDepth;
+//     public string downCamImageTopic = "/vision/down_cam/image_raw";
+//     public string downCamInfoTopic = "/vision/down_cam/camera_info";
+//     public string frontCamImageTopic = "/vision/front_cam/image_raw";
+//     public string frontCamDepthTopic = "/vision/front_cam/aligned_depth_to_color/image_raw";
+//     public string frontCamInfoTopic = "/vision/front_cam/aligned_depth_to_color/camera_info";
 
 //     public int imageWidth;
 //     public int imageHeight;
 
 //     RenderTexture renderTexture;
 //     Texture2D texture;
-    
-    
 
 //     // Start is called before the first frame update
 //     void Start() {
 //         roscon = ROSConnection.GetOrCreateInstance();
 
-//         roscon.RegisterPublisher<ImageMsg>(pubDownCamRaw);
-//         roscon.RegisterPublisher<ImageMsg>(pubDownCamDepth);
+//         roscon.RegisterPublisher<ImageMsg>(downCamImageTopic);
+//         roscon.RegisterPublisher<ImageMsg>(frontCamImageTopic);
+//         roscon.RegisterPublisher<ImageMsg>(frontCamDepthTopic);
 
-//         renderTexture = new RenderTexture(imageWidth, imageHeight);
+//         InvokeRepeating("PublishDownCam", 0f, 1f / downCamFPS);
+//         InvokeRepeating("PublishFrontCam", 0f, 1f / frontCamFPS);
+
 //     }
 
 //     void SendImage(Camera sensorCamera, string topicName) {
@@ -49,13 +51,16 @@
 //         RenderTexture.active = oldRT;
         
 //         // Encode the texture as an ImageMsg, and send to ROS
-//         msgDownCamRaw = camText.ToImageMsg();
-//         roscon.Publish(topicName, msgDownCamRaw);
-//         // camText.Dispose();
+//         ImageMsg imageMsg = camText.ToImageMsg();
+//         RosConnection.GetOrCreateInstance().Publish(topicName, imageMsg);
+//         camText.Dispose();
 //     }
 
-//     // Update is called once per frame
-//     void Update() {
-//         SendImage(downCam, pubDownCamRaw);
+//     void PublishFrontCam() {
+//         SendImage(frontCam, frontCamImageTopic);
+//     }
+
+//     void PublishDownCam() {
+//         SendImage(downCam, downCamImageTopic);
 //     }
 // }
