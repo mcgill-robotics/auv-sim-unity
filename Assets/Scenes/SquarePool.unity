@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 4
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2160.3733, g: 2111.9866, b: 2782.9846, a: 1}
+  m_IndirectSpecularColor: {r: 2158.2678, g: 2108.715, b: 2775.922, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -183,7 +183,7 @@ Transform:
   m_GameObject: {fileID: 142032061}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.09, y: -0.12, z: -0.25}
+  m_LocalPosition: {x: 0.032, y: -0.495, z: -0.022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -717,7 +717,7 @@ Transform:
   m_GameObject: {fileID: 256451382}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.409, y: 0, z: -0.578}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -902,7 +902,7 @@ Transform:
   m_GameObject: {fileID: 523339872}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.358, y: 0, z: 0.553}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1655,7 +1655,7 @@ Transform:
   m_GameObject: {fileID: 688549716}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.571, y: 0, z: 0.367}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2184,7 +2184,7 @@ Transform:
   m_GameObject: {fileID: 915007698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 0, z: 0}
+  m_LocalPosition: {x: 0.54, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2594,7 +2594,7 @@ Transform:
   m_GameObject: {fileID: 1226931469}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.1, y: 0.05, z: 1.8}
+  m_LocalPosition: {x: -3.1, y: 0.001, z: 1.8}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2623,23 +2623,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba04a4037578127db0775e2f83e0c3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: /dead_reckon_report
+  stateTopicName: /unity/state
+  isDVLActive: 1
+  isDepthSensorActive: 1
+  isIMUActive: 1
   auv: {fileID: 1226931469}
-  x: 0
-  y: 0
-  z: 0
-  roll: 0
-  pitch: 0
-  yaw: 0
-  msg:
-    x: 0
-    y: 0
-    z: 0
-    roll: 0
-    pitch: 0
-    yaw: 0
-    std: 0
-    status: 0
 --- !u!65 &1226931477
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2668,12 +2656,31 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1226931469}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 17f2cd4078169b44d8f5677d78a6b821, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subTopicName: /thruster_report
+  auvRb: {fileID: 1226931471}
+  thrusterPositions:
+  - {fileID: 1311353825}
+  - {fileID: 1565018786}
+  - {fileID: 688549717}
+  - {fileID: 1864151315}
+  - {fileID: 523339873}
+  - {fileID: 1887475411}
+  - {fileID: 256451383}
+  - {fileID: 1663201252}
+  thrusterDirections:
+  - {x: -1, y: 0, z: 0}
+  - {x: -1, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  - {x: 0, y: 0, z: -1}
+  - {x: 0, y: -1, z: 0}
+  - {x: 0, y: -1, z: 0}
+  - {x: 0, y: -1, z: 0}
+  - {x: 0, y: -1, z: 0}
+  thrusterForcesTopicName: /propulsion/thruster_forces
 --- !u!1 &1311353824
 GameObject:
   m_ObjectHideFlags: 0
@@ -2700,7 +2707,7 @@ Transform:
   m_GameObject: {fileID: 1311353824}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.62}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2718,7 +2725,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17f2cd4078169b44d8f5677d78a6b821, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subTopicName: /thruster_report
+  auvRb: {fileID: 0}
+  thrusterPositions: []
+  thrusterDirections: []
+  thrusterForcesTopicName: /propulsion/thruster_forces
 --- !u!1 &1330414012
 GameObject:
   m_ObjectHideFlags: 0
@@ -2855,7 +2865,7 @@ Transform:
   m_GameObject: {fileID: 1565018785}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.628}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3066,7 +3076,7 @@ Transform:
   m_GameObject: {fileID: 1663201251}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.425, y: 0, z: 0.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3503,7 +3513,7 @@ Transform:
   m_GameObject: {fileID: 1864151314}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.587, y: 0, z: -0.383}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3538,23 +3548,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba04a4037578127db0775e2f83e0c3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topicName: /dead_reckon_report
+  stateTopicName: /unity/state
+  isDVLActive: 1
+  isDepthSensorActive: 1
+  isIMUActive: 1
   auv: {fileID: 1226931469}
-  x: 0
-  y: 0
-  z: 0
-  roll: 0
-  pitch: 0
-  yaw: 0
-  msg:
-    x: 0
-    y: 0
-    z: 0
-    roll: 0
-    pitch: 0
-    yaw: 0
-    std: 0
-    status: 0
 --- !u!4 &1886102463
 Transform:
   m_ObjectHideFlags: 0
@@ -3595,7 +3593,7 @@ Transform:
   m_GameObject: {fileID: 1887475410}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.377, y: 0, z: -0.578}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
