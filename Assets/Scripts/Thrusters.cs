@@ -8,9 +8,11 @@ public class Thrusters : MonoBehaviour {
     public Rigidbody auvRb;
     public Transform[] thrusterPositions;
     public Vector3[] thrusterDirections;
+    public float AUVRealMass = 25;
     public string thrusterForcesTopicName = "/propulsion/thruster_forces";
 
-    double[] current_thruster_forces = new double[8];    
+    private double[] current_thruster_forces = new double[8];    
+    private float massScalarRealToSim;
 
     void thrusterForceCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg) {
         current_thruster_forces[0] = msg.SURGE_PORT;
@@ -25,6 +27,7 @@ public class Thrusters : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+        massScalarRealToSim = auvRb.mass / AUVRealMass;
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.Subscribe<RosMessageTypes.Auv.ThrusterForcesMsg>(thrusterForcesTopicName, thrusterForceCallback);
     }
@@ -33,9 +36,9 @@ public class Thrusters : MonoBehaviour {
     void FixedUpdate() {
         for (int i = 0; i < thrusterPositions.Length; i++) {
             Vector3 force_in_direction = new Vector3(
-                thrusterDirections[i].x * (float)current_thruster_forces[i],
-                thrusterDirections[i].y * (float)current_thruster_forces[i],
-                thrusterDirections[i].z * (float)current_thruster_forces[i]
+                thrusterDirections[i].x * (float)current_thruster_forces[i] * massScalarRealToSim,
+                thrusterDirections[i].y * (float)current_thruster_forces[i] * massScalarRealToSim,
+                thrusterDirections[i].z * (float)current_thruster_forces[i] * massScalarRealToSim
             );
             auvRb.AddForceAtPosition(force_in_direction, thrusterPositions[i].position, ForceMode.Impulse);
         }
