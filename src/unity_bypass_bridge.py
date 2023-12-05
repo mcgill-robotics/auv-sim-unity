@@ -2,15 +2,14 @@
 
 import rospy
 import numpy as np
-
-from auv_msgs.msg import DeadReckonReport, UnityState
-from geometry_msgs.msg import Quaternion, Vector3
-from sbg_driver.msg import SbgImuData, SbgEkfQuat
-from std_msgs.msg import Float64
-from tf import transformations
 import quaternion
+from tf import transformations
+from tf2_ros import TransformBroadcaster
+from auv_msgs.msg import UnityState
+from geometry_msgs.msg import Pose, Quaternion, Vector3, TransformStamped, Point
+from std_msgs.msg import Float64, Bool
 
-DEG_PER_RAD = (180 / np.pi)
+DEG_PER_RAD = 180 / np.pi
 
 def cb_unity_state(msg):
     pose_x = msg.position[0]
@@ -27,96 +26,72 @@ def cb_unity_state(msg):
     twist_angular_x = msg.angular_velocity[0]
     twist_angular_y = msg.angular_velocity[1]
     twist_angular_z = msg.angular_velocity[2]
-
-    isDVLActive = msg.isDVLActive
-    isIMUActive = msg.isIMUActive
-    isDepthSensorActive = msg.isDepthSensorActive
-
-    # DVL - NWU
-    if isDVLActive:
-        # Position
-        position_NWU_auv = np.array([pose_x, pose_y, pose_z])
-        position_auv_dvlref = quaternion.rotate_vectors(q_NWU_dvlref.inverse(), position_NWU_auv)
-        dvl_offset_NWU = quaternion.rotate_vectors(q_NWU_dvlref, np.array([auv_dvl_offset_x, auv_dvl_offset_y, auv_dvl_offset_z]))
-        position_dvl_dvlref = position_auv_dvlref + dvl_offset_NWU
-
-        # Orientation
-        q_NWU_auv = np.quaternion(pose_quat_w, pose_quat_x, pose_quat_y, pose_quat_z)
-        q_dvlref_dvl = q_NWU_dvlref.inverse() * q_NWU_auv * q_dvl_auv.inverse()
-        # euler_dvlref_auv = quaternion.as_euler_angles(q_dvlref_dvl)
-        euler_dvlref_dvl = transformations.euler_from_quaternion([q_dvlref_dvl.x, q_dvlref_dvl.y, q_dvlref_dvl.z, q_dvlref_dvl.w])
-
-
-        dvl_msg = DeadReckonReport()
-
-        dvl_msg.x = position_dvl_dvlref[0]
-        dvl_msg.y = position_dvl_dvlref[1]
-        dvl_msg.z = position_dvl_dvlref[2]
-        dvl_msg.std = 0.0
-        dvl_msg.status = 1
-        dvl_msg.roll = euler_dvlref_dvl[0] * DEG_PER_RAD
-        dvl_msg.pitch = euler_dvlref_dvl[1] * DEG_PER_RAD
-        dvl_msg.yaw = euler_dvlref_dvl[2] * DEG_PER_RAD
-        pub_dvl_sensor.publish(dvl_msg)
-
-    # IMU - NED
-    if isIMUActive:
-        sbg_quat_msg = SbgEkfQuat()
-        sbg_quat_msg.quaternion = Quaternion(pose_quat_x, pose_quat_y, pose_quat_z, pose_quat_w)
-        pub_imu_quat_sensor.publish(sbg_quat_msg)
-
-        sbg_data_msg = SbgImuData()
-        sbg_data_msg.gyro = Vector3(twist_angular_x[0], twist_angular_y[1], twist_angular_z[2])
-        pub_imu_data_sensor.publish(sbg_data_msg)
-
-    # DEPTH SENSOR
-    if isDepthSensorActive:
-        depth_msg = Float64()
-        depth_msg.data = pose_z
-        pub_depth_sensor.publish(depth_msg)
-
     
+    pub_x.publish(pose_x)
+    pub_y.publish(pose_y)
+    pub_z.publish(pose_z)
+    
+    np_quaternion = np.array([pose_quat_x, pose_quat_y, pose_quat_z, pose_quat_w])
+    roll = transformations.euler_from_quaternion(np_quaternion, 'rxyz')[0] * DEG_PER_RAD
+    pitch = transformations.euler_from_quaternion(np_quaternion, 'ryxz')[0] * DEG_PER_RAD
+    yaw = transformations.euler_from_quaternion(np_quaternion, 'rzyx')[0] * DEG_PER_RAD
+    pub_theta_x.publish(roll)
+    pub_theta_y.publish(pitch)
+    pub_theta_z.publish(yaw)
+    
+    pub_ang_vel.publish(Vector3(twist_angular_x, twist_angular_y, twist_angular_z))
+    pub_lin_vel.publish(Vector3(twist_linear_x, twist_linear_y, twist_linear_z))
+    
+    pose = Pose(Point(x=pose_x, y=pose_y, z=pose_z), Quaternion(x = pose_quat_x, y = pose_quat_y, z = pose_quat_z, w = pose_quat_w))
+    pub_pose.publish(pose)
+    broadcast_auv_pose(pose)
+    
+    pub_imu_sensor_status.publish(Bool(True))
+    pub_depth_sensor_status.publish(Bool(True))
+    pub_dvl_sensor_status.publish(Bool(True))
+
+def broadcast_auv_pose(pose):
+    t = TransformStamped()
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = "world"
+    t.child_frame_id = "auv_base"
+    t.transform.translation.x = pose.position.x
+    t.transform.translation.y = pose.position.y
+    t.transform.translation.z = pose.position.z 
+    t.transform.rotation = pose.orientation
+    tf_broadcaster.sendTransform(t)
+
+    t_rot = TransformStamped()
+    t_rot.header.stamp = rospy.Time.now()
+    t_rot.header.frame_id = "world_rotation"
+    t_rot.child_frame_id = "auv_rotation"
+    t_rot.transform.translation.x = 0
+    t_rot.transform.translation.y = 0
+    t_rot.transform.translation.z = 0
+    t_rot.transform.rotation = pose.orientation
+    tf_broadcaster.sendTransform(t_rot)
 
 
 
 if __name__ == '__main__':
-    rospy.init_node('unity_bridge')
-
-    # Load parameters
-    q_dvl_auv_w = rospy.get_param("~q_dvl_auv_w")
-    q_dvl_auv_x = rospy.get_param("~q_dvl_auv_x")
-    q_dvl_auv_y = rospy.get_param("~q_dvl_auv_y")
-    q_dvl_auv_z = rospy.get_param("~q_dvl_auv_z")
-    
-    auv_dvl_offset_x = rospy.get_param("~auv_dvl_offset_x")
-    auv_dvl_offset_y = rospy.get_param("~auv_dvl_offset_y")
-    auv_dvl_offset_z = rospy.get_param("~auv_dvl_offset_z")
-    
-    q_imu_auv_w = rospy.get_param("~q_imu_auv_w")
-    q_imu_auv_x = rospy.get_param("~q_imu_auv_x")
-    q_imu_auv_y = rospy.get_param("~q_imu_auv_y")
-    q_imu_auv_z = rospy.get_param("~q_imu_auv_z")
-
-    # REFERENCE FRAME DEFINITIONS
-    q_NED_NWU = np.quaternion(0, 1, 0, 0)
-    q_NWU_dvlref = np.quaternion(0,1,0,0)
-
-    q_imu_auv = np.quaternion(q_imu_auv_w, q_imu_auv_x, q_imu_auv_y, q_imu_auv_z)
-
-    q_auv_gazeboImu = np.quaternion(0, -0.70710678, 0, 0.70710678)
-    q_NWU_gazeboImuRef = np.quaternion(0, -0.70710678, 0, 0.70710678)
-    q_gazeboImu_imu = q_auv_gazeboImu.inverse() * q_imu_auv.inverse()
-
-    q_dvl_auv = np.quaternion(q_dvl_auv_w, q_dvl_auv_x, q_dvl_auv_y, q_dvl_auv_z)
-
-
+    rospy.init_node('unity_bypass_bridge')
 
     # Set up subscribers and publishers
     rospy.Subscriber('/unity/state', UnityState, cb_unity_state)
 
-    pub_dvl_sensor = rospy.Publisher('/dead_reckon_report', DeadReckonReport, queue_size=1)
-    pub_depth_sensor = rospy.Publisher('/depth', Float64, queue_size=1)
-    pub_imu_quat_sensor = rospy.Publisher('/sbg/ekf_quat', SbgEkfQuat, queue_size=1)
-    pub_imu_data_sensor = rospy.Publisher('/sbg/imu_data', SbgImuData, queue_size=1)
+    pub_imu_sensor_status = rospy.Publisher("/sensors/imu/status", Bool, queue_size=1)
+    pub_depth_sensor_status = rospy.Publisher("/sensors/depth/status", Bool, queue_size=1)
+    pub_dvl_sensor_status = rospy.Publisher("/sensors/dvl/status", Bool, queue_size=1)
 
+    pub_pose = rospy.Publisher('pose', Pose, queue_size=1)
+    pub_x = rospy.Publisher('state_x', Float64, queue_size=1)
+    pub_y = rospy.Publisher('state_y', Float64, queue_size=1)
+    pub_z = rospy.Publisher('state_z', Float64, queue_size=1)
+    pub_theta_x = rospy.Publisher('state_theta_x', Float64, queue_size=1)
+    pub_theta_y = rospy.Publisher('state_theta_y', Float64, queue_size=1)
+    pub_theta_z = rospy.Publisher('state_theta_z', Float64, queue_size=1)
+    pub_ang_vel = rospy.Publisher('angular_velocity', Vector3, queue_size=1)
+    pub_lin_vel = rospy.Publisher('linear_velocity', Vector3, queue_size=1)
+    tf_broadcaster = TransformBroadcaster()
+ 
     rospy.spin()
