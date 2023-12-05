@@ -36,11 +36,11 @@ public class Thrusters : MonoBehaviour {
     void FixedUpdate() {
         for (int i = 0; i < thrusterPositions.Length; i++) {
             if (thrusterPositions[i].position.y < 0) {
-                Vector3 worldForcePosition = thrusterPositions[i].TransformDirection(thrusterDirections[i]);
+                Vector3 worldForceDirection = thrusterPositions[i].TransformDirection(thrusterDirections[i]);
                 Vector3 force_in_direction = new Vector3(
-                    worldForcePosition.x * (float)current_thruster_forces[i] * massScalarRealToSim,
-                    worldForcePosition.y * (float)current_thruster_forces[i] * massScalarRealToSim,
-                    worldForcePosition.z * (float)current_thruster_forces[i] * massScalarRealToSim
+                    worldForceDirection.x * (float)current_thruster_forces[i] * massScalarRealToSim,
+                    worldForceDirection.y * (float)current_thruster_forces[i] * massScalarRealToSim,
+                    worldForceDirection.z * (float)current_thruster_forces[i] * massScalarRealToSim
                 );
                 auvRb.AddForceAtPosition(force_in_direction, thrusterPositions[i].position, ForceMode.Force);
             }
