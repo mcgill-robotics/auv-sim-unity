@@ -416,7 +416,7 @@ MonoBehaviour:
   thrusterPositions: []
   thrusterDirections: []
   AUVRealMass: 25
-  thrusterForcesTopicName: /propulsion/thruster_forces
+  thrusterForcesTopicName: /propulsion/forces
 --- !u!1 &3048217278442744329
 GameObject:
   m_ObjectHideFlags: 0
@@ -977,4 +977,4 @@ MonoBehaviour:
   - {x: 0, y: -1, z: 0}
   - {x: 0, y: -1, z: 0}
   AUVRealMass: 25
-  thrusterForcesTopicName: /propulsion/thruster_forces
+  thrusterForcesTopicName: /propulsion/forces

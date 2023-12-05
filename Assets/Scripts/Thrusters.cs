@@ -9,7 +9,7 @@ public class Thrusters : MonoBehaviour {
     public Transform[] thrusterPositions;
     public Vector3[] thrusterDirections;
     public float AUVRealMass = 25;
-    public string thrusterForcesTopicName = "/propulsion/thruster_forces";
+    public string thrusterForcesTopicName = "/propulsion/forces";
 
     private double[] current_thruster_forces = new double[8];    
     private float massScalarRealToSim;
