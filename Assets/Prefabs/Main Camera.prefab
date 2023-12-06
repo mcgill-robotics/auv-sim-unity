@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1572207579523223798}
-  moveSpeed: 25
+  moveSpeed: 15
   XRotateSpeed: -100
   YRotateSpeed: 100
-  scrollSpeed: 15
+  scrollSpeed: 5
   auv: {fileID: 0}
