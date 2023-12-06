@@ -5,10 +5,10 @@ using UnityEngine;
 public class MainCamControl : MonoBehaviour
 {
     public Camera cam;
-    public float moveSpeed;
-    public float XRotateSpeed;
-    public float YRotateSpeed;
-    public float scrollSpeed;
+    public float moveSpeed = 15;
+    public float XRotateSpeed = -100;
+    public float YRotateSpeed = 100;
+    public float scrollSpeed = 5;
     
     public GameObject auv;
 
