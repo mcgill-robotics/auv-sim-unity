@@ -7,6 +7,7 @@ public class LogicManager1 : MonoBehaviour
     public GameObject downCam;
     public GameObject frontCam;
     public GameObject mainCam;
+    public GameObject followCam;
 
 
 
@@ -20,17 +21,28 @@ public class LogicManager1 : MonoBehaviour
         downCam.SetActive(true);
         frontCam.SetActive(false);
         mainCam.SetActive(false);
+        followCam.SetActive(false);
     }
 
     public void activateFrontCam() {
         downCam.SetActive(false);
         frontCam.SetActive(true);
         mainCam.SetActive(false);
+        followCam.SetActive(false);
     }
+
     public void activateMainCam() {
         downCam.SetActive(false);
         frontCam.SetActive(false);
         mainCam.SetActive(true);
+        followCam.SetActive(false);
+    }
+    
+    public void activateFollowCam() {
+        downCam.SetActive(false);
+        frontCam.SetActive(false);
+        mainCam.SetActive(false);
+        followCam.SetActive(true);
     }
 
 
