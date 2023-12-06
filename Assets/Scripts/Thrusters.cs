@@ -6,8 +6,7 @@ using Unity.Robotics.ROSTCPConnector;
 public class Thrusters : MonoBehaviour {
     ROSConnection roscon;
     public Rigidbody auvRb;
-    public Transform[] thrusterPositions;
-    public Vector3[] thrusterDirections;
+    public Transform[] thrusters;
     public float AUVRealMass = 25;
     public string thrusterForcesTopicName = "/propulsion/forces";
 
@@ -21,7 +20,7 @@ public class Thrusters : MonoBehaviour {
         current_thruster_forces[3] = msg.SWAY_STERN;
         current_thruster_forces[4] = msg.HEAVE_BOW_PORT;
         current_thruster_forces[5] = msg.HEAVE_BOW_STAR;
-        current_thruster_forces[8] = msg.HEAVE_STERN_STAR;
+        current_thruster_forces[6] = msg.HEAVE_STERN_STAR;
         current_thruster_forces[7] = msg.HEAVE_STERN_PORT;
     }
 
@@ -34,15 +33,15 @@ public class Thrusters : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate() {
-        for (int i = 0; i < thrusterPositions.Length; i++) {
-            if (thrusterPositions[i].position.y < 0) {
-                Vector3 worldForceDirection = thrusterPositions[i].TransformDirection(thrusterDirections[i]);
+        for (int i = 0; i < thrusters.Length; i++) {
+            if (thrusters[i].position.y < 0) {
+                Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
                 Vector3 force_in_direction = new Vector3(
                     worldForceDirection.x * (float)current_thruster_forces[i] * massScalarRealToSim,
                     worldForceDirection.y * (float)current_thruster_forces[i] * massScalarRealToSim,
                     worldForceDirection.z * (float)current_thruster_forces[i] * massScalarRealToSim
                 );
-                auvRb.AddForceAtPosition(force_in_direction, thrusterPositions[i].position, ForceMode.Force);
+                auvRb.AddForceAtPosition(force_in_direction, thrusters[i].position, ForceMode.Force);
             }
         }
     }
