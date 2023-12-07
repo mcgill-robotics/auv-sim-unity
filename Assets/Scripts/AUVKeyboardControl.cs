@@ -19,8 +19,12 @@ public class AUVKeyboardControl : MonoBehaviour
 
     void Update()
     {
-        HandleMovementInput();
         HandleFreezeInput();
+    }
+
+    void FixedUpdate()
+    {
+        HandleMovementInput();
     }
 
     void HandleMovementInput()

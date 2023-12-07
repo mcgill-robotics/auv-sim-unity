@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8351091208554975750}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.329279, y: 9.767413, z: 1.7134724}
   m_LocalScale: {x: 30.02, y: 1, z: 29.86}
   m_ConstrainProportionsScale: 0
@@ -48,10 +48,10 @@ MonoBehaviour:
   surfaceType: 2
   geometryType: 0
   mesh: {fileID: 0}
-  cpuSimulation: 1
-  cpuFullResolution: 1
+  cpuSimulation: 0
+  cpuFullResolution: 0
   cpuEvaluateRipples: 0
-  timeMultiplier: 0.8
+  timeMultiplier: 1
   repetitionSize: 500
   largeWindSpeed: 30
   largeWindOrientationValue: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
   largeBand1FadeStart: 300
   largeBand1FadeDistance: 800
   ripples: 1
-  ripplesWindSpeed: 5
+  ripplesWindSpeed: 2.15
   ripplesWindOrientationMode: 0
   ripplesWindOrientationValue: 0
   ripplesCurrentMode: 0

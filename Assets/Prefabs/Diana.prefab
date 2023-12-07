@@ -4952,7 +4952,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -24738,7 +24738,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -39850,10 +39850,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c86fb369f4c8a479b34390dc66e763, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sinkForce: 3
-  floatForce: 2
-  moveForce: 2
-  rotationForce: 0.1
+  sinkForce: 10
+  floatForce: 4
+  moveForce: 5
+  rotationForce: 0.3
 --- !u!114 &388949641563069673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39875,3 +39875,7 @@ MonoBehaviour:
   frontCamImageTopic: /vision/front_cam/color/image_raw
   frontCamDepthTopic: /vision/front_cam/aligned_depth_to_color/image_raw
   frontCamInfoTopic: /vision/front_cam/aligned_depth_to_color/camera_info
+  downCamWidth: 320
+  downCamHeight: 180
+  frontCamWidth: 320
+  frontCamHeight: 180
