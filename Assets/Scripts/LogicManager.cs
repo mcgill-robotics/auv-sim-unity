@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LogicManager1 : MonoBehaviour
 {
@@ -54,6 +55,11 @@ public class LogicManager1 : MonoBehaviour
             freeCam.transform.position = auv.position + directionFromTarget.normalized * distanceToAUVWhenSnapping;
         }
     }
-
+    
+    public void reloadScene()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
 
 }
