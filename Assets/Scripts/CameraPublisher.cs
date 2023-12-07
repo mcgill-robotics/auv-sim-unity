@@ -22,10 +22,11 @@ public class CameraPublisher : MonoBehaviour {
 
     private uint image_step = 4;
 
-    public int imageWidth;
-    public int imageHeight;
+    // public int imageWidth;
+    // public int imageHeight;
     RenderTexture renderTexture;
-    Texture2D texture;
+    RenderTexture lastTexture;
+    Texture2D cameraTexture;
 
     // Start is called before the first frame update
     void Start() {
@@ -41,7 +42,7 @@ public class CameraPublisher : MonoBehaviour {
     }
 
     void SendImage(Camera sensorCamera, string topicName) {
-        RenderTexture renderTexture = new RenderTexture(sensorCamera.pixelWidth, sensorCamera.pixelHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
+        renderTexture = new RenderTexture(sensorCamera.pixelWidth, sensorCamera.pixelHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
         renderTexture.Create();
 
         int frame_width = renderTexture.width;
@@ -49,7 +50,7 @@ public class CameraPublisher : MonoBehaviour {
 
         Rect frame = new Rect(0, 0, frame_width, frame_height);
  
-        Texture2D cameraTexture = new Texture2D(frame_width, frame_height, TextureFormat.RGBA32, false);
+        cameraTexture = new Texture2D(frame_width, frame_height, TextureFormat.RGBA32, false);
 
         HeaderMsg header = new HeaderMsg();
 
@@ -61,7 +62,7 @@ public class CameraPublisher : MonoBehaviour {
         img_msg.encoding = "rgba8";
 
         sensorCamera.targetTexture = renderTexture;
-        RenderTexture lastTexture = RenderTexture.active;
+        lastTexture = RenderTexture.active;
  
         RenderTexture.active = renderTexture;
         sensorCamera.Render();
@@ -73,7 +74,21 @@ public class CameraPublisher : MonoBehaviour {
         sensorCamera.targetTexture = null;
 
         img_msg.header = header;
-        img_msg.data = cameraTexture.GetRawTextureData();
+        // TODO: this is a slow way of flipping the image vertically, should find a faster way of doing this
+        int rowSize = (int) image_step * (int) frame_width;
+        byte[] imageData = cameraTexture.GetRawTextureData();
+        byte[] tempRow = new byte[rowSize];
+        for (int y = 0; y < frame_height / 2; y++) {
+            int rowIndex1 = y * rowSize;
+            int rowIndex2 = (frame_height - 1 - y) * rowSize;
+
+            for (int i = 0; i < rowSize; i++) {
+                byte temp = imageData[rowIndex1 + i];
+                imageData[rowIndex1 + i] = imageData[rowIndex2 + i];
+                imageData[rowIndex2 + i] = temp;
+            }
+        }
+        img_msg.data = imageData;
     
         roscon.Publish(topicName, img_msg);
     }

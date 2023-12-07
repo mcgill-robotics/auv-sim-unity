@@ -39620,6 +39620,7 @@ GameObject:
   - component: {fileID: 5860055065770175907}
   - component: {fileID: 3893699261838076034}
   - component: {fileID: 7567667168083034900}
+  - component: {fileID: 388949641563069673}
   m_Layer: 0
   m_Name: Diana
   m_TagString: Untagged
@@ -39853,3 +39854,24 @@ MonoBehaviour:
   floatForce: 2
   moveForce: 2
   rotationForce: 0.1
+--- !u!114 &388949641563069673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9125884452830664388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1f530d6fe7ff924eafbaf47e789bbc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  downCam: {fileID: 6885015490001473572}
+  frontCam: {fileID: 458601235084590774}
+  downCamFPS: 10
+  frontCamFPS: 10
+  downCamImageTopic: /vision/down_cam/image_raw
+  downCamInfoTopic: /vision/down_cam/camera_info
+  frontCamImageTopic: /vision/front_cam/color/image_raw
+  frontCamDepthTopic: /vision/front_cam/aligned_depth_to_color/image_raw
+  frontCamInfoTopic: /vision/front_cam/aligned_depth_to_color/camera_info
