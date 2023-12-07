@@ -7,7 +7,8 @@ public class Thrusters : MonoBehaviour {
     ROSConnection roscon;
     public Rigidbody auvRb;
     public Transform[] thrusters;
-    public float AUVRealMass = 25;
+    public ParticleSystem[] thrusterParticles;
+    public float AUVRealForceMultiplier = 3;
     public string thrusterForcesTopicName = "/propulsion/forces";
 
     private double[] current_thruster_forces = new double[8];    
@@ -22,11 +23,20 @@ public class Thrusters : MonoBehaviour {
         current_thruster_forces[5] = msg.HEAVE_BOW_STAR;
         current_thruster_forces[6] = msg.HEAVE_STERN_STAR;
         current_thruster_forces[7] = msg.HEAVE_STERN_PORT;
+
+        for (int i = 0; i < thrusters.Length; i++) {
+            if (current_thruster_forces[i] > 0) {
+                thrusterParticles[i].Play();
+            } else {
+                thrusterParticles[i].Stop();
+                thrusterParticles[i].Clear();
+            }
+        }
     }
 
     // Start is called before the first frame update
     void Start() {
-        massScalarRealToSim = auvRb.mass / AUVRealMass;
+        massScalarRealToSim = 1f / AUVRealForceMultiplier;
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.Subscribe<RosMessageTypes.Auv.ThrusterForcesMsg>(thrusterForcesTopicName, thrusterForceCallback);
     }

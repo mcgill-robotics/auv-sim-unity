@@ -16,7 +16,6 @@
     <arg name="vision" default="true" />
 
     <param name="sim" value="true" />
-    <param name="use_sim_time" value="true" />
 
     <include file="$(find bringup)/launch/bringup.launch">
         <arg name="sim" value="true" />
