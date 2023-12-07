@@ -1379,8 +1379,8 @@ Rigidbody:
   m_GameObject: {fileID: 9125884452830664388}
   serializedVersion: 4
   m_Mass: 3
-  m_Drag: 0.5
-  m_AngularDrag: 0.5
+  m_Drag: 3
+  m_AngularDrag: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1409,7 +1409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72654cd3b1e01e845881bc182dcc2474, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buoyancyForce: 30
+  buoyancyForce: 32
 --- !u!114 &5860055065770175907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1463,7 +1463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c86fb369f4c8a479b34390dc66e763, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sinkForce: 5
-  floatForce: 5
-  moveForce: 5
-  rotationForce: 5
+  sinkForce: 3
+  floatForce: 2
+  moveForce: 2
+  rotationForce: 0.1

@@ -17,7 +17,7 @@ public class AUVKeyboardControl : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         HandleMovementInput();
         HandleFreezeInput();
@@ -28,44 +28,43 @@ public class AUVKeyboardControl : MonoBehaviour
         if (!isFrozen)
         {
         
-            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) { // control orientation
-                if (Input.GetKey(KeyCode.W)) {
-                    rb.AddTorque(new Vector3(0f, 0f, rotationForce));
-                }
-                if (Input.GetKey(KeyCode.A)) {
-                    rb.AddForce(new Vector3(0f, rotationForce, 0f));
-                }
-                if (Input.GetKey(KeyCode.S)) {
-                    rb.AddForce(new Vector3(0f, 0f, -rotationForce));
-                }
-                if (Input.GetKey(KeyCode.D)) {
-                    rb.AddForce(new Vector3(0f, -rotationForce, 0f));
-                }
-                if (Input.GetKey(KeyCode.Q)) {
-                    rb.AddForce(new Vector3(rotationForce, 0f, 0f));
-                }
-                if (Input.GetKey(KeyCode.E)) {
-                    rb.AddForce(new Vector3(-rotationForce, 0f, 0f));
-                }
-            } else { //control position
-                if (Input.GetKey(KeyCode.W)) {
-                    rb.AddForce(transform.forward * moveForce);
-                }
-                if (Input.GetKey(KeyCode.A)) {
-                    rb.AddForce(-transform.right * moveForce);
-                }
-                if (Input.GetKey(KeyCode.S)) {
-                    rb.AddForce(-transform.forward * moveForce);
-                }
-                if (Input.GetKey(KeyCode.D)) {
-                    rb.AddForce(transform.right * moveForce);
-                }
-                if (Input.GetKey(KeyCode.Q)) {
-                    rb.AddForce(transform.up * floatForce);
-                }
-                if (Input.GetKey(KeyCode.E)) {
-                    rb.AddForce(-transform.up * sinkForce);
-                }
+            // control orientation
+            if (Input.GetKey(KeyCode.I)) {
+                rb.AddTorque(rb.transform.TransformDirection(new Vector3(0f, 0f, -rotationForce)));
+            }
+            if (Input.GetKey(KeyCode.J)) {
+                rb.AddTorque(rb.transform.TransformDirection(new Vector3(0f, -rotationForce, 0f)));
+            }
+            if (Input.GetKey(KeyCode.K)) {
+                rb.AddTorque(rb.transform.TransformDirection(new Vector3(0f, 0f, rotationForce)));
+            }
+            if (Input.GetKey(KeyCode.L)) {
+                rb.AddTorque(rb.transform.TransformDirection(new Vector3(0f, rotationForce, 0f)));
+            }
+            if (Input.GetKey(KeyCode.U)) {
+                rb.AddTorque(rb.transform.TransformDirection(new Vector3(rotationForce, 0f, 0f)));
+            }
+            if (Input.GetKey(KeyCode.O)) {
+                rb.AddTorque(rb.transform.TransformDirection(new Vector3(-rotationForce, 0f, 0f)));
+            }
+            //control position
+            if (Input.GetKey(KeyCode.W)) {
+                rb.AddForce(transform.right * moveForce);
+            }
+            if (Input.GetKey(KeyCode.A)) {
+                rb.AddForce(transform.forward * moveForce);
+            }
+            if (Input.GetKey(KeyCode.S)) {
+                rb.AddForce(-transform.right * moveForce);
+            }
+            if (Input.GetKey(KeyCode.D)) {
+                rb.AddForce(-transform.forward * moveForce);
+            }
+            if (Input.GetKey(KeyCode.Q)) {
+                rb.AddForce(transform.up * floatForce);
+            }
+            if (Input.GetKey(KeyCode.E)) {
+                rb.AddForce(-transform.up * sinkForce);
             }
             
         }
