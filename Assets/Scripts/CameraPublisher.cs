@@ -20,10 +20,13 @@ public class CameraPublisher : MonoBehaviour {
     public string frontCamDepthTopic = "/vision/front_cam/aligned_depth_to_color/image_raw";
     public string frontCamInfoTopic = "/vision/front_cam/aligned_depth_to_color/camera_info";
 
+    public int downCamWidth;
+    public int downCamHeight;
+    public int frontCamWidth;
+    public int frontCamHeight;
+
     private uint image_step = 4;
 
-    // public int imageWidth;
-    // public int imageHeight;
     RenderTexture renderTexture;
     RenderTexture lastTexture;
     Texture2D cameraTexture;
@@ -41,8 +44,9 @@ public class CameraPublisher : MonoBehaviour {
 
     }
 
-    void SendImage(Camera sensorCamera, string topicName) {
-        renderTexture = new RenderTexture(sensorCamera.pixelWidth, sensorCamera.pixelHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
+    void SendImage(Camera sensorCamera, string topicName, int width, int height) {
+        // renderTexture = new RenderTexture(sensorCamera.pixelWidth, sensorCamera.pixelHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
+        renderTexture = new RenderTexture(width, height, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
         renderTexture.Create();
 
         int frame_width = renderTexture.width;
@@ -116,10 +120,10 @@ public class CameraPublisher : MonoBehaviour {
     // }
 
     void PublishFrontCam() {
-        SendImage(frontCam, frontCamImageTopic);
+        SendImage(frontCam, frontCamImageTopic, frontCamWidth, frontCamHeight);
     }
 
     void PublishDownCam() {
-        SendImage(downCam, downCamImageTopic);
+        SendImage(downCam, downCamImageTopic, downCamWidth, downCamHeight);
     }
 }

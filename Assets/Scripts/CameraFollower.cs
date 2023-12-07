@@ -10,8 +10,8 @@ public class CameraFollower : MonoBehaviour
     private Vector3 offsetPosition;
     private Quaternion offsetRotation;
 
-    // Start is called before the first frame update
-    void Start()
+    // Awake is called before Start
+    void Awake()
     {
         offsetPosition = offsetPosition = targetObject.transform.InverseTransformPoint(transform.position);
         offsetRotation = Quaternion.Inverse(targetObject.transform.rotation) * transform.rotation;
