@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2184.4084, g: 2167.842, b: 2938.7502, a: 1}
+  m_IndirectSpecularColor: {r: 2160.3733, g: 2111.9866, b: 2782.9807, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1121,10 +1121,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 244388010849540397, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 122.90002
+      objectReference: {fileID: 0}
+    - target: {fileID: 528293814676445065, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 195.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3573693028636423332, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 159.30002
+      objectReference: {fileID: 0}
     - target: {fileID: 4797710807658622409, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: m_Name
       value: GUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 6398964159316034671, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 195.5
       objectReference: {fileID: 0}
     - target: {fileID: 6486178864677557761, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
@@ -1151,6 +1171,16 @@ PrefabInstance:
       propertyPath: followCam
       value: 
       objectReference: {fileID: 1491860992}
+    - target: {fileID: 7653515216735756326, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 141.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8580937029324087227, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 177.20001
+      objectReference: {fileID: 0}
     - target: {fileID: 8992770861254398870, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: m_Pivot.x

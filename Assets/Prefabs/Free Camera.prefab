@@ -113,9 +113,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   volumeAnchorOverride: {fileID: 0}
-  antialiasing: 2
+  antialiasing: 0
   SMAAQuality: 2
-  dithering: 1
+  dithering: 0
   stopNaNs: 0
   taaSharpenStrength: 0.5
   TAAQuality: 1
@@ -236,8 +236,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 5752039481066933183}
-  moveSpeed: 15
-  XRotateSpeed: -100
-  YRotateSpeed: 100
+  moveSpeed: 2.5
+  XRotateSpeed: -60
+  YRotateSpeed: 60
   scrollSpeed: 5
   auv: {fileID: 0}
