@@ -16,7 +16,7 @@ public class CameraPublisher : MonoBehaviour {
     
     public string downCamImageTopic = "/vision/down_cam/image_raw";
     public string downCamInfoTopic = "/vision/down_cam/camera_info";
-    public string frontCamImageTopic = "/vision/front_cam/image_raw";
+    public string frontCamImageTopic = "/vision/front_cam/color/image_raw";
     public string frontCamDepthTopic = "/vision/front_cam/aligned_depth_to_color/image_raw";
     public string frontCamInfoTopic = "/vision/front_cam/aligned_depth_to_color/camera_info";
 
