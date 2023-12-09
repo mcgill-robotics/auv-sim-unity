@@ -5,14 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pool Water
+  - Grid
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Grid
   - Water
   - UI
-  - 
+  - Air
   - 
   - 
   - 
