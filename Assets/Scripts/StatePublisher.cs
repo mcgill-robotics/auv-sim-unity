@@ -31,10 +31,10 @@ public class StatePublisher : MonoBehaviour {
       }
       timeSinceLastUpdate = 0;
 
-      msg.position = auv.transform.position.To<NED>();
-      msg.eulerAngles = (auv.transform.eulerAngles + new Vector3(0f,90f,0f)).To<NED>();
-      msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<NED>();
-      msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<NED>();
+      msg.position = auv.transform.position.To<RUF>();
+      msg.eulerAngles = (auv.transform.eulerAngles + new Vector3(0f,90f,0f)).To<RUF>();
+      msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<RUF>();
+      msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<RUF>();
 
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
