@@ -13,20 +13,20 @@ DEG_PER_RAD = 180 / np.pi
 q_NED_NWU = np.quaternion(0, 1, 0, 0)
 
 def cb_unity_state(msg):
-    pose_x = msg.position.x
-    pose_y = -msg.position.y
-    pose_z = -msg.position.z
+    pose_x = msg.position.z
+    pose_y = -msg.position.x
+    pose_z = msg.position.y
     
-    pose_theta_x = -msg.eulerAngles.y
-    pose_theta_y = -msg.eulerAngles.x
-    pose_theta_z = -msg.eulerAngles.z
+    pose_theta_x = -msg.eulerAngles.x
+    pose_theta_y = -msg.eulerAngles.z
+    pose_theta_z = -msg.eulerAngles.y
 
-    twist_linear_x = msg.velocity.x
-    twist_linear_y = -msg.velocity.y
-    twist_linear_z = -msg.velocity.z
+    twist_linear_x = msg.velocity.z
+    twist_linear_y = -msg.velocity.x
+    twist_linear_z = msg.velocity.y
     twist_angular_x = -msg.angular_velocity.x
-    twist_angular_y = -msg.angular_velocity.y
-    twist_angular_z = msg.angular_velocity.z
+    twist_angular_y = -msg.angular_velocity.z
+    twist_angular_z = -msg.angular_velocity.y
     
     pub_x.publish(pose_x)
     pub_y.publish(pose_y)
