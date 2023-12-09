@@ -81,8 +81,10 @@ public class Thrusters : MonoBehaviour {
                 current_keyboard_thruster_forces[7] -= rotationForce / 4;
             }
             if (Input.GetKey(KeyCode.J)) {
-                current_keyboard_thruster_forces[2] += rotationForce / 2;
-                current_keyboard_thruster_forces[3] += rotationForce / 2;
+                current_keyboard_thruster_forces[0] += rotationForce / 4;
+                current_keyboard_thruster_forces[1] -= rotationForce / 4;
+                current_keyboard_thruster_forces[2] += rotationForce / 4;
+                current_keyboard_thruster_forces[3] += rotationForce / 4;
             }
             if (Input.GetKey(KeyCode.K)) {
                 current_keyboard_thruster_forces[4] -= rotationForce / 4;
@@ -91,8 +93,10 @@ public class Thrusters : MonoBehaviour {
                 current_keyboard_thruster_forces[7] += rotationForce / 4;
             }
             if (Input.GetKey(KeyCode.L)) {
-                current_keyboard_thruster_forces[2] -= rotationForce / 2;
-                current_keyboard_thruster_forces[3] -= rotationForce / 2;
+                current_keyboard_thruster_forces[0] -= rotationForce / 4;
+                current_keyboard_thruster_forces[1] += rotationForce / 4;
+                current_keyboard_thruster_forces[2] -= rotationForce / 4;
+                current_keyboard_thruster_forces[3] -= rotationForce / 4;
             }
             if (Input.GetKey(KeyCode.U)) {
                 current_keyboard_thruster_forces[4] += rotationForce / 4;
