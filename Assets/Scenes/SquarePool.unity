@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2158.307, g: 2108.7112, b: 2775.926, a: 1}
+  m_IndirectSpecularColor: {r: 2160.0354, g: 2111.7952, b: 2782.973, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1047,7 +1047,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3770935016554941800, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 1063035487164708132, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 6635791176811422466, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 2c4d24ed0a923cd4cba760a5f559ba77, type: 3}
 --- !u!1 &2334187588474330434 stripped
 GameObject:
@@ -1124,6 +1136,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5736824168270498814, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6694663146640389069, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
       propertyPath: targetObject
@@ -1132,7 +1149,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6094771895050945534, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 7926721206706453426, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 4383945544840064404, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 6462d786a647a1c4baac67c96ac333d7, type: 3}
 --- !u!1001 &2841438678725444348
 PrefabInstance:
