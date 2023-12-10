@@ -21,6 +21,13 @@ public class LogicManager1 : MonoBehaviour
     public string zSetpointTopicName;
     public string quatSetpointTopicName;
     
+    public string xPositionTopicName;
+    public string yPositionTopicName;
+    public string zPositionTopicName;
+    public string thetaXTopicName;
+    public string thetaYTopicName;
+    public string thetaZTopicName;
+
     public TMPro.TMP_InputField xInputField;
     public TMPro.TMP_InputField yInputField;
     public TMPro.TMP_InputField zInputField;
@@ -41,6 +48,12 @@ public class LogicManager1 : MonoBehaviour
     void Start()
     {
         roscon = ROSConnection.GetOrCreateInstance();
+        roscon.Subscribe<Float64Msg>(xPositionTopicName, xPositionCallback);
+        roscon.Subscribe<Float64Msg>(yPositionTopicName, yPositionCallback);
+        roscon.Subscribe<Float64Msg>(zPositionTopicName, zPositionCallback);
+        roscon.Subscribe<Float64Msg>(thetaXTopicName, thetaXCallback);
+        roscon.Subscribe<Float64Msg>(thetaYTopicName, thetaYCallback);
+        roscon.Subscribe<Float64Msg>(thetaZTopicName, thetaZCallback);
         roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
@@ -49,19 +62,28 @@ public class LogicManager1 : MonoBehaviour
         activateFreeCam();
     }
 
-    void Update()
-    {
-        XPosText.text = "Current X: " + auv.position.z;
-        YPosText.text = "Current Y: " + -auv.position.x;
-        ZPosText.text = "Current Z: " + auv.position.y;
-
-        Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, auv.eulerAngles.z);
-        Quaternion pitchQuaternion = Quaternion.Euler(auv.eulerAngles.x, 0f, 0f);
-        Quaternion yawQuaternion = Quaternion.Euler(0f, auv.eulerAngles.y + 90f, 0f);
-        Quaternion rotation = rollQuaternion * pitchQuaternion * yawQuaternion; // to specify XYZ order of euler angles
-        RotXText.text = "Current Euler X: " + -rotation.eulerAngles.x;
-        RotYText.text = "Current Euler Y: " + -rotation.eulerAngles.z;
-        RotZText.text = "Current Euler Z: " + rotation.eulerAngles.y;
+    void xPositionCallback(Float64Msg msg) {
+        XPosText.text = "Current X: " + msg.data;
+    }
+    
+    void yPositionCallback(Float64Msg msg) {
+        YPosText.text = "Current Y: " + msg.data;
+    }
+    
+    void zPositionCallback(Float64Msg msg) {
+        ZPosText.text = "Current Z: " + msg.data;
+    }
+    
+    void thetaXCallback(Float64Msg msg) {
+        RotXText.text = "Current Euler X: " + msg.data;
+    }
+    
+    void thetaYCallback(Float64Msg msg) {
+        RotYText.text = "Current Euler Y: " + msg.data;
+    }
+    
+    void thetaZCallback(Float64Msg msg) {
+        RotZText.text = "Current Euler Z: " + msg.data;
     }
 
     public void activateDownCam() {
@@ -135,10 +157,7 @@ public class LogicManager1 : MonoBehaviour
         Quaternion yawQuaternion = Quaternion.Euler(0f, float.Parse(rotZInputField.text), 0f);
         Quaternion setpoint = rollQuaternion * pitchQuaternion * yawQuaternion; // to specify XYZ order of euler angles
 
-        msg.w = setpoint.w;
-        msg.x = setpoint.x;
-        msg.y = setpoint.y;
-        msg.z = setpoint.z;
+        msg = setpoint.To<NED>();
         roscon.Publish(quatSetpointTopicName, msg);
     }
 }

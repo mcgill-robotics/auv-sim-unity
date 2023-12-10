@@ -17,9 +17,14 @@ def cb_unity_state(msg):
     pose_y = -msg.position.x
     pose_z = msg.position.y
     
-    pose_theta_x = -msg.eulerAngles.x
-    pose_theta_y = -msg.eulerAngles.z
-    pose_theta_z = -msg.eulerAngles.y
+    q_NED_auv = np.quaternion(msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z)
+    q_NWU_auv = q_NED_NWU.inverse() * q_NED_auv * q_NED_NWU
+
+    euler_NWU_auv = transformations.euler_from_quaternion([q_NWU_auv.x, q_NWU_auv.y, q_NWU_auv.z, q_NWU_auv.w])
+   
+    pub_theta_x.publish(euler_NWU_auv[0] * DEG_PER_RAD)
+    pub_theta_y.publish(euler_NWU_auv[1] * DEG_PER_RAD)
+    pub_theta_z.publish(euler_NWU_auv[2] * DEG_PER_RAD)
 
     twist_linear_x = msg.velocity.z
     twist_linear_y = -msg.velocity.x
@@ -32,16 +37,10 @@ def cb_unity_state(msg):
     pub_y.publish(pose_y)
     pub_z.publish(pose_z)
     
-    q_NWU_auv = transformations.quaternion_from_euler(pose_theta_x/DEG_PER_RAD, pose_theta_y/DEG_PER_RAD, pose_theta_z/DEG_PER_RAD)
-   
-    pub_theta_x.publish(pose_theta_x)
-    pub_theta_y.publish(pose_theta_y)
-    pub_theta_z.publish(pose_theta_z)
-    
     pub_ang_vel.publish(Vector3(twist_angular_x, twist_angular_y, twist_angular_z))
     pub_lin_vel.publish(Vector3(twist_linear_x, twist_linear_y, twist_linear_z))
     
-    pose = Pose(Point(x=pose_x, y=pose_y, z=pose_z), Quaternion(x = q_NWU_auv[0], y = q_NWU_auv[1], z = q_NWU_auv[2], w = q_NWU_auv[3]))
+    pose = Pose(Point(x=pose_x, y=pose_y, z=pose_z), Quaternion(x = q_NWU_auv.x, y = q_NWU_auv.y, z = q_NWU_auv.z, w = q_NWU_auv.w))
     pub_pose.publish(pose)
     broadcast_auv_pose(pose)
     
