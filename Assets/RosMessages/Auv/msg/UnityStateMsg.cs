@@ -14,7 +14,7 @@ namespace RosMessageTypes.Auv
         public override string RosMessageName => k_RosMessageName;
 
         public Geometry.Vector3Msg position;
-        public Geometry.Vector3Msg eulerAngles;
+        public Geometry.QuaternionMsg orientation;
         public Geometry.Vector3Msg velocity;
         public Geometry.Vector3Msg angular_velocity;
         public bool isDVLActive;
@@ -24,7 +24,7 @@ namespace RosMessageTypes.Auv
         public UnityStateMsg()
         {
             this.position = new Geometry.Vector3Msg();
-            this.eulerAngles = new Geometry.Vector3Msg();
+            this.orientation = new Geometry.QuaternionMsg();
             this.velocity = new Geometry.Vector3Msg();
             this.angular_velocity = new Geometry.Vector3Msg();
             this.isDVLActive = false;
@@ -32,10 +32,10 @@ namespace RosMessageTypes.Auv
             this.isIMUActive = false;
         }
 
-        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.Vector3Msg eulerAngles, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive)
         {
             this.position = position;
-            this.eulerAngles = eulerAngles;
+            this.orientation = orientation;
             this.velocity = velocity;
             this.angular_velocity = angular_velocity;
             this.isDVLActive = isDVLActive;
@@ -48,7 +48,7 @@ namespace RosMessageTypes.Auv
         private UnityStateMsg(MessageDeserializer deserializer)
         {
             this.position = Geometry.Vector3Msg.Deserialize(deserializer);
-            this.eulerAngles = Geometry.Vector3Msg.Deserialize(deserializer);
+            this.orientation = Geometry.QuaternionMsg.Deserialize(deserializer);
             this.velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             this.angular_velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.isDVLActive);
@@ -59,7 +59,7 @@ namespace RosMessageTypes.Auv
         public override void SerializeTo(MessageSerializer serializer)
         {
             serializer.Write(this.position);
-            serializer.Write(this.eulerAngles);
+            serializer.Write(this.orientation);
             serializer.Write(this.velocity);
             serializer.Write(this.angular_velocity);
             serializer.Write(this.isDVLActive);
@@ -71,7 +71,7 @@ namespace RosMessageTypes.Auv
         {
             return "UnityStateMsg: " +
             "\nposition: " + position.ToString() +
-            "\neulerAngles: " + eulerAngles.ToString() +
+            "\norientation: " + orientation.ToString() +
             "\nvelocity: " + velocity.ToString() +
             "\nangular_velocity: " + angular_velocity.ToString() +
             "\nisDVLActive: " + isDVLActive.ToString() +
