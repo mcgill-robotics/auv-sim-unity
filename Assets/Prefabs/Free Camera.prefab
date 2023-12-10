@@ -408,10 +408,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 5752039481066933183}
-  moveSpeed: 2.5
-  XRotateSpeed: -60
-  YRotateSpeed: 60
+  moveSpeed: 0.1
+  XRotateSpeed: 400
+  YRotateSpeed: -400
   scrollSpeed: 5
+  noObjectUnderMouseDefaultPivotDistance: 10
   auv: {fileID: 0}
 --- !u!1001 &3111149841535638898
 PrefabInstance:
