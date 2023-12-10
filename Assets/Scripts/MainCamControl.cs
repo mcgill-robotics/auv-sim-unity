@@ -1,41 +1,103 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class MainCamControl : MonoBehaviour
 {
     public Camera cam;
-    public float moveSpeed = 15;
-    public float XRotateSpeed = -100;
-    public float YRotateSpeed = 100;
-    public float scrollSpeed = 5;
+    public float moveSpeed = 2.5f;
+    public float XRotateSpeed = 400f;
+    public float YRotateSpeed = -400f;
+    public float scrollSpeed = 6f;
+
+    public float noObjectUnderMouseDefaultPivotDistance = 5f;
     
     public GameObject auv;
 
     
-
+    private bool isDragging = false;
+    private bool isPanning = false;
+    private Vector3 initialMousePosition;
+    private Vector3 initialCamPosition;
 
     void Update()
     {
-
-        if(Input.GetMouseButton(0)) {
-            if (Input.GetAxis("Mouse X") > 0 || Input.GetAxis("Mouse X") < 0) {
-                cam.transform.Translate(new Vector3(Input.GetAxisRaw("Mouse X") * Time.deltaTime * -moveSpeed,  Input.GetAxisRaw("Mouse Y") * Time.deltaTime * -moveSpeed, 0.0f));
-            }
+        if (Input.GetMouseButtonDown(0))
+        {
+            initialMousePosition = getWorldPointUnderMouse();
+            initialCamPosition = cam.transform.position;
+            isDragging = true;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            isDragging = false;
+        }
+        if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+        {
+            initialMousePosition = getWorldPointUnderMouse();
+            isPanning = true;
+        }
+        else if (Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
+        {
+            isPanning = false;
         }
 
-        if (Input.GetMouseButton(2)) {
-            transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * XRotateSpeed * Time.deltaTime);
-            transform.Rotate(Vector3.right * Input.GetAxisRaw("Mouse Y") * YRotateSpeed * Time.deltaTime);
-            Vector3 currentCamRotation = cam.transform.rotation.eulerAngles;
-            cam.transform.rotation = Quaternion.Euler(currentCamRotation.x, currentCamRotation.y, 0); // always flatten camera
+        if (isDragging)
+        {
+            UpdateDragging();
+        }
+        
+        if (isPanning) {
+            UpdatePanning();
         }
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0 || Input.GetAxis("Mouse ScrollWheel") < 0 ) {
-            cam.transform.position += (cam.transform.forward * scrollSpeed * Input.GetAxis("Mouse ScrollWheel"));
-         } 
+            float distanceToWorld = Vector3.Distance(cam.transform.position, getWorldPointUnderMouse());
+            cam.transform.position = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, scrollSpeed * Input.GetAxis("Mouse ScrollWheel") * distanceToWorld/5));
+        } 
         
     }
 
+    void UpdateDragging()
+    {
+        Vector3 mouseDirectionFromCam = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1f)) - cam.transform.position;
+        Vector3 newFocusedPoint = calculateIntersection(cam.transform.position, mouseDirectionFromCam, initialMousePosition, initialMousePosition-initialCamPosition);
+        cam.transform.position += (initialMousePosition - newFocusedPoint);
+    }
+    
+    void UpdatePanning()
+    {
+        cam.transform.RotateAround(initialMousePosition, Vector3.up, Input.GetAxisRaw("Mouse X") * XRotateSpeed * Time.deltaTime);
+        cam.transform.RotateAround(initialMousePosition, transform.right, Input.GetAxisRaw("Mouse Y") * YRotateSpeed * Time.deltaTime);
+    }
+
+    Vector3 getWorldPointUnderMouse()
+    {
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        // Create a layer mask that includes all layers except "Water" and "Air"
+        int layerMask = ~((1 << LayerMask.NameToLayer("Water")) | (1 << LayerMask.NameToLayer("Air")));
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
+        {
+            return hit.point;
+        }
+        else
+        {
+            return ray.GetPoint(noObjectUnderMouseDefaultPivotDistance);
+        }
+    }
+
+    Vector3 calculateIntersection(Vector3 origin, Vector3 direction, Vector3 planePoint, Vector3 planeNormal)
+    {
+        // Calculate the distance from the plane to the origin of the vector
+        float distanceToPlane = Vector3.Dot(planeNormal, planePoint - origin) / Vector3.Dot(planeNormal, direction);
+        // Calculate the intersection point
+        Vector3 intersectionPoint = origin + direction * distanceToPlane;
+
+        return intersectionPoint;
+    }
 
 }
