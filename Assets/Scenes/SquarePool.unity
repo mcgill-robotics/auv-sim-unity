@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2160.0354, g: 2111.7952, b: 2782.973, a: 1}
+  m_IndirectSpecularColor: {r: 2158.307, g: 2108.7112, b: 2775.922, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -987,17 +987,17 @@ PrefabInstance:
     - target: {fileID: 1234483232789958684, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.608
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 1234483232789958684, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5
+      value: 0.81
       objectReference: {fileID: 0}
     - target: {fileID: 1234483232789958684, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.114
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1234483232789958684, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
         type: 3}
@@ -1085,11 +1085,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Follow Camera
-      objectReference: {fileID: 0}
-    - target: {fileID: 3963910224192570585, guid: 6462d786a647a1c4baac67c96ac333d7,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5418470402887709861, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
