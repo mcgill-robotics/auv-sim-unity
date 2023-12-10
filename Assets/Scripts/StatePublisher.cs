@@ -33,11 +33,8 @@ public class StatePublisher : MonoBehaviour {
 
       msg.position = auv.transform.position.To<RUF>();
 
-      Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, auv.transform.eulerAngles.z);
-      Quaternion pitchQuaternion = Quaternion.Euler(auv.transform.eulerAngles.x, 0f, 0f);
-      Quaternion yawQuaternion = Quaternion.Euler(0f, auv.transform.eulerAngles.y + 90f, 0f);
-      Quaternion rotation = rollQuaternion * pitchQuaternion * yawQuaternion; // to specify XYZ order of euler angles
-      msg.eulerAngles = rotation.eulerAngles.To<RUF>();
+      Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
+      msg.orientation = rotation.To<NED>();
       msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<RUF>();
       msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<RUF>();
 
