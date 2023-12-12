@@ -9,12 +9,16 @@ using TMPro;
 
 public class LogicManager1 : MonoBehaviour
 {
+    [Header("CAMERA CONTROL VARIABLES")]
+
     public GameObject downCam;
     public GameObject frontCam;
     public GameObject freeCam;
     public GameObject followCam;
     public Transform auv;
     public float distanceToAUVWhenSnapping;
+
+    [Header("PID GUI VARIABLES")]
 
     public string xSetpointTopicName;
     public string ySetpointTopicName;
@@ -34,6 +38,8 @@ public class LogicManager1 : MonoBehaviour
     public TMPro.TMP_InputField rotXInputField;
     public TMPro.TMP_InputField rotYInputField;
     public TMPro.TMP_InputField rotZInputField;
+
+    [Header("DEBUG INFO VARIABLES")]
 
     public TMP_Text XPosText;
     public TMP_Text YPosText;

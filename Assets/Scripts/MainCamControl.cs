@@ -19,14 +19,14 @@ public class MainCamControl : MonoBehaviour
     private bool isDragging = false;
     private bool isPanning = false;
     private Vector3 initialMousePosition;
-    private Vector3 initialCamPosition;
+    private Vector3 initialCamDirection;
 
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
             initialMousePosition = getWorldPointUnderMouse();
-            initialCamPosition = cam.transform.position;
+            initialCamDirection = cam.transform.forward;
             isDragging = true;
         }
         else if (Input.GetMouseButtonUp(0))
@@ -62,7 +62,7 @@ public class MainCamControl : MonoBehaviour
     void UpdateDragging()
     {
         Vector3 mouseDirectionFromCam = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1f)) - cam.transform.position;
-        Vector3 newFocusedPoint = calculateIntersection(cam.transform.position, mouseDirectionFromCam, initialMousePosition, initialMousePosition-initialCamPosition);
+        Vector3 newFocusedPoint = calculateIntersection(cam.transform.position, mouseDirectionFromCam, initialMousePosition, initialCamDirection);
         cam.transform.position += (initialMousePosition - newFocusedPoint);
     }
     
