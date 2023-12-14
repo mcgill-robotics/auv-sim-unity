@@ -9,77 +9,65 @@ using RosMessageTypes.BuiltinInterfaces;
 
 public class CameraPublisher : MonoBehaviour {
     ROSConnection roscon;
-    public Camera downCam;
-    public Camera frontCam;
-    public int downCamFPS;
-    public int frontCamFPS;
+    public Camera cam;
+    public int FPS;
     
-    public string downCamImageTopic = "/vision/down_cam/image_raw";
-    public string downCamInfoTopic = "/vision/down_cam/camera_info";
-    public string frontCamImageTopic = "/vision/front_cam/color/image_raw";
-    public string frontCamDepthTopic = "/vision/front_cam/aligned_depth_to_color/image_raw";
-    public string frontCamInfoTopic = "/vision/front_cam/aligned_depth_to_color/camera_info";
+    public string imageTopic = "/vision/down_cam/image_raw";
+    public string infoTopic = "/vision/down_cam/camera_info";
 
-    public int downCamWidth;
-    public int downCamHeight;
-    public int frontCamWidth;
-    public int frontCamHeight;
+    public int publishWidth;
+    public int publishHeight;
 
     private uint image_step = 4;
 
     RenderTexture renderTexture;
     RenderTexture lastTexture;
     Texture2D cameraTexture;
+    Rect frame;
+    int rowSize;
+    ImageMsg img_msg;
+    int frame_height;
 
     // Start is called before the first frame update
     void Start() {
-        roscon = ROSConnection.GetOrCreateInstance();
 
-        roscon.RegisterPublisher<ImageMsg>(downCamImageTopic);
-        roscon.RegisterPublisher<ImageMsg>(frontCamImageTopic);
-        roscon.RegisterPublisher<ImageMsg>(frontCamDepthTopic);
-
-        InvokeRepeating("PublishDownCam", 0f, 1f / downCamFPS);
-        InvokeRepeating("PublishFrontCam", 0f, 1f / frontCamFPS);
-
-    }
-
-    void SendImage(Camera sensorCamera, string topicName, int width, int height) {
-        // renderTexture = new RenderTexture(sensorCamera.pixelWidth, sensorCamera.pixelHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
-        renderTexture = new RenderTexture(width, height, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
+        renderTexture = new RenderTexture(publishWidth, publishHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
         renderTexture.Create();
 
-        int frame_width = renderTexture.width;
-        int frame_height = renderTexture.height;
+        cam.targetTexture = renderTexture;
 
-        Rect frame = new Rect(0, 0, frame_width, frame_height);
+        int frame_width = renderTexture.width;
+        frame_height = renderTexture.height;
+        rowSize = (int) image_step * (int) frame_width;
+
+        frame = new Rect(0, 0, frame_width, frame_height);
  
         cameraTexture = new Texture2D(frame_width, frame_height, TextureFormat.RGBA32, false);
 
-        HeaderMsg header = new HeaderMsg();
-
-        ImageMsg img_msg = new ImageMsg();
-
+        img_msg = new ImageMsg();
         img_msg.width = (uint) frame_width;
         img_msg.height = (uint) frame_height;
         img_msg.step = image_step * (uint) frame_width;
         img_msg.encoding = "rgba8";
+        HeaderMsg header = new HeaderMsg();
+        img_msg.header = header;
 
-        sensorCamera.targetTexture = renderTexture;
+        roscon = ROSConnection.GetOrCreateInstance();
+        roscon.RegisterPublisher<ImageMsg>(imageTopic);
+        InvokeRepeating("SendImage", 0f, 1f / FPS);
+    }
+
+    void SendImage() {
+        cam.targetTexture = renderTexture;
         lastTexture = RenderTexture.active;
- 
         RenderTexture.active = renderTexture;
-        sensorCamera.Render();
- 
+        cam.Render();
         cameraTexture.ReadPixels(frame, 0, 0);
         cameraTexture.Apply();
- 
-        sensorCamera.targetTexture = lastTexture;
-        sensorCamera.targetTexture = null;
+        cam.targetTexture = lastTexture;
+        cam.targetTexture = null;
 
-        img_msg.header = header;
         // TODO: this is a slow way of flipping the image vertically, should find a faster way of doing this
-        int rowSize = (int) image_step * (int) frame_width;
         byte[] imageData = cameraTexture.GetRawTextureData();
         byte[] tempRow = new byte[rowSize];
         for (int y = 0; y < frame_height / 2; y++) {
@@ -94,7 +82,7 @@ public class CameraPublisher : MonoBehaviour {
         }
         img_msg.data = imageData;
     
-        roscon.Publish(topicName, img_msg);
+        roscon.Publish(imageTopic, img_msg);
     }
 
     // void SendCameraInfo() {
@@ -119,11 +107,4 @@ public class CameraPublisher : MonoBehaviour {
     //     cameraInfoPublisher.Publish(cameraInfoMsg);
     // }
 
-    void PublishFrontCam() {
-        SendImage(frontCam, frontCamImageTopic, frontCamWidth, frontCamHeight);
-    }
-
-    void PublishDownCam() {
-        SendImage(downCam, downCamImageTopic, downCamWidth, downCamHeight);
-    }
 }
