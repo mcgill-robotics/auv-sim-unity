@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Rendering;
 using Unity.Robotics.ROSTCPConnector;
+using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 using RosMessageTypes.Sensor;
 using RosMessageTypes.Std;
 using RosMessageTypes.BuiltinInterfaces;
@@ -17,6 +20,8 @@ public class CameraPublisher : MonoBehaviour {
 
     public int publishWidth;
     public int publishHeight;
+
+    public ROSClock ROSClock;
 
     private uint image_step = 4;
 
@@ -54,6 +59,7 @@ public class CameraPublisher : MonoBehaviour {
 
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.RegisterPublisher<ImageMsg>(imageTopic);
+        roscon.RegisterPublisher<CameraInfoMsg>(infoTopic);
         InvokeRepeating("SendImage", 0f, 1f / FPS);
     }
 
@@ -80,9 +86,14 @@ public class CameraPublisher : MonoBehaviour {
                 imageData[rowIndex2 + i] = temp;
             }
         }
+
         img_msg.data = imageData;
-    
+        img_msg.header.stamp.sec = ROSClock.sec;
+        img_msg.header.stamp.nanosec = ROSClock.nanosec;
+
         roscon.Publish(imageTopic, img_msg);
+        CameraInfoMsg cameraInfoMessage = CameraInfoGenerator.ConstructCameraInfoMessage(cam, img_msg.header, 0.0f, 0.01f);
+        roscon.Publish(infoTopic, cameraInfoMessage);
     }
 
     // void SendCameraInfo() {
