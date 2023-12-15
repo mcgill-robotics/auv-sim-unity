@@ -7,9 +7,9 @@ using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Rosgraph;
 
 
-public class ROSClockPublisher : MonoBehaviour
+public class ROSClock : MonoBehaviour
 {
-    public string topicName = "clock";
+    public string topicName = "/clock";
     [Header("READ-ONLY")]
     public uint sec;
     public uint nanosec;
