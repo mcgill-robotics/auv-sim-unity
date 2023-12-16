@@ -46,7 +46,7 @@ public class ROSClock : MonoBehaviour
  
     private void Update()
     {
-        PublishMessage();
+        if (bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"))) PublishMessage();
     }
  
 }
