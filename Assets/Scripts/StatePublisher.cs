@@ -7,15 +7,15 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 public class StatePublisher : MonoBehaviour {
     private ROSConnection roscon;
     public string stateTopicName = "/unity/state";
-    public bool isDVLActive = true;
-    public bool isDepthSensorActive = true;
-    public bool isIMUActive = true;
-    public int updateFrequency = 10;
-
     public GameObject auv;
 
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
+    bool isDVLActive = true;
+    bool isDepthSensorActive = true;
+    bool isIMUActive = true;
+    bool publishToRos = true;
+    int updateFrequency = 10;
 
     // Start is called before the first frame update
     void Start() {
@@ -25,8 +25,14 @@ public class StatePublisher : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+      publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
+      updateFrequency = int.Parse(PlayerPrefs.GetString("poseRate", "10"));
+      isDVLActive = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
+      isDepthSensorActive = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
+      isIMUActive = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
+
       timeSinceLastUpdate += Time.deltaTime;
-      if (timeSinceLastUpdate < 1.0/updateFrequency) {
+      if (timeSinceLastUpdate < 1.0/updateFrequency || !publishToRos) {
         return;
       }
       timeSinceLastUpdate = 0;

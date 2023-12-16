@@ -34684,6 +34684,7 @@ GameObject:
   - component: {fileID: 1984050538200986885}
   - component: {fileID: 1725695333347896686}
   - component: {fileID: 1857265043965750109}
+  - component: {fileID: 1074087907878398024}
   m_Layer: 7
   m_Name: Diana
   m_TagString: Untagged
@@ -34850,6 +34851,7 @@ MonoBehaviour:
   infoTopic: /vision/down_cam/camera_info
   publishWidth: 640
   publishHeight: 480
+  ROSClock: {fileID: 0}
 --- !u!114 &1857265043965750109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34868,6 +34870,28 @@ MonoBehaviour:
   infoTopic: /vision/front_cam/camera_info
   publishWidth: 640
   publishHeight: 480
+  ROSClock: {fileID: 0}
+--- !u!114 &1074087907878398024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7966692850184543646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e2c113a351ce545845315cf47417c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 8025909593628517870}
+  FPS: 10
+  imageTopic: vision/front_cam/aligned_depth_to_rgb/image_raw
+  publishWidth: 640
+  publishHeight: 480
+  ROSClock: {fileID: 0}
+  uberReplacementShader: {fileID: 4800000, guid: 9a3cfabc178d0504ea9f33b8708bb815,
+    type: 3}
+  opticalFlowSensitivity: 1
 --- !u!1 &8143249375483504980
 GameObject:
   m_ObjectHideFlags: 0
