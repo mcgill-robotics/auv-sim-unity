@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
@@ -47,6 +48,9 @@ public class LogicManager1 : MonoBehaviour
     public TMP_Text RotXText;
     public TMP_Text RotYText;
     public TMP_Text RotZText;
+
+    [Header("FOR QUALITY SETTINGS")]
+    public TMP_Dropdown qualityDropdown;
 
     private ROSConnection roscon;
 
@@ -166,4 +170,9 @@ public class LogicManager1 : MonoBehaviour
         msg = setpoint.To<NED>();
         roscon.Publish(quatSetpointTopicName, msg);
     }
+
+    public void setQualityLevel() {
+        QualitySettings.SetQualityLevel(qualityDropdown.value, true);
+    }
+
 }
