@@ -21,7 +21,7 @@ public class MainCamControl : MonoBehaviour
     private Vector3 initialMousePosition;
     private Vector3 initialCamDirection;
 
-    void Update()
+    void FixedUpdate()
     {
         if (Input.GetMouseButtonDown(0))
         {

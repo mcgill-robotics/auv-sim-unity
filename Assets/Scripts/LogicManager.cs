@@ -173,6 +173,8 @@ public class LogicManager1 : MonoBehaviour
 
     public void setQualityLevel() {
         QualitySettings.SetQualityLevel(qualityDropdown.value, true);
+        PlayerPrefs.SetString("qualityLevel", qualityDropdown.value.ToString());
+        PlayerPrefs.Save();
     }
 
 }

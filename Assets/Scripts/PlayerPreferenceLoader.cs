@@ -80,7 +80,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
         poseRateInputField.text = load("poseRate", "10");
 
         // QUALITY SETTING
-        qualityDropdown.value = int.Parse(load("qualityLevel", "0"));
+        qualityDropdown.value = int.Parse(load("qualityLevel", "3"));
 
         // KEYBIND Text LABELS
         surgeKeybindText.text = load("surgeKeybind", "w");
