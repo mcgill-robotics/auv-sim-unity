@@ -34792,10 +34792,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stateTopicName: /unity/state
-  isDVLActive: 1
-  isDepthSensorActive: 1
-  isIMUActive: 1
-  updateFrequency: 5
   auv: {fileID: 7966692850184543646}
 --- !u!114 &1984050538200986885
 MonoBehaviour:
@@ -34846,12 +34842,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 4246374246147535837}
-  FPS: 10
   imageTopic: /vision/down_cam/image_raw
   infoTopic: /vision/down_cam/camera_info
-  publishWidth: 640
-  publishHeight: 480
   ROSClock: {fileID: 0}
+  isFrontCam: 0
 --- !u!114 &1857265043965750109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34865,12 +34859,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 8025909593628517870}
-  FPS: 10
   imageTopic: /vision/front_cam/color/image_raw
   infoTopic: /vision/front_cam/camera_info
-  publishWidth: 640
-  publishHeight: 480
   ROSClock: {fileID: 0}
+  isFrontCam: 1
 --- !u!114 &1074087907878398024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34884,10 +34876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 8025909593628517870}
-  FPS: 10
   imageTopic: vision/front_cam/aligned_depth_to_rgb/image_raw
-  publishWidth: 640
-  publishHeight: 480
   ROSClock: {fileID: 0}
   uberReplacementShader: {fileID: 4800000, guid: 9a3cfabc178d0504ea9f33b8708bb815,
     type: 3}
