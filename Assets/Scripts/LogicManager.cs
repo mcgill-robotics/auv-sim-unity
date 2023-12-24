@@ -52,6 +52,10 @@ public class LogicManager1 : MonoBehaviour
     [Header("FOR QUALITY SETTINGS")]
     public TMP_Dropdown qualityDropdown;
 
+    [Header("FOR PUBLISHER TOGGLE SETTINGS")]
+    public Toggle PublishROSToggle;
+
+
     private ROSConnection roscon;
 
     // Start is called before the first frame update
@@ -174,6 +178,11 @@ public class LogicManager1 : MonoBehaviour
     public void setQualityLevel() {
         QualitySettings.SetQualityLevel(qualityDropdown.value, true);
         PlayerPrefs.SetString("qualityLevel", qualityDropdown.value.ToString());
+        PlayerPrefs.Save();
+    }
+
+    public void setROSPublishToggle() {
+        PlayerPrefs.SetString("PublishROSToggle", PublishROSToggle.isOn.ToString());
         PlayerPrefs.Save();
     }
 
