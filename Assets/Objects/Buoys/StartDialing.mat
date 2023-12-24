@@ -192,7 +192,7 @@ Material:
     - _DepthOffsetEnable: 0
     - _DetailAlbedoScale: 2
     - _DetailNormalMapScale: 1
-    - _DetailNormalScale: 2
+    - _DetailNormalScale: 0
     - _DetailSmoothnessScale: 2
     - _DiffusionProfile: 0
     - _DiffusionProfileHash: 0

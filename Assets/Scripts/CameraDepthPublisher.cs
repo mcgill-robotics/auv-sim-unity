@@ -53,7 +53,7 @@ public class CameraDepthPublisher : MonoBehaviour
         cam.SetReplacementShader(shader, "");
         cam.backgroundColor = clearColor;
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.allowHDR = false;
+        cam.allowHDR = true;
         cam.allowMSAA = false;
     }
     public enum ReplacementMode
