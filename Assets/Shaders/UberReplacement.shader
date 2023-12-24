@@ -47,9 +47,10 @@ float4 Output(float depth01, float3 normal)
     }
     else if (_OutputMode == 2) // DepthCompressed
     {
-        float linearZFromNear = Linear01FromEyeToLinear01FromNear(depth01); 
-        float k = 0.25; // compression factor
-        return pow(linearZFromNear, k);
+        return depth01;
+        // float linearZFromNear = Linear01FromEyeToLinear01FromNear(depth01); 
+        // float k = 1.0; // compression factor
+        // return pow(linearZFromNear, k);
     }
     else if (_OutputMode == 3) // DepthMultichannel
     {

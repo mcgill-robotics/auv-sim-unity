@@ -23,6 +23,8 @@ public class MainCamControl : MonoBehaviour
 
     void FixedUpdate()
     {
+        bool IsMouseOverGameWindow = !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
+        if (!IsMouseOverGameWindow) return;
         if (Input.GetMouseButtonDown(0))
         {
             initialMousePosition = getWorldPointUnderMouse();

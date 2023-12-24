@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2157.3762, g: 2108.131, b: 2775.1448, a: 1}
+  m_IndirectSpecularColor: {r: 2158.969, g: 2110.473, b: 2780.7776, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -685,6 +685,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 771793219785905394}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1823688465 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9174896830081508314, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+    type: 3}
+  m_PrefabInstance: {fileID: 771793219785905394}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1823688464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a61f8a71c3e95b3458f5247c8b5b8d5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2013410473
 GameObject:
   m_ObjectHideFlags: 1
@@ -808,21 +820,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Free Camera
       objectReference: {fileID: 0}
-    - target: {fileID: 8507505185789148469, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9174896830081508314, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
         type: 3}
       propertyPath: auv
       value: 
       objectReference: {fileID: 5727419424819990256}
-    - target: {fileID: 9174896830081508314, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
-        type: 3}
-      propertyPath: smoothness
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1001,6 +1003,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1062217955038282041, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1823688465}
     - target: {fileID: 1958521753421128368, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: m_Name
@@ -1106,6 +1113,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6586919492812039246, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1823688465}
     - target: {fileID: 8917813709615850096, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: auv

@@ -34876,9 +34876,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 8025909593628517870}
-  imageTopic: vision/front_cam/aligned_depth_to_rgb/image_raw
+  imageTopic: vision/front_cam/aligned_depth_to_color/image_raw
   ROSClock: {fileID: 0}
-  uberReplacementShader: {fileID: 4800000, guid: 9a3cfabc178d0504ea9f33b8708bb815,
+  uberReplacementShader: {fileID: 4800000, guid: 4161534b782c8bb4b8cf3f5e7e92d6b8,
     type: 3}
   opticalFlowSensitivity: 1
 --- !u!1 &8143249375483504980
