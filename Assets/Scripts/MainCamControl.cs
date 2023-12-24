@@ -24,14 +24,18 @@ public class MainCamControl : MonoBehaviour
     void FixedUpdate()
     {
         bool IsMouseOverGameWindow = !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
-        if (!IsMouseOverGameWindow) return;
+        if (!IsMouseOverGameWindow) {
+            isPanning = false;
+            isDragging = false;
+            return;
+        }
         if (Input.GetMouseButtonDown(0))
         {
             initialMousePosition = getWorldPointUnderMouse();
             initialCamDirection = cam.transform.forward;
             isDragging = true;
         }
-        else if (Input.GetMouseButtonUp(0))
+        else if (!Input.GetMouseButton(0))
         {
             isDragging = false;
         }
@@ -40,7 +44,7 @@ public class MainCamControl : MonoBehaviour
             initialMousePosition = getWorldPointUnderMouse();
             isPanning = true;
         }
-        else if (Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
+        else if (!(Input.GetMouseButton(1) || Input.GetMouseButton(2)))
         {
             isPanning = false;
         }
