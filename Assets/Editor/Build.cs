@@ -46,7 +46,7 @@ public class BuildPlayerExample
     public static void BuildMac()
     {
         string[] scenes = { "Assets/Scenes/SquarePool.unity" };
-        Build(scenes, "Builds/Mac/", BuildTarget.StandaloneOSX);
+        Build(scenes, "Builds/Mac/sim.app", BuildTarget.StandaloneOSX);
     }
 
     [MenuItem("Build/Build All")]
