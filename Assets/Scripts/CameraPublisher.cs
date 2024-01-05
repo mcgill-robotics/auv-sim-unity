@@ -60,7 +60,7 @@ public class CameraPublisher : MonoBehaviour {
             publishHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
         }
 
-        renderTexture = new RenderTexture(publishWidth, publishHeight, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
+        renderTexture = new RenderTexture(publishWidth, publishHeight, 32, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
         renderTexture.Create();
 
         cam.targetTexture = renderTexture;
