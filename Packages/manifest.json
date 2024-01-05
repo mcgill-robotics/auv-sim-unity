@@ -2,7 +2,6 @@
   "dependencies": {
     "com.unity.collab-proxy": "2.0.7",
     "com.unity.feature.development": "1.0.1",
-    "com.unity.render-pipelines.high-definition": "14.0.8",
     "com.unity.robotics.ros-tcp-connector": "https://github.com/Unity-Technologies/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.5",
