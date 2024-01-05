@@ -136,6 +136,8 @@ public class CameraDepthPublisher : MonoBehaviour
             cam.Render();
             texture2D.ReadPixels(rect, 0, 0);
             texture2D.Apply();
+            cam.targetTexture = prevActiveRT;
+            cam.targetTexture = null;
 
             int rowSize = (int) image_step * (int) publishWidth;
             byte[] imageData = texture2D.GetRawTextureData();
