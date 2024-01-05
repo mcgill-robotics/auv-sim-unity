@@ -16,6 +16,7 @@ public class LogicManager1 : MonoBehaviour
     public GameObject frontCam;
     public GameObject freeCam;
     public GameObject followCam;
+    public GameObject depthCam;
     public Transform auv;
     public float distanceToAUVWhenSnapping;
 
@@ -105,6 +106,7 @@ public class LogicManager1 : MonoBehaviour
         frontCam.SetActive(false);
         freeCam.SetActive(false);
         followCam.SetActive(false);
+        depthCam.SetActive(false);
     }
 
     public void activateFrontCam() {
@@ -112,6 +114,7 @@ public class LogicManager1 : MonoBehaviour
         frontCam.SetActive(true);
         freeCam.SetActive(false);
         followCam.SetActive(false);
+        depthCam.SetActive(false);
     }
 
     public void activateFreeCam() {
@@ -119,6 +122,7 @@ public class LogicManager1 : MonoBehaviour
         frontCam.SetActive(false);
         freeCam.SetActive(true);
         followCam.SetActive(false);
+        depthCam.SetActive(false);
     }
     
     public void activateFollowCam() {
@@ -126,6 +130,15 @@ public class LogicManager1 : MonoBehaviour
         frontCam.SetActive(false);
         freeCam.SetActive(false);
         followCam.SetActive(true);
+        depthCam.SetActive(false);
+    }
+
+    public void activateDepthCam() {
+        downCam.SetActive(false);
+        frontCam.SetActive(false);
+        freeCam.SetActive(false);
+        followCam.SetActive(false);
+        depthCam.SetActive(true);
     }
 
     public void snapFreeCam() {
