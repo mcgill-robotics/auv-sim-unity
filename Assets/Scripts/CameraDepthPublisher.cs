@@ -35,6 +35,7 @@ public class CameraDepthPublisher : MonoBehaviour
     private CapturePass capturePass = new CapturePass() { name = "_depth" };
     private Texture2D texture2D;
     private Rect rect;
+    private RenderTexture rt;
     struct CapturePass
     {
         public string name;
@@ -91,6 +92,13 @@ public class CameraDepthPublisher : MonoBehaviour
         SetupCameraWithReplacementShader(cam, uberReplacementShader, ReplacementMode.DepthCompressed, Color.white);
 
         capturePass.camera = cam;
+
+        bool supportsAntialiasing = true;
+        var depth = 32;
+        var format = RenderTextureFormat.Default;
+        var readWrite = RenderTextureReadWrite.Default;
+        var antiAliasing = (supportsAntialiasing) ? Mathf.Max(1, QualitySettings.antiAliasing) : 1;
+        rt = RenderTexture.GetTemporary(publishWidth, publishHeight, depth, format, readWrite, antiAliasing);
     }
 
     void Update()
@@ -115,23 +123,12 @@ public class CameraDepthPublisher : MonoBehaviour
 
         if (timeElapsed > 1.0f/FPS && publishToRos)
         {
-            bool supportsAntialiasing = true;
-            bool needsRescale = false;
-            var depth = 32;
-            var format = RenderTextureFormat.Default;
-            var readWrite = RenderTextureReadWrite.Default;
-            var antiAliasing = (supportsAntialiasing) ? Mathf.Max(1, QualitySettings.antiAliasing) : 1;
 
-            var finalRT =
-                RenderTexture.GetTemporary(publishWidth, publishHeight, depth, format, readWrite, antiAliasing);
-            var renderRT = (!needsRescale) ? finalRT :
-                RenderTexture.GetTemporary(cam.pixelWidth, cam.pixelHeight, depth, format, readWrite, antiAliasing);
 
             var prevActiveRT = RenderTexture.active;
-            var prevCameraRT = cam.targetTexture;
             // render to offscreen texture (readonly from CPU side)
-            RenderTexture.active = renderRT;
-            cam.targetTexture = renderRT;
+            RenderTexture.active = rt;
+            cam.targetTexture = rt;
             
             cam.Render();
             texture2D.ReadPixels(rect, 0, 0);
@@ -141,7 +138,6 @@ public class CameraDepthPublisher : MonoBehaviour
 
             int rowSize = (int) image_step * (int) publishWidth;
             byte[] imageData = texture2D.GetRawTextureData();
-            byte[] tempRow = new byte[rowSize];
             for (int y = 0; y < publishHeight / 2; y++) {
                 int rowIndex1 = y * rowSize;
                 int rowIndex2 = (publishHeight - 1 - y) * rowSize;
@@ -160,10 +156,10 @@ public class CameraDepthPublisher : MonoBehaviour
             ros.Publish(imageTopic, img_msg);
 
             timeElapsed = 0;
-            renderRT.DiscardContents();
+/*            renderRT.DiscardContents();
             renderRT.Release();
             finalRT.DiscardContents();
-            finalRT.Release();
+            finalRT.Release();*/
         }
     }
 }
