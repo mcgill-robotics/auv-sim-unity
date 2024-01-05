@@ -160,6 +160,10 @@ public class CameraDepthPublisher : MonoBehaviour
             ros.Publish(imageTopic, img_msg);
 
             timeElapsed = 0;
+            renderRT.DiscardContents();
+            renderRT.Release();
+            finalRT.DiscardContents();
+            finalRT.Release();
         }
     }
 }
