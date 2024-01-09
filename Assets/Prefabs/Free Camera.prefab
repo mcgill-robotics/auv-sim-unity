@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8697414373871367411}
   - component: {fileID: 325110989433102181}
   - component: {fileID: 965650403573013587}
+  - component: {fileID: 5187796720580527432}
   m_Layer: 0
   m_Name: Free Camera
   m_TagString: MainCamera
@@ -73,7 +74,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 153
   m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -104,6 +105,29 @@ MonoBehaviour:
   scrollSpeed: 5
   noObjectUnderMouseDefaultPivotDistance: 10
   auv: {fileID: 0}
+--- !u!114 &5187796720580527432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824241220014870354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f050c868d56d1744db45068457f60399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waterLayers:
+    serializedVersion: 2
+    m_Bits: 16
+  shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
+  fakeSky: {fileID: 0}
+  depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
+  depthStart: -12
+  depthEnd: 50
+  depthLayers:
+    serializedVersion: 2
+    m_Bits: 409
 --- !u!1001 &9021025389564632182
 PrefabInstance:
   m_ObjectHideFlags: 0

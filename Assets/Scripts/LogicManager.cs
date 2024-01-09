@@ -52,6 +52,7 @@ public class LogicManager1 : MonoBehaviour
 
     [Header("FOR QUALITY SETTINGS")]
     public TMP_Dropdown qualityDropdown;
+    public GameObject waterObject;
 
     [Header("FOR PUBLISHER TOGGLE SETTINGS")]
     public Toggle PublishROSToggle;
@@ -192,6 +193,14 @@ public class LogicManager1 : MonoBehaviour
         QualitySettings.SetQualityLevel(qualityDropdown.value, true);
         PlayerPrefs.SetString("qualityLevel", qualityDropdown.value.ToString());
         PlayerPrefs.Save();
+        if (qualityDropdown.value == 3) { //turn off water on barebones
+            waterObject.SetActive(false);
+        } else {
+            waterObject.SetActive(true);
+        }
+        if (qualityDropdown.value == 2) {
+
+        }
     }
 
     public void setROSPublishToggle() {
