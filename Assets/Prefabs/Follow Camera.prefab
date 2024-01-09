@@ -74,7 +74,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 153
+    m_Bits: 665
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -122,7 +122,7 @@ MonoBehaviour:
   depthEnd: 50
   depthLayers:
     serializedVersion: 2
-    m_Bits: 409
+    m_Bits: 784
 --- !u!1001 &7482556299846469612
 PrefabInstance:
   m_ObjectHideFlags: 0
