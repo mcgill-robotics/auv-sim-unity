@@ -148,11 +148,11 @@ public class Thrusters : MonoBehaviour {
         for (int i = 0; i < thrusters.Length; i++) {
             if (thrusters[i].position.y < 0) {
                 double current_thruster_force = current_ros_thruster_forces[i] + current_keyboard_thruster_forces[i];
-               /* if (Math.Abs(current_thruster_force) > 0) {
+                if (Math.Abs(current_thruster_force) > 0 && QualitySettings.GetQualityLevel() < 2) {
                     thrusterParticles[i].Play();
                 } else {
                     thrusterParticles[i].Stop();
-                }*/
+                }
                 Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
                 Vector3 force_in_direction = new Vector3(
                     worldForceDirection.x * (float)current_thruster_force * massScalarRealToSim,

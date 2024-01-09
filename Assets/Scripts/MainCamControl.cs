@@ -29,7 +29,7 @@ public class MainCamControl : MonoBehaviour
             isDragging = false;
             return;
         }
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0) && !isDragging)
         {
             initialMousePosition = getWorldPointUnderMouse();
             initialCamDirection = cam.transform.forward;
@@ -39,7 +39,7 @@ public class MainCamControl : MonoBehaviour
         {
             isDragging = false;
         }
-        if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+        if (!isPanning && (Input.GetMouseButton(1) || Input.GetMouseButton(2)))
         {
             initialMousePosition = getWorldPointUnderMouse();
             isPanning = true;
