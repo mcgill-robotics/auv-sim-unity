@@ -8,6 +8,10 @@ public class StatePublisher : MonoBehaviour {
     private ROSConnection roscon;
     public string stateTopicName = "/unity/state";
     public GameObject auv;
+    public Transform hydrophone1;
+    public Transform hydrophone2;
+    public Transform hydrophone3;
+    public Transform pinger1;
 
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
@@ -47,6 +51,11 @@ public class StatePublisher : MonoBehaviour {
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
+
+      float d1 = Vector3.Distance(hydrophone1.position, pinger1.position);
+      float d2 = Vector3.Distance(hydrophone2.position, pinger1.position);
+      float d3 = Vector3.Distance(hydrophone3.position, pinger1.position);
+      msg.hydrophones_distances = new Vector3(d1, d2, d3).To<RUF>();
 
       roscon.Publish(stateTopicName, msg);
     }
