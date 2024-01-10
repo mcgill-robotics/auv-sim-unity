@@ -17,6 +17,7 @@ namespace RosMessageTypes.Auv
         public Geometry.QuaternionMsg orientation;
         public Geometry.Vector3Msg velocity;
         public Geometry.Vector3Msg angular_velocity;
+        public Geometry.Vector3Msg hydrophones_distances;
         public bool isDVLActive;
         public bool isDepthSensorActive;
         public bool isIMUActive;
@@ -27,17 +28,19 @@ namespace RosMessageTypes.Auv
             this.orientation = new Geometry.QuaternionMsg();
             this.velocity = new Geometry.Vector3Msg();
             this.angular_velocity = new Geometry.Vector3Msg();
+            this.hydrophones_distances = new Geometry.Vector3Msg();
             this.isDVLActive = false;
             this.isDepthSensorActive = false;
             this.isIMUActive = false;
         }
 
-        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, Geometry.Vector3Msg hydrophones_distances, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive)
         {
             this.position = position;
             this.orientation = orientation;
             this.velocity = velocity;
             this.angular_velocity = angular_velocity;
+            this.hydrophones_distances = hydrophones_distances;
             this.isDVLActive = isDVLActive;
             this.isDepthSensorActive = isDepthSensorActive;
             this.isIMUActive = isIMUActive;
@@ -51,6 +54,7 @@ namespace RosMessageTypes.Auv
             this.orientation = Geometry.QuaternionMsg.Deserialize(deserializer);
             this.velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             this.angular_velocity = Geometry.Vector3Msg.Deserialize(deserializer);
+            this.hydrophones_distances = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.isDVLActive);
             deserializer.Read(out this.isDepthSensorActive);
             deserializer.Read(out this.isIMUActive);
@@ -62,6 +66,7 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.orientation);
             serializer.Write(this.velocity);
             serializer.Write(this.angular_velocity);
+            serializer.Write(this.hydrophones_distances);
             serializer.Write(this.isDVLActive);
             serializer.Write(this.isDepthSensorActive);
             serializer.Write(this.isIMUActive);
@@ -74,6 +79,7 @@ namespace RosMessageTypes.Auv
             "\norientation: " + orientation.ToString() +
             "\nvelocity: " + velocity.ToString() +
             "\nangular_velocity: " + angular_velocity.ToString() +
+            "\nhydrophones_distances: " + hydrophones_distances.ToString() +
             "\nisDVLActive: " + isDVLActive.ToString() +
             "\nisDepthSensorActive: " + isDepthSensorActive.ToString() +
             "\nisIMUActive: " + isIMUActive.ToString();
