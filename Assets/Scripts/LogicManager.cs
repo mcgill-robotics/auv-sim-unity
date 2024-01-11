@@ -56,7 +56,10 @@ public class LogicManager1 : MonoBehaviour
 
     [Header("FOR PUBLISHER TOGGLE SETTINGS")]
     public Toggle PublishROSToggle;
-
+    public Toggle DisplaySimToggle;
+    public LayerMask hiddenSimLayerMask;
+    private LayerMask followCamDefaultLayerMask; 
+    private LayerMask freeCamDefaultLayerMask; 
 
     private ROSConnection roscon;
 
@@ -76,6 +79,8 @@ public class LogicManager1 : MonoBehaviour
         roscon.RegisterPublisher<RosMessageTypes.Geometry.QuaternionMsg>(quatSetpointTopicName); 
         activateFollowCam();
         activateFreeCam();
+        followCamDefaultLayerMask = followCam.GetComponent<Camera>().cullingMask;
+        freeCamDefaultLayerMask = freeCam.GetComponent<Camera>().cullingMask;
     }
 
     void xPositionCallback(Float64Msg msg) {
@@ -205,6 +210,18 @@ public class LogicManager1 : MonoBehaviour
 
     public void setROSPublishToggle() {
         PlayerPrefs.SetString("PublishROSToggle", PublishROSToggle.isOn.ToString());
+        PlayerPrefs.Save();
+    }
+
+    public void hideSimObjects() {
+        if (DisplaySimToggle.isOn) {
+            freeCam.GetComponent<Camera>().cullingMask = freeCamDefaultLayerMask;
+            followCam.GetComponent<Camera>().cullingMask = followCamDefaultLayerMask;
+        } else {
+            freeCam.GetComponent<Camera>().cullingMask = hiddenSimLayerMask;
+            followCam.GetComponent<Camera>().cullingMask = hiddenSimLayerMask;
+        }
+        PlayerPrefs.SetString("DisplaySimToggle", DisplaySimToggle.isOn.ToString());
         PlayerPrefs.Save();
     }
 
