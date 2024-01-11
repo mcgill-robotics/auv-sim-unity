@@ -13,6 +13,7 @@ public class StatePublisher : MonoBehaviour {
     public Transform hydrophone2;
     public Transform hydrophone3;
     public Transform pinger1;
+    public Transform pinger2;
 
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
@@ -53,22 +54,36 @@ public class StatePublisher : MonoBehaviour {
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
 
-      // Assumption: H1 is the origin hydrophone
+      float speedOfSound = 1480.0f;
+
+      // Assumption: H1 is the origin hydrophone ------------------- definetely wrong
       float d1 = Vector3.Distance(hydrophone1.position, pinger1.position);
       float d2 = Vector3.Distance(hydrophone2.position, pinger1.position);
       float d3 = Vector3.Distance(hydrophone3.position, pinger1.position);
 
-      float speedOfSound = 1480.0f;
       float time1 = Math.Abs(d1 / speedOfSound);
       float time2 = Math.Abs(d2 / speedOfSound);
-      
       float time3 = Math.Abs(d3 / speedOfSound);
 
       float time1Diff = Math.Abs(time1 - time1);
       float time2Diff = Math.Abs(time2 - time1);
       float time3Diff = Math.Abs(time3 - time1);
 
-      msg.hydrophones_time_diff = new Vector3(time1Diff, time2Diff, time3Diff).To<RUF>();
+      msg.pinger1 = new Vector3(time1Diff, time2Diff, time3Diff).To<RUF>();
+
+      d1 = Vector3.Distance(hydrophone1.position, pinger2.position);
+      d2 = Vector3.Distance(hydrophone2.position, pinger2.position);
+      d3 = Vector3.Distance(hydrophone3.position, pinger2.position);
+
+      time1 = Math.Abs(d1 / speedOfSound);
+      time2 = Math.Abs(d2 / speedOfSound);
+      time3 = Math.Abs(d3 / speedOfSound);
+
+      time1Diff = Math.Abs(time1 - time1);
+      time2Diff = Math.Abs(time2 - time1);
+      time3Diff = Math.Abs(time3 - time1);
+
+      msg.pinger2 = new Vector3(time1Diff, time2Diff, time3Diff).To<RUF>();
 
       roscon.Publish(stateTopicName, msg);
     }
