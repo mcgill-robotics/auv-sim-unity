@@ -4839,6 +4839,37 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!1 &245443624473551495
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2827878461161054428}
+  m_Layer: 7
+  m_Name: H1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2827878461161054428
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245443624473551495}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8419815910484017771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &461578088931516422
 GameObject:
   m_ObjectHideFlags: 0
@@ -9678,6 +9709,37 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &553162768095159181
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3765094178207333226}
+  m_Layer: 7
+  m_Name: H3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3765094178207333226
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 553162768095159181}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.121, y: -0.5, z: -0.182}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8419815910484017771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &830557106992824934
 GameObject:
   m_ObjectHideFlags: 0
@@ -9944,7 +10006,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
-  fakeSky: {fileID: 0}
   depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
   depthStart: -12
   depthEnd: 50
@@ -14956,6 +15017,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2297705547457053319}
   m_Mesh: {fileID: -5368255686313445931, guid: e887983eeac3f204e95bd0e56bf28deb, type: 3}
+--- !u!1 &2516010956381176927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5248232744464753039}
+  m_Layer: 7
+  m_Name: H2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5248232744464753039
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2516010956381176927}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.115, y: -0.5, z: -0.169}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8419815910484017771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3085819985603699769
 GameObject:
   m_ObjectHideFlags: 0
@@ -25150,7 +25242,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
-  fakeSky: {fileID: 0}
   depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
   depthStart: -12
   depthEnd: 50
@@ -34884,6 +34975,9 @@ Transform:
   - {fileID: 4606490147057768750}
   - {fileID: 5903801332939882808}
   - {fileID: 3127392219416277239}
+  - {fileID: 5248232744464753039}
+  - {fileID: 3765094178207333226}
+  - {fileID: 2827878461161054428}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!65 &164947047110222799
@@ -34961,6 +35055,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateTopicName: /unity/state
   auv: {fileID: 7413149208586452460}
+  hydrophone1: {fileID: 2827878461161054428}
+  hydrophone2: {fileID: 5248232744464753039}
+  hydrophone3: {fileID: 3765094178207333226}
+  pinger1: {fileID: 0}
 --- !u!114 &7994222596644147075
 MonoBehaviour:
   m_ObjectHideFlags: 0

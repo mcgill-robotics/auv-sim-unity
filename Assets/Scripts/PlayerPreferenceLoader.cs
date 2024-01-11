@@ -14,6 +14,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
     public Toggle PublishDVLToggle;
     public Toggle PublishIMUToggle;
     public Toggle PublishROSToggle;
+    public Toggle DisplaySimToggle;
 
     public Toggle PIDGuiToggle;
     public Toggle CameraGuiToggle;
@@ -61,6 +62,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
         PublishDVLToggle.isOn = bool.Parse(load("PublishDVLToggle", "true"));
         PublishIMUToggle.isOn = bool.Parse(load("PublishIMUToggle", "true"));
         PublishROSToggle.isOn = bool.Parse(load("PublishROSToggle", "true"));
+        DisplaySimToggle.isOn = bool.Parse(load("DisplaySimToggle", "true"));
 
         PIDGuiToggle.isOn = bool.Parse(load("PIDGuiToggle", "true"));
         CameraGuiToggle.isOn = bool.Parse(load("CameraGuiToggle", "true"));
