@@ -68,7 +68,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 85
+  field of view: 100
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -123,7 +123,7 @@ MonoBehaviour:
   shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
   depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
   depthStart: -12
-  depthEnd: 50
+  depthEnd: 60
   depthLayers:
     serializedVersion: 2
     m_Bits: 784
@@ -153,7 +153,7 @@ PrefabInstance:
     - target: {fileID: 5459698219153633174, guid: 0d8dfdb3ee3d6384abd19db6e02b6011,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1
+      value: 1.35
       objectReference: {fileID: 0}
     - target: {fileID: 5459698219153633174, guid: 0d8dfdb3ee3d6384abd19db6e02b6011,
         type: 3}
