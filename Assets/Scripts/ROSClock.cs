@@ -16,6 +16,7 @@ public class ROSClock : MonoBehaviour
     
     private ROSConnection roscon;
     private ClockMsg message;
+    private double clockTimePassed;
  
     void Start()
     {
@@ -27,13 +28,15 @@ public class ROSClock : MonoBehaviour
         message = new ClockMsg();
         message.clock.sec = 0;
         message.clock.nanosec = 0;
+
+        clockTimePassed = double.Parse(PlayerPrefs.GetString("ROSClock", "0"));
     }
  
  
    
     void PublishMessage()
     { 
-        var publishTime = Time.fixedTimeAsDouble;
+        var publishTime = Time.fixedTimeAsDouble + clockTimePassed;
  
         sec = (uint) Math.Floor(publishTime);
         nanosec = (uint)((publishTime - Math.Floor(publishTime)) * 1e9f);
@@ -42,6 +45,7 @@ public class ROSClock : MonoBehaviour
         message.clock.nanosec = nanosec;
 
         roscon.Publish(topicName, message);
+        PlayerPrefs.SetString("ROSClock", publishTime.ToString());
     }
  
     private void Update()

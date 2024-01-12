@@ -157,6 +157,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
                 detectionObject = GameObject.Instantiate(detectionIndicatorPrefab);
             }
             detectionObject.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
+            detectionObject.transform.SetParent(transform);
         }
     }
 
