@@ -68,7 +68,7 @@ public class StatePublisher : MonoBehaviour {
       float time2Diff = Math.Abs(time2 - time1);
       float time3Diff = Math.Abs(time3 - time1);
 
-      msg.hydrophones_time_diff = new Vector3(time1Diff, time2Diff, time3Diff).To<RUF>();
+      // msg.hydrophones_time_diff = new Vector3(time1Diff, time2Diff, time3Diff).To<RUF>();
 
       roscon.Publish(stateTopicName, msg);
     }
