@@ -64,13 +64,13 @@ public class StatePublisher : MonoBehaviour {
       double d3 = Vector3.Distance(hydrophone3.position, pinger1.position);
       // Debug.Log("D1: " + d1 + " D2: " + d2 + " D3: " + d3);
 
-      double time1 = Math.Abs(d1 / speedOfSound);
-      double time2 = Math.Abs(d2 / speedOfSound);
-      double time3 = Math.Abs(d3 / speedOfSound);
+      double time1 = d1 / speedOfSound;
+      double time2 = d2 / speedOfSound;
+      double time3 = d3 / speedOfSound;
       // Debug.Log("Time1: " + time1 + " Time2: " + time2 + " Time3: " + time3);
 
-      double time2Diff = Math.Abs(time2 - time1);
-      double time3Diff = Math.Abs(time3 - time1);
+      double time2Diff = time2 - time1;
+      double time3Diff = time3 - time1;
 
       double[] dt_pinger1 = {time2Diff, time3Diff};
 
