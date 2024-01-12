@@ -5,7 +5,6 @@ public class UnderwaterCameraEffect : MonoBehaviour
 {
     public LayerMask waterLayers;
     public Shader shader;
-    public GameObject fakeSky;
 
     [Header("Depth Effect")]
     public Color depthColor = new Color(0, 0.42f, 0.87f);
@@ -105,8 +104,6 @@ public class UnderwaterCameraEffect : MonoBehaviour
         {
             inWater = false;
         }
-        
-        fakeSky.SetActive(inWater);
     }
 
     //Automatically finds and assigned inspector variables so the script can be immediately used when attached to a gameobject
