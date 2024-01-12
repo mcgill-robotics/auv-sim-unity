@@ -22,6 +22,7 @@ public class StatePublisher : MonoBehaviour {
     bool isDVLActive = true;
     bool isDepthSensorActive = true;
     bool isIMUActive = true;
+    bool isHydrophonesActive = true;
     bool publishToRos = true;
     int updateFrequency = 10;
 
