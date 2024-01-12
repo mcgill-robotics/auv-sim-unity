@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 624444003076356661}
   - component: {fileID: 212217505944588075}
   - component: {fileID: 6577315762966062105}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: PoolWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
