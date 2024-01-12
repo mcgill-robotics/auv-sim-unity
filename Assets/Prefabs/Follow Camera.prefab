@@ -74,7 +74,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 665
+    m_Bits: 1689
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -116,7 +116,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
-  fakeSky: {fileID: 0}
   depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
   depthStart: -12
   depthEnd: 50

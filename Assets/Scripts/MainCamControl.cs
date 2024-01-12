@@ -21,6 +21,11 @@ public class MainCamControl : MonoBehaviour
     private Vector3 initialMousePosition;
     private Vector3 initialCamDirection;
 
+    void Update()
+    {
+        FixedUpdate();
+    }
+
     void FixedUpdate()
     {
         bool IsMouseOverGameWindow = !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
