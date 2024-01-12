@@ -10008,7 +10008,7 @@ MonoBehaviour:
   shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
   depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
   depthStart: -12
-  depthEnd: 50
+  depthEnd: 60
   depthLayers:
     serializedVersion: 2
     m_Bits: 784
@@ -25244,7 +25244,7 @@ MonoBehaviour:
   shader: {fileID: 4800000, guid: c55bd3ab6244f78489a76f1a97364d89, type: 3}
   depthColor: {r: 0, g: 0.45097682, b: 0.6132076, a: 1}
   depthStart: -12
-  depthEnd: 50
+  depthEnd: 60
   depthLayers:
     serializedVersion: 2
     m_Bits: 784
@@ -35059,6 +35059,7 @@ MonoBehaviour:
   hydrophone2: {fileID: 5248232744464753039}
   hydrophone3: {fileID: 3765094178207333226}
   pinger1: {fileID: 0}
+  pinger2: {fileID: 0}
 --- !u!114 &7994222596644147075
 MonoBehaviour:
   m_ObjectHideFlags: 0
