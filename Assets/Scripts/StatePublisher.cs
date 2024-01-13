@@ -39,6 +39,7 @@ public class StatePublisher : MonoBehaviour {
       isDVLActive = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
       isDepthSensorActive = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
       isIMUActive = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
+      isHydrophonesActive = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "true"));
 
       timeSinceLastUpdate += Time.deltaTime;
       if (timeSinceLastUpdate < 1.0/updateFrequency || !publishToRos) {
@@ -56,6 +57,7 @@ public class StatePublisher : MonoBehaviour {
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
+      msg.isHydrophonesActive = isHydrophonesActive;
 
       double speedOfSound = 1480.0;
 
