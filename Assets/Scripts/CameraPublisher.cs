@@ -30,7 +30,8 @@ public class CameraPublisher : MonoBehaviour {
     Rect frame;
     int rowSize;
     ImageMsg img_msg;
-    int frame_height;
+    int publishHeight;
+    int publishWidth;
     int FPS;
     string camPublishPreferenceKey;
     string camFPSPreferenceKey;
@@ -45,8 +46,6 @@ public class CameraPublisher : MonoBehaviour {
     }
 
     public void Initialize() {
-        int publishWidth;
-        int publishHeight;
         if (isFrontCam) {
             camPublishPreferenceKey = "PublishFrontCamToggle";
             camFPSPreferenceKey = "frontCamRate";
@@ -65,18 +64,16 @@ public class CameraPublisher : MonoBehaviour {
 
         cam.targetTexture = renderTexture;
 
-        int frame_width = renderTexture.width;
-        frame_height = renderTexture.height;
-        rowSize = (int) image_step * (int) frame_width;
+        rowSize = (int) image_step * (int) publishWidth;
 
-        frame = new Rect(0, 0, frame_width, frame_height);
+        frame = new Rect(0, 0, publishWidth, publishHeight);
  
-        cameraTexture = new Texture2D(frame_width, frame_height, TextureFormat.RGBA32, false);
+        cameraTexture = new Texture2D(publishWidth, publishHeight, TextureFormat.RGBA32, false);
 
         img_msg = new ImageMsg();
-        img_msg.width = (uint) frame_width;
-        img_msg.height = (uint) frame_height;
-        img_msg.step = image_step * (uint) frame_width;
+        img_msg.width = (uint) publishWidth;
+        img_msg.height = (uint) publishHeight;
+        img_msg.step = image_step * (uint) publishWidth;
         img_msg.encoding = "rgba8";
         HeaderMsg header = new HeaderMsg();
         img_msg.header = header;
@@ -115,9 +112,9 @@ public class CameraPublisher : MonoBehaviour {
             // TODO: this is a slow way of flipping the image vertically, should find a faster way of doing this
             byte[] imageData = cameraTexture.GetRawTextureData();
             byte[] tempRow = new byte[rowSize];
-            for (int y = 0; y < frame_height / 2; y++) {
+            for (int y = 0; y < publishHeight / 2; y++) {
                 int rowIndex1 = y * rowSize;
-                int rowIndex2 = (frame_height - 1 - y) * rowSize;
+                int rowIndex2 = (publishHeight - 1 - y) * rowSize;
 
                 for (int i = 0; i < rowSize; i++) {
                     byte temp = imageData[rowIndex1 + i];
@@ -132,6 +129,8 @@ public class CameraPublisher : MonoBehaviour {
 
             roscon.Publish(imageTopic, img_msg);
             CameraInfoMsg cameraInfoMessage = CameraInfoGenerator.ConstructCameraInfoMessage(cam, img_msg.header, 0.0f, 0.01f);
+            cameraInfoMessage.width = (uint) publishWidth;
+            cameraInfoMessage.height = (uint) publishHeight;
             roscon.Publish(infoTopic, cameraInfoMessage);
         }
     }
