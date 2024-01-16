@@ -7,20 +7,22 @@ public class PingerBearing : MonoBehaviour
     public Transform pinger1;
     public Transform Diana;
 
-    private Vector3 targetDirection;
-    private Vector3 newDirection;
+    int damping = 5;
+
     void Start()
     {
-        targetDirection = pinger1.position - transform.position;
         transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
-        newDirection = Vector3.RotateTowards(transform.position, targetDirection, 5.0f, 0.0f);
-        transform.rotation = Quaternion.LookRotation(newDirection);
+        var lookPos = pinger1.position - transform.position;
+        lookPos.y = 0;
+        var rotation = Quaternion.LookRotation(lookPos);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * damping); 
     }
     void Update()
     {
-        targetDirection = pinger1.position - transform.position;
         transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
-        newDirection = Vector3.RotateTowards(transform.position, targetDirection, 5.0f, 0.0f);
-        transform.rotation = Quaternion.LookRotation(newDirection);
+        var lookPos = pinger1.position - transform.position;
+        lookPos.y = 0;
+        var rotation = Quaternion.LookRotation(lookPos);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * damping); 
     }
 }
