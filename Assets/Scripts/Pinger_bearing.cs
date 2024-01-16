@@ -7,15 +7,20 @@ public class PingerBearing : MonoBehaviour
     public Transform pinger1;
     public Transform Diana;
 
-    private Vector3 heading;
+    private Vector3 targetDirection;
+    private Vector3 newDirection;
     void Start()
     {
-        heading = pinger1.position - Diana.position;
-        transform.position = Vector3.MoveTowards(Diana.position, heading, 5.0f);
+        targetDirection = pinger1.position - transform.position;
+        transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
+        newDirection = Vector3.RotateTowards(transform.position, targetDirection, 5.0f, 0.0f);
+        transform.rotation = Quaternion.LookRotation(newDirection);
     }
     void Update()
     {
-        heading = pinger1.position - Diana.position;
-        transform.position = Vector3.MoveTowards(Diana.position, heading, 0.2f);
+        targetDirection = pinger1.position - transform.position;
+        transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
+        newDirection = Vector3.RotateTowards(transform.position, targetDirection, 5.0f, 0.0f);
+        transform.rotation = Quaternion.LookRotation(newDirection);
     }
 }
