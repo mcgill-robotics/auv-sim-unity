@@ -79,6 +79,11 @@ public class StatePublisher : MonoBehaviour {
 
       // Debug.Log("Time2Diff: " + time2Diff + " Time3Diff: " + time3Diff);
       msg.dt_pinger1 = dt_pinger1;
+      // Debug.Log("Diana's position: " + auv.transform.position);
+      Debug.Log("H1 position: " + hydrophone1.position);
+      Debug.Log("H2 position: " + hydrophone2.position);
+      Debug.Log("H3 position: " + hydrophone3.position);
+      Debug.Log("Pinger1 position: " + pinger1.position);
 
       roscon.Publish(stateTopicName, msg);
     }
