@@ -420,8 +420,8 @@ Transform:
   m_GameObject: {fileID: 278419459}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.078, y: 4.631, z: -0.436}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0.75}
+  m_LocalPosition: {x: 1.19, y: 4.631, z: -0.295}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2175982894692285522}
@@ -435,7 +435,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 278419459}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ffa3f0bb789fdc47b380f505dd545ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 8cc25dd469c8d354897fc3c644116863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pinger1: {fileID: 1765690335}
