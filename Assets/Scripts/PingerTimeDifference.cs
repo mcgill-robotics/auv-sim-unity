@@ -6,7 +6,7 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Std;
 using RosMessageTypes.Auv;
 
-public class PingerBearing : MonoBehaviour {
+public class PingerTimeDifference : MonoBehaviour {
     ROSConnection roscon;
 
     private string pingerTimeDifferenceTopicName = "/sensors/hydrophones/pinger_time_difference";
