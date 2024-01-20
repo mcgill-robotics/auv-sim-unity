@@ -8,13 +8,11 @@ using RosMessageTypes.Auv;
 
 public class PingerBearing : MonoBehaviour {
     ROSConnection roscon;
-    private string pingerBearingTopicName = "/sensors/hydrophones/pinger_bearing";
 
     private string pingerTimeDifferenceTopicName = "/sensors/hydrophones/pinger_time_difference";
     private PingerTimeDifferenceMsg timeDiffMsg = new PingerTimeDifferenceMsg();
     private double speedOfSound = 1480.0;
     
-
     public Transform Diana;
 
     public Transform hydrophone1;
@@ -25,8 +23,6 @@ public class PingerBearing : MonoBehaviour {
     public Transform pinger3;
     public Transform pinger4;
     
-    int damping = 5;
-
     Vector3 pinger1Bearing;
     Vector3 pinger2Bearing;
     Vector3 pinger3Bearing;
@@ -41,14 +37,6 @@ public class PingerBearing : MonoBehaviour {
     double[] time3 = new double[4];
     double[] time2Diff = new double[4];
     double[] time3Diff = new double[4];
-
-
-    void pingerBearingCallback(PingerBearingMsg msg) {
-        pinger1Bearing = new Vector3((float)msg.pinger1_bearing.x, (float)msg.pinger1_bearing.y, (float)msg.pinger1_bearing.z);
-        pinger2Bearing = new Vector3((float)msg.pinger2_bearing.x, (float)msg.pinger2_bearing.y, (float)msg.pinger2_bearing.z);
-        pinger3Bearing = new Vector3((float)msg.pinger3_bearing.x, (float)msg.pinger3_bearing.y, (float)msg.pinger3_bearing.z);
-        pinger4Bearing = new Vector3((float)msg.pinger4_bearing.x, (float)msg.pinger4_bearing.y, (float)msg.pinger4_bearing.z);
-    }
 
     void calculateTimeDifference() {
         timeDiffMsg.is_pinger1_active = true;
@@ -116,24 +104,9 @@ public class PingerBearing : MonoBehaviour {
     void Start() {
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.RegisterPublisher<PingerTimeDifferenceMsg>(pingerTimeDifferenceTopicName); 
-        roscon.Subscribe<PingerBearingMsg>(pingerBearingTopicName, pingerBearingCallback);
-
-        calculateTimeDifference();
-
-        transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
-        var lookPos = pinger1.position - transform.position;
-        lookPos.y = 0;
-        var rotation = Quaternion.LookRotation(lookPos);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * damping); 
     }
 
-    void Update()  {
+    void Update() {
         calculateTimeDifference();
-
-        transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
-        var lookPos = pinger1.position - transform.position;
-        lookPos.y = 0;
-        var rotation = Quaternion.LookRotation(lookPos);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * damping); 
     }
 }
