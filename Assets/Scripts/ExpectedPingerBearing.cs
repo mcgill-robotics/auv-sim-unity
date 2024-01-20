@@ -24,16 +24,15 @@ public class ExpectedPingerBearing : MonoBehaviour {
     public Transform ExpectedPinger4;
 
     void pingerBearingCallback(PingerBearingMsg msg) {
+        // unity is ROS
+        // y is z
+        // x is -y
+        // z is x
         pinger1Bearing = new Vector3(-(float)msg.pinger1_bearing.y, (float)msg.pinger1_bearing.z, (float)msg.pinger1_bearing.x);
         pinger2Bearing = new Vector3(-(float)msg.pinger2_bearing.y, (float)msg.pinger2_bearing.z, (float)msg.pinger2_bearing.x);
         pinger3Bearing = new Vector3(-(float)msg.pinger3_bearing.y, (float)msg.pinger3_bearing.z, (float)msg.pinger3_bearing.x);
         pinger4Bearing = new Vector3(-(float)msg.pinger4_bearing.y, (float)msg.pinger4_bearing.z, (float)msg.pinger4_bearing.x);
     }
-
-    // unity is ROS
-    // y is z
-    // x is -y
-    // z is x
 
     void Start() {
         roscon = ROSConnection.GetOrCreateInstance();
@@ -46,20 +45,18 @@ public class ExpectedPingerBearing : MonoBehaviour {
         ExpectedPinger3.position = Vector3.MoveTowards(ExpectedPinger3.position, Diana.position, 5.0f);
         ExpectedPinger4.position = Vector3.MoveTowards(ExpectedPinger4.position, Diana.position, 5.0f);
 
-        Debug.Log("BEFORE pinger1Bearing: " + pinger1Bearing);
         pinger1Bearing.y = 0;
         pinger2Bearing.y = 0;
         pinger3Bearing.y = 0;
         pinger4Bearing.y = 0;
-        Debug.Log("AFTER pinger1Bearing: " + pinger1Bearing);
+
         var rotation1 = Quaternion.LookRotation(pinger1Bearing);
         var rotation2 = Quaternion.LookRotation(pinger2Bearing);
         var rotation3 = Quaternion.LookRotation(pinger3Bearing);
         var rotation4 = Quaternion.LookRotation(pinger4Bearing);
 
-        // Debug.Log("pinger1Bearing: " + pinger1Bearing);
-        // Debug.Log("rotation1: " + rotation1);
-        // Debug.Log("ExpectedPinger1.rotation: " + ExpectedPinger1.rotation);
+        Debug.Log("ExpectedPinger1.rotation: " + ExpectedPinger1.rotation);
+        Debug.Log("rotation1: " + rotation1);
         
         ExpectedPinger1.rotation = Quaternion.Slerp(ExpectedPinger1.rotation, rotation1, Time.deltaTime * damping);
         ExpectedPinger2.rotation = Quaternion.Slerp(ExpectedPinger2.rotation, rotation2, Time.deltaTime * damping);
