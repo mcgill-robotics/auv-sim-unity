@@ -40,18 +40,19 @@ public class ExpectedPingerBearing : MonoBehaviour {
         ExpectedPinger2.position = Vector3.MoveTowards(ExpectedPinger2.position, Diana.position, 5.0f);
         ExpectedPinger3.position = Vector3.MoveTowards(ExpectedPinger3.position, Diana.position, 5.0f);
         ExpectedPinger4.position = Vector3.MoveTowards(ExpectedPinger4.position, Diana.position, 5.0f);
-        var lookPos1 = pinger1Bearing;
-        var lookPos2 = pinger2Bearing;
-        var lookPos3 = pinger3Bearing;
-        var lookPos4 = pinger4Bearing;
-        lookPos1.y = 0;
-        lookPos2.y = 0;
-        lookPos3.y = 0;
-        lookPos4.y = 0;
-        var rotation1 = Quaternion.LookRotation(lookPos1);
-        var rotation2 = Quaternion.LookRotation(lookPos2);
-        var rotation3 = Quaternion.LookRotation(lookPos3);
-        var rotation4 = Quaternion.LookRotation(lookPos4);
+
+        pinger1Bearing.y = 0;
+        pinger2Bearing.y = 0;
+        pinger3Bearing.y = 0;
+        pinger4Bearing.y = 0;
+        
+        var rotation1 = Quaternion.LookRotation(pinger1Bearing);
+        var rotation2 = Quaternion.LookRotation(pinger2Bearing);
+        var rotation3 = Quaternion.LookRotation(pinger3Bearing);
+        var rotation4 = Quaternion.LookRotation(pinger4Bearing);
+
+        Debug.Log("Pinger 1 Bearing rotation1: " + rotation1);
+        
         ExpectedPinger1.rotation = Quaternion.Slerp(ExpectedPinger1.rotation, rotation1, Time.deltaTime * damping);
         ExpectedPinger2.rotation = Quaternion.Slerp(ExpectedPinger2.rotation, rotation2, Time.deltaTime * damping);
         ExpectedPinger3.rotation = Quaternion.Slerp(ExpectedPinger3.rotation, rotation3, Time.deltaTime * damping);
