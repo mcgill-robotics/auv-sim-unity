@@ -11,10 +11,9 @@ public class TruePingerBearing : MonoBehaviour {
     int damping = 5;
 
     void Update() {
-        transform.position = Vector3.MoveTowards(transform.position, Diana.position, 5.0f);
+        transform.position = Diana.position;
         var lookPos = pinger.position - transform.position;
         lookPos.y = 0;
-        var rotation = Quaternion.LookRotation(lookPos);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * damping); 
+        transform.rotation = Quaternion.LookRotation(lookPos);
     }
 }
