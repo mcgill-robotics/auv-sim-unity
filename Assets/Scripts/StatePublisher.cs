@@ -57,33 +57,7 @@ public class StatePublisher : MonoBehaviour {
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
-      msg.isHydrophonesActive = isHydrophonesActive;
-
-      double speedOfSound = 1480.0;
-
-      // Assumption: H1 is the origin hydrophone
-      double d1 = Vector3.Distance(hydrophone1.position, pinger1.position);
-      double d2 = Vector3.Distance(hydrophone2.position, pinger1.position);
-      double d3 = Vector3.Distance(hydrophone3.position, pinger1.position);
-      // Debug.Log("D1: " + d1 + " D2: " + d2 + " D3: " + d3);
-
-      double time1 = d1 / speedOfSound;
-      double time2 = d2 / speedOfSound;
-      double time3 = d3 / speedOfSound;
-      // Debug.Log("Time1: " + time1 + " Time2: " + time2 + " Time3: " + time3);
-
-      double time2Diff = time2 - time1;
-      double time3Diff = time3 - time1;
-
-      double[] dt_pinger1 = {time2Diff, time3Diff};
-
-      // Debug.Log("Time2Diff: " + time2Diff + " Time3Diff: " + time3Diff);
-      msg.dt_pinger1 = dt_pinger1;
-      // Debug.Log("Diana's position: " + auv.transform.position);
-      Debug.Log("H1 position: " + hydrophone1.position);
-      Debug.Log("H2 position: " + hydrophone2.position);
-      Debug.Log("H3 position: " + hydrophone3.position);
-      Debug.Log("Pinger1 position: " + pinger1.position);
+      msg.isHydrophonesActive = isHydrophonesActive;      
 
       roscon.Publish(stateTopicName, msg);
     }

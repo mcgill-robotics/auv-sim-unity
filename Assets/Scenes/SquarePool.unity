@@ -438,8 +438,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cc25dd469c8d354897fc3c644116863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pinger1: {fileID: 1765690335}
   Diana: {fileID: 8903359823325025299}
+  hydrophone1: {fileID: 2205296006858668005}
+  hydrophone2: {fileID: 2205296006858668004}
+  hydrophone3: {fileID: 2205296006858668003}
+  pinger1: {fileID: 1765690335}
+  pinger2: {fileID: 112962373}
+  pinger3: {fileID: 813260828}
+  pinger4: {fileID: 1707856123}
 --- !u!136 &278419462
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1956,6 +1962,24 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1b569bfd0ceba054590bd50d26375651, type: 3}
+--- !u!4 &2205296006858668003 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3765094178207333226, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 2205296006858668002}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2205296006858668004 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5248232744464753039, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 2205296006858668002}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2205296006858668005 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2827878461161054428, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 2205296006858668002}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2324450094870113800
 PrefabInstance:
   m_ObjectHideFlags: 0
