@@ -15,8 +15,6 @@ public class ExpectedPingerBearing : MonoBehaviour {
     public Vector3 pinger3Bearing;
     public Vector3 pinger4Bearing;
 
-    public Vector3 = new Vector3(-1.0f, 1.0f, 0.0f);
-
     public Transform Diana;
 
     public Transform ExpectedPinger1;
@@ -45,8 +43,6 @@ public class ExpectedPingerBearing : MonoBehaviour {
         ExpectedPinger2.position = Diana.position;
         ExpectedPinger3.position = Diana.position;
         ExpectedPinger4.position = Diana.position;
-
-        Debug.Log("Diana.rotation: " + Diana.rotation);
         
         ExpectedPinger1.rotation = Quaternion.LookRotation(pinger1Bearing);
         ExpectedPinger2.rotation = Quaternion.LookRotation(pinger2Bearing);
