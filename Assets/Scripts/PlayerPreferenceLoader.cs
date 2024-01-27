@@ -11,6 +11,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
     public Toggle PublishDownCamToggle;
     public Toggle PublishFrontCamToggle;
     public Toggle PublishDepthToggle;
+    public Toggle PublishHydrophonesToggle;
     public Toggle PublishDVLToggle;
     public Toggle PublishIMUToggle;
     public Toggle PublishROSToggle;
@@ -59,6 +60,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
         PublishDownCamToggle.isOn = bool.Parse(load("PublishDownCamToggle", "true"));
         PublishFrontCamToggle.isOn = bool.Parse(load("PublishFrontCamToggle", "true"));
         PublishDepthToggle.isOn = bool.Parse(load("PublishDepthToggle", "true"));
+        PublishHydrophonesToggle.isOn = bool.Parse(load("PublishHydrophonesToggle", "true"));
         PublishDVLToggle.isOn = bool.Parse(load("PublishDVLToggle", "true"));
         PublishIMUToggle.isOn = bool.Parse(load("PublishIMUToggle", "true"));
         PublishROSToggle.isOn = bool.Parse(load("PublishROSToggle", "true"));
