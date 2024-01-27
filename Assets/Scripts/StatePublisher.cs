@@ -14,12 +14,15 @@ public class StatePublisher : MonoBehaviour {
     public Transform hydrophone3;
     public Transform pinger1;
     public Transform pinger2;
+    public Transform pinger3;
+    public Transform pinger4;
 
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
     bool isDVLActive = true;
     bool isDepthSensorActive = true;
     bool isIMUActive = true;
+    bool isHydrophonesActive = true;
     bool publishToRos = true;
     int updateFrequency = 10;
 
@@ -36,6 +39,7 @@ public class StatePublisher : MonoBehaviour {
       isDVLActive = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
       isDepthSensorActive = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
       isIMUActive = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
+      isHydrophonesActive = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "true"));
 
       timeSinceLastUpdate += Time.deltaTime;
       if (timeSinceLastUpdate < 1.0/updateFrequency || !publishToRos) {
@@ -53,23 +57,7 @@ public class StatePublisher : MonoBehaviour {
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
-
-      float speedOfSound = 1480.0f;
-
-      // Assumption: H1 is the origin hydrophone ------------------- definetely wrong
-      float d1 = Vector3.Distance(hydrophone1.position, pinger1.position);
-      float d2 = Vector3.Distance(hydrophone2.position, pinger1.position);
-      float d3 = Vector3.Distance(hydrophone3.position, pinger1.position);
-
-      float time1 = Math.Abs(d1 / speedOfSound);
-      float time2 = Math.Abs(d2 / speedOfSound);
-      float time3 = Math.Abs(d3 / speedOfSound);
-
-      float time1Diff = Math.Abs(time1 - time1);
-      float time2Diff = Math.Abs(time2 - time1);
-      float time3Diff = Math.Abs(time3 - time1);
-
-      // msg.hydrophones_time_diff = new Vector3(time1Diff, time2Diff, time3Diff).To<RUF>();
+      msg.isHydrophonesActive = isHydrophonesActive;      
 
       roscon.Publish(stateTopicName, msg);
     }

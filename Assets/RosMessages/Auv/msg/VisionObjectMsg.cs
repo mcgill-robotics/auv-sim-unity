@@ -22,6 +22,8 @@ namespace RosMessageTypes.Auv
         public double theta_z;
         // additional data field (for additional info on objects like lane marker second heading)
         public double extra_field;
+        // confidence field
+        public double confidence;
 
         public VisionObjectMsg()
         {
@@ -31,9 +33,10 @@ namespace RosMessageTypes.Auv
             this.z = 0.0;
             this.theta_z = 0.0;
             this.extra_field = 0.0;
+            this.confidence = 0.0;
         }
 
-        public VisionObjectMsg(string label, double x, double y, double z, double theta_z, double extra_field)
+        public VisionObjectMsg(string label, double x, double y, double z, double theta_z, double extra_field, double confidence)
         {
             this.label = label;
             this.x = x;
@@ -41,6 +44,7 @@ namespace RosMessageTypes.Auv
             this.z = z;
             this.theta_z = theta_z;
             this.extra_field = extra_field;
+            this.confidence = confidence;
         }
 
         public static VisionObjectMsg Deserialize(MessageDeserializer deserializer) => new VisionObjectMsg(deserializer);
@@ -53,6 +57,7 @@ namespace RosMessageTypes.Auv
             deserializer.Read(out this.z);
             deserializer.Read(out this.theta_z);
             deserializer.Read(out this.extra_field);
+            deserializer.Read(out this.confidence);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
@@ -63,6 +68,7 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.z);
             serializer.Write(this.theta_z);
             serializer.Write(this.extra_field);
+            serializer.Write(this.confidence);
         }
 
         public override string ToString()
@@ -73,7 +79,8 @@ namespace RosMessageTypes.Auv
             "\ny: " + y.ToString() +
             "\nz: " + z.ToString() +
             "\ntheta_z: " + theta_z.ToString() +
-            "\nextra_field: " + extra_field.ToString();
+            "\nextra_field: " + extra_field.ToString() +
+            "\nconfidence: " + confidence.ToString();
         }
 
 #if UNITY_EDITOR
