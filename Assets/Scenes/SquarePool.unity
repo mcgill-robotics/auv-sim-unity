@@ -840,7 +840,16 @@ VisualEffect:
     m_Vector4f:
       m_Array: []
     m_Uint:
-      m_Array: []
+      m_Array:
+      - m_Value: 0
+        m_Name: particleCount
+        m_Overridden: 0
+      - m_Value: 0
+        m_Name: ParticleCount
+        m_Overridden: 1
+      - m_Value: 640
+        m_Name: Resolution
+        m_Overridden: 1
     m_Int:
       m_Array: []
     m_Matrix4x4f:
@@ -850,7 +859,13 @@ VisualEffect:
     m_Gradient:
       m_Array: []
     m_NamedObject:
-      m_Array: []
+      m_Array:
+      - m_Value: {fileID: 2800000, guid: 276d9e395ae18fe40a9b4988549f2349, type: 3}
+        m_Name: TexPosScale
+        m_Overridden: 1
+      - m_Value: {fileID: 2800000, guid: 276d9e395ae18fe40a9b4988549f2349, type: 3}
+        m_Name: TexColor
+        m_Overridden: 1
     m_Bool:
       m_Array: []
 --- !u!4 &1700896305

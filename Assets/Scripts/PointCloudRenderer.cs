@@ -22,31 +22,36 @@ public class PointCloudRenderer : MonoBehaviour
     private void Start()
     {
         vfx = GetComponent<VisualEffect>();
+        roscon = ROSConnection.GetOrCreateInstance();
+        roscon.Subscribe<PointCloud2Msg>(pointCloudTopicName, pointCloudCallback);
     }
 
     private void Update()
     {
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.Subscribe<PointCloud2Msg>(pointCloudTopicName, pointCloudCallback);
         if (toUpdate)
         {
             toUpdate = false;
-
+            var particleId = Shader.PropertyToID("ParticleCount");
+            var colorId = Shader.PropertyToID("TexColor");
+            var posScaleId = Shader.PropertyToID("ParticleCount");
+            var resolutionId = Shader.PropertyToID("ParticleCount");
+            Debug.Log(resolutionId);
             vfx.Reinit();
-            vfx.SetUInt(Shader.PropertyToID("ParticleCount"), particleCount);
-            vfx.SetTexture(Shader.PropertyToID("TexColor"), texColor);
-            vfx.SetTexture(Shader.PropertyToID("TexPosScale"), texPosScale);
-            vfx.SetUInt(Shader.PropertyToID("Resolution"), resolution);
+            vfx.SetUInt(particleId, particleCount);
+            vfx.SetTexture(colorId, texColor);
+            vfx.SetTexture(posScaleId, texPosScale);
+            vfx.SetUInt(resolutionId, resolution);
         }
     }
 
     void pointCloudCallback(PointCloud2Msg pointCloudMsg)
     {
+        int cap = 500 * 32;
         long numParticles = pointCloudMsg.data.Length / pointCloudMsg.point_step;
-        Vector3[] positions = new Vector3[numParticles];
-        Color[] colors = new Color[numParticles];
+        Vector3[] positions = new Vector3[500];
+        Color[] colors = new Color[500];
         int index = 0;
-        for (int i = 0; i + pointCloudMsg.point_step < pointCloudMsg.data.Length; i += (int)(pointCloudMsg.point_step))
+        for (int i = 0; i + pointCloudMsg.point_step < pointCloudMsg.data.Length && index < 500; i += (int)(pointCloudMsg.point_step))
         {
             float x = System.BitConverter.ToSingle(pointCloudMsg.data, i);
             float y = System.BitConverter.ToSingle(pointCloudMsg.data, i + 4);
