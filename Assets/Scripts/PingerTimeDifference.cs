@@ -39,6 +39,9 @@ public class PingerTimeDifference : MonoBehaviour {
     double[] time3Diff = new double[4];
 
     void calculateTimeDifference() {
+        timeDiffMsg.state_x = Diana.position.z;
+        timeDiffMsg.state_y = - Diana.position.x;
+
         timeDiffMsg.is_pinger1_active = true;
         timeDiffMsg.is_pinger2_active = true;
         timeDiffMsg.is_pinger3_active = true;

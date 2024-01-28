@@ -9,20 +9,12 @@ public class StatePublisher : MonoBehaviour {
     private ROSConnection roscon;
     public string stateTopicName = "/unity/state";
     public GameObject auv;
-    public Transform hydrophone1;
-    public Transform hydrophone2;
-    public Transform hydrophone3;
-    public Transform pinger1;
-    public Transform pinger2;
-    public Transform pinger3;
-    public Transform pinger4;
 
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
     bool isDVLActive = true;
     bool isDepthSensorActive = true;
     bool isIMUActive = true;
-    bool isHydrophonesActive = true;
     bool publishToRos = true;
     int updateFrequency = 10;
 
@@ -39,7 +31,6 @@ public class StatePublisher : MonoBehaviour {
       isDVLActive = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
       isDepthSensorActive = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
       isIMUActive = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
-      isHydrophonesActive = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "true"));
 
       timeSinceLastUpdate += Time.deltaTime;
       if (timeSinceLastUpdate < 1.0/updateFrequency || !publishToRos) {
@@ -57,7 +48,6 @@ public class StatePublisher : MonoBehaviour {
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
-      msg.isHydrophonesActive = isHydrophonesActive;      
 
       roscon.Publish(stateTopicName, msg);
     }
