@@ -21,6 +21,7 @@ public class ExpectedPingerBearing : MonoBehaviour {
     public Transform ExpectedPinger2;
     public Transform ExpectedPinger3;
     public Transform ExpectedPinger4;
+    Quaternion default_rotation = new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f);
 
     void pingerBearingCallback(PingerBearingMsg msg) {
         // unity is ROS
@@ -44,10 +45,10 @@ public class ExpectedPingerBearing : MonoBehaviour {
         ExpectedPinger3.position = Diana.position;
         ExpectedPinger4.position = Diana.position;
         
-        ExpectedPinger1.rotation = Quaternion.LookRotation(pinger1Bearing);
-        ExpectedPinger2.rotation = Quaternion.LookRotation(pinger2Bearing);
-        ExpectedPinger3.rotation = Quaternion.LookRotation(pinger3Bearing);
-        ExpectedPinger4.rotation = Quaternion.LookRotation(pinger4Bearing);
+        ExpectedPinger1.rotation = Quaternion.LookRotation(pinger1Bearing) * default_rotation;
+        ExpectedPinger2.rotation = Quaternion.LookRotation(pinger2Bearing) * default_rotation;
+        ExpectedPinger3.rotation = Quaternion.LookRotation(pinger3Bearing) * default_rotation;
+        ExpectedPinger4.rotation = Quaternion.LookRotation(pinger4Bearing) * default_rotation;
     }
 }
 
