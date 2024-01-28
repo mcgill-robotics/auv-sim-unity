@@ -21,6 +21,8 @@ namespace RosMessageTypes.Auv
         public double[] dt_pinger2;
         public double[] dt_pinger3;
         public double[] dt_pinger4;
+        public double state_x;
+        public double state_y;
 
         public PingerTimeDifferenceMsg()
         {
@@ -32,9 +34,11 @@ namespace RosMessageTypes.Auv
             this.dt_pinger2 = new double[0];
             this.dt_pinger3 = new double[0];
             this.dt_pinger4 = new double[0];
+            this.state_x = 0.0;
+            this.state_y = 0.0;
         }
 
-        public PingerTimeDifferenceMsg(bool is_pinger1_active, bool is_pinger2_active, bool is_pinger3_active, bool is_pinger4_active, double[] dt_pinger1, double[] dt_pinger2, double[] dt_pinger3, double[] dt_pinger4)
+        public PingerTimeDifferenceMsg(bool is_pinger1_active, bool is_pinger2_active, bool is_pinger3_active, bool is_pinger4_active, double[] dt_pinger1, double[] dt_pinger2, double[] dt_pinger3, double[] dt_pinger4, double state_x, double state_y)
         {
             this.is_pinger1_active = is_pinger1_active;
             this.is_pinger2_active = is_pinger2_active;
@@ -44,6 +48,8 @@ namespace RosMessageTypes.Auv
             this.dt_pinger2 = dt_pinger2;
             this.dt_pinger3 = dt_pinger3;
             this.dt_pinger4 = dt_pinger4;
+            this.state_x = state_x;
+            this.state_y = state_y;
         }
 
         public static PingerTimeDifferenceMsg Deserialize(MessageDeserializer deserializer) => new PingerTimeDifferenceMsg(deserializer);
@@ -58,6 +64,8 @@ namespace RosMessageTypes.Auv
             deserializer.Read(out this.dt_pinger2, sizeof(double), deserializer.ReadLength());
             deserializer.Read(out this.dt_pinger3, sizeof(double), deserializer.ReadLength());
             deserializer.Read(out this.dt_pinger4, sizeof(double), deserializer.ReadLength());
+            deserializer.Read(out this.state_x);
+            deserializer.Read(out this.state_y);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
@@ -74,6 +82,8 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.dt_pinger3);
             serializer.WriteLength(this.dt_pinger4);
             serializer.Write(this.dt_pinger4);
+            serializer.Write(this.state_x);
+            serializer.Write(this.state_y);
         }
 
         public override string ToString()
@@ -86,7 +96,9 @@ namespace RosMessageTypes.Auv
             "\ndt_pinger1: " + System.String.Join(", ", dt_pinger1.ToList()) +
             "\ndt_pinger2: " + System.String.Join(", ", dt_pinger2.ToList()) +
             "\ndt_pinger3: " + System.String.Join(", ", dt_pinger3.ToList()) +
-            "\ndt_pinger4: " + System.String.Join(", ", dt_pinger4.ToList());
+            "\ndt_pinger4: " + System.String.Join(", ", dt_pinger4.ToList()) +
+            "\nstate_x: " + state_x.ToString() +
+            "\nstate_y: " + state_y.ToString();
         }
 
 #if UNITY_EDITOR
