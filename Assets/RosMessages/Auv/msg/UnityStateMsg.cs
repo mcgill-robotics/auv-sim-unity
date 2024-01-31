@@ -20,6 +20,7 @@ namespace RosMessageTypes.Auv
         public bool isDVLActive;
         public bool isDepthSensorActive;
         public bool isIMUActive;
+        public bool isHydrophonesActive;
 
         public UnityStateMsg()
         {
@@ -30,9 +31,10 @@ namespace RosMessageTypes.Auv
             this.isDVLActive = false;
             this.isDepthSensorActive = false;
             this.isIMUActive = false;
+            this.isHydrophonesActive = false;
         }
 
-        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive, bool isHydrophonesActive)
         {
             this.position = position;
             this.orientation = orientation;
@@ -41,6 +43,7 @@ namespace RosMessageTypes.Auv
             this.isDVLActive = isDVLActive;
             this.isDepthSensorActive = isDepthSensorActive;
             this.isIMUActive = isIMUActive;
+            this.isHydrophonesActive = isHydrophonesActive;
         }
 
         public static UnityStateMsg Deserialize(MessageDeserializer deserializer) => new UnityStateMsg(deserializer);
@@ -54,6 +57,7 @@ namespace RosMessageTypes.Auv
             deserializer.Read(out this.isDVLActive);
             deserializer.Read(out this.isDepthSensorActive);
             deserializer.Read(out this.isIMUActive);
+            deserializer.Read(out this.isHydrophonesActive);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
@@ -65,6 +69,7 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.isDVLActive);
             serializer.Write(this.isDepthSensorActive);
             serializer.Write(this.isIMUActive);
+            serializer.Write(this.isHydrophonesActive);
         }
 
         public override string ToString()
@@ -76,7 +81,8 @@ namespace RosMessageTypes.Auv
             "\nangular_velocity: " + angular_velocity.ToString() +
             "\nisDVLActive: " + isDVLActive.ToString() +
             "\nisDepthSensorActive: " + isDepthSensorActive.ToString() +
-            "\nisIMUActive: " + isIMUActive.ToString();
+            "\nisIMUActive: " + isIMUActive.ToString() +
+            "\nisHydrophonesActive: " + isHydrophonesActive.ToString();
         }
 
 #if UNITY_EDITOR
