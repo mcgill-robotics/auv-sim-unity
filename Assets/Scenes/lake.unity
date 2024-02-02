@@ -2565,6 +2565,21 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 918fccde6bf977d46a3b4b7392dede57, type: 2}
     - target: {fileID: 982285454551795732, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.21568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 982285454551795732, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.13725491
+      objectReference: {fileID: 0}
+    - target: {fileID: 982285454551795732, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.09803922
+      objectReference: {fileID: 0}
+    - target: {fileID: 982285454551795732, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 2065
       objectReference: {fileID: 0}
@@ -2575,13 +2590,78 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2162995022298250556, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
+      propertyPath: depthEnd
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2162995022298250556, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthStart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2162995022298250556, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.b
+      value: 0.21568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 2162995022298250556, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.g
+      value: 0.13725491
+      objectReference: {fileID: 0}
+    - target: {fileID: 2162995022298250556, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.r
+      value: 0.09803922
+      objectReference: {fileID: 0}
+    - target: {fileID: 2162995022298250556, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
       propertyPath: depthLayers.m_Bits
       value: 2321
       objectReference: {fileID: 0}
     - target: {fileID: 3283135384778742527, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.21568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283135384778742527, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.13725491
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283135384778742527, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.09803922
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283135384778742527, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 2065
+      objectReference: {fileID: 0}
+    - target: {fileID: 4888702391134186142, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthEnd
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4888702391134186142, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthStart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4888702391134186142, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.b
+      value: 0.21568628
+      objectReference: {fileID: 0}
+    - target: {fileID: 4888702391134186142, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.g
+      value: 0.13725491
+      objectReference: {fileID: 0}
+    - target: {fileID: 4888702391134186142, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.r
+      value: 0.09803922
       objectReference: {fileID: 0}
     - target: {fileID: 4888702391134186142, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
@@ -2612,6 +2692,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Diana
+      objectReference: {fileID: 0}
+    - target: {fileID: 7831795061861894162, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: far clip plane
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7831795061861894162, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}

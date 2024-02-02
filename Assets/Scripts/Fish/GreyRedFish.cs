@@ -20,7 +20,6 @@ public class GreyRedFish : MonoBehaviour {
         // Move our position a step closer to the target.
         var step =  speed * Time.deltaTime; // calculate distance to move
         if (isMovingToTarget1) {
-            Debug.Log(Vector3.Distance(transform.position, target1));
             transform.position = Vector3.MoveTowards(transform.position, target1, step);
             if (Vector3.Distance(transform.position, target1) < 0.1f) {
                 isMovingToTarget1 = false;
