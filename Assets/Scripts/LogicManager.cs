@@ -55,13 +55,21 @@ public class LogicManager1 : MonoBehaviour
     public GameObject waterObject;
 
     [Header("FOR PUBLISHER TOGGLE SETTINGS")]
+    public Toggle PublishDVLToggle;
     public Toggle PublishROSToggle;
     public Toggle DisplaySimToggle;
+    public Toggle PublishIMUToggle;
     public LayerMask hiddenSimLayerMask;
     private LayerMask followCamDefaultLayerMask; 
     private LayerMask freeCamDefaultLayerMask; 
+    public Toggle PublishDepthToggle;
+    public Toggle PublishHydrophonesToggle;
+    public Toggle PublishFrontCamToggle;
+    public Toggle PublishDownCamToggle;
 
     private ROSConnection roscon;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -223,6 +231,36 @@ public class LogicManager1 : MonoBehaviour
         }
         PlayerPrefs.SetString("DisplaySimToggle", DisplaySimToggle.isOn.ToString());
         PlayerPrefs.Save();
+    }
+
+
+    public void setPublishDVLToggle(){
+         PlayerPrefs.SetString("PublishDVLToggle", PublishDVLToggle.isOn.ToString());
+         PlayerPrefs.Save();
+    }
+
+    public void setPublishIMUToggle(){
+         PlayerPrefs.SetString("PublishIMUToggle", PublishIMUToggle.isOn.ToString());
+         PlayerPrefs.Save();
+    }
+
+   public void setPublishDepthToggle(){
+         PlayerPrefs.SetString("PublishDepthToggle", PublishDepthToggle.isOn.ToString());
+         PlayerPrefs.Save();
+    }
+
+    public void setPublishHydrophonesToggle(){
+         PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophonesToggle.isOn.ToString());
+         PlayerPrefs.Save();
+    }
+    public void setPublishFrontCamToggle(){
+         PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCamToggle.isOn.ToString());
+         PlayerPrefs.Save();
+    }
+
+    public void setPublishDownCamToggle(){
+         PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCamToggle.isOn.ToString());
+         PlayerPrefs.Save();
     }
 
 }
