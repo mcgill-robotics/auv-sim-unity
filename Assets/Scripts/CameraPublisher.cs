@@ -109,7 +109,7 @@ public class CameraPublisher : MonoBehaviour {
             cam.targetTexture = lastTexture;
             cam.targetTexture = null;
 
-            byte[] imageData = flipTextureVertically(publishHeight, cameraTexture);
+            byte[] imageData = flipTextureVertically(cameraTexture);
 
             img_msg.data = imageData;
             img_msg.header.stamp.sec = ROSClock.sec;
@@ -119,11 +119,12 @@ public class CameraPublisher : MonoBehaviour {
             CameraInfoMsg cameraInfoMessage = CameraInfoGenerator.ConstructCameraInfoMessage(cam, img_msg.header, 0.0f, 0.01f);
             cameraInfoMessage.width = (uint) publishWidth;
             cameraInfoMessage.height = (uint) publishHeight;
+            cameraInfoMessage.K = GetIntrinsic(cam);
             roscon.Publish(infoTopic, cameraInfoMessage);
         }
     }
 
-    private byte[] flipTextureVertically(int publishHeight, Texture2D texture2D) {
+    private byte[] flipTextureVertically(Texture2D texture2D) {
         byte[] imageData = texture2D.GetRawTextureData();
         for (int y = 0; y < publishHeight / 2; y++) {
             int rowIndex1 = y * rowSize;
@@ -137,5 +138,31 @@ public class CameraPublisher : MonoBehaviour {
         }
 
         return imageData;
+    }
+
+    private double[] GetIntrinsic(Camera cam) {
+        float pixel_aspect_ratio = (float)publishWidth / (float)publishHeight;
+
+        float alpha_u = cam.focalLength * ((float)publishWidth / cam.sensorSize.x);
+        float alpha_v = cam.focalLength * pixel_aspect_ratio * ((float)publishHeight / cam.sensorSize.y);
+
+        float u_0 = (float)publishWidth / 2;
+        float v_0 = (float)publishHeight / 2;
+
+        //IntrinsicMatrix in row major
+        double[] camIntriMatrix = new double[9];
+        camIntriMatrix[0] = alpha_u;
+        camIntriMatrix[1] = 0f;
+        camIntriMatrix[2] = u_0;
+
+        camIntriMatrix[3] = 0f;
+        camIntriMatrix[4] = alpha_v;
+        camIntriMatrix[5] = v_0;
+
+        camIntriMatrix[6] = 0f;
+        camIntriMatrix[7] = 0f;
+        camIntriMatrix[8] = 1f;
+
+        return camIntriMatrix;
     }
 }

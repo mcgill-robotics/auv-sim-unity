@@ -124,7 +124,6 @@ public class CameraDepthPublisher : MonoBehaviour
         if (timeElapsed > 1.0f/FPS && publishToRos)
         {
 
-
             var prevActiveRT = RenderTexture.active;
             // render to offscreen texture (readonly from CPU side)
             RenderTexture.active = rt;
