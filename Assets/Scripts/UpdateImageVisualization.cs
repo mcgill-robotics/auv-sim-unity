@@ -43,6 +43,8 @@ public class UpdateImageVisualization : MonoBehaviour
 
     void ImageCb(ImageMsg msg)
     {
+        Destroy(colorTex);
+        
         if (imageCount != 0) {
             imageCount += 1;
             return;
@@ -52,18 +54,22 @@ public class UpdateImageVisualization : MonoBehaviour
             colorTex = new Texture2D((int)msg.width, (int)msg.height, TextureFormat.RFloat, false);
             colorTex.LoadRawTextureData(msg.data);
             colorTex.Apply();
+            Normalize(colorTex);
         } else if (msg.encoding == "bgr8") {
             colorTex = new Texture2D((int)msg.width, (int)msg.height, TextureFormat.RGB24, false);
             colorTex.LoadRawTextureData(msg.data);
             colorTex.Apply();
             SwitchBlueAndRedChannels(colorTex);
+            BrightenTexture(colorTex, brightnessFactor);
         } else {
             colorTex = new Texture2D((int)msg.width, (int)msg.height, TextureFormat.RGBA32, false);
             colorTex.LoadRawTextureData(msg.data);
             colorTex.Apply();
+            BrightenTexture(colorTex, brightnessFactor);
         }
 
-        BrightenTexture(colorTex, brightnessFactor);
+        colorTex.hideFlags = HideFlags.HideAndDontSave;
+
 
         visualizationImageGUI.texture = colorTex;
         int newWidth = (int) msg.width * (90 / (int) msg.height);
@@ -94,6 +100,34 @@ public class UpdateImageVisualization : MonoBehaviour
         texture.SetPixels(pixels);
 
         // Apply changes to the texture
+        texture.Apply();
+    }
+
+    public void Normalize(Texture2D texture)
+    {
+        Color[] pixels = texture.GetPixels();
+
+        float minValue = float.MaxValue;
+        float maxValue = float.MinValue;
+
+        // Find the minimum and maximum values in the texture
+        foreach (Color pixel in pixels)
+        {
+            float value = pixel.r; // Assuming R channel represents the float value
+            minValue = Mathf.Min(minValue, value);
+            maxValue = Mathf.Max(maxValue, value);
+        }
+
+        // Normalize the values to the range [0, 1]
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i].r = Mathf.InverseLerp(minValue, maxValue, pixels[i].r);
+            pixels[i].g = Mathf.InverseLerp(minValue, maxValue, pixels[i].r);
+            pixels[i].b = Mathf.InverseLerp(minValue, maxValue, pixels[i].r);
+        }
+
+        // Apply the changes to the texture
+        texture.SetPixels(pixels);
         texture.Apply();
     }
 
