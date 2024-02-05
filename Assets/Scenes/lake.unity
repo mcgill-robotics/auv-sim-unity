@@ -295,6 +295,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 361381268040256482, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: ROSClock
+      value: 
+      objectReference: {fileID: 1501599823}
     - target: {fileID: 814293834962563285, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: ROSClock
@@ -330,6 +335,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 3974704778999433285, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: ROSClock
+      value: 
+      objectReference: {fileID: 1501599823}
     - target: {fileID: 4397899073020934594, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: depthEnd
@@ -375,6 +385,11 @@ PrefabInstance:
       propertyPath: m_projectionMatrixMode
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5637028640627133196, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: ROSClock
+      value: 
+      objectReference: {fileID: 1501599823}
     - target: {fileID: 5814250326581585104, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_CullingMask.m_Bits
@@ -1026,7 +1041,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 127
   m_IsActive: 1
 --- !u!154 &360026149
 TerrainCollider:
@@ -1080,7 +1095,7 @@ Terrain:
   m_DeringLightProbesForTrees: 1
   m_ReceiveGI: 1
   m_ScaleInLightmap: 0.512
-  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightmapParameters: {fileID: 0}
   m_GroupingID: 0
   m_RenderingLayerMask: 257
   m_AllowAutoConnect: 1
@@ -4102,6 +4117,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bc3b9620fd25e247b3044c9f5dbf347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1501599823 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 731944307895966141, guid: 25cd8633a8a0ac648aa1883997bc26b8,
+    type: 3}
+  m_PrefabInstance: {fileID: 1279629668}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32a587fdf98191e429e9df04d264750c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1537473435 stripped
