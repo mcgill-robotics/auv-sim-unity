@@ -27,7 +27,7 @@ public class StatePublisher : MonoBehaviour {
     // Update is called once per frame
     void Update() {
       publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
-      updateFrequency = int.Parse(PlayerPrefs.GetString("poseRate", "10"));
+      updateFrequency = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
       isDVLActive = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
       isDepthSensorActive = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
       isIMUActive = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
