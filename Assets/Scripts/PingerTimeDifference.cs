@@ -12,8 +12,6 @@ public class PingerTimeDifference : MonoBehaviour {
     private string pingerTimeDifferenceTopicName = "/sensors/hydrophones/pinger_time_difference";
     private PingerTimeDifferenceMsg timeDiffMsg = new PingerTimeDifferenceMsg();
     private double speedOfSound = 1480.0;
-    
-    public Transform Diana;
 
     public Transform hydrophone1;
     public Transform hydrophone2;
@@ -37,6 +35,15 @@ public class PingerTimeDifference : MonoBehaviour {
     double[] time3 = new double[4];
     double[] time2Diff = new double[4];
     double[] time3Diff = new double[4];
+
+    void Start() {
+        hydrophone1.position = transform.position + Vector3.up * -0.5f;
+        hydrophone2.position = hydrophone1.position + Vector3.forward * 0.1f;
+        hydrophone3.position = hydrophone1.position + Vector3.right * -0.1f;
+
+        roscon = ROSConnection.GetOrCreateInstance();
+        roscon.RegisterPublisher<PingerTimeDifferenceMsg>(pingerTimeDifferenceTopicName); 
+    }
 
     void calculateTimeDifference() {
         timeDiffMsg.is_pinger1_active = true;
@@ -99,11 +106,6 @@ public class PingerTimeDifference : MonoBehaviour {
         timeDiffMsg.dt_pinger4 = new double[2] {time2Diff[3], time3Diff[3]};
 
         roscon.Publish(pingerTimeDifferenceTopicName, timeDiffMsg);
-    }
-
-    void Start() {
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.RegisterPublisher<PingerTimeDifferenceMsg>(pingerTimeDifferenceTopicName); 
     }
 
     void Update() {

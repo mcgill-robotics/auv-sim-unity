@@ -7,8 +7,8 @@ public class TruePingerBearing : MonoBehaviour {
     public Transform pinger;
 
     void Update() {
-        transform.position = Diana.position;
-        var lookPos = pinger.position - transform.position;
+        transform.position = Diana.position + new Vector3(0,1,0);
+        var lookPos = transform.position - pinger.position;
         lookPos.y = 0;
         Quaternion default_rotation = new Quaternion(0.7071068f, 0f, 0f, 0.7071068f);
         transform.rotation = Quaternion.LookRotation(lookPos) * default_rotation;
