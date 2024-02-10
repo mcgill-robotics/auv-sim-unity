@@ -443,7 +443,7 @@ PrefabInstance:
     - target: {fileID: 7201638562213876563, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: depthEnd
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7201638562213876563, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
