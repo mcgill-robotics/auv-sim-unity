@@ -82,7 +82,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
         frontCamHeightInputField.text = load("frontCamHeight", "480");
         downCamWidthInputField.text = load("downCamWidth", "640");
         downCamHeightInputField.text = load("downCamHeight", "480");
-        poseRateInputField.text = load("poseRate", "10");
+        poseRateInputField.text = load("poseRate", "50");
 
         // QUALITY SETTING
         qualityDropdown.value = int.Parse(load("qualityLevel", "3"));

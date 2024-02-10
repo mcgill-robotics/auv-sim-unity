@@ -28,6 +28,9 @@ public class ExpectedPingerBearing : MonoBehaviour {
         // y is z
         // x is -y
         // z is x
+        
+        Debug.Log("X " + msg.pinger1_bearing.x);
+        Debug.Log("Y" + msg.pinger1_bearing.y);
         pinger1Bearing = new Vector3(-(float)msg.pinger1_bearing.y, 0.0f, (float)msg.pinger1_bearing.x);
         pinger2Bearing = new Vector3(-(float)msg.pinger2_bearing.y, 0.0f, (float)msg.pinger2_bearing.x);
         pinger3Bearing = new Vector3(-(float)msg.pinger3_bearing.y, 0.0f, (float)msg.pinger3_bearing.x);
@@ -40,10 +43,10 @@ public class ExpectedPingerBearing : MonoBehaviour {
     }
 
     void Update() {
-        ExpectedPinger1.position = Diana.position;
-        ExpectedPinger2.position = Diana.position;
-        ExpectedPinger3.position = Diana.position;
-        ExpectedPinger4.position = Diana.position;
+        ExpectedPinger1.position = Diana.position + new Vector3(0,1,0);
+        ExpectedPinger2.position = Diana.position + new Vector3(0,1,0);
+        ExpectedPinger3.position = Diana.position + new Vector3(0,1,0);
+        ExpectedPinger4.position = Diana.position + new Vector3(0,1,0);
         
         ExpectedPinger1.rotation = Quaternion.LookRotation(pinger1Bearing) * default_rotation;
         ExpectedPinger2.rotation = Quaternion.LookRotation(pinger2Bearing) * default_rotation;

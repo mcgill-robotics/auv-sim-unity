@@ -124,7 +124,6 @@ public class CameraDepthPublisher : MonoBehaviour
         if (timeElapsed > 1.0f/FPS && publishToRos)
         {
 
-
             var prevActiveRT = RenderTexture.active;
             // render to offscreen texture (readonly from CPU side)
             RenderTexture.active = rt;
@@ -136,18 +135,8 @@ public class CameraDepthPublisher : MonoBehaviour
             cam.targetTexture = prevActiveRT;
             cam.targetTexture = null;
 
-            int rowSize = (int) image_step * (int) publishWidth;
-            byte[] imageData = texture2D.GetRawTextureData();
-            for (int y = 0; y < publishHeight / 2; y++) {
-                int rowIndex1 = y * rowSize;
-                int rowIndex2 = (publishHeight - 1 - y) * rowSize;
-
-                for (int i = 0; i < rowSize; i++) {
-                    byte temp = imageData[rowIndex1 + i];
-                    imageData[rowIndex1 + i] = imageData[rowIndex2 + i];
-                    imageData[rowIndex2 + i] = temp;
-                }
-            }
+            scaleTexture(texture2D);
+            byte[] imageData = flipTextureVertically(image_step, publishWidth, publishHeight, texture2D);
 
             img_msg.data = imageData;
             img_msg.header.stamp.sec = ROSClock.sec;
@@ -156,10 +145,37 @@ public class CameraDepthPublisher : MonoBehaviour
             ros.Publish(imageTopic, img_msg);
 
             timeElapsed = 0;
-/*            renderRT.DiscardContents();
-            renderRT.Release();
-            finalRT.DiscardContents();
-            finalRT.Release();*/
         }
+    }
+
+    private byte[] flipTextureVertically(uint image_step, int publishWidth, int publishHeight, Texture2D texture2D) {
+        int rowSize = (int) image_step * (int) publishWidth;
+        byte[] imageData = texture2D.GetRawTextureData();
+        for (int y = 0; y < publishHeight / 2; y++) {
+            int rowIndex1 = y * rowSize;
+            int rowIndex2 = (publishHeight - 1 - y) * rowSize;
+
+            for (int i = 0; i < rowSize; i++) {
+                byte temp = imageData[rowIndex1 + i];
+                imageData[rowIndex1 + i] = imageData[rowIndex2 + i];
+                imageData[rowIndex2 + i] = temp;
+            }
+        }
+
+        return imageData;
+    }
+
+    private void scaleTexture(Texture2D depthImage) {
+        float near = cam.nearClipPlane;
+        float far = cam.farClipPlane;
+
+        Color[] pixels = depthImage.GetPixels();
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i].r = near + (pixels[i].r * (far - near));
+        }
+
+        depthImage.SetPixels(pixels);
+        depthImage.Apply();
     }
 }

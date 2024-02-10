@@ -26,6 +26,16 @@ inline float Linear01FromEyeToLinear01FromNear(float depth01)
     return (depth01 - near/far) * (1 + near/far);
 }
 
+inline float Linearize01Depth( float z )
+{
+    return  1.0 / ((z * _ZBufferParams.x) + _ZBufferParams.y);
+}
+
+inline float LinearCorrectDepth( float x )
+{
+    return pow(x, 0.945029148) + 0.212203107 * pow(x, 3) + 0.901320643 * pow(x, 2) + -1.11224133 * x;
+}
+
 float4 Output(float depth01, float3 normal)
 {
     /* see ImageSynthesis.cs
@@ -47,10 +57,9 @@ float4 Output(float depth01, float3 normal)
     }
     else if (_OutputMode == 2) // DepthCompressed
     {
-        return depth01;
-        float linearZFromNear = Linear01FromEyeToLinear01FromNear(depth01); 
-        float k = 0.25; // compression factor
-        return pow(linearZFromNear, k);
+        // float linearZFromNear = Linear01FromEyeToLinear01FromNear(depth01);
+        float depth = Linearize01Depth(1.0 - depth01);
+        return depth;
     }
     else if (_OutputMode == 3) // DepthMultichannel
     {
@@ -79,22 +88,29 @@ CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
 #include "UnityCG.cginc"
+
+uniform sampler2D _CameraDepthTexture; //the depth texture
+
 struct v2f {
     float4 pos : SV_POSITION;
     float4 nz : TEXCOORD0;
+    float4 projPos : TEXCOORD1; //Screen position of pos
     UNITY_VERTEX_OUTPUT_STEREO
 };
+
 v2f vert( appdata_base v ) {
     v2f o;
-    UNITY_SETUP_INSTANCE_ID(v);
-    UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+    // UNITY_SETUP_INSTANCE_ID(v);
+    // UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
     o.pos = UnityObjectToClipPos(v.vertex);
     o.nz.xyz = COMPUTE_VIEW_NORMAL;
     o.nz.w = COMPUTE_DEPTH_01;
+    o.projPos = ComputeScreenPos(o.pos);
     return o;
 }
+
 fixed4 frag(v2f i) : SV_Target {
-    return Output (i.nz.w, i.nz.xyz);
+    return LinearCorrectDepth(Linear01FromEyeToLinear01FromNear(i.nz.w));
 }
 ENDCG
     }
