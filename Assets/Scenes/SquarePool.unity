@@ -1998,6 +1998,11 @@ PrefabInstance:
       propertyPath: auv
       value: 
       objectReference: {fileID: 6207282852912111775}
+    - target: {fileID: 7539123155777984239, guid: fe9144dd8dc101040b20cfb3f194f289,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
