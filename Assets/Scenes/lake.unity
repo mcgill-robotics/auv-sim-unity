@@ -315,6 +315,36 @@ PrefabInstance:
       propertyPath: ROSClock
       value: 
       objectReference: {fileID: 1501599823}
+    - target: {fileID: 573591179028015319, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthEnd
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 573591179028015319, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthLayers.m_Bits
+      value: 2833
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthEnd
+      value: 98
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.a
+      value: 0.22745098
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthLayers.m_Bits
+      value: 2833
+      objectReference: {fileID: 0}
     - target: {fileID: 709341525689035954, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: ROSClock
@@ -399,6 +429,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5449358791783708913, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2833
       objectReference: {fileID: 0}
     - target: {fileID: 5453575958872177076, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
@@ -584,6 +619,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9067538300868637867, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2833
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1242,7 +1282,7 @@ PrefabInstance:
     - target: {fileID: 5296825098047564813, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
       propertyPath: depthEnd
-      value: 10
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 5296825098047564813, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
