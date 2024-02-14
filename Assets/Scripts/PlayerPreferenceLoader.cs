@@ -7,7 +7,6 @@ using TMPro;
 public class PlayerPreferenceLoader : MonoBehaviour
 {
     public LogicManager1 logicManagerScript;
-
     public Toggle PublishDownCamToggle;
     public Toggle PublishFrontCamToggle;
     public Toggle PublishDepthToggle;
@@ -110,10 +109,6 @@ public class PlayerPreferenceLoader : MonoBehaviour
 
         // CALL LOGIC MANAGER SCRIPT FUNCTIONS TO APPLY LOADING
         logicManagerScript.setQualityLevel();
-
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.Subscribe<Float64Msg>(xPositionTopicName, xPositionCallback);
-        roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
 
     }
 
