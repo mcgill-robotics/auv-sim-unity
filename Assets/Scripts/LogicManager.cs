@@ -33,6 +33,11 @@ public class LogicManager1 : MonoBehaviour
     public string thetaXTopicName;
     public string thetaYTopicName;
     public string thetaZTopicName;
+    public string pidQuatEnableName = "/controls/pid/quat/enable";
+    public string pidXEnableName = "/controls/pid/x/enable";
+    public string pidYEnableName = "/controls/pid/y/enable";
+    public string pidZEnableName = "/controls/pid/z/enable";
+
 
     public TMPro.TMP_InputField xInputField;
     public TMPro.TMP_InputField yInputField;
@@ -49,6 +54,7 @@ public class LogicManager1 : MonoBehaviour
     public TMP_Text RotXText;
     public TMP_Text RotYText;
     public TMP_Text RotZText;
+    
 
     [Header("FOR QUALITY SETTINGS")]
     public TMP_Dropdown qualityDropdown;
@@ -67,8 +73,7 @@ public class LogicManager1 : MonoBehaviour
     public Toggle PublishFrontCamToggle;
     public Toggle PublishDownCamToggle;
 
-    private ROSConnection roscon;
-
+    private ROSConnection roscon; 
 
 
     // Start is called before the first frame update
@@ -84,6 +89,10 @@ public class LogicManager1 : MonoBehaviour
         roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
+        roscon.RegisterPublisher<BoolMsg>(pidQuatEnableName);
+        roscon.RegisterPublisher<BoolMsg>(pidXEnableName);
+        roscon.RegisterPublisher<BoolMsg>(pidYEnableName);
+        roscon.RegisterPublisher<BoolMsg>(pidZEnableName);
         roscon.RegisterPublisher<RosMessageTypes.Geometry.QuaternionMsg>(quatSetpointTopicName); 
         activateFollowCam();
         activateFreeCam();
@@ -164,13 +173,22 @@ public class LogicManager1 : MonoBehaviour
     }
     
     public void reloadScene()
-    {
+    {   
+        BoolMsg bool_msg = new BoolMsg(false);
+        roscon.Publish(pidXEnableName, bool_msg);
+        roscon.Publish(pidYEnableName, bool_msg);
+        roscon.Publish(pidZEnableName, bool_msg);
+        
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.name);
+
     }
 
     public void setXPID()
-    {
+    {   
+        BoolMsg bool_msg = new BoolMsg(true);
+        roscon.Publish(pidXEnableName, bool_msg);
+
         Float64Msg msg = new Float64Msg();
         msg.data = float.Parse(xInputField.text);
         roscon.Publish(xSetpointTopicName, msg);
@@ -178,23 +196,32 @@ public class LogicManager1 : MonoBehaviour
 
     public void setYPID()
     {
+        BoolMsg bool_msg = new BoolMsg(true);
+        roscon.Publish(pidYEnableName, bool_msg);
+
         Float64Msg msg = new Float64Msg();
         msg.data = float.Parse(yInputField.text);
         roscon.Publish(ySetpointTopicName, msg);
     }
     
     public void setZPID()
-    {
+    {   
+        BoolMsg bool_msg = new BoolMsg(true);
+        roscon.Publish(pidZEnableName, bool_msg);
+
         Float64Msg msg = new Float64Msg();
         msg.data = float.Parse(zInputField.text);
         roscon.Publish(zSetpointTopicName, msg);
     }
     
     public void setQuatPID()
-    {
+    {   
+        BoolMsg bool_msg = new BoolMsg(true);
+        roscon.Publish(pidQuatEnableName, bool_msg);
+
         RosMessageTypes.Geometry.QuaternionMsg msg = new RosMessageTypes.Geometry.QuaternionMsg();
-        Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, float.Parse(rotXInputField.text));
-        Quaternion pitchQuaternion = Quaternion.Euler(float.Parse(rotYInputField.text), 0f, 0f);
+        Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, -float.Parse(rotXInputField.text));
+        Quaternion pitchQuaternion = Quaternion.Euler(-float.Parse(rotYInputField.text), 0f, 0f);
         Quaternion yawQuaternion = Quaternion.Euler(0f, float.Parse(rotZInputField.text), 0f);
         Quaternion setpoint = rollQuaternion * pitchQuaternion * yawQuaternion; // to specify XYZ order of euler angles
 

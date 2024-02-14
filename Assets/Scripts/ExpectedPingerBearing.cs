@@ -29,8 +29,6 @@ public class ExpectedPingerBearing : MonoBehaviour {
         // x is -y
         // z is x
         
-        Debug.Log("X " + msg.pinger1_bearing.x);
-        Debug.Log("Y" + msg.pinger1_bearing.y);
         pinger1Bearing = new Vector3(-(float)msg.pinger1_bearing.y, 0.0f, (float)msg.pinger1_bearing.x);
         pinger2Bearing = new Vector3(-(float)msg.pinger2_bearing.y, 0.0f, (float)msg.pinger2_bearing.x);
         pinger3Bearing = new Vector3(-(float)msg.pinger3_bearing.y, 0.0f, (float)msg.pinger3_bearing.x);
