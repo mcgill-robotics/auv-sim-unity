@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SquarePool.unity
     guid: 853f76cd56fb87445ae03a495133179f
+  - enabled: 1
+    path: Assets/Scenes/lake.unity
+    guid: 69cb0b6fca7859a4baf9c5dce3f0f928
   m_configObjects: {}
