@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 165732441}
   - component: {fileID: 165732443}
   - component: {fileID: 165732442}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: MRSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 379.75, y: -168.25}
+  m_AnchoredPosition: {x: 350, y: -153.14}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &165732442
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: f3416424462ae3947bddc8f6c6d6cd2a, type: 3}
+  m_Texture: {fileID: 2800000, guid: c9dd6fc6291266442950ae2f0b704da3, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -229,8 +229,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -591, y: 184}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -584, y: 187.68}
+  m_SizeDelta: {x: 123.6844, y: 30.9211}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &938090974
 MonoBehaviour:
@@ -378,7 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -424,11 +424,11 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2043250028}
+  - {fileID: 165732441}
   - {fileID: 938090973}
   - {fileID: 1868858897}
   - {fileID: 1654967618}
-  - {fileID: 2043250028}
-  - {fileID: 165732441}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -493,7 +493,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Competition
+  m_text: 'Lake
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 004b1618e03426947af89004a2f0c2bb, type: 2}
   m_sharedMaterial: {fileID: -1354654705530426433, guid: 004b1618e03426947af89004a2f0c2bb,
@@ -653,7 +655,7 @@ GameObject:
   - component: {fileID: 1654967619}
   - component: {fileID: 1654967622}
   m_Layer: 5
-  m_Name: Competition
+  m_Name: Lake
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -732,7 +734,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Scene2
+          m_StringArgument: lake
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1654967620
@@ -1102,8 +1104,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.000030517578, y: 0.000030517578}
+  m_SizeDelta: {x: -0.000061035, y: 0.000061035}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2043250029
 MonoBehaviour:
