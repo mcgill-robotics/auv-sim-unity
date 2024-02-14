@@ -51,8 +51,9 @@ public class PlayerPreferenceLoader : MonoBehaviour
     public TMP_Text negRollKeybindText;
     // FREEZE KEYBIND
     public TMP_Text freezeKeybindText;
-    private bool isCheckingKey = false;
+    private static bool isCheckingKey = false;
     private Color originalButtonColor;
+    private int timeoutInSeconds = 7;
 
     // Start is called before the first frame update
     void Start()
@@ -118,15 +119,18 @@ public class PlayerPreferenceLoader : MonoBehaviour
 
     public void OnButtonClick(Button clickedButton)
     {
-        Image buttonImage = clickedButton.GetComponent<Image>();
-        if (buttonImage != null)
-        {
-            originalButtonColor = buttonImage.color;
-        }
-        ChangeButtonColor(clickedButton, new Color(1f, 0f, 0f, 0.5f));
-        if (!isCheckingKey)
-        {
+        if (!isCheckingKey){
+            Image buttonImage = clickedButton.GetComponent<Image>();
+            
+            if (buttonImage != null){
+                originalButtonColor = buttonImage.color;
+            }
+            
+            ChangeButtonColor(clickedButton, new Color(1f, 0f, 0f, 0.5f));
             StartCoroutine(CheckForKey(clickedButton));
+
+        } else {
+            return;
         }
     }
 
@@ -134,23 +138,36 @@ public class PlayerPreferenceLoader : MonoBehaviour
     {
         isCheckingKey = true;
 
-        while (true)
+        float startTime = Time.time;
+
+        while (Time.time - startTime < timeoutInSeconds)
         {
             foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode)))
             {
                 if (Input.GetKeyDown(keyCode))
                 {
-                    TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI >();
-                    string newText = keyCode.ToString().ToLower();
-                    buttonText.text = newText;
-                    isCheckingKey = false;
-                    setPlayerRefsKeys(clickedButton, newText);
-                    ChangeButtonColor(clickedButton, originalButtonColor);
-                    yield break;
+                    if ((keyCode >= KeyCode.A && keyCode <= KeyCode.Z) || (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9))
+                    {
+                        TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI >();
+                        string newText = keyCode.ToString().ToLower();
+                        buttonText.text = newText;
+                        isCheckingKey = false;
+                        setPlayerRefsKeys(clickedButton, newText);
+                        ChangeButtonColor(clickedButton, originalButtonColor);
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return null;
+                    }
+                    
+                
                 }
             }
             yield return null;
         }
+        isCheckingKey = false;
+        ChangeButtonColor(clickedButton, originalButtonColor);
     }
 
     private void ChangeButtonColor(Button button, Color newColor)
