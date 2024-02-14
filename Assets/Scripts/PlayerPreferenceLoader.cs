@@ -191,7 +191,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
     }
 
     private void setPlayerRefsKeys(Button button, string keyCode){
-        
+        // movement keybinds
         if (button.name == "ForwardKeybind"){
             PlayerPrefs.SetString("surgeKeybind", keyCode);
             PlayerPrefs.Save();
@@ -214,6 +214,37 @@ public class PlayerPreferenceLoader : MonoBehaviour
         }
         if (button.name == "NegativeHeaveKeybind"){
             PlayerPrefs.SetString("negHeaveKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        
+        // rotations keybinds
+        if (button.name == "YawKeybind"){
+            PlayerPrefs.SetString("yawKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "NegativeYawKeybind"){
+            PlayerPrefs.SetString("negYawKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "PitchKeybind"){
+            PlayerPrefs.SetString("pitchKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "NegativePitchKeybind"){
+            PlayerPrefs.SetString("negPitchKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "RollKeybind"){
+            PlayerPrefs.SetString("rollKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "NegativeRollKeybind"){
+            PlayerPrefs.SetString("negRollKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+
+        if (button.name == "FreezeKeybind"){
+            PlayerPrefs.SetString("freezeKeybind", keyCode);
             PlayerPrefs.Save();
         }
 
