@@ -19195,7 +19195,6 @@ MonoBehaviour:
   CameraGuiToggle: {fileID: 3102479570849526197}
   DebugInfoGuiToggle: {fileID: 4088191502368839382}
   SensorSelectGuiToggle: {fileID: 6961708733454408335}
-  VisualizeBeliefsToggle: {fileID: 4399201137036935817}
   settingsGUI: {fileID: 1057162282297812304}
   frontCamRateInputField: {fileID: 7128991604752484364}
   downCamRateInputField: {fileID: 8223218298763560284}
