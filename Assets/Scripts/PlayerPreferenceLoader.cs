@@ -54,6 +54,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
     private static bool isCheckingKey = false;
     private Color originalButtonColor;
     private int timeoutInSeconds = 7;
+    public CameraPublisher camPub;
 
     // Start is called before the first frame update
     void Start()
@@ -110,6 +111,10 @@ public class PlayerPreferenceLoader : MonoBehaviour
         // CALL LOGIC MANAGER SCRIPT FUNCTIONS TO APPLY LOADING
         logicManagerScript.setQualityLevel();
 
+        roscon = ROSConnection.GetOrCreateInstance();
+        roscon.Subscribe<Float64Msg>(xPositionTopicName, xPositionCallback);
+        roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
+
     }
 
     string load(string key, string defaultValue)
@@ -134,6 +139,30 @@ public class PlayerPreferenceLoader : MonoBehaviour
         }
     }
 
+    public void OnClickRates(Button clickedButton){
+
+        if (clickedButton.name == "SetFrontCamRateBtn"){
+            PlayerPrefs.SetString("frontCamRate", frontCamRateInputField.text);
+        }
+        if (clickedButton.name == "SetDownCamRateBtn"){
+            PlayerPrefs.SetString("downCamRate", downCamRateInputField.text);
+        }
+        if (clickedButton.name == "SetFrontCamResBtn"){
+            PlayerPrefs.SetString("frontCamWidth", frontCamWidthInputField.text);
+            PlayerPrefs.SetString("frontCamHeight", frontCamHeightInputField.text);
+        }
+        if (clickedButton.name == "SetDownCamResBtn"){
+            PlayerPrefs.SetString("downCamHeight", downCamHeightInputField.text);
+            PlayerPrefs.SetString("downCamWidth", downCamWidthInputField.text);
+        }
+        if (clickedButton.name == "SetPoseRateBtn"){
+            PlayerPrefs.SetString("poseRate", poseRateInputField.text);
+        }
+        PlayerPrefs.Save();
+        camPub.Initialize();
+
+    }
+
     private System.Collections.IEnumerator CheckForKey(Button clickedButton)
     {
         isCheckingKey = true;
@@ -146,7 +175,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
             {
                 if (Input.GetKeyDown(keyCode))
                 {
-                    if ((keyCode >= KeyCode.A && keyCode <= KeyCode.Z) || (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9))
+                    if ((keyCode >= KeyCode.A && keyCode <= KeyCode.Z) || (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9) || (keyCode == KeyCode.Space))
                     {
                         TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI >();
                         string newText = keyCode.ToString().ToLower();
@@ -216,7 +245,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
             PlayerPrefs.SetString("negHeaveKeybind", keyCode);
             PlayerPrefs.Save();
         }
-        
+
         // rotations keybinds
         if (button.name == "YawKeybind"){
             PlayerPrefs.SetString("yawKeybind", keyCode);
