@@ -51,6 +51,8 @@ public class PlayerPreferenceLoader : MonoBehaviour
     public TMP_Text negRollKeybindText;
     // FREEZE KEYBIND
     public TMP_Text freezeKeybindText;
+    private bool isCheckingKey = false;
+    private Color originalButtonColor;
 
     // Start is called before the first frame update
     void Start()
@@ -112,5 +114,91 @@ public class PlayerPreferenceLoader : MonoBehaviour
     string load(string key, string defaultValue)
     {
         return PlayerPrefs.GetString(key, defaultValue);
+    }
+
+    public void OnButtonClick(Button clickedButton)
+    {
+        Image buttonImage = clickedButton.GetComponent<Image>();
+        if (buttonImage != null)
+        {
+            originalButtonColor = buttonImage.color;
+        }
+        ChangeButtonColor(clickedButton, new Color(1f, 0f, 0f, 0.5f));
+        if (!isCheckingKey)
+        {
+            StartCoroutine(CheckForKey(clickedButton));
+        }
+    }
+
+    private System.Collections.IEnumerator CheckForKey(Button clickedButton)
+    {
+        isCheckingKey = true;
+
+        while (true)
+        {
+            foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode)))
+            {
+                if (Input.GetKeyDown(keyCode))
+                {
+                    TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI >();
+                    string newText = keyCode.ToString().ToLower();
+                    buttonText.text = newText;
+                    isCheckingKey = false;
+                    setPlayerRefsKeys(clickedButton, newText);
+                    ChangeButtonColor(clickedButton, originalButtonColor);
+                    yield break;
+                }
+            }
+            yield return null;
+        }
+    }
+
+    private void ChangeButtonColor(Button button, Color newColor)
+    {
+        if (button != null)
+        {
+            Image buttonImage = button.GetComponent<Image>();
+            if (buttonImage != null)
+            {
+                buttonImage.color = newColor;
+            }
+            else
+            {
+                Debug.LogError("Image component not found on the button GameObject.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Button component not assigned.");
+        }
+    }
+
+    private void setPlayerRefsKeys(Button button, string keyCode){
+        
+        if (button.name == "ForwardKeybind"){
+            PlayerPrefs.SetString("surgeKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "BackwardKeybind"){
+            PlayerPrefs.SetString("negSurgeKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "LeftKeybind"){
+            PlayerPrefs.SetString("swayKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "RightKeybind"){
+            PlayerPrefs.SetString("negSwayKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "HeaveKeybind"){
+            PlayerPrefs.SetString("heaveKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+        if (button.name == "NegativeHeaveKeybind"){
+            PlayerPrefs.SetString("negHeaveKeybind", keyCode);
+            PlayerPrefs.Save();
+        }
+
     }
 }
