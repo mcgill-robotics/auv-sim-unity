@@ -238,9 +238,6 @@ public class LogicManager1 : MonoBehaviour
         } else {
             waterObject.SetActive(true);
         }
-        if (qualityDropdown.value == 2) {
-
-        }
     }
 
     public void setROSPublishToggle() {
