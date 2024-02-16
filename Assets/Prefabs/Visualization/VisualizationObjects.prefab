@@ -308,15 +308,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 515d570c9ba4e58438fa43d82b75d3c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pinger1Bearing: {x: 0, y: 0, z: 0}
-  pinger2Bearing: {x: 0, y: 0, z: 0}
-  pinger3Bearing: {x: 0, y: 0, z: 0}
-  pinger4Bearing: {x: 0, y: 0, z: 0}
   Diana: {fileID: 4280374532802326820}
   ExpectedPinger1: {fileID: 2005680050307560075}
   ExpectedPinger2: {fileID: 178099776962942731}
   ExpectedPinger3: {fileID: 8519638552033538106}
   ExpectedPinger4: {fileID: 3500032331422628413}
+  truePingerBearingParent: {fileID: 2317717495254038825}
 --- !u!1 &644303360617149145
 GameObject:
   m_ObjectHideFlags: 0
@@ -1946,7 +1943,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6008821663083383522
 Transform:
   m_ObjectHideFlags: 0

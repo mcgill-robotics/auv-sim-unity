@@ -20,7 +20,6 @@ public class PlayerPreferenceLoader : MonoBehaviour
     public Toggle CameraGuiToggle;
     public Toggle DebugInfoGuiToggle;
     public Toggle SensorSelectGuiToggle;
-    public Toggle VisualizeBeliefsToggle;
 
     public GameObject settingsGUI;
     //ROS SETTINGS UI ELEMENTS
@@ -73,7 +72,6 @@ public class PlayerPreferenceLoader : MonoBehaviour
         CameraGuiToggle.isOn = bool.Parse(load("CameraGuiToggle", "true"));
         DebugInfoGuiToggle.isOn = bool.Parse(load("DebugInfoGuiToggle", "true"));
         SensorSelectGuiToggle.isOn = bool.Parse(load("SensorSelectGuiToggle", "true"));
-        VisualizeBeliefsToggle.isOn = bool.Parse(load("VisualizeBeliefsToggle", "true"));
 
         // activate settings to ensure settings UI will update instantly
         settingsGUI.SetActive(true);
