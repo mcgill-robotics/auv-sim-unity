@@ -7,7 +7,6 @@ using TMPro;
 public class PlayerPreferenceLoader : MonoBehaviour
 {
     public LogicManager1 logicManagerScript;
-
     public Toggle PublishDownCamToggle;
     public Toggle PublishFrontCamToggle;
     public Toggle PublishDepthToggle;
@@ -111,4 +110,5 @@ public class PlayerPreferenceLoader : MonoBehaviour
     {
         return PlayerPrefs.GetString(key, defaultValue);
     }
+    
 }
