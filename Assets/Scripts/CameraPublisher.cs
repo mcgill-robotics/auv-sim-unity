@@ -121,6 +121,8 @@ public class CameraPublisher : MonoBehaviour {
             cameraInfoMessage.height = (uint) publishHeight;
             cameraInfoMessage.K = GetIntrinsic(cam);
             roscon.Publish(infoTopic, cameraInfoMessage);
+
+            timeElapsed = 0;
         }
     }
 

@@ -2935,13 +2935,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2939540207406600517}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5818,13 +5818,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5097203308992959792}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6656,13 +6656,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5293902268332359845}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -7638,13 +7638,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1318042123577952072}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -7772,13 +7772,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 8774160468800177482}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -14698,13 +14698,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5869654214856384710}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -19164,7 +19164,7 @@ Transform:
   m_GameObject: {fileID: 5888939150855243449}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -31.712214, y: 31.06833, z: -32.5988}
+  m_LocalPosition: {x: -31.712208, y: 31.06832, z: -32.5988}
   m_LocalScale: {x: 1.0575794, y: 1.0575794, z: 1.0575794}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20203,13 +20203,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 5028036533590491744}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -21263,13 +21263,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 4518768321326833798}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -24123,13 +24123,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 3919062941828717032}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -24617,13 +24617,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 7280702682873570528}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -24751,13 +24751,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 618245093481682419}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -25289,13 +25289,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 8959784731336580651}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -26594,13 +26594,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8802404770607110610}
-        m_TargetAssemblyTypeName: LogicManager1, Assembly-CSharp
-        m_MethodName: setZPID
-        m_Mode: 1
+      - m_Target: {fileID: 787956991830660767}
+        m_TargetAssemblyTypeName: PlayerPreferenceLoader, Assembly-CSharp
+        m_MethodName: OnButtonClick
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 7003263431629161663}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -26935,6 +26935,10 @@ MonoBehaviour:
   thetaXTopicName: /state/theta/x
   thetaYTopicName: /state/theta/y
   thetaZTopicName: /state/theta/z
+  pidQuatEnableName: /controls/pid/quat/enable
+  pidXEnableName: /controls/pid/x/enable
+  pidYEnableName: /controls/pid/y/enable
+  pidZEnableName: /controls/pid/z/enable
   xInputField: {fileID: 3428791423950976642}
   yInputField: {fileID: 4443700471279586134}
   zInputField: {fileID: 2029708016509124632}
@@ -26949,11 +26953,17 @@ MonoBehaviour:
   RotZText: {fileID: 1109755116668570712}
   qualityDropdown: {fileID: 2940965058856985268}
   waterObject: {fileID: 0}
+  PublishDVLToggle: {fileID: 0}
   PublishROSToggle: {fileID: 672695481884564430}
   DisplaySimToggle: {fileID: 4456184810390242533}
+  PublishIMUToggle: {fileID: 0}
   hiddenSimLayerMask:
     serializedVersion: 2
     m_Bits: 1560
+  PublishDepthToggle: {fileID: 0}
+  PublishHydrophonesToggle: {fileID: 0}
+  PublishFrontCamToggle: {fileID: 0}
+  PublishDownCamToggle: {fileID: 0}
 --- !u!1 &8686098597198071976
 GameObject:
   m_ObjectHideFlags: 0
