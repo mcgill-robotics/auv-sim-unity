@@ -1989,6 +1989,10 @@ MonoBehaviour:
   thetaXTopicName: /state/theta/x
   thetaYTopicName: /state/theta/y
   thetaZTopicName: /state/theta/z
+  pidQuatEnableName: /controls/pid/quat/enable
+  pidXEnableName: /controls/pid/x/enable
+  pidYEnableName: /controls/pid/y/enable
+  pidZEnableName: /controls/pid/z/enable
   xInputField: {fileID: 1129485743307125987}
   yInputField: {fileID: 9013284660523209409}
   zInputField: {fileID: 8702904961761662957}
@@ -2003,11 +2007,27 @@ MonoBehaviour:
   RotZText: {fileID: 792457055047865602}
   qualityDropdown: {fileID: 8997312943293373086}
   waterObject: {fileID: 0}
+  PublishDVLToggle: {fileID: 3213936915588399300}
   PublishROSToggle: {fileID: 8385683480480584980}
   DisplaySimToggle: {fileID: 1843891120060462986}
+  PublishIMUToggle: {fileID: 238491925735580352}
   hiddenSimLayerMask:
     serializedVersion: 2
     m_Bits: 1560
+  PublishDepthToggle: {fileID: 2979558056141152629}
+  PublishHydrophonesToggle: {fileID: 7888603869471875345}
+  PublishFrontCamToggle: {fileID: 3670223155979208578}
+  PublishDownCamToggle: {fileID: 5702722839728351790}
+  frontCamRateInputField: {fileID: 3264008991904397011}
+  downCamRateInputField: {fileID: 8858875285144551552}
+  frontCamWidthInputField: {fileID: 2108619091069215940}
+  frontCamHeightInputField: {fileID: 5511250122170668444}
+  downCamWidthInputField: {fileID: 538390437348107028}
+  downCamHeightInputField: {fileID: 997807177711170821}
+  poseRateInputField: {fileID: 4823786881685592051}
+  frontCamPub: {fileID: 0}
+  downCamPub: {fileID: 0}
+  depthCamPub: {fileID: 0}
 --- !u!1 &774353789228983600
 GameObject:
   m_ObjectHideFlags: 0

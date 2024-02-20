@@ -292,6 +292,42 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5deee85aa310055499ba07de83decdcb, type: 3}
+--- !u!114 &1725125090253566739 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8854565254095210587, guid: 5deee85aa310055499ba07de83decdcb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1725125090253566738}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6642039138354941070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e2c113a351ce545845315cf47417c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1725125090253566740 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5893181029425891567, guid: 5deee85aa310055499ba07de83decdcb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1725125090253566738}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6642039138354941070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1f530d6fe7ff924eafbaf47e789bbc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1725125090253566741 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4512782091847515814, guid: 5deee85aa310055499ba07de83decdcb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1725125090253566738}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6642039138354941070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1f530d6fe7ff924eafbaf47e789bbc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2420192389075659319
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -703,6 +739,21 @@ PrefabInstance:
       propertyPath: followCam
       value: 
       objectReference: {fileID: 5221225813191996731}
+    - target: {fileID: 4640251518440368495, guid: 1a73412f8be35584cba82730e1a43755,
+        type: 3}
+      propertyPath: downCamPub
+      value: 
+      objectReference: {fileID: 1725125090253566741}
+    - target: {fileID: 4640251518440368495, guid: 1a73412f8be35584cba82730e1a43755,
+        type: 3}
+      propertyPath: depthCamPub
+      value: 
+      objectReference: {fileID: 1725125090253566739}
+    - target: {fileID: 4640251518440368495, guid: 1a73412f8be35584cba82730e1a43755,
+        type: 3}
+      propertyPath: frontCamPub
+      value: 
+      objectReference: {fileID: 1725125090253566740}
     - target: {fileID: 4640251518440368495, guid: 1a73412f8be35584cba82730e1a43755,
         type: 3}
       propertyPath: waterObject
