@@ -98,6 +98,7 @@ public class CameraPublisher : MonoBehaviour {
             publishToRos = false;
         }
         timeElapsed += Time.deltaTime;
+        
         if (timeElapsed > 1.0f/FPS && publishToRos)
         {
             cam.targetTexture = renderTexture;
