@@ -64,7 +64,7 @@ public class MainCamControl : MonoBehaviour
         }
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0 || Input.GetAxis("Mouse ScrollWheel") < 0 ) {
-            float distanceToWorld = Mathf.Max(Vector3.Distance(cam.transform.position, getWorldPointUnderMouse()), 2f);
+            float distanceToWorld = Mathf.Max(Vector3.Distance(cam.transform.position, getWorldPointUnderMouse()), 5f);
             cam.transform.position = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, scrollSpeed * Input.GetAxis("Mouse ScrollWheel") * distanceToWorld/5));
         } 
         
