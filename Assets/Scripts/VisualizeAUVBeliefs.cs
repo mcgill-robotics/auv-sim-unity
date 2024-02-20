@@ -107,7 +107,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
             } else if (detection.label == "Buoy") {
                 buoyInMap = true;
                 buoyVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
-                buoyVisualization.transform.rotation = Quaternion.Euler(0, (float)detection.theta_z, 0);
+                buoyVisualization.transform.rotation = Quaternion.Euler(0, (float)detection.theta_z + 90f, 0);
             } else if (detection.label == "Octagon Table") {
                 octagonTableInMap = true;
                 octagonTableVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
