@@ -10,10 +10,12 @@ public class ExpectedPingerBearing : MonoBehaviour {
     ROSConnection roscon;
     private string pingerBearingTopicName = "/sensors/hydrophones/pinger_bearing";
 
-    public Vector3 pinger1Bearing;
-    public Vector3 pinger2Bearing;
-    public Vector3 pinger3Bearing;
-    public Vector3 pinger4Bearing;
+    Vector3 pinger1Bearing;
+    Vector3 pinger2Bearing;
+    Vector3 pinger3Bearing;
+    Vector3 pinger4Bearing;
+
+    bool hasReceivedPingerEstimate = false;
 
     public Transform Diana;
 
@@ -21,6 +23,9 @@ public class ExpectedPingerBearing : MonoBehaviour {
     public Transform ExpectedPinger2;
     public Transform ExpectedPinger3;
     public Transform ExpectedPinger4;
+
+    public GameObject truePingerBearingParent;
+
     Quaternion default_rotation = new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f);
 
     void pingerBearingCallback(PingerBearingMsg msg) {
@@ -29,12 +34,12 @@ public class ExpectedPingerBearing : MonoBehaviour {
         // x is -y
         // z is x
         
-        Debug.Log("X " + msg.pinger1_bearing.x);
-        Debug.Log("Y" + msg.pinger1_bearing.y);
         pinger1Bearing = new Vector3(-(float)msg.pinger1_bearing.y, 0.0f, (float)msg.pinger1_bearing.x);
         pinger2Bearing = new Vector3(-(float)msg.pinger2_bearing.y, 0.0f, (float)msg.pinger2_bearing.x);
         pinger3Bearing = new Vector3(-(float)msg.pinger3_bearing.y, 0.0f, (float)msg.pinger3_bearing.x);
         pinger4Bearing = new Vector3(-(float)msg.pinger4_bearing.y, 0.0f, (float)msg.pinger4_bearing.x);
+        hasReceivedPingerEstimate = true;
+        truePingerBearingParent.SetActive(true);
     }
 
     void Start() {
@@ -43,6 +48,7 @@ public class ExpectedPingerBearing : MonoBehaviour {
     }
 
     void Update() {
+        if (!hasReceivedPingerEstimate) return;
         ExpectedPinger1.position = Diana.position + new Vector3(0,1,0);
         ExpectedPinger2.position = Diana.position + new Vector3(0,1,0);
         ExpectedPinger3.position = Diana.position + new Vector3(0,1,0);

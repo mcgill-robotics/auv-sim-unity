@@ -98,6 +98,7 @@ public class CameraPublisher : MonoBehaviour {
             publishToRos = false;
         }
         timeElapsed += Time.deltaTime;
+        
         if (timeElapsed > 1.0f/FPS && publishToRos)
         {
             cam.targetTexture = renderTexture;
@@ -121,6 +122,8 @@ public class CameraPublisher : MonoBehaviour {
             cameraInfoMessage.height = (uint) publishHeight;
             cameraInfoMessage.K = GetIntrinsic(cam);
             roscon.Publish(infoTopic, cameraInfoMessage);
+
+            timeElapsed = 0;
         }
     }
 

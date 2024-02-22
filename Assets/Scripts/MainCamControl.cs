@@ -21,12 +21,12 @@ public class MainCamControl : MonoBehaviour
     private Vector3 initialMousePosition;
     private Vector3 initialCamDirection;
 
-    void Update()
+    void FixedUpdate()
     {
-        FixedUpdate();
+        Update();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         bool IsMouseOverGameWindow = !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
         if (!IsMouseOverGameWindow) {
@@ -64,7 +64,7 @@ public class MainCamControl : MonoBehaviour
         }
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0 || Input.GetAxis("Mouse ScrollWheel") < 0 ) {
-            float distanceToWorld = Mathf.Max(Vector3.Distance(cam.transform.position, getWorldPointUnderMouse()), 2f);
+            float distanceToWorld = Mathf.Max(Vector3.Distance(cam.transform.position, getWorldPointUnderMouse()), 5f);
             cam.transform.position = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, scrollSpeed * Input.GetAxis("Mouse ScrollWheel") * distanceToWorld/5));
         } 
         
@@ -79,8 +79,8 @@ public class MainCamControl : MonoBehaviour
     
     void UpdatePanning()
     {
-        cam.transform.RotateAround(initialMousePosition, Vector3.up, Input.GetAxisRaw("Mouse X") * XRotateSpeed * Time.deltaTime);
-        cam.transform.RotateAround(initialMousePosition, transform.right, Input.GetAxisRaw("Mouse Y") * YRotateSpeed * Time.deltaTime);
+        cam.transform.RotateAround(initialMousePosition, Vector3.up, Input.GetAxis("Mouse X") * XRotateSpeed * Time.fixedDeltaTime);
+        cam.transform.RotateAround(initialMousePosition, transform.right, Input.GetAxis("Mouse Y") * YRotateSpeed * Time.fixedDeltaTime);
     }
 
     Vector3 getWorldPointUnderMouse()
