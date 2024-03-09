@@ -246,43 +246,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -21.51559
+      value: -21.4
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -22.380003
+      value: -22.73
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -33.1
+      value: -33.17
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5931228
+      value: 0.60065717
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.07512837
+      value: -0.07114378
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7996599
+      value: 0.79608643
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.055724084
+      value: -0.019900724
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -10.267
+      value: -3.083
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 107.153
+      value: 106.143
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -3.149
+      value: -7.896
       objectReference: {fileID: 0}
     - target: {fileID: 400008, guid: f20a15ee7150fd647af421022dde4d44, type: 3}
       propertyPath: m_ConstrainProportionsScale
@@ -666,7 +666,7 @@ TerrainCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: b971bf7d4566c41449ee2959a8972f35, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: ff3bab8d37c7c0e45bf28ea97e842450, type: 2}
   m_EnableTreeColliders: 1
 --- !u!218 &1273886389
 Terrain:
@@ -677,7 +677,7 @@ Terrain:
   m_GameObject: {fileID: 1273886386}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: b971bf7d4566c41449ee2959a8972f35, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: ff3bab8d37c7c0e45bf28ea97e842450, type: 2}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
