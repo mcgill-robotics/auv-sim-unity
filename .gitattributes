@@ -1,5 +1,5 @@
 *.sln text
-* text eol=lf
+*.asset eol=lf -text
 *.png binary
 *.pt binary
 *.pdf binary
