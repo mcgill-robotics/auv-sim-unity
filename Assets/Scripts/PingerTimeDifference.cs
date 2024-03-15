@@ -117,10 +117,10 @@ public class PingerTimeDifference : MonoBehaviour {
         time4Diff[3] = time4[3] - time1[3];
         
 
-        timeDiffMsg.dt_pinger1 = new double[2] {time2Diff[0], time3Diff[0], time4Diff[0]};
-        timeDiffMsg.dt_pinger2 = new double[2] {time2Diff[1], time3Diff[1], time4Diff[1]};
-        timeDiffMsg.dt_pinger3 = new double[2] {time2Diff[2], time3Diff[2], time4Diff[2]};
-        timeDiffMsg.dt_pinger4 = new double[2] {time2Diff[3], time3Diff[3], time4Diff[3]};
+        timeDiffMsg.dt_pinger1 = new double[3] {time2Diff[0], time3Diff[0], time4Diff[0]};
+        timeDiffMsg.dt_pinger2 = new double[3] {time2Diff[1], time3Diff[1], time4Diff[1]};
+        timeDiffMsg.dt_pinger3 = new double[3] {time2Diff[2], time3Diff[2], time4Diff[2]};
+        timeDiffMsg.dt_pinger4 = new double[3] {time2Diff[3], time3Diff[3], time4Diff[3]};
 
         roscon.Publish(pingerTimeDifferenceTopicName, timeDiffMsg);
     }
