@@ -44,7 +44,7 @@ public class PingerTimeDifference : MonoBehaviour {
         hydrophone1.position = transform.position + Vector3.up * -0.5f;
         hydrophone2.position = hydrophone1.position + Vector3.forward * 0.1f;
         hydrophone3.position = hydrophone1.position + Vector3.right * -0.1f;
-        hydrophone4.position = hydrophone1.position + Vector3.up * -0.1f;   
+        hydrophone4.position = hydrophone1.position + Vector3.up * -0.1f;   // Position unsure, change if incorrect
 
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.RegisterPublisher<PingerTimeDifferenceMsg>(pingerTimeDifferenceTopicName); 
