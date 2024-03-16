@@ -402,6 +402,12 @@ Transform:
   - {fileID: 903474673884779288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &393137689 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4593424934240793374, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &731648943
 GameObject:
   m_ObjectHideFlags: 0
@@ -510,6 +516,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 357466907183608939, guid: aa61c4e32bb17c741850c8493a01975c,
     type: 3}
   m_PrefabInstance: {fileID: 755665431}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &760109512 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 480369389584627130, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &813260827
 PrefabInstance:
@@ -1053,6 +1065,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1830194917}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1907267124 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7185839655269147826, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2005052683 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1487725964637141184, guid: 43a06d251454db744b1961d17085d98a,
@@ -1163,6 +1181,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 357466907183608939, guid: aa61c4e32bb17c741850c8493a01975c,
     type: 3}
   m_PrefabInstance: {fileID: 2041468934}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2075251490 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1702395658486560678, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &550464106571170563
 PrefabInstance:
@@ -2089,6 +2113,36 @@ PrefabInstance:
       propertyPath: ROSClock
       value: 
       objectReference: {fileID: 8624929}
+    - target: {fileID: 2147572688685011025, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_Name
+      value: HZ
+      objectReference: {fileID: 0}
+    - target: {fileID: 2396982645971625551, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_Name
+      value: HX
+      objectReference: {fileID: 0}
+    - target: {fileID: 4394602334487593476, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_Name
+      value: HY
+      objectReference: {fileID: 0}
+    - target: {fileID: 4593424934240793374, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4593424934240793374, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: Diana
+      value: 
+      objectReference: {fileID: 6207282852912111775}
     - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: pinger1
@@ -2124,16 +2178,56 @@ PrefabInstance:
       propertyPath: hydrophone3
       value: 
       objectReference: {fileID: 2005052683}
+    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: hydrophone4
+      value: 
+      objectReference: {fileID: 760109512}
+    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: hydrophoneO
+      value: 
+      objectReference: {fileID: 2075251490}
+    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: hydrophoneX
+      value: 
+      objectReference: {fileID: 393137689}
+    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: hydrophoneY
+      value: 
+      objectReference: {fileID: 1907267124}
+    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: hydrophoneZ
+      value: 
+      objectReference: {fileID: 760109512}
     - target: {fileID: 6642039138362327368, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_Name
       value: Diana
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185839655269147826, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185839655269147826, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8399238135166730803, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: ROSClock
       value: 
       objectReference: {fileID: 8624929}
+    - target: {fileID: 8863598140929573514, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_Name
+      value: HO
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
