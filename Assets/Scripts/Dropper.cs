@@ -8,7 +8,7 @@ using RosMessageTypes.Geometry;
 public class Dropper : MonoBehaviour {
     public Transform DroppingSphere;
     ROSConnection roscon;
-    private string dropperTopicName = "/actuators/drop";
+    private string dropperTopicName = "/actuators/grab";
 
     void dropSphere(GameObject sphere) {
         // Get the Rigidbody component of the sphere
@@ -31,7 +31,7 @@ public class Dropper : MonoBehaviour {
 
     void Start() {
         roscon = ROSConnection.GetOrCreateInstance();
-        roscon.Subscribe<EmptyMsg>("/actuators/drop", dropSphereCallback);
+        roscon.Subscribe<Bool>("/actuators/grab", dropSphereCallback);
     }
 
     void Update() {
