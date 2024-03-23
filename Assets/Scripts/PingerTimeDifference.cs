@@ -51,7 +51,69 @@ public class PingerTimeDifference : MonoBehaviour {
         roscon.RegisterPublisher<PingerTimeDifferenceMsg>(pingerTimeDifferenceTopicName); 
     }
 
-    void calculateTimeDifference() {
+    void calculateTimeDifference2D() {
+        timeDiffMsg.is_pinger1_active = true;
+        timeDiffMsg.is_pinger2_active = true;
+        timeDiffMsg.is_pinger3_active = true;
+        timeDiffMsg.is_pinger4_active = true;
+        
+        // Pinger 1
+        dO[0] = Vector3.Distance(hydrophoneO.position, pinger1.position);
+        dX[0] = Vector3.Distance(hydrophoneX.position, pinger1.position);
+        dY[0] = Vector3.Distance(hydrophoneY.position, pinger1.position);
+
+        timeO[0] = dO[0] / speedOfSound;
+        timeX[0] = dX[0] / speedOfSound;
+        timeY[0] = dY[0] / speedOfSound;
+
+        timeXDiff[0] = timeO[0] - timeX[0];
+        timeYDiff[0] = timeO[0] - timeY[0];
+
+        // Pinger 2
+        dO[1] = Vector3.Distance(hydrophoneO.position, pinger2.position);
+        dX[1] = Vector3.Distance(hydrophoneX.position, pinger2.position);
+        dY[1] = Vector3.Distance(hydrophoneY.position, pinger2.position);
+
+        timeO[1] = dO[1] / speedOfSound;
+        timeX[1] = dX[1] / speedOfSound;
+        timeY[1] = dY[1] / speedOfSound;
+
+        timeXDiff[1] = timeO[1] - timeX[1];
+        timeYDiff[1] = timeO[1] - timeY[1];
+
+        // Pinger 3
+        dO[2] = Vector3.Distance(hydrophoneO.position, pinger3.position);
+        dX[2] = Vector3.Distance(hydrophoneX.position, pinger3.position);
+        dY[2] = Vector3.Distance(hydrophoneY.position, pinger3.position);
+
+        timeO[2] = dO[2] / speedOfSound;
+        timeX[2] = dX[2] / speedOfSound;
+        timeY[2] = dY[2] / speedOfSound;
+
+        timeXDiff[2] =  timeO[2] - timeX[2];
+        timeYDiff[2] =  timeO[2] - timeY[2];
+
+        // Pinger 4
+        dO[3] = Vector3.Distance(hydrophoneO.position, pinger4.position);
+        dX[3] = Vector3.Distance(hydrophoneX.position, pinger4.position);
+        dY[3] = Vector3.Distance(hydrophoneY.position, pinger4.position);
+
+        timeO[3] = dO[3] / speedOfSound;
+        timeX[3] = dX[3] / speedOfSound;
+        timeY[3] = dY[3] / speedOfSound;
+
+        timeXDiff[3] = timeO[3] - timeX[3];
+        timeYDiff[3] = timeO[3] - timeY[3];
+        
+        timeDiffMsg.dt_pinger1 = new double[2] {timeXDiff[0], timeYDiff[0]};
+        timeDiffMsg.dt_pinger2 = new double[2] {timeXDiff[1], timeYDiff[1]};
+        timeDiffMsg.dt_pinger3 = new double[2] {timeXDiff[2], timeYDiff[2]};
+        timeDiffMsg.dt_pinger4 = new double[2] {timeXDiff[3], timeYDiff[3]};
+
+        roscon.Publish(pingerTimeDifferenceTopicName, timeDiffMsg);
+    }
+
+    void calculateTimeDifference3D() {
         timeDiffMsg.is_pinger1_active = true;
         timeDiffMsg.is_pinger2_active = true;
         timeDiffMsg.is_pinger3_active = true;
@@ -127,6 +189,9 @@ public class PingerTimeDifference : MonoBehaviour {
     }
 
     void Update() {
-        calculateTimeDifference();
+        if (hydrophoneZ == null) {
+            calculateTimeDifference2D();
+        }
+        calculateTimeDifference3D();
     }
 }
