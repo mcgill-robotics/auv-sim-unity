@@ -2202,7 +2202,7 @@ PrefabInstance:
         type: 3}
       propertyPath: hydrophoneZ
       value: 
-      objectReference: {fileID: 760109512}
+      objectReference: {fileID: 0}
     - target: {fileID: 6642039138362327368, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_Name
