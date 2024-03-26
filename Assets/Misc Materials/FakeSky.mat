@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: FakeSky
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_Parent: {fileID: 2100000, guid: 260e8016abf1e104d8b6b034e55a174c, type: 2}
+  m_Parent: {fileID: 7922251121040759823, guid: 9cd55fce13a7eff4cbdb3c957214b7a7,
+    type: 3}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []

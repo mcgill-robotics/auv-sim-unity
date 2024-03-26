@@ -25,13 +25,15 @@ public class Dropper : MonoBehaviour {
         }
     }
 
-    void dropSphereCallback(EmptyMsg message) {
-        dropSphere(DroppingSphere.gameObject);
+    void dropSphereCallback(BoolMsg message) {
+        if (message.data) { // Check if boolmsg is true
+            dropSphere(DroppingSphere.gameObject);
+        }
     }
 
     void Start() {
         roscon = ROSConnection.GetOrCreateInstance();
-        roscon.Subscribe<Bool>("/actuators/grab", dropSphereCallback);
+        roscon.Subscribe<BoolMsg>("/actuators/grab", dropSphereCallback);
     }
 
     void Update() {
