@@ -908,7 +908,13 @@ PlayerSettings:
   XboxOneOverrideIdentityName: 
   XboxOneOverrideIdentityPublisher: 
   vrEditorSettings: {}
-  cloudServicesEnabled: {}
+  cloudServicesEnabled:
+    Build: 0
+    Game Performance: 0
+    Legacy Analytics: 0
+    Purchasing: 0
+    UDP: 0
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -928,11 +934,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 6cd96846-49f4-41d2-9d2a-2bd5cc8d24a6
+  cloudProjectId: 3e378c8b-94db-4829-b0f0-a2ade5789667
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: auv-sim-unity-HDRP
-  organizationId: averystraumann
+  projectName: AUV-SIM-UNITY
+  organizationId: unity_a6ddaa592a0d2d6d09c9
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
