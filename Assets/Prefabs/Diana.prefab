@@ -9844,6 +9844,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1895543544804091106}
   m_Mesh: {fileID: -5368255686313445931, guid: e887983eeac3f204e95bd0e56bf28deb, type: 3}
+--- !u!1 &2147572688685011025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 480369389584627130}
+  m_Layer: 7
+  m_Name: H4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &480369389584627130
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2147572688685011025}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 142454021354145122}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2396982645971625551
 GameObject:
   m_ObjectHideFlags: 0
@@ -29943,6 +29974,7 @@ Transform:
   - {fileID: 4593424934240793374}
   - {fileID: 7185839655269147826}
   - {fileID: 1702395658486560678}
+  - {fileID: 480369389584627130}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!65 &5558434845062824359
@@ -30123,6 +30155,7 @@ MonoBehaviour:
   hydrophone1: {fileID: 0}
   hydrophone2: {fileID: 0}
   hydrophone3: {fileID: 0}
+  hydrophone4: {fileID: 0}
   pinger1: {fileID: 0}
   pinger2: {fileID: 0}
   pinger3: {fileID: 0}
