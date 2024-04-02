@@ -677,6 +677,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 996712570}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1188850908 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7185839655269147826, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1254071584 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7539123155778216309, guid: fe9144dd8dc101040b20cfb3f194f289,
@@ -2409,12 +2415,12 @@ PrefabInstance:
         type: 3}
       propertyPath: hydrophoneY
       value: 
-      objectReference: {fileID: 1907267124}
+      objectReference: {fileID: 1188850908}
     - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: hydrophoneZ
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 760109512}
     - target: {fileID: 6642039138362327368, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_Name
