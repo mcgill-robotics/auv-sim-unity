@@ -1,3 +1,4 @@
+*.sln text
 *.png binary
 *.pt binary
 *.pdf binary
