@@ -1,6 +1,7 @@
-*.sln text
-* text eol=lf
 *.png binary
 *.pt binary
 *.pdf binary
 *.ttf binary
+*.tif binary
+*.asset text
+*.unity text
