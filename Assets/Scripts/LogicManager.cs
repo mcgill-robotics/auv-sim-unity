@@ -33,6 +33,10 @@ public class LogicManager1 : MonoBehaviour
     public string thetaXTopicName;
     public string thetaYTopicName;
     public string thetaZTopicName;
+    public string missionStatusTopicName;
+    public string DVLStatusTopicName;
+    public string IMUStatusTopicName;
+    public string depthStatusTopicName;
     public string pidQuatEnableName = "/controls/pid/quat/enable";
     public string pidXEnableName = "/controls/pid/x/enable";
     public string pidYEnableName = "/controls/pid/y/enable";
@@ -54,6 +58,10 @@ public class LogicManager1 : MonoBehaviour
     public TMP_Text RotXText;
     public TMP_Text RotYText;
     public TMP_Text RotZText;
+    public TMP_Text MissionStatusText;
+    public TMP_Text DVLStatusText;
+    public TMP_Text IMUStatusText;
+    public TMP_Text DepthStatusText;
     
 
     [Header("FOR QUALITY SETTINGS")]
@@ -101,6 +109,10 @@ public class LogicManager1 : MonoBehaviour
         roscon.Subscribe<Float64Msg>(thetaXTopicName, thetaXCallback);
         roscon.Subscribe<Float64Msg>(thetaYTopicName, thetaYCallback);
         roscon.Subscribe<Float64Msg>(thetaZTopicName, thetaZCallback);
+        roscon.Subscribe<StringMsg>(missionStatusTopicName, missionStatusCallback);
+        roscon.Subscribe<BoolMsg>(DVLStatusTopicName, DVLStatusCallback);
+        roscon.Subscribe<BoolMsg>(IMUStatusTopicName, IMUStatusCallback);
+        roscon.Subscribe<BoolMsg>(depthStatusTopicName, depthStatusCallback);
         roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
@@ -137,6 +149,22 @@ public class LogicManager1 : MonoBehaviour
     
     void thetaZCallback(Float64Msg msg) {
         RotZText.text = "Current Euler Z: " + msg.data;
+    }
+
+    void missionStatusCallback(StringMsg msg) {
+        MissionStatusText.text = "Mission status: " + msg.data;
+    }
+
+    void DVLStatusCallback(BoolMsg msg) {
+        DVLStatusText.text = "DVL Status: " + msg.data.ToString();
+    }
+
+    void IMUStatusCallback(BoolMsg msg) {
+        IMUStatusText.text = "IMU Status: " + msg.data.ToString();
+    }
+
+    void depthStatusCallback(BoolMsg msg) {
+        DepthStatusText.text = "Depth Status: " + msg.data.ToString();
     }
 
     public void activateDownCam() {
