@@ -37,6 +37,10 @@ public class LogicManager1 : MonoBehaviour
     public string DVLStatusTopicName;
     public string IMUStatusTopicName;
     public string depthStatusTopicName;
+    public string hydrophonesStatusTopicName;
+    public string actuatorStatusTopicName;
+    public string downCamStatusTopicName;
+    public string frontCamStatusTopicName;
     public string pidQuatEnableName = "/controls/pid/quat/enable";
     public string pidXEnableName = "/controls/pid/x/enable";
     public string pidYEnableName = "/controls/pid/y/enable";
@@ -62,6 +66,10 @@ public class LogicManager1 : MonoBehaviour
     public TMP_Text DVLStatusText;
     public TMP_Text IMUStatusText;
     public TMP_Text DepthStatusText;
+    public TMP_Text HydrophonesStatusText;
+    public TMP_Text ActuatorStatusText;
+    public TMP_Text FrontCamStatusText;
+    public TMP_Text DownCamStatusText;
     
 
     [Header("FOR QUALITY SETTINGS")]
@@ -110,9 +118,13 @@ public class LogicManager1 : MonoBehaviour
         roscon.Subscribe<Float64Msg>(thetaYTopicName, thetaYCallback);
         roscon.Subscribe<Float64Msg>(thetaZTopicName, thetaZCallback);
         roscon.Subscribe<StringMsg>(missionStatusTopicName, missionStatusCallback);
-        roscon.Subscribe<BoolMsg>(DVLStatusTopicName, DVLStatusCallback);
-        roscon.Subscribe<BoolMsg>(IMUStatusTopicName, IMUStatusCallback);
-        roscon.Subscribe<BoolMsg>(depthStatusTopicName, depthStatusCallback);
+        roscon.Subscribe<Int32Msg>(DVLStatusTopicName, DVLStatusCallback);
+        roscon.Subscribe<Int32Msg>(IMUStatusTopicName, IMUStatusCallback);
+        roscon.Subscribe<Int32Msg>(depthStatusTopicName, depthStatusCallback);
+        roscon.Subscribe<Int32Msg>(hydrophonesStatusTopicName, hydrophonesStatusCallback);
+        roscon.Subscribe<Int32Msg>(actuatorStatusTopicName, actuatorStatusCallback);
+        roscon.Subscribe<Int32Msg>(downCamStatusTopicName, downCamStatusCallback);
+        roscon.Subscribe<Int32Msg>(frontCamStatusTopicName, frontCamStatusCallback);
         roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
@@ -155,16 +167,32 @@ public class LogicManager1 : MonoBehaviour
         MissionStatusText.text = "Mission status: " + msg.data;
     }
 
-    void DVLStatusCallback(BoolMsg msg) {
+    void DVLStatusCallback(Int32Msg msg) {
         DVLStatusText.text = "DVL Status: " + msg.data.ToString();
     }
 
-    void IMUStatusCallback(BoolMsg msg) {
+    void IMUStatusCallback(Int32Msg msg) {
         IMUStatusText.text = "IMU Status: " + msg.data.ToString();
     }
 
-    void depthStatusCallback(BoolMsg msg) {
+    void depthStatusCallback(Int32Msg msg) {
         DepthStatusText.text = "Depth Status: " + msg.data.ToString();
+    }
+
+    void hydrophonesStatusCallback(Int32Msg msg) {
+        HydrophonesStatusText.text = "Hydrophones Status: " + msg.data.ToString();
+    }
+
+    void actuatorStatusCallback(Int32Msg msg) {
+        ActuatorStatusText.text = "Actuator Status: " + msg.data.ToString();
+    }
+
+    void downCamStatusCallback(Int32Msg msg) {
+        DownCamStatusText.text = "Down Cam Status: " + msg.data.ToString();
+    }
+
+    void frontCamStatusCallback(Int32Msg msg) {
+        FrontCamStatusText.text = "Front Cam Status: " + msg.data.ToString();
     }
 
     public void activateDownCam() {
