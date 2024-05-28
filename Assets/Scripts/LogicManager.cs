@@ -41,6 +41,7 @@ public class LogicManager1 : MonoBehaviour
     public string actuatorStatusTopicName;
     public string downCamStatusTopicName;
     public string frontCamStatusTopicName;
+    public string IMUFrontCamStatusTopicName;
     public string pidQuatEnableName = "/controls/pid/quat/enable";
     public string pidXEnableName = "/controls/pid/x/enable";
     public string pidYEnableName = "/controls/pid/y/enable";
@@ -70,6 +71,7 @@ public class LogicManager1 : MonoBehaviour
     public TMP_Text ActuatorStatusText;
     public TMP_Text FrontCamStatusText;
     public TMP_Text DownCamStatusText;
+    public TMP_Text IMUFrontCamStatusText;
     
 
     [Header("FOR QUALITY SETTINGS")]
@@ -125,6 +127,7 @@ public class LogicManager1 : MonoBehaviour
         roscon.Subscribe<Int32Msg>(actuatorStatusTopicName, actuatorStatusCallback);
         roscon.Subscribe<Int32Msg>(downCamStatusTopicName, downCamStatusCallback);
         roscon.Subscribe<Int32Msg>(frontCamStatusTopicName, frontCamStatusCallback);
+        roscon.Subscribe<Int32Msg>(IMUFrontCamStatusTopicName, IMUfrontCamStatusCallback);
         roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
@@ -193,6 +196,10 @@ public class LogicManager1 : MonoBehaviour
 
     void frontCamStatusCallback(Int32Msg msg) {
         FrontCamStatusText.text = "Front Cam Status: " + msg.data.ToString();
+    }
+
+    void IMUfrontCamStatusCallback(Int32Msg msg) {
+        IMUFrontCamStatusText.text = "IMU Front Cam Status: " + msg.data.ToString();
     }
 
     public void activateDownCam() {
