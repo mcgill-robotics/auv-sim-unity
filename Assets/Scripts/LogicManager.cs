@@ -127,7 +127,7 @@ public class LogicManager1 : MonoBehaviour
         roscon.Subscribe<Int32Msg>(actuatorStatusTopicName, actuatorStatusCallback);
         roscon.Subscribe<Int32Msg>(downCamStatusTopicName, downCamStatusCallback);
         roscon.Subscribe<Int32Msg>(frontCamStatusTopicName, frontCamStatusCallback);
-        roscon.Subscribe<Int32Msg>(IMUFrontCamStatusTopicName, IMUfrontCamStatusCallback);
+        roscon.Subscribe<Int32Msg>(IMUFrontCamStatusTopicName, IMUFrontCamStatusCallback);
         roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
         roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
@@ -198,7 +198,7 @@ public class LogicManager1 : MonoBehaviour
         FrontCamStatusText.text = "Front Cam Status: " + msg.data.ToString();
     }
 
-    void IMUfrontCamStatusCallback(Int32Msg msg) {
+    void IMUFrontCamStatusCallback(Int32Msg msg) {
         IMUFrontCamStatusText.text = "IMU Front Cam Status: " + msg.data.ToString();
     }
 
