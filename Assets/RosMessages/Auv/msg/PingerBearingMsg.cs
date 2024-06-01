@@ -19,6 +19,7 @@ namespace RosMessageTypes.Auv
         public Geometry.Vector3Msg pinger4_bearing;
         public double state_x;
         public double state_y;
+        public double state_z;
 
         public PingerBearingMsg()
         {
@@ -28,9 +29,10 @@ namespace RosMessageTypes.Auv
             this.pinger4_bearing = new Geometry.Vector3Msg();
             this.state_x = 0.0;
             this.state_y = 0.0;
+            this.state_z = 0.0;
         }
 
-        public PingerBearingMsg(Geometry.Vector3Msg pinger1_bearing, Geometry.Vector3Msg pinger2_bearing, Geometry.Vector3Msg pinger3_bearing, Geometry.Vector3Msg pinger4_bearing, double state_x, double state_y)
+        public PingerBearingMsg(Geometry.Vector3Msg pinger1_bearing, Geometry.Vector3Msg pinger2_bearing, Geometry.Vector3Msg pinger3_bearing, Geometry.Vector3Msg pinger4_bearing, double state_x, double state_y, double state_z)
         {
             this.pinger1_bearing = pinger1_bearing;
             this.pinger2_bearing = pinger2_bearing;
@@ -38,6 +40,7 @@ namespace RosMessageTypes.Auv
             this.pinger4_bearing = pinger4_bearing;
             this.state_x = state_x;
             this.state_y = state_y;
+            this.state_z = state_z;
         }
 
         public static PingerBearingMsg Deserialize(MessageDeserializer deserializer) => new PingerBearingMsg(deserializer);
@@ -50,6 +53,7 @@ namespace RosMessageTypes.Auv
             this.pinger4_bearing = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.state_x);
             deserializer.Read(out this.state_y);
+            deserializer.Read(out this.state_z);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
@@ -60,6 +64,7 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.pinger4_bearing);
             serializer.Write(this.state_x);
             serializer.Write(this.state_y);
+            serializer.Write(this.state_z);
         }
 
         public override string ToString()
@@ -70,7 +75,8 @@ namespace RosMessageTypes.Auv
             "\npinger3_bearing: " + pinger3_bearing.ToString() +
             "\npinger4_bearing: " + pinger4_bearing.ToString() +
             "\nstate_x: " + state_x.ToString() +
-            "\nstate_y: " + state_y.ToString();
+            "\nstate_y: " + state_y.ToString() +
+            "\nstate_z: " + state_z.ToString();
         }
 
 #if UNITY_EDITOR
