@@ -12,10 +12,12 @@ public class StatePublisher : MonoBehaviour {
 
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
-    bool isDVLActive = true;
-    bool isDepthSensorActive = true;
-    bool isIMUActive = true;
+    int isDVLActive = 1;
+    int isDepthSensorActive = 1;
+    int isIMUActive = 1;
+    int isHydrophonesActive = 1; 
     bool publishToRos = true;
+
     int updateFrequency = 10;
 
     // Start is called before the first frame update
@@ -28,9 +30,10 @@ public class StatePublisher : MonoBehaviour {
     void Update() {
       publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
       updateFrequency = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
-      isDVLActive = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
-      isDepthSensorActive = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
-      isIMUActive = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
+      isDVLActive = Convert.ToInt32(bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true")));
+      isDepthSensorActive = Convert.ToInt32(bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true")));
+      isIMUActive = Convert.ToInt32(bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true")));
+      isHydrophonesActive = Convert.ToInt32(bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "true")));
 
       timeSinceLastUpdate += Time.deltaTime;
       if (timeSinceLastUpdate < 1.0/updateFrequency || !publishToRos) {
@@ -48,6 +51,7 @@ public class StatePublisher : MonoBehaviour {
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
       msg.isIMUActive = isIMUActive;
+      msg.isHydrophonesActive = isHydrophonesActive;
 
       roscon.Publish(stateTopicName, msg);
     }
