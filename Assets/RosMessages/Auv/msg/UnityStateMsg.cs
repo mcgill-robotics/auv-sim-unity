@@ -17,10 +17,10 @@ namespace RosMessageTypes.Auv
         public Geometry.QuaternionMsg orientation;
         public Geometry.Vector3Msg velocity;
         public Geometry.Vector3Msg angular_velocity;
-        public bool isDVLActive;
-        public bool isDepthSensorActive;
-        public bool isIMUActive;
-        public bool isHydrophonesActive;
+        public int isDVLActive;
+        public int isDepthSensorActive;
+        public int isIMUActive;
+        public int isHydrophonesActive;
 
         public UnityStateMsg()
         {
@@ -28,13 +28,13 @@ namespace RosMessageTypes.Auv
             this.orientation = new Geometry.QuaternionMsg();
             this.velocity = new Geometry.Vector3Msg();
             this.angular_velocity = new Geometry.Vector3Msg();
-            this.isDVLActive = false;
-            this.isDepthSensorActive = false;
-            this.isIMUActive = false;
-            this.isHydrophonesActive = false;
+            this.isDVLActive = 0;
+            this.isDepthSensorActive = 0;
+            this.isIMUActive = 0;
+            this.isHydrophonesActive = 0;
         }
 
-        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, bool isDVLActive, bool isDepthSensorActive, bool isIMUActive, bool isHydrophonesActive)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, int isDVLActive, int isDepthSensorActive, int isIMUActive, int isHydrophonesActive)
         {
             this.position = position;
             this.orientation = orientation;
