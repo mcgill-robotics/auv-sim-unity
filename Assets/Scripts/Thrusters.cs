@@ -22,14 +22,14 @@ public class Thrusters : MonoBehaviour {
     private float massScalarRealToSim;
 
     void thrusterForceCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg) {
-        current_ros_thruster_forces[0] = msg.SURGE_PORT;
-        current_ros_thruster_forces[1] = msg.SURGE_STAR;
-        current_ros_thruster_forces[2] = msg.SWAY_BOW;
-        current_ros_thruster_forces[3] = msg.SWAY_STERN;
-        current_ros_thruster_forces[4] = msg.HEAVE_BOW_PORT;
-        current_ros_thruster_forces[5] = msg.HEAVE_BOW_STAR;
-        current_ros_thruster_forces[6] = msg.HEAVE_STERN_STAR;
-        current_ros_thruster_forces[7] = msg.HEAVE_STERN_PORT;
+        current_ros_thruster_forces[0] = msg.FRONT_LEFT;
+        current_ros_thruster_forces[1] = msg.FRONT_RIGHT;
+        current_ros_thruster_forces[2] = msg.BACK_LEFT;
+        current_ros_thruster_forces[3] = msg.BACK_RIGHT;
+        current_ros_thruster_forces[4] = msg.HEAVE_FRONT_LEFT;
+        current_ros_thruster_forces[5] = msg.HEAVE_FRONT_RIGHT;
+        current_ros_thruster_forces[6] = msg.HEAVE_BACK_LEFT;
+        current_ros_thruster_forces[7] = msg.HEAVE_BACK_RIGHT;
     }
     
     // Start is called before the first frame update
