@@ -81,10 +81,10 @@ public class Thrusters : MonoBehaviour {
                 current_keyboard_thruster_forces[7] -= rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("yawKeybind", "j"))) {
-                current_keyboard_thruster_forces[0] += rotationForce / 4;
-                current_keyboard_thruster_forces[1] -= rotationForce / 4;
+                current_keyboard_thruster_forces[0] -= rotationForce / 4;
+                current_keyboard_thruster_forces[1] += rotationForce / 4;
                 current_keyboard_thruster_forces[2] += rotationForce / 4;
-                current_keyboard_thruster_forces[3] += rotationForce / 4;
+                current_keyboard_thruster_forces[3] -= rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("negPitchKeybind", "k"))) {
                 current_keyboard_thruster_forces[4] -= rotationForce / 4;
@@ -93,39 +93,47 @@ public class Thrusters : MonoBehaviour {
                 current_keyboard_thruster_forces[7] += rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("negYawKeybind", "l"))) {
-                current_keyboard_thruster_forces[0] -= rotationForce / 4;
-                current_keyboard_thruster_forces[1] += rotationForce / 4;
+                current_keyboard_thruster_forces[0] += rotationForce / 4;
+                current_keyboard_thruster_forces[1] -= rotationForce / 4;
                 current_keyboard_thruster_forces[2] -= rotationForce / 4;
-                current_keyboard_thruster_forces[3] -= rotationForce / 4;
+                current_keyboard_thruster_forces[3] += rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("negRollKeybind", "u"))) {
                 current_keyboard_thruster_forces[4] += rotationForce / 4;
                 current_keyboard_thruster_forces[5] -= rotationForce / 4;
-                current_keyboard_thruster_forces[6] -= rotationForce / 4;
-                current_keyboard_thruster_forces[7] += rotationForce / 4;
+                current_keyboard_thruster_forces[6] += rotationForce / 4;
+                current_keyboard_thruster_forces[7] -= rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("rollKeybind", "o"))) {
                 current_keyboard_thruster_forces[4] -= rotationForce / 4;
                 current_keyboard_thruster_forces[5] += rotationForce / 4;
-                current_keyboard_thruster_forces[6] += rotationForce / 4;
-                current_keyboard_thruster_forces[7] -= rotationForce / 4;
+                current_keyboard_thruster_forces[6] -= rotationForce / 4;
+                current_keyboard_thruster_forces[7] += rotationForce / 4;
             }
             //control position
             if (Input.GetKey(PlayerPrefs.GetString("surgeKeybind", "w"))) {
-                current_keyboard_thruster_forces[0] -= moveForce / 2;
-                current_keyboard_thruster_forces[1] -= moveForce / 2;
+                current_keyboard_thruster_forces[0] += moveForce / 4;
+                current_keyboard_thruster_forces[1] += moveForce / 4;
+                current_keyboard_thruster_forces[2] -= moveForce / 4;
+                current_keyboard_thruster_forces[3] -= moveForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("swayKeybind", "a"))) {
-                current_keyboard_thruster_forces[2] += moveForce / 2;
-                current_keyboard_thruster_forces[3] -= moveForce / 2;
-            }
-            if (Input.GetKey(PlayerPrefs.GetString("negSurgeKeybind", "s"))) {
-                current_keyboard_thruster_forces[0] += moveForce / 2;
+                current_keyboard_thruster_forces[0] -= moveForce / 2;
                 current_keyboard_thruster_forces[1] += moveForce / 2;
-            }
-            if (Input.GetKey(PlayerPrefs.GetString("negSwayKeybind", "d"))) {
                 current_keyboard_thruster_forces[2] -= moveForce / 2;
                 current_keyboard_thruster_forces[3] += moveForce / 2;
+            }
+            if (Input.GetKey(PlayerPrefs.GetString("negSurgeKeybind", "s"))) {
+                current_keyboard_thruster_forces[0] -= moveForce / 4;
+                current_keyboard_thruster_forces[1] -= moveForce / 4;
+                current_keyboard_thruster_forces[2] += moveForce / 4;
+                current_keyboard_thruster_forces[3] += moveForce / 4;
+            }
+            if (Input.GetKey(PlayerPrefs.GetString("negSwayKeybind", "d"))) {
+                current_keyboard_thruster_forces[0] += moveForce / 2;
+                current_keyboard_thruster_forces[1] -= moveForce / 2;
+                current_keyboard_thruster_forces[2] += moveForce / 2;
+                current_keyboard_thruster_forces[3] -= moveForce / 2;
             }
             if (Input.GetKey(PlayerPrefs.GetString("negHeaveKeybind", "q"))) {
                 current_keyboard_thruster_forces[4] += sinkForce / 4;
@@ -153,7 +161,7 @@ public class Thrusters : MonoBehaviour {
                 } else {
                     thrusterParticles[i].Stop();
                 }
-                Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
+                Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.down);
                 Vector3 force_in_direction = new Vector3(
                     worldForceDirection.x * (float)current_thruster_force * massScalarRealToSim,
                     worldForceDirection.y * (float)current_thruster_force * massScalarRealToSim,
