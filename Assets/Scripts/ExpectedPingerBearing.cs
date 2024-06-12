@@ -10,12 +10,9 @@ public class ExpectedPingerBearing : MonoBehaviour {
     ROSConnection roscon;
     private string pingerBearingTopicName = "/sensors/hydrophones/pinger_bearing";
 
-    Vector3 pinger1Bearing;
-    Vector3 pinger2Bearing;
-    Vector3 pinger3Bearing;
-    Vector3 pinger4Bearing;
+    Vector3[] pingerBearing = new Vector3[4];
 
-    bool hasReceivedPingerEstimate = false;
+    bool[] hasReceivedPingerEstimate = {false, false, false, false};
 
     public Transform Diana;
 
@@ -23,7 +20,8 @@ public class ExpectedPingerBearing : MonoBehaviour {
     public Transform ExpectedPinger2;
     public Transform ExpectedPinger3;
     public Transform ExpectedPinger4;
-
+    Transform[] ExpectedPinger = new Transform[4];
+ 
     public GameObject truePingerBearingParent;
 
     Quaternion default_rotation = new Quaternion(-0.7071068f, 0f, 0f, 0.7071068f);
@@ -33,31 +31,32 @@ public class ExpectedPingerBearing : MonoBehaviour {
         // y is z
         // x is -y
         // z is x
-        
-        pinger1Bearing = new Vector3(-(float)msg.pinger1_bearing.y, 0.0f, (float)msg.pinger1_bearing.x);
-        pinger2Bearing = new Vector3(-(float)msg.pinger2_bearing.y, 0.0f, (float)msg.pinger2_bearing.x);
-        pinger3Bearing = new Vector3(-(float)msg.pinger3_bearing.y, 0.0f, (float)msg.pinger3_bearing.x);
-        pinger4Bearing = new Vector3(-(float)msg.pinger4_bearing.y, 0.0f, (float)msg.pinger4_bearing.x);
-        hasReceivedPingerEstimate = true;
+        pingerBearing[msg.frequency_index] = new Vector3(
+            -(float)msg.pinger_bearing.y, 
+            (float)msg.pinger_bearing.z, 
+            (float)msg.pinger_bearing.x
+        );
+
+        hasReceivedPingerEstimate[msg.frequency_index] = true;
         truePingerBearingParent.SetActive(true);
     }
 
     void Start() {
+        ExpectedPinger[0] = ExpectedPinger1; 
+        ExpectedPinger[1] = ExpectedPinger2; 
+        ExpectedPinger[2] = ExpectedPinger3; 
+        ExpectedPinger[3] = ExpectedPinger4;
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.Subscribe<PingerBearingMsg>(pingerBearingTopicName, pingerBearingCallback);
     }
 
     void Update() {
-        if (!hasReceivedPingerEstimate) return;
-        ExpectedPinger1.position = Diana.position + new Vector3(0,1,0);
-        ExpectedPinger2.position = Diana.position + new Vector3(0,1,0);
-        ExpectedPinger3.position = Diana.position + new Vector3(0,1,0);
-        ExpectedPinger4.position = Diana.position + new Vector3(0,1,0);
-        
-        ExpectedPinger1.rotation = Quaternion.LookRotation(pinger1Bearing) * default_rotation;
-        ExpectedPinger2.rotation = Quaternion.LookRotation(pinger2Bearing) * default_rotation;
-        ExpectedPinger3.rotation = Quaternion.LookRotation(pinger3Bearing) * default_rotation;
-        ExpectedPinger4.rotation = Quaternion.LookRotation(pinger4Bearing) * default_rotation;
+        for (int i = 0; i < ExpectedPinger.Length; i++) {
+            if (hasReceivedPingerEstimate[i]) {
+                ExpectedPinger[i].position = Diana.position + new Vector3(0,1,0);
+                ExpectedPinger[i].rotation = Quaternion.LookRotation(pingerBearing[i]) * default_rotation;
+            }
+        }
     }
 }
 
