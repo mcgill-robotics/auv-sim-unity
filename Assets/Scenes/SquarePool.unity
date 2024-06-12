@@ -1660,6 +1660,11 @@ PrefabInstance:
       propertyPath: ROSClock
       value: 
       objectReference: {fileID: 8624929}
+    - target: {fileID: 4280303695290914712, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.186
+      objectReference: {fileID: 0}
     - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: pinger1
