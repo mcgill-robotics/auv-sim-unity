@@ -9,7 +9,10 @@ public class StatePublisher : MonoBehaviour {
     private ROSConnection roscon;
     public string stateTopicName = "/unity/state";
     public GameObject auv;
-
+    public Rigidbody auvRigidBody;
+    Vector3 acceleration;
+    Vector3 lastVelocity;
+    Vector3 currentVelocity;
     private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
     private float timeSinceLastUpdate;
     int isDVLActive = 1;
@@ -22,6 +25,9 @@ public class StatePublisher : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+      lastVelocity = auvRigidBody.velocity;
+      acceleration = new Vector3(0, 0, 0);
+
       roscon = ROSConnection.GetOrCreateInstance();
       roscon.RegisterPublisher<RosMessageTypes.Auv.UnityStateMsg>(stateTopicName); 
     }
@@ -41,12 +47,17 @@ public class StatePublisher : MonoBehaviour {
       }
       timeSinceLastUpdate = 0;
 
+      currentVelocity = auvRigidBody.velocity;
+      acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
+      lastVelocity = currentVelocity;
+
       msg.position = auv.transform.position.To<RUF>();
 
       Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
       msg.orientation = rotation.To<NED>();
       msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<RUF>();
       msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<RUF>();
+      msg.linear_acceleration = acceleration.To<RUF>();
 
       msg.isDVLActive = isDVLActive;
       msg.isDepthSensorActive = isDepthSensorActive;
