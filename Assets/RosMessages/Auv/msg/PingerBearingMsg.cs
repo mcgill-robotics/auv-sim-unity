@@ -13,7 +13,7 @@ namespace RosMessageTypes.Auv
         public const string k_RosMessageName = "auv_msgs/PingerBearing";
         public override string RosMessageName => k_RosMessageName;
 
-        public int frequency_index;
+        public int frequency;
         public Geometry.Vector3Msg pinger_bearing;
         public double state_x;
         public double state_y;
@@ -21,16 +21,16 @@ namespace RosMessageTypes.Auv
 
         public PingerBearingMsg()
         {
-            this.frequency_index = 0;
+            this.frequency = 0;
             this.pinger_bearing = new Geometry.Vector3Msg();
             this.state_x = 0.0;
             this.state_y = 0.0;
             this.state_z = 0.0;
         }
 
-        public PingerBearingMsg(int frequency_index, Geometry.Vector3Msg pinger_bearing, double state_x, double state_y, double state_z)
+        public PingerBearingMsg(int frequency, Geometry.Vector3Msg pinger_bearing, double state_x, double state_y, double state_z)
         {
-            this.frequency_index = frequency_index;
+            this.frequency = frequency;
             this.pinger_bearing = pinger_bearing;
             this.state_x = state_x;
             this.state_y = state_y;
@@ -41,7 +41,7 @@ namespace RosMessageTypes.Auv
 
         private PingerBearingMsg(MessageDeserializer deserializer)
         {
-            deserializer.Read(out this.frequency_index);
+            deserializer.Read(out this.frequency);
             this.pinger_bearing = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.state_x);
             deserializer.Read(out this.state_y);
@@ -50,7 +50,7 @@ namespace RosMessageTypes.Auv
 
         public override void SerializeTo(MessageSerializer serializer)
         {
-            serializer.Write(this.frequency_index);
+            serializer.Write(this.frequency);
             serializer.Write(this.pinger_bearing);
             serializer.Write(this.state_x);
             serializer.Write(this.state_y);
@@ -60,7 +60,7 @@ namespace RosMessageTypes.Auv
         public override string ToString()
         {
             return "PingerBearingMsg: " +
-            "\nfrequency_index: " + frequency_index.ToString() +
+            "\nfrequency: " + frequency.ToString() +
             "\npinger_bearing: " + pinger_bearing.ToString() +
             "\nstate_x: " + state_x.ToString() +
             "\nstate_y: " + state_y.ToString() +

@@ -32,7 +32,7 @@ public class PingerTimeDifference : MonoBehaviour {
     Vector3 pinger2Bearing;
     Vector3 pinger3Bearing;
     Vector3 pinger4Bearing;
-    int[] frequencies = {1, 2, 3, 4};
+    public int[] frequencies = {1, 2, 3, 4};
 
     double[] hydrophoneToPingerDistances = new double[4];
     double[] hydrophoneSignalTimes = new double[4];  
