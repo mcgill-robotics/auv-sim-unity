@@ -13,80 +13,41 @@ namespace RosMessageTypes.Auv
         public const string k_RosMessageName = "auv_msgs/PingerTimeDifference";
         public override string RosMessageName => k_RosMessageName;
 
-        public bool is_pinger1_active;
-        public bool is_pinger2_active;
-        public bool is_pinger3_active;
-        public bool is_pinger4_active;
-        public double[] dt_pinger1;
-        public double[] dt_pinger2;
-        public double[] dt_pinger3;
-        public double[] dt_pinger4;
+        public int frequency;
+        public uint[] times;
 
         public PingerTimeDifferenceMsg()
         {
-            this.is_pinger1_active = false;
-            this.is_pinger2_active = false;
-            this.is_pinger3_active = false;
-            this.is_pinger4_active = false;
-            this.dt_pinger1 = new double[0];
-            this.dt_pinger2 = new double[0];
-            this.dt_pinger3 = new double[0];
-            this.dt_pinger4 = new double[0];
+            this.frequency = 0;
+            this.times = new uint[0];
         }
 
-        public PingerTimeDifferenceMsg(bool is_pinger1_active, bool is_pinger2_active, bool is_pinger3_active, bool is_pinger4_active, double[] dt_pinger1, double[] dt_pinger2, double[] dt_pinger3, double[] dt_pinger4)
+        public PingerTimeDifferenceMsg(int frequency, uint[] times)
         {
-            this.is_pinger1_active = is_pinger1_active;
-            this.is_pinger2_active = is_pinger2_active;
-            this.is_pinger3_active = is_pinger3_active;
-            this.is_pinger4_active = is_pinger4_active;
-            this.dt_pinger1 = dt_pinger1;
-            this.dt_pinger2 = dt_pinger2;
-            this.dt_pinger3 = dt_pinger3;
-            this.dt_pinger4 = dt_pinger4;
+            this.frequency = frequency;
+            this.times = times;
         }
 
         public static PingerTimeDifferenceMsg Deserialize(MessageDeserializer deserializer) => new PingerTimeDifferenceMsg(deserializer);
 
         private PingerTimeDifferenceMsg(MessageDeserializer deserializer)
         {
-            deserializer.Read(out this.is_pinger1_active);
-            deserializer.Read(out this.is_pinger2_active);
-            deserializer.Read(out this.is_pinger3_active);
-            deserializer.Read(out this.is_pinger4_active);
-            deserializer.Read(out this.dt_pinger1, sizeof(double), deserializer.ReadLength());
-            deserializer.Read(out this.dt_pinger2, sizeof(double), deserializer.ReadLength());
-            deserializer.Read(out this.dt_pinger3, sizeof(double), deserializer.ReadLength());
-            deserializer.Read(out this.dt_pinger4, sizeof(double), deserializer.ReadLength());
+            deserializer.Read(out this.frequency);
+            deserializer.Read(out this.times, sizeof(uint), deserializer.ReadLength());
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
-            serializer.Write(this.is_pinger1_active);
-            serializer.Write(this.is_pinger2_active);
-            serializer.Write(this.is_pinger3_active);
-            serializer.Write(this.is_pinger4_active);
-            serializer.WriteLength(this.dt_pinger1);
-            serializer.Write(this.dt_pinger1);
-            serializer.WriteLength(this.dt_pinger2);
-            serializer.Write(this.dt_pinger2);
-            serializer.WriteLength(this.dt_pinger3);
-            serializer.Write(this.dt_pinger3);
-            serializer.WriteLength(this.dt_pinger4);
-            serializer.Write(this.dt_pinger4);
+            serializer.Write(this.frequency);
+            serializer.WriteLength(this.times);
+            serializer.Write(this.times);
         }
 
         public override string ToString()
         {
             return "PingerTimeDifferenceMsg: " +
-            "\nis_pinger1_active: " + is_pinger1_active.ToString() +
-            "\nis_pinger2_active: " + is_pinger2_active.ToString() +
-            "\nis_pinger3_active: " + is_pinger3_active.ToString() +
-            "\nis_pinger4_active: " + is_pinger4_active.ToString() +
-            "\ndt_pinger1: " + System.String.Join(", ", dt_pinger1.ToList()) +
-            "\ndt_pinger2: " + System.String.Join(", ", dt_pinger2.ToList()) +
-            "\ndt_pinger3: " + System.String.Join(", ", dt_pinger3.ToList()) +
-            "\ndt_pinger4: " + System.String.Join(", ", dt_pinger4.ToList());
+            "\nfrequency: " + frequency.ToString() +
+            "\ntimes: " + System.String.Join(", ", times.ToList());
         }
 
 #if UNITY_EDITOR

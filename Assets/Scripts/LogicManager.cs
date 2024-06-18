@@ -71,8 +71,7 @@ public class LogicManager1 : MonoBehaviour
     public TMP_Text ActuatorStatusText;
     public TMP_Text FrontCamStatusText;
     public TMP_Text DownCamStatusText;
-    public TMP_Text IMUFrontCamStatusText;
-    
+    public TMP_Text IMUFrontCamStatusText;    
 
     [Header("FOR QUALITY SETTINGS")]
     public TMP_Dropdown qualityDropdown;
@@ -91,6 +90,8 @@ public class LogicManager1 : MonoBehaviour
     public Toggle PublishFrontCamToggle;
     public Toggle PublishDownCamToggle;
 
+    public TMP_Dropdown HydrophonesNumberDropdown;
+
     private ROSConnection roscon; 
 
     public TMPro.TMP_InputField frontCamRateInputField;
@@ -107,6 +108,7 @@ public class LogicManager1 : MonoBehaviour
     public CameraPublisher frontCamPub;
     public CameraPublisher downCamPub;
     public CameraDepthPublisher depthCamPub;
+    public int hydrophonesNumberOption;
 
 
     // Start is called before the first frame update
@@ -139,7 +141,15 @@ public class LogicManager1 : MonoBehaviour
         activateFollowCam();
         activateFreeCam();
         followCamDefaultLayerMask = followCam.GetComponent<Camera>().cullingMask;
-        freeCamDefaultLayerMask = freeCam.GetComponent<Camera>().cullingMask;
+        freeCamDefaultLayerMask = freeCam.GetComponent<Camera>().cullingMask;  
+        hydrophonesNumberOption = 0; 
+        HydrophonesNumberDropdown.onValueChanged.AddListener(delegate {
+            DropdownValueChanged(HydrophonesNumberDropdown);
+        });
+    }
+
+    void DropdownValueChanged(TMP_Dropdown change) {
+        hydrophonesNumberOption = change.value;
     }
 
     void xPositionCallback(Float64Msg msg) {
