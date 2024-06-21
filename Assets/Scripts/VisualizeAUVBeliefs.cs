@@ -84,7 +84,6 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 	}
 
 	void UpdateVisualizeBearing1(bool isActive) {
-		Debug.Log(isActive);
 		trueBearingPinger1.SetActive(isActive);
 		expectedBearingPinger1.SetActive(isActive);
 	}
