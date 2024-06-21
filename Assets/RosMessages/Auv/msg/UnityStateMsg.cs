@@ -33,7 +33,7 @@ namespace RosMessageTypes.Auv
             this.orientation = new Geometry.QuaternionMsg();
             this.velocity = new Geometry.Vector3Msg();
             this.angular_velocity = new Geometry.Vector3Msg();
-            this.frequencies = new int[4];
+            this.frequencies = new int[0];
             this.times_pinger_1 = new uint[0];
             this.times_pinger_2 = new uint[0];
             this.times_pinger_3 = new uint[0];
@@ -69,7 +69,7 @@ namespace RosMessageTypes.Auv
             this.orientation = Geometry.QuaternionMsg.Deserialize(deserializer);
             this.velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             this.angular_velocity = Geometry.Vector3Msg.Deserialize(deserializer);
-            deserializer.Read(out this.frequencies, sizeof(int), 4);
+            deserializer.Read(out this.frequencies, sizeof(int), deserializer.ReadLength());
             deserializer.Read(out this.times_pinger_1, sizeof(uint), deserializer.ReadLength());
             deserializer.Read(out this.times_pinger_2, sizeof(uint), deserializer.ReadLength());
             deserializer.Read(out this.times_pinger_3, sizeof(uint), deserializer.ReadLength());
@@ -86,6 +86,7 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.orientation);
             serializer.Write(this.velocity);
             serializer.Write(this.angular_velocity);
+            serializer.WriteLength(this.frequencies);
             serializer.Write(this.frequencies);
             serializer.WriteLength(this.times_pinger_1);
             serializer.Write(this.times_pinger_1);

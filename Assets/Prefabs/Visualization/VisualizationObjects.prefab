@@ -122,7 +122,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Diana: {fileID: 4280374532802326820}
-  pinger: {fileID: 0}
+  pinger1: {fileID: 0}
+  pinger2: {fileID: 0}
+  pinger3: {fileID: 0}
+  pinger4: {fileID: 0}
+  trueBearing1: {fileID: 0}
+  trueBearing2: {fileID: 0}
+  trueBearing3: {fileID: 0}
+  trueBearing4: {fileID: 0}
 --- !u!1 &151149064476393552
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,7 +276,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8464577424086433159}
-  - component: {fileID: 2002414830074919948}
   m_Layer: 10
   m_Name: expected_pinger_bearing
   m_TagString: Untagged
@@ -296,24 +302,6 @@ Transform:
   - {fileID: 3500032331422628413}
   m_Father: {fileID: 3688279785327286677}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2002414830074919948
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 630361057815099102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 515d570c9ba4e58438fa43d82b75d3c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Diana: {fileID: 4280374532802326820}
-  ExpectedPinger1: {fileID: 2005680050307560075}
-  ExpectedPinger2: {fileID: 178099776962942731}
-  ExpectedPinger3: {fileID: 8519638552033538106}
-  ExpectedPinger4: {fileID: 3500032331422628413}
-  truePingerBearingParent: {fileID: 2317717495254038825}
 --- !u!1 &644303360617149145
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,7 +1524,6 @@ GameObject:
   - component: {fileID: 3441010553536666048}
   - component: {fileID: 6748507028022277066}
   - component: {fileID: 2409443651547529099}
-  - component: {fileID: 6706528256437147489}
   m_Layer: 10
   m_Name: true_pinger1_bearing
   m_TagString: Untagged
@@ -1633,20 +1620,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &6706528256437147489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2010008538299831353}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1132b8cd6a5e72241bb18069778d60d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Diana: {fileID: 4280374532802326820}
-  pinger: {fileID: 0}
 --- !u!1 &2111042509889910616
 GameObject:
   m_ObjectHideFlags: 0
@@ -4291,7 +4264,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Diana: {fileID: 4280374532802326820}
-  pinger: {fileID: 0}
+  pinger1: {fileID: 0}
+  pinger2: {fileID: 0}
+  pinger3: {fileID: 0}
+  pinger4: {fileID: 0}
+  trueBearing1: {fileID: 0}
+  trueBearing2: {fileID: 0}
+  trueBearing3: {fileID: 0}
+  trueBearing4: {fileID: 0}
 --- !u!1 &6006848637368756512
 GameObject:
   m_ObjectHideFlags: 0
@@ -5161,7 +5141,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Diana: {fileID: 4280374532802326820}
-  pinger: {fileID: 0}
+  pinger1: {fileID: 0}
+  pinger2: {fileID: 0}
+  pinger3: {fileID: 0}
+  pinger4: {fileID: 0}
+  trueBearing1: {fileID: 0}
+  trueBearing2: {fileID: 0}
+  trueBearing3: {fileID: 0}
+  trueBearing4: {fileID: 0}
 --- !u!1 &8003614537796102070
 GameObject:
   m_ObjectHideFlags: 0

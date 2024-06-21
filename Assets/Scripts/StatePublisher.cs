@@ -102,10 +102,9 @@ public class StatePublisher : MonoBehaviour {
 		uint[][] times = new uint[numberOfPingers][];
 		int[] frequencies = new int[numberOfPingers];
 		for (int i = 0; i < numberOfPingers; i++) {
-			(uint[] t, int f) = classPingerTimeDifference.calculateTimeDifference(i);
-			times[i] = t;
-			frequencies[i] = f;
+			(times[i], frequencies[i]) = classPingerTimeDifference.CalculateTimeDifference(i);
 		}
+		
 		
 		msg.position = auv.transform.position.To<RUF>();
 
