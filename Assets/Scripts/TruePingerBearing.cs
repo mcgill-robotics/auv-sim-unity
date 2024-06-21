@@ -16,7 +16,7 @@ public class truePingerBearing : MonoBehaviour {
 	List<Transform> pingersList = new List<Transform>();
 	List<Transform> bearingsList = new List<Transform>();
 
-	Quaternion default_rotation = new Quaternion(0.7071068f, 0f, 0f, 0.7071068f);
+	Quaternion default_rotation = new Quaternion(1.0f, 0f, 0f, 0.0f);
 
 	void Start () {
 		pingersList.Add(pinger1);
