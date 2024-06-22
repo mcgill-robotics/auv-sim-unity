@@ -17,6 +17,11 @@ namespace RosMessageTypes.Auv
         public Geometry.QuaternionMsg orientation;
         public Geometry.Vector3Msg velocity;
         public Geometry.Vector3Msg angular_velocity;
+        public int[] frequencies;
+        public uint[] times_pinger_1;
+        public uint[] times_pinger_2;
+        public uint[] times_pinger_3;
+        public uint[] times_pinger_4;
         public int isDVLActive;
         public int isDepthSensorActive;
         public int isIMUActive;
@@ -28,18 +33,28 @@ namespace RosMessageTypes.Auv
             this.orientation = new Geometry.QuaternionMsg();
             this.velocity = new Geometry.Vector3Msg();
             this.angular_velocity = new Geometry.Vector3Msg();
+            this.frequencies = new int[0];
+            this.times_pinger_1 = new uint[0];
+            this.times_pinger_2 = new uint[0];
+            this.times_pinger_3 = new uint[0];
+            this.times_pinger_4 = new uint[0];
             this.isDVLActive = 0;
             this.isDepthSensorActive = 0;
             this.isIMUActive = 0;
             this.isHydrophonesActive = 0;
         }
 
-        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, int isDVLActive, int isDepthSensorActive, int isIMUActive, int isHydrophonesActive)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, int[] frequencies, uint[] times_pinger_1, uint[] times_pinger_2, uint[] times_pinger_3, uint[] times_pinger_4, int isDVLActive, int isDepthSensorActive, int isIMUActive, int isHydrophonesActive)
         {
             this.position = position;
             this.orientation = orientation;
             this.velocity = velocity;
             this.angular_velocity = angular_velocity;
+            this.frequencies = frequencies;
+            this.times_pinger_1 = times_pinger_1;
+            this.times_pinger_2 = times_pinger_2;
+            this.times_pinger_3 = times_pinger_3;
+            this.times_pinger_4 = times_pinger_4;
             this.isDVLActive = isDVLActive;
             this.isDepthSensorActive = isDepthSensorActive;
             this.isIMUActive = isIMUActive;
@@ -54,6 +69,11 @@ namespace RosMessageTypes.Auv
             this.orientation = Geometry.QuaternionMsg.Deserialize(deserializer);
             this.velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             this.angular_velocity = Geometry.Vector3Msg.Deserialize(deserializer);
+            deserializer.Read(out this.frequencies, sizeof(int), deserializer.ReadLength());
+            deserializer.Read(out this.times_pinger_1, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.times_pinger_2, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.times_pinger_3, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.times_pinger_4, sizeof(uint), deserializer.ReadLength());
             deserializer.Read(out this.isDVLActive);
             deserializer.Read(out this.isDepthSensorActive);
             deserializer.Read(out this.isIMUActive);
@@ -66,6 +86,16 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.orientation);
             serializer.Write(this.velocity);
             serializer.Write(this.angular_velocity);
+            serializer.WriteLength(this.frequencies);
+            serializer.Write(this.frequencies);
+            serializer.WriteLength(this.times_pinger_1);
+            serializer.Write(this.times_pinger_1);
+            serializer.WriteLength(this.times_pinger_2);
+            serializer.Write(this.times_pinger_2);
+            serializer.WriteLength(this.times_pinger_3);
+            serializer.Write(this.times_pinger_3);
+            serializer.WriteLength(this.times_pinger_4);
+            serializer.Write(this.times_pinger_4);
             serializer.Write(this.isDVLActive);
             serializer.Write(this.isDepthSensorActive);
             serializer.Write(this.isIMUActive);
@@ -79,6 +109,11 @@ namespace RosMessageTypes.Auv
             "\norientation: " + orientation.ToString() +
             "\nvelocity: " + velocity.ToString() +
             "\nangular_velocity: " + angular_velocity.ToString() +
+            "\nfrequencies: " + System.String.Join(", ", frequencies.ToList()) +
+            "\ntimes_pinger_1: " + System.String.Join(", ", times_pinger_1.ToList()) +
+            "\ntimes_pinger_2: " + System.String.Join(", ", times_pinger_2.ToList()) +
+            "\ntimes_pinger_3: " + System.String.Join(", ", times_pinger_3.ToList()) +
+            "\ntimes_pinger_4: " + System.String.Join(", ", times_pinger_4.ToList()) +
             "\nisDVLActive: " + isDVLActive.ToString() +
             "\nisDepthSensorActive: " + isDepthSensorActive.ToString() +
             "\nisIMUActive: " + isIMUActive.ToString() +

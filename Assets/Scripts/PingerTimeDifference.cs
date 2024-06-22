@@ -1,104 +1,79 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using Unity.Robotics.ROSTCPConnector;
-using Unity.Robotics.ROSTCPConnector.ROSGeometry;
-using RosMessageTypes.Std;
-using RosMessageTypes.Auv;
-
-public class PingerTimeDifference : MonoBehaviour {
-    ROSConnection roscon;
-
-    public string pingerTimeDifferenceTopicName = "/sensors/hydrophones/pinger_time_difference";
-    
-    public double speedOfSound = 1480.0;
-
-    LogicManager1 logicManager1;
-
-    public Transform hydrophoneO;
-    public Transform hydrophoneX;
-    public Transform hydrophoneY;
-    public Transform hydrophoneZ;   // for fourth hydrophone
-    public Transform pinger1;
-    public Transform pinger2;
-    public Transform pinger3;
-    public Transform pinger4;
-
-    public List<Transform> hydrophoneList = new List<Transform>();
-    public List<Transform> pingersList = new List<Transform>();
-
-    Vector3 pinger1Bearing;
-    Vector3 pinger2Bearing;
-    Vector3 pinger3Bearing;
-    Vector3 pinger4Bearing;
-    public int[] frequencies = {1, 2, 3, 4};
-
-    double[] hydrophoneToPingerDistances = new double[4];
-    double[] hydrophoneSignalTimes = new double[4];  
-    // Time difference between Hydrophone 0 and all others
-    double[] hydrophonesTimeDifference = new double[3]; 
-    uint[] timeInNanoseconds = new uint[3];
-
-    void Start() {
-        // hydrophoneO.position = transform.position +  Vector3.up * -0.5f;
-        // hydrophoneX.position = hydrophoneO.position + Vector3.forward * 0.1f;
-        // hydrophoneY.position = hydrophoneO.position + Vector3.right * -0.1f;
-        // hydrophoneZ.position =  hydrophoneO.position + Vector3.up * -0.1f;   // Position unsure, change if incorrect
-
-        hydrophoneList.Add(hydrophoneO);
-        hydrophoneList.Add(hydrophoneX);
-        hydrophoneList.Add(hydrophoneY);
-        hydrophoneList.Add(hydrophoneZ);
-        pingersList.Add(pinger1);
-        pingersList.Add(pinger2);
-        pingersList.Add(pinger3);
-        pingersList.Add(pinger4);
-
-        logicManager1 = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
-
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.RegisterPublisher<PingerTimeDifferenceMsg>(pingerTimeDifferenceTopicName);         
-    }
+using System.Linq;
 
 
-    void calculateTimeDifference() {   
-        for (int j = 0; j < pingersList.Count; j++) {  
-            for (int i = 0; i < hydrophoneToPingerDistances.Length; i++) {
-                hydrophoneToPingerDistances[i] = Vector3.Distance(hydrophoneList[i].position, pingersList[j].position);
-                hydrophoneSignalTimes[i] = hydrophoneToPingerDistances[i] / speedOfSound;
-            }   
-            
-            for (int i = 0; i < hydrophonesTimeDifference.Length - 1; i++) {
-                hydrophonesTimeDifference[i] = hydrophoneSignalTimes[0] - hydrophoneSignalTimes[i + 1];
-            }
-            // Debug.Log();
-            // for (int i = 0; i < hydrophonesTimeDifference.Length; i++) {
-            //     // Check if the converted value fits within the uint range (0 to 4294967295)
-            //     if (hydrophonesTimeDifference[i] * 10e-8 <= uint.MaxValue) {
-            //         // Cast the double value multiplied by 10e-8 to uint
-            //         timeInNanoseconds[i] = (uint)(hydrophonesTimeDifference[i] * 10e-8);
-            //     } else {
-            //         // Handle potential overflow if the value is too large for uint
-            //         Debug.LogError($"Time value {hydrophonesTimeDifference[i]} exceeds uint range after conversion. Consider using a different data type.");
-            //     }
-            // }
-            
-            // @TODO - FIX MULTIPLICATION VALUE
-            for (int i = 0; i < hydrophonesTimeDifference.Length; i++) { 
-                timeInNanoseconds[i] = (uint)(hydrophonesTimeDifference[i] * 100000);
-            }
+public class PingerTimeDifference : MonoBehaviour {    
+	double speedOfSound = 1480.0;
 
-            PingerTimeDifferenceMsg timeDiffMsg = new PingerTimeDifferenceMsg();
-            timeDiffMsg.frequency = frequencies[j];
-            
-            timeDiffMsg.times = timeInNanoseconds[..(logicManager1.hydrophonesNumberOption+2)];
-            
-            roscon.Publish(pingerTimeDifferenceTopicName, timeDiffMsg);
-        }
-    }
+	LogicManager1 logicManager1;
 
-    void Update() {
-        calculateTimeDifference();
-    }
+	public Transform hydrophoneO;
+	public Transform hydrophoneX;
+	public Transform hydrophoneY;
+	public Transform hydrophoneZ;   // for fourth hydrophone
+	public Transform pinger1;
+	public Transform pinger2;
+	public Transform pinger3;
+	public Transform pinger4;
+	public int[] frequencies = new int[4];
+
+	List<Transform> hydrophoneList = new List<Transform>();
+	List<Transform> pingersList = new List<Transform>();
+
+	double[] pingerToHydrophonesTime = new double[4];  
+	double[] hydrophoneToPingerDistances = new double[4];
+	double[] hydrophonesTimes = new double[3]; 
+	double currentTime; // in seconds.
+	int scaledTimeUnit = 10000000; // 10e-7 --> 1 second = 10,000,000
+	uint uintMaxValue = uint.MaxValue;
+	double doubleUintMaxValue;
+	uint[] scaledTimes = new uint[3];
+	
+	void Start() {
+		doubleUintMaxValue = (double)uintMaxValue;
+
+		logicManager1 = FindObjectOfType<LogicManager1>(); // Find an instance of the other class.
+		if (logicManager1 == null) {
+			Debug.LogError("[in PingerTimeDifference.cs] LogiManager class is not assigned.");
+		}
+
+		hydrophoneList.Add(hydrophoneO);
+		hydrophoneList.Add(hydrophoneX);
+		hydrophoneList.Add(hydrophoneY);
+		hydrophoneList.Add(hydrophoneZ);
+		pingersList.Add(pinger1);
+		pingersList.Add(pinger2);
+		pingersList.Add(pinger3);
+		pingersList.Add(pinger4);
+	}
+
+	public (uint[], int) CalculateTimeDifference(int pinger_index) {  
+		/* 
+		Simulate absolute the time that each hydrophones detected a signal.
+		Returns: (Absolute time for eachc hydrophone of when it detected signal, frequency of signal)
+		*/
+
+		currentTime = Time.time;
+		
+		// 1. Calculate  the time it takes for frequency wave to get to each hydrophone. 
+		// Delta_time = Delta_space / Velocity_of_sound
+		for (int i = 0; i < hydrophoneToPingerDistances.Length; i++) {
+			hydrophoneToPingerDistances[i] = Vector3.Distance(hydrophoneList[i].position, pingersList[pinger_index].position);
+			pingerToHydrophonesTime[i] = hydrophoneToPingerDistances[i] / speedOfSound;
+		}   
+		
+		// 2. Get min Delta_time and calculate the difference to the other Delta_time.
+		double minDeltaTime = pingerToHydrophonesTime.Min();
+		double[] differences = pingerToHydrophonesTime.Select(value => value - minDeltaTime).ToArray();
+
+		// 3. Add the difference (always positive) to the currentTime --> absolute time.
+		hydrophonesTimes = differences.Select(diff => diff + currentTime).ToArray();
+
+    // 4. Scale times & 5. Simulate overflow.
+    scaledTimes = hydrophonesTimes.Select(time => (uint)((time * scaledTimeUnit) % doubleUintMaxValue)).ToArray();
+
+		return (scaledTimes[..(logicManager1.hydrophonesNumberOption+3)], frequencies[pinger_index]);
+	}
 }
