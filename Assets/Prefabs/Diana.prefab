@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4027727145202181931}
   - component: {fileID: 917342901599712562}
   m_Layer: 7
-  m_Name: T5
+  m_Name: T_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4851,7 +4851,7 @@ GameObject:
   - component: {fileID: 1525631298861369484}
   - component: {fileID: 6265910633743181312}
   m_Layer: 7
-  m_Name: T1
+  m_Name: T_5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10107,7 +10107,7 @@ GameObject:
   - component: {fileID: 2224246404826760794}
   - component: {fileID: 1040019666131477434}
   m_Layer: 7
-  m_Name: T7
+  m_Name: T_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15113,7 +15113,7 @@ GameObject:
   - component: {fileID: 305987408631327832}
   - component: {fileID: 8578474657466228811}
   m_Layer: 7
-  m_Name: T6
+  m_Name: T_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20089,7 +20089,7 @@ GameObject:
   - component: {fileID: 3558580705934371262}
   - component: {fileID: 1343134254498612216}
   m_Layer: 7
-  m_Name: T3
+  m_Name: T_8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25094,7 +25094,7 @@ GameObject:
   - component: {fileID: 214232693516036926}
   - component: {fileID: 6245546699801272700}
   m_Layer: 7
-  m_Name: T4
+  m_Name: T_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30070,23 +30070,23 @@ MonoBehaviour:
   moveForce: 30
   rotationForce: 6
   thrusters:
-  - {fileID: 3843044506494975501}
-  - {fileID: 7127034341945162317}
-  - {fileID: 9017845175051007044}
   - {fileID: 3180349591521751992}
-  - {fileID: 8924822783506195858}
-  - {fileID: 4485734789917198213}
-  - {fileID: 7002955693338183193}
   - {fileID: 2498170292098729312}
+  - {fileID: 4485734789917198213}
+  - {fileID: 7127034341945162317}
+  - {fileID: 3843044506494975501}
+  - {fileID: 8924822783506195858}
+  - {fileID: 7002955693338183193}
+  - {fileID: 9017845175051007044}
   thrusterParticles:
-  - {fileID: 6265910633743181312}
-  - {fileID: 3991166916865546585}
-  - {fileID: 1343134254498612216}
   - {fileID: 6245546699801272700}
-  - {fileID: 4027727145202181931}
-  - {fileID: 8578474657466228811}
-  - {fileID: 1040019666131477434}
   - {fileID: 3924975806902506137}
+  - {fileID: 8578474657466228811}
+  - {fileID: 3991166916865546585}
+  - {fileID: 6265910633743181312}
+  - {fileID: 4027727145202181931}
+  - {fileID: 1040019666131477434}
+  - {fileID: 1343134254498612216}
   AUVRealForceMultiplier: 3
   thrusterForcesTopicName: /propulsion/forces
 --- !u!114 &8399238135166730803
@@ -30161,6 +30161,7 @@ MonoBehaviour:
   pinger2: {fileID: 0}
   pinger3: {fileID: 0}
   pinger4: {fileID: 0}
+  frequencies: a861000030750000b8880000409c0000
 --- !u!1 &6857964464029234968
 GameObject:
   m_ObjectHideFlags: 0
@@ -30339,7 +30340,7 @@ GameObject:
   - component: {fileID: 8692503599748770734}
   - component: {fileID: 3991166916865546585}
   m_Layer: 7
-  m_Name: T2
+  m_Name: T_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35344,7 +35345,7 @@ GameObject:
   - component: {fileID: 9201017285306664875}
   - component: {fileID: 3924975806902506137}
   m_Layer: 7
-  m_Name: T8
+  m_Name: T_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40203,7 +40204,7 @@ Transform:
   m_GameObject: {fileID: 8145447325148307294}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.015, y: -0.16, z: 0.007}
+  m_LocalPosition: {x: -0.015, y: -0.186, z: 0.007}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
