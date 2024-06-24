@@ -5918,10 +5918,20 @@ PrefabInstance:
       propertyPath: ROSClock
       value: 
       objectReference: {fileID: 8624929}
-    - target: {fileID: 4280303695290914712, guid: 1b569bfd0ceba054590bd50d26375651,
+    - target: {fileID: 933235529770127536, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.186
+      propertyPath: m_AllowDynamicResolution
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1042058618123832615, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: AUVRealForceMultiplier
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5449358791783708913, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_AllowDynamicResolution
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
@@ -5943,25 +5953,10 @@ PrefabInstance:
       propertyPath: pinger4
       value: 
       objectReference: {fileID: 1707856123}
-    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
+    - target: {fileID: 5613464897600066670, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
-      propertyPath: frequencies.Array.data[0]
-      value: 25000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
-        type: 3}
-      propertyPath: frequencies.Array.data[1]
-      value: 30000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
-        type: 3}
-      propertyPath: frequencies.Array.data[2]
-      value: 35000
-      objectReference: {fileID: 0}
-    - target: {fileID: 5497699506469662933, guid: 1b569bfd0ceba054590bd50d26375651,
-        type: 3}
-      propertyPath: frequencies.Array.data[3]
-      value: 40000
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6642039138362327368, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
@@ -5973,6 +5968,11 @@ PrefabInstance:
       propertyPath: ROSClock
       value: 
       objectReference: {fileID: 8624929}
+    - target: {fileID: 9067538300868637867, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_AllowDynamicResolution
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
