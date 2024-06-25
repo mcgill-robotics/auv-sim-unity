@@ -14,6 +14,10 @@ public class StatePublisher : MonoBehaviour {
 	int numberOfPingers = 4;
 	public string stateTopicName = "/unity/state";
 	public GameObject auv;
+	public Rigidbody auvRigidBody;
+    Vector3 acceleration;
+    Vector3 lastVelocity;
+    Vector3 currentVelocity;
 
 	private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
 	private float timeSinceLastUpdate;
@@ -27,6 +31,8 @@ public class StatePublisher : MonoBehaviour {
 
 	// Start is called before the first frame update
 	void Start() {
+		lastVelocity = auvRigidBody.velocity;
+      	acceleration = new Vector3(0, 0, 0);
 		classLogicManager = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
 		if (classLogicManager != null) {
 			SubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
@@ -89,7 +95,7 @@ public class StatePublisher : MonoBehaviour {
 	}
 
     // Update is called once per frame
-	void Update() {
+	void FixedUpdate() {
 		publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
 		updateFrequency = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
 
@@ -105,6 +111,9 @@ public class StatePublisher : MonoBehaviour {
 			(times[i], frequencies[i]) = classPingerTimeDifference.CalculateTimeDifference(i);
 		}
 		
+		currentVelocity = auvRigidBody.velocity;
+		acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
+		lastVelocity = currentVelocity;
 		
 		msg.position = auv.transform.position.To<RUF>();
 
@@ -117,6 +126,7 @@ public class StatePublisher : MonoBehaviour {
 		msg.times_pinger_2 = times[1];
 		msg.times_pinger_3 = times[2];
 		msg.times_pinger_4 = times[3];
+		msg.linear_acceleration = acceleration.To<RUF>();
 
 		msg.isDVLActive = Convert.ToInt32(isDVLActive);
 		msg.isDepthSensorActive = Convert.ToInt32(isDepthSensorActive);
