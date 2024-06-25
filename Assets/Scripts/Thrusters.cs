@@ -22,14 +22,14 @@ public class Thrusters : MonoBehaviour {
     private float massScalarRealToSim;
 
     void thrusterForceCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg) {
-        current_ros_thruster_forces[4] = msg.FRONT_LEFT;
-        current_ros_thruster_forces[3] = msg.FRONT_RIGHT;
-        current_ros_thruster_forces[7] = msg.BACK_LEFT;
-        current_ros_thruster_forces[0] = msg.BACK_RIGHT;
-        current_ros_thruster_forces[5] = msg.HEAVE_FRONT_LEFT;
-        current_ros_thruster_forces[2] = msg.HEAVE_FRONT_RIGHT;
+        current_ros_thruster_forces[0] = msg.FRONT_LEFT;
+        current_ros_thruster_forces[1] = msg.FRONT_RIGHT;
+        current_ros_thruster_forces[2] = msg.BACK_LEFT;
+        current_ros_thruster_forces[3] = msg.BACK_RIGHT;
+        current_ros_thruster_forces[4] = msg.HEAVE_FRONT_LEFT;
+        current_ros_thruster_forces[5] = msg.HEAVE_FRONT_RIGHT;
         current_ros_thruster_forces[6] = msg.HEAVE_BACK_LEFT;
-        current_ros_thruster_forces[1] = msg.HEAVE_BACK_RIGHT;
+        current_ros_thruster_forces[7] = msg.HEAVE_BACK_RIGHT;
     }
     
     // Start is called before the first frame update
@@ -65,20 +65,20 @@ public class Thrusters : MonoBehaviour {
     {
         if (!isFrozen)
         {
-            current_keyboard_thruster_forces[4] = 0;
-            current_keyboard_thruster_forces[3] = 0;
-            current_keyboard_thruster_forces[7] = 0;
             current_keyboard_thruster_forces[0] = 0;
-            current_keyboard_thruster_forces[5] = 0;
-            current_keyboard_thruster_forces[2] = 0;
-            current_keyboard_thruster_forces[6] = 0;
             current_keyboard_thruster_forces[1] = 0;
+            current_keyboard_thruster_forces[2] = 0;
+            current_keyboard_thruster_forces[3] = 0;
+            current_keyboard_thruster_forces[4] = 0;
+            current_keyboard_thruster_forces[5] = 0;
+            current_keyboard_thruster_forces[6] = 0;
+            current_keyboard_thruster_forces[7] = 0;
             // control orientation
             if (Input.GetKey(PlayerPrefs.GetString("pitchKeybind", "i"))) {
                 current_keyboard_thruster_forces[5] += rotationForce / 4;
                 current_keyboard_thruster_forces[2] += rotationForce / 4;
-                current_keyboard_thruster_forces[6] -= rotationForce / 4;
                 current_keyboard_thruster_forces[1] -= rotationForce / 4;
+                current_keyboard_thruster_forces[6] -= rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("yawKeybind", "j"))) {
                 current_keyboard_thruster_forces[4] -= rotationForce / 4;
@@ -89,8 +89,8 @@ public class Thrusters : MonoBehaviour {
             if (Input.GetKey(PlayerPrefs.GetString("negPitchKeybind", "k"))) {
                 current_keyboard_thruster_forces[5] -= rotationForce / 4;
                 current_keyboard_thruster_forces[2] -= rotationForce / 4;
-                current_keyboard_thruster_forces[6] += rotationForce / 4;
                 current_keyboard_thruster_forces[1] += rotationForce / 4;
+                current_keyboard_thruster_forces[6] += rotationForce / 4;
             }
             if (Input.GetKey(PlayerPrefs.GetString("negYawKeybind", "l"))) {
                 current_keyboard_thruster_forces[4] += rotationForce / 4;
@@ -161,7 +161,7 @@ public class Thrusters : MonoBehaviour {
                 } else {
                     thrusterParticles[i].Stop();
                 }
-                Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.down);
+                Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
                 Vector3 force_in_direction = new Vector3(
                     worldForceDirection.x * (float)current_thruster_force * massScalarRealToSim,
                     worldForceDirection.y * (float)current_thruster_force * massScalarRealToSim,
