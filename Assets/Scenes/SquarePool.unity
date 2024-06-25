@@ -1998,6 +1998,7 @@ GameObject:
   - component: {fileID: 704409894}
   - component: {fileID: 704409893}
   - component: {fileID: 704409892}
+  - component: {fileID: 704409895}
   m_Layer: 5
   m_Name: TaskSelectionDropdown
   m_TagString: Untagged
@@ -2085,8 +2086,6 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Buoy
       m_Image: {fileID: 0}
-    - m_Text: Dropper
-      m_Image: {fileID: 0}
     - m_Text: Bin
       m_Image: {fileID: 0}
     - m_Text: Torpedoes
@@ -2139,6 +2138,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 704409890}
   m_CullTransparentMesh: 1
+--- !u!114 &704409895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704409890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6db7da4e56b58324fb209846300fd6a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Diana: {fileID: 6636075807003561213}
+  PoleQuali: {fileID: 509380137}
+  GateQuali: {fileID: 1916879084}
+  Gate: {fileID: 608833713}
+  LaneMarkerStraight: {fileID: 1778639699}
+  LaneMarker45Left: {fileID: 1473555366}
+  Buoy: {fileID: 529932685}
+  Pinger1: {fileID: 22528777}
+  Pinger2: {fileID: 371514115}
+  Pinger3: {fileID: 291631787}
+  Pinger4: {fileID: 1829674424}
+  OctagonTable: {fileID: 240931000}
+  Bin: {fileID: 231467401}
+  TaskSelectionDropdown: {fileID: 704409892}
 --- !u!224 &713060550 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1909683913105021413, guid: bbc9cbf680109cd46b643acbf3ee2aad,
@@ -5030,38 +5055,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7926141796255369339}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1418660593 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8662082210179673187, guid: bbc9cbf680109cd46b643acbf3ee2aad,
-    type: 3}
-  m_PrefabInstance: {fileID: 1782545752910746834}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1418660596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1418660593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6db7da4e56b58324fb209846300fd6a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Diana: {fileID: 6636075807003561213}
-  PoleQuali: {fileID: 509380137}
-  GateQuali: {fileID: 1916879084}
-  Gate: {fileID: 608833713}
-  LaneMarkerStraight: {fileID: 1778639699}
-  LaneMarker45Left: {fileID: 1473555366}
-  Buoy: {fileID: 529932685}
-  Pinger1: {fileID: 22528777}
-  Pinger2: {fileID: 371514115}
-  Pinger3: {fileID: 291631787}
-  Pinger4: {fileID: 1829674424}
-  OctagonTable: {fileID: 240931000}
-  Bin: {fileID: 231467401}
-  TaskSelectionDropdown: {fileID: 704409892}
 --- !u!1 &1450438565
 GameObject:
   m_ObjectHideFlags: 0
@@ -5838,7 +5831,7 @@ PrefabInstance:
     - target: {fileID: 6145180326267436429, guid: bef96aaf040ddb949b3ae1345df82e8c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6145180326267436429, guid: bef96aaf040ddb949b3ae1345df82e8c,
         type: 3}
@@ -5848,7 +5841,7 @@ PrefabInstance:
     - target: {fileID: 6145180326267436429, guid: bef96aaf040ddb949b3ae1345df82e8c,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6145180326267436429, guid: bef96aaf040ddb949b3ae1345df82e8c,
         type: 3}
@@ -7558,11 +7551,7 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1036458899}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8662082210179673187, guid: bbc9cbf680109cd46b643acbf3ee2aad,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1418660596}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bbc9cbf680109cd46b643acbf3ee2aad, type: 3}
 --- !u!1 &1994060661400303125 stripped
 GameObject:
@@ -8208,7 +8197,7 @@ PrefabInstance:
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
@@ -8406,10 +8395,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2007603}
     m_Modifications:
+    - target: {fileID: 375398725119299124, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 375398725119299124, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1610483585662502128, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1610483585662502128, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
         type: 3}
@@ -8419,7 +8418,7 @@ PrefabInstance:
     - target: {fileID: 1610483585662502128, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1610483585662502128, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
         type: 3}
@@ -8454,6 +8453,16 @@ PrefabInstance:
     - target: {fileID: 1610483585662502128, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026418999414935502, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026418999414935502, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4093329936564336754, guid: 6b46c0f84fb1ebb41bc57c6683e1a4cb,

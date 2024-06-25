@@ -25,7 +25,7 @@ public class TaskSelection : MonoBehaviour {
 	List<Dictionary<string, Vector3>> objectsPosition = new List<Dictionary<string, Vector3>>() {
 		// MasterPlanner 
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(-13, 0, -14)},
+			{"AUV", new Vector3(-13, -0.2f, -14)},
 			{"Gate", new Vector3(-9, -1, -12)},
 			{"LaneMarkerStraight", new Vector3(-6.5f, -5, -11.5f)},
 			{"Buoy", new Vector3(4, 0, -13)},
@@ -38,51 +38,47 @@ public class TaskSelection : MonoBehaviour {
 		},
 		// Quali
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -3)},
+			{"AUV", new Vector3(0, -0.2f, -3)},
 			{"GateQuali", new Vector3(0, -1, 0)},
 			{"PoleQuali", new Vector3(0, -3, 10)}
 		},
 		// Gate
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)},
-			{"Gate", new Vector3(0, 0, 0)}
+			{"AUV", new Vector3(0, -0.2f, 0)},
+			{"Gate", new Vector3(2, -1, 2)}
 		},
 		// Buoy
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)},
-			{"Buoy", new Vector3(0, 0, 0)}
-		},
-		// Dropper
-		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)}
-		},
-		// Octagon
-		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)},
-			{"Pinger1", new Vector3(0, 0, 0)},
-			{"OctagonTable", new Vector3(0, 0, 0)}
-		},
-		// Torpedo
-		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)}
+			{"AUV", new Vector3(0, -0.2f, 0)},
+			{"Buoy", new Vector3(0, 0, 3)}
 		},
 		// Bins
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)},
-			{"Bin", new Vector3(0, 0, 0)}
+			{"AUV", new Vector3(0, -0.2f, 0)},
+			{"Bin", new Vector3(0, -5, 3)}
 		}, 
+		// Torpedo
+		new Dictionary<string, Vector3> {
+			{"AUV", new Vector3(0, -0.2f, 0)}
+		},
+		// Octagon
+		new Dictionary<string, Vector3> {
+			{"AUV", new Vector3(0, -0.2f, 0)},
+			{"OctagonTable", new Vector3(0, -5, 3)}
+		},
 		// Lane Marker
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, -14)},
-			{"LaneMarker45Left", new Vector3(0, 0, 0)}
+			{"AUV", new Vector3(0, -0.2f, 0)},
+			{"LaneMarker45Left", new Vector3(2, -5, 2)},
+			{"LaneMarkerStraight", new Vector3(-5, -5, 7)},
 		},
 		// Pinger
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, 0, 0)},
-			{"Pinger1", new Vector3(0, 0, 0)},
-			{"Pinger2", new Vector3(0, 0, 0)},
-			{"Pinger3", new Vector3(0, 0, 0)},
-			{"Pinger4", new Vector3(0, 0, 0)}
+			{"AUV", new Vector3(0, -0.2f, 0)},
+			{"Pinger1", new Vector3(10, -3, 10)},
+			{"Pinger2", new Vector3(10, -3, -10)},
+			{"Pinger3", new Vector3(-10, -3, -10)},
+			{"Pinger4", new Vector3(-10, -3, 10)}
 		} 
 	};
 	
@@ -109,36 +105,32 @@ public class TaskSelection : MonoBehaviour {
 		// Gate
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(0, -90, 0)},
-			{"Gate", new Vector3(0, 0, 0)}
+			{"Gate", new Vector3(0, 45, 0)}
 		},
 		// Buoy
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(0, -90, 0)},
 			{"Buoy", new Vector3(0, 0, 0)}
 		},
-		// Dropper
+		// Bins
+		new Dictionary<string, Vector3> {
+			{"AUV", new Vector3(0, -90, 0)},
+			{"Bin", new Vector3(0, 0, 0)}
+		},
+		// Torpedo
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(0, -90, 0)}
 		},
 		// Octagon
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(0, -90, 0)},
-			{"Pinger1", new Vector3(0, 0, 0)},
 			{"OctagonTable", new Vector3(0, 0, 0)}
-		},
-		// Torpedo
-		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, -90, 0)}
-		},
-		// Bins
-		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, -90, 0)},
-			{"Bin", new Vector3(0, 0, 0)}
 		},
 		// Lane Marker
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(0, -90, 0)},
-			{"LaneMarker45Left", new Vector3(0, 0, 0)}
+			{"LaneMarker45Left", new Vector3(0, 0, 0)},
+			{"LaneMarkerStraight", new Vector3(0, 75, 0)}
 		},
 		// Pinger
 		new Dictionary<string, Vector3> {
@@ -182,13 +174,15 @@ public class TaskSelection : MonoBehaviour {
 
 	void SetTaskEnvironment() {
 		foreach (string tasksName in tasksNameList) {
-			if (objectsPosition[current_option].ContainsKey(tasksName) && objectsEulerAngles[current_option].ContainsKey(tasksName)) {
+			objectsDictionary[tasksName].SetActive(false);
+			if (objectsPosition[current_option].ContainsKey(tasksName) && objectsEulerAngles[current_option].ContainsKey(tasksName)) {	
 				objectsDictionary[tasksName].transform.position = objectsPosition[current_option][tasksName];
 				objectsDictionary[tasksName].transform.eulerAngles = objectsEulerAngles[current_option][tasksName];
 			}	else {
 				objectsDictionary[tasksName].transform.position = new Vector3(0, -100, 0);
 				objectsDictionary[tasksName].transform.eulerAngles = new Vector3(0, -100, 0);
 			}		
+			objectsDictionary[tasksName].SetActive(true);
 		}
 	}
 }
