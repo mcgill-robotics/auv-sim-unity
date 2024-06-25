@@ -28,8 +28,8 @@ public class TaskSelection : MonoBehaviour {
 			{"AUV", new Vector3(-13, -0.2f, -14)},
 			{"Gate", new Vector3(-9, -1, -12)},
 			{"LaneMarkerStraight", new Vector3(-6.5f, -5, -11.5f)},
-			{"Buoy", new Vector3(4, 0, -13)},
-			{"LaneMarker45Left", new Vector3(1.5f, -5, -9)},
+			{"Buoy", new Vector3(4, 0, -11)},
+			{"LaneMarker45Left", new Vector3(5, -5, -9)},
 			{"Bin", new Vector3(-4, -5, 4)},
 			{"Pinger1", new Vector3(9, -5, -5)},
 			// Missing Torpedos prop
@@ -89,7 +89,7 @@ public class TaskSelection : MonoBehaviour {
 			{"Gate", new Vector3(0, 75, 0)},
 			{"LaneMarkerStraight", new Vector3(0, 75, 0)},
 			{"Buoy", new Vector3(4, 0, -13)},
-			{"LaneMarker45Left", new Vector3(0, 30, 0)},
+			{"LaneMarker45Left", new Vector3(0, 0, 0)},
 			{"Bin", new Vector3(0, 45, 0)},
 			{"Pinger1", new Vector3(0, 0, 0)},
 			// Missing Torpedos prop
