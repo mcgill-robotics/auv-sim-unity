@@ -10,6 +10,7 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 public class VisualizeAUVBeliefs : MonoBehaviour {
 	ROSConnection roscon;
 	LogicManager1 classLogicManager;
+	public GameObject Diana;
 	public GameObject dianaVisualization;
 	public GameObject laneMarker1FromVisualization;
 	public GameObject laneMarker1ToVisualization;
@@ -59,6 +60,9 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 		} else {
 			Debug.LogError("[in VisualizeAUVBeliefs.cs] LogiManager class is not assigned.");
 		}
+
+		currentAUVPos = Diana.transform.position;
+		currentAUVRot = Diana.transform.eulerAngles;
 
 		roscon = ROSConnection.GetOrCreateInstance();
 		roscon.Subscribe<RosMessageTypes.Auv.VisionObjectArrayMsg>(detectionFrameTopicName, detectionFrameCallback);
