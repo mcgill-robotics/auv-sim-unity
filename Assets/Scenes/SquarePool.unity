@@ -5763,6 +5763,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f530d6fe7ff924eafbaf47e789bbc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &6636075807003561222 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 9150705416908342384, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7462122433893927667 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1240796924398374253, guid: a010ef89deacabb49aa31b279389987c,
@@ -5923,6 +5929,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 668416996780181483, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: auvRigidBody
+      value: 
+      objectReference: {fileID: 6636075807003561222}
     - target: {fileID: 709341525689035954, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: ROSClock
