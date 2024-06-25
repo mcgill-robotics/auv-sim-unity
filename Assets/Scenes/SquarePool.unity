@@ -7179,13 +7179,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3023718906358451422, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
+      propertyPath: rigidity
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023718906358451422, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
       propertyPath: targetObject
       value: 
       objectReference: {fileID: 6636075807003561213}
     - target: {fileID: 3506957346313205037, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3
+      value: -13
       objectReference: {fileID: 0}
     - target: {fileID: 3506957346313205037, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
@@ -7195,7 +7200,7 @@ PrefabInstance:
     - target: {fileID: 3506957346313205037, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.25
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 3506957346313205037, guid: 6462d786a647a1c4baac67c96ac333d7,
         type: 3}
@@ -7878,6 +7883,11 @@ PrefabInstance:
       propertyPath: pinger
       value: 
       objectReference: {fileID: 112962373}
+    - target: {fileID: 4014665394318296922, guid: 43a06d251454db744b1961d17085d98a,
+        type: 3}
+      propertyPath: Diana
+      value: 
+      objectReference: {fileID: 6636075807003561213}
     - target: {fileID: 4014665394318296922, guid: 43a06d251454db744b1961d17085d98a,
         type: 3}
       propertyPath: trueBearingPinger1
