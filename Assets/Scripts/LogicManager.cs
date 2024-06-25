@@ -277,41 +277,59 @@ public class LogicManager1 : MonoBehaviour {
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidXEnableName, bool_msg);
 
-		Float64Msg msg = new Float64Msg();
-		msg.data = float.Parse(xInputField.text);
-		roscon.Publish(xSetpointTopicName, msg);
+		if (float.TryParse(xInputField.text, out float result)) {
+			Float64Msg msg = new Float64Msg();
+			msg.data = float.Parse(xInputField.text);
+			roscon.Publish(xSetpointTopicName, msg);
+		} else {
+			Debug.LogWarning("Invalid X PID input");
+		}
 	}
 
 	public void setYPID() {
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidYEnableName, bool_msg);
 
-		Float64Msg msg = new Float64Msg();
-		msg.data = float.Parse(yInputField.text);
-		roscon.Publish(ySetpointTopicName, msg);
+		if (float.TryParse(yInputField.text, out float result)) {
+			Float64Msg msg = new Float64Msg();
+			msg.data = float.Parse(yInputField.text);
+			roscon.Publish(ySetpointTopicName, msg);
+		} else {
+			Debug.LogWarning("Invalid Y PID input");
+		}
 	}
 	
 	public void setZPID() {   
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidZEnableName, bool_msg);
 
-		Float64Msg msg = new Float64Msg();
-		msg.data = float.Parse(zInputField.text);
-		roscon.Publish(zSetpointTopicName, msg);
+		if (float.TryParse(zInputField.text, out float result)) {
+			Float64Msg msg = new Float64Msg();
+			msg.data = float.Parse(zInputField.text);
+			roscon.Publish(zSetpointTopicName, msg);
+		} else {
+			Debug.LogWarning("Invalid Z PID input");
+		}
 	}
 	
 	public void setQuatPID() {   
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidQuatEnableName, bool_msg);
 
-		RosMessageTypes.Geometry.QuaternionMsg msg = new RosMessageTypes.Geometry.QuaternionMsg();
-		Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, -float.Parse(rotXInputField.text));
-		Quaternion pitchQuaternion = Quaternion.Euler(-float.Parse(rotYInputField.text), 0f, 0f);
-		Quaternion yawQuaternion = Quaternion.Euler(0f, float.Parse(rotZInputField.text), 0f);
-		Quaternion setpoint = rollQuaternion * pitchQuaternion * yawQuaternion; // to specify XYZ order of euler angles
+		if (float.TryParse(rotXInputField.text, out float resultX) &&
+				float.TryParse(rotYInputField.text, out float resultY) &&
+				float.TryParse(rotZInputField.text, out float resultZ)) {
+			RosMessageTypes.Geometry.QuaternionMsg msg = new RosMessageTypes.Geometry.QuaternionMsg();
+			Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, -resultX);
+			Quaternion pitchQuaternion = Quaternion.Euler(-resultY, 0f, 0f);
+			Quaternion yawQuaternion = Quaternion.Euler(0f, resultZ, 0f);
+			Quaternion setpoint = rollQuaternion * pitchQuaternion * yawQuaternion; // to specify XYZ order of euler angles
 
-		msg = setpoint.To<NED>();
-		roscon.Publish(quatSetpointTopicName, msg);
+			msg = setpoint.To<NED>();
+			roscon.Publish(quatSetpointTopicName, msg);
+		} else {
+			Debug.LogWarning("Invalid Rotation PID");
+		}		
 	}
 
 	public void setQualityLevel() {
@@ -382,8 +400,6 @@ public class LogicManager1 : MonoBehaviour {
 				
 			ChangeButtonColor(clickedButton, new Color(1f, 0f, 0f, 0.5f));
 			StartCoroutine(CheckForKey(clickedButton));
-		} else {
-			return;
 		}
 	}
 
@@ -511,7 +527,6 @@ public class LogicManager1 : MonoBehaviour {
 			PlayerPrefs.SetString("negRollKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-
 		if (button.name == "FreezeKeybind"){
 			PlayerPrefs.SetString("freezeKeybind", keyCode);
 			PlayerPrefs.Save();
