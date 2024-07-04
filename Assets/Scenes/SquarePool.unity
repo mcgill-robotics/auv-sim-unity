@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 4763716915498289636}
-  m_IndirectSpecularColor: {r: 0.25330132, g: 0.21698837, b: 0.23319197, a: 1}
+  m_IndirectSpecularColor: {r: 1.4595089, g: 1.250288, b: 1.343623, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2887,6 +2887,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Follow Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 5296825098047564813, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      propertyPath: depthEnd
+      value: 34.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5296825098047564813, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      propertyPath: depthColor.b
+      value: 0.745283
+      objectReference: {fileID: 0}
+    - target: {fileID: 5296825098047564813, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      propertyPath: depthColor.g
+      value: 0.622757
+      objectReference: {fileID: 0}
+    - target: {fileID: 5296825098047564813, guid: 6462d786a647a1c4baac67c96ac333d7,
+        type: 3}
+      propertyPath: depthColor.r
+      value: 0.28475437
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3083,6 +3103,26 @@ PrefabInstance:
       propertyPath: auv
       value: 
       objectReference: {fileID: 6636075807003561213}
+    - target: {fileID: 5187796720580527432, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      propertyPath: depthEnd
+      value: 34.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5187796720580527432, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      propertyPath: depthColor.b
+      value: 0.745283
+      objectReference: {fileID: 0}
+    - target: {fileID: 5187796720580527432, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      propertyPath: depthColor.g
+      value: 0.622757
+      objectReference: {fileID: 0}
+    - target: {fileID: 5187796720580527432, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
+        type: 3}
+      propertyPath: depthColor.r
+      value: 0.28475437
+      objectReference: {fileID: 0}
     - target: {fileID: 5824241220014870354, guid: 2c4d24ed0a923cd4cba760a5f559ba77,
         type: 3}
       propertyPath: m_Name
@@ -3650,6 +3690,16 @@ PrefabInstance:
       propertyPath: auv
       value: 
       objectReference: {fileID: 6207282852912111775}
+    - target: {fileID: 4892771462708887632, guid: fe9144dd8dc101040b20cfb3f194f289,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4892771462708887632, guid: fe9144dd8dc101040b20cfb3f194f289,
+        type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6077355930840444867, guid: fe9144dd8dc101040b20cfb3f194f289,
         type: 3}
       propertyPath: m_Name
@@ -3734,6 +3784,46 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 573591179028015319, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthEnd
+      value: 34.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 573591179028015319, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.b
+      value: 0.745283
+      objectReference: {fileID: 0}
+    - target: {fileID: 573591179028015319, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.g
+      value: 0.622757
+      objectReference: {fileID: 0}
+    - target: {fileID: 573591179028015319, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.r
+      value: 0.28475437
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthEnd
+      value: 34.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.b
+      value: 0.745283
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.g
+      value: 0.622757
+      objectReference: {fileID: 0}
+    - target: {fileID: 593741197419061748, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: depthColor.r
+      value: 0.28475437
       objectReference: {fileID: 0}
     - target: {fileID: 709341525689035954, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
