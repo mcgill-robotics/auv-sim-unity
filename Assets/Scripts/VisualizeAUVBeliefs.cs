@@ -175,7 +175,6 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 			} else if (detection.label == "Octagon Table") {
 				octagonTableInMap = true;
 				octagonTableVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
-				octagonTableVisualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z, 0);
 			} else if (detection.label == "Abydos Symbol") {
 				if (num_abydos_symbols_in_map == 0) {
 					abydosSymbol1Visualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
