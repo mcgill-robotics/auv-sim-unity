@@ -95,7 +95,7 @@ public class MainCamControl : MonoBehaviour {
 		RaycastHit hit;
 
 		// Create a layer mask that includes all layers except "Water" and "Air"
-		int layerMask = ~((1 << LayerMask.NameToLayer("Water")) | (1 << LayerMask.NameToLayer("Air")));
+		int layerMask = ~((1 << LayerMask.NameToLayer("Water")) | (1 << LayerMask.NameToLayer("Air")) | (1 << LayerMask.NameToLayer("Props")));
 
 		if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask)) {
 			return hit.point;
