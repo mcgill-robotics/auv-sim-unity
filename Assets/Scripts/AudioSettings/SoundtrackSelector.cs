@@ -7,11 +7,9 @@ public class BackgroundMusicManager : MonoBehaviour {
 	public AudioSource audioSource;
 	public List<AudioClip> audioClips;
 	private List<string> audioOptions = new List<string>();
+	private int lastAudioIndex;
 
 	void Start() {
-		// // Get the TMP_Dropdown component attached to the same GameObject
-		// audioDropdown = GetComponent<TMP_Dropdown>();
-
 		// Ensure the AudioSource component is attached
 		if (audioSource == null) {
 			audioSource = gameObject.AddComponent<AudioSource>();
@@ -20,6 +18,7 @@ public class BackgroundMusicManager : MonoBehaviour {
 		foreach (AudioClip clip in audioClips) {
 			audioOptions.Add(clip.name);
 		}
+		audioOptions.Add("Silence");
 
 		// Initialize the dropdown options.
 		audioDropdown.AddOptions(audioOptions);
@@ -27,6 +26,8 @@ public class BackgroundMusicManager : MonoBehaviour {
 		// Start playing default selection.
 		audioSource.clip = audioClips[0];
 		audioSource.Play();
+
+		lastAudioIndex = 0;
 
 		// Set up the listener for the dropdown.
 		audioDropdown.onValueChanged.AddListener(delegate { DropdownValueChanged(audioDropdown); });
@@ -38,6 +39,10 @@ public class BackgroundMusicManager : MonoBehaviour {
 		if (index >= 0 && index < audioClips.Count) {
 			audioSource.clip = audioClips[index];
 			audioSource.Play();
+			lastAudioIndex = index;
+		} else {
+			audioSource.clip = audioClips[lastAudioIndex];
+			audioSource.Pause();
 		}
 	}
 }
