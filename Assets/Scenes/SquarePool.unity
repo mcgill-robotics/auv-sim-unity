@@ -7768,6 +7768,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6841097415789483664, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
+      propertyPath: m_Options.m_Options.Array.data[0].m_Text
+      value: Competition
+      objectReference: {fileID: 0}
+    - target: {fileID: 6841097415789483664, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -7880,6 +7885,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7655546731865122864, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_text
+      value: Competition
       objectReference: {fileID: 0}
     - target: {fileID: 7733751763147360125, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}

@@ -23,7 +23,7 @@ public class TaskSelection : MonoBehaviour {
 	Dictionary<string, GameObject> objectsDictionary = new Dictionary<string, GameObject>();
 	public TMP_Dropdown TaskSelectionDropdown;	
 	List<Dictionary<string, Vector3>> objectsPosition = new List<Dictionary<string, Vector3>>() {
-		// MasterPlanner 
+		// Competition 
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(-13, -0.2f, -14)},
 			{"Gate", new Vector3(-9, -1, -12)},
@@ -83,7 +83,7 @@ public class TaskSelection : MonoBehaviour {
 	};
 	
 	List<Dictionary<string, Vector3>> objectsEulerAngles = new List<Dictionary<string, Vector3>>() {
-		// MasterPlanner 
+		// Competition 
 		new Dictionary<string, Vector3> {
 			{"AUV", new Vector3(0, -90, 0)},
 			{"Gate", new Vector3(0, 75, 0)},
