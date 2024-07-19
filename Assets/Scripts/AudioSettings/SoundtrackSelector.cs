@@ -39,6 +39,7 @@ public class BackgroundMusicManager : MonoBehaviour {
 
 		// Start playing default selection.
 		audioSource.clip = defaultSoundtracks[0];
+		audioSource.volume = audioSource.volume / 4; 
 		audioSource.Play();
 
 		currentTrackIndex = 0;

@@ -11,6 +11,6 @@ public class VolumeController : MonoBehaviour {
 	}
 
 	public void SetVolume(float volume) {
-		soundtrack.volume = volume;
+		soundtrack.volume = volume / 2;
 	}
 }
