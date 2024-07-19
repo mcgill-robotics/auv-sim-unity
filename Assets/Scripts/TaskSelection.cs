@@ -142,7 +142,7 @@ public class TaskSelection : MonoBehaviour {
 		} 
 	};
 	List<string> tasksNameList;
-	int current_option = 0;
+	public int current_option = 0;
 
 	void Start () {	
 		objectsDictionary.Add("AUV", Diana);
@@ -172,7 +172,7 @@ public class TaskSelection : MonoBehaviour {
 		SetTaskEnvironment();
 	}
 
-	void SetTaskEnvironment() {
+	public void SetTaskEnvironment() {
 		foreach (string tasksName in tasksNameList) {
 			objectsDictionary[tasksName].SetActive(false);
 			if (objectsPosition[current_option].ContainsKey(tasksName) && objectsEulerAngles[current_option].ContainsKey(tasksName)) {	
