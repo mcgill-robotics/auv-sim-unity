@@ -1,0 +1,36 @@
+"Gate: Coin Flip", 300
+"Gate: Pass through", 100
+"Gate: Maintain a fixed heading", 150 --> 
+               "it means that its clear the robot is being controlled 
+               by a PID or something like that as opposed to being 
+               pointed in the right direction and just firing 
+               thrusters with no feed back to how they are moving the 
+               robot." -- from robotics
+"Gate: Style Yaw", 100 --> Every 90 degrees (8x max)
+"Gate: Style Roll/Pitch", 200 --> Every 90 degrees (8x max)
+
+"Hydrothermal Vent: Touch", 300
+"Hydrothermal Vent: Circumnavigate (wrong)", 600
+"Hydrothermal Vent: Circumnavigate (correct)", 800
+"Hydrothermal Vent: Fire torpedoes", 200 --> Per torpedo
+
+"Ocean Temperature: Any bin", 400 --> Per marker (max 2)
+"Ocean Temperature: Correct side", 800 --> Per marker (max 2)
+
+"Mapping: Any", 600 --> Per torpedo (max 2) 
+"Mapping: Correct sequence", 1400  
+"Mapping: 'Far' torpedoes", 300 --> Per torpedo
+
+"Collect Samples: Surface in Area", 800
+"Collect Samples: Surface with object", 400 --> Per object
+"Collect Samples: Drop object", 200 --> Per object
+"Collect Samples: Object in bin (TW)", 300
+"Collect Samples: Object in bin (C)", 500
+"Collect Samples: Object in bin (N)", 700
+"Collect Samples: Individual bin", 300 --> Per object
+
+"Random Pinger first task", 500
+"Random Pinger second task ", 1500
+
+"Finish the mission with T minutes (whole + fractional)", 100 --> Tx100
+
