@@ -2049,6 +2049,7 @@ GameObject:
   - component: {fileID: 525631820}
   - component: {fileID: 525631819}
   - component: {fileID: 525631823}
+  - component: {fileID: 525631824}
   m_Layer: 5
   m_Name: CompetitionGUI
   m_TagString: Untagged
@@ -2159,6 +2160,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timerText: {fileID: 916888156}
+--- !u!114 &525631824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525631817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a09a99ceebbccb4195f7579f669c396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  auv: {fileID: 6207282852912111775}
+  targetProp: {fileID: 7591953641717288217}
+  pointYawAvailable: 400
+  pointPitchRollAvailable: 800
 --- !u!1 &577752435
 GameObject:
   m_ObjectHideFlags: 0
@@ -9668,22 +9685,22 @@ PrefabInstance:
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.9996821
+      value: -0.7847763
       objectReference: {fileID: 0}
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.025212137
+      value: 0.6197792
       objectReference: {fileID: 0}
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
@@ -9693,7 +9710,7 @@ PrefabInstance:
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 111962.9
+      value: 283.4
       objectReference: {fileID: 0}
     - target: {fileID: 142454021354145122, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
