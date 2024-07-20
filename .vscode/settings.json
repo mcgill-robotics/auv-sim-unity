@@ -65,6 +65,7 @@
     "[csharp]": {
         "editor.formatOnSave": true,
         "editor.codeLens": false,
-        "editor.tabSize": 2
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "ms-dotnettools.csharp"
     }
 }

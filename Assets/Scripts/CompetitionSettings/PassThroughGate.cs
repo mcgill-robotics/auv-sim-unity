@@ -2,7 +2,8 @@ using System;
 using UnityEngine;
 using System.Collections;
 
-public class PassThroughGate : MonoBehaviour {
+public class PassThroughGate : MonoBehaviour
+{
 	public static PassThroughGate instance;
 	public Transform gate;
 	public Transform gatePole1;
@@ -12,25 +13,34 @@ public class PassThroughGate : MonoBehaviour {
 	private float gateHeight = 1.5f;
 	private bool hasEnteredGate = false;
 
-	void Awake() {
+	void Awake()
+	{
 		instance = this;
 	}
 
-	void Start() {
+	void Start()
+	{
 		this.enabled = false; // Start disabled.
 	}
-	
-	void Update() {
+
+	void Update()
+	{
 		CheckGatePassage();
 	}
 
-	void CheckGatePassage() {
-		if (IsWithinGateBounds()) {
-			if (!hasEnteredGate) {
+	void CheckGatePassage()
+	{
+		if (IsWithinGateBounds())
+		{
+			if (!hasEnteredGate)
+			{
 				hasEnteredGate = true;
 			}
-		}	else {
-			if (hasEnteredGate) {
+		}
+		else
+		{
+			if (hasEnteredGate)
+			{
 				hasEnteredGate = false;
 				PointsManager.instance.AddPoint(pointsAvailable, "Gate");
 				this.enabled = false;
@@ -38,7 +48,8 @@ public class PassThroughGate : MonoBehaviour {
 		}
 	}
 
-	bool IsWithinGateBounds() {
+	bool IsWithinGateBounds()
+	{
 		// Gate as rectangle (2D) that you have to go through.
 		Vector3 auvPosition = auv.position;
 		Vector3 gatePosition = gate.position;
@@ -54,16 +65,18 @@ public class PassThroughGate : MonoBehaviour {
 		// Y axis check (unity).
 		float topGate = gatePosition.y + (gateHeight / 2);
 		float bottomGate = gatePosition.y - (gateHeight / 2);
-		bool withinYBounds = auvPosition.y <= topGate;		
+		bool withinYBounds = auvPosition.y <= topGate;
 
 		return withinZBounds && withinXBounds && withinYBounds;
 	}
 
-	public void StartScript() {
+	public void StartScript()
+	{
 		this.enabled = true; // Enable the script.
 	}
 
-	public void StopScript() {
+	public void StopScript()
+	{
 		this.enabled = false; // Disable the script.
 	}
 }
