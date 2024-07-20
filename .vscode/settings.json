@@ -63,6 +63,8 @@
     "dotnet.preferCSharpExtension": true,
     "omnisharp.organizeImportsOnFormat": true,
     "[csharp]": {
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.codeLens": false,
+        "editor.tabSize": 2
     }
 }

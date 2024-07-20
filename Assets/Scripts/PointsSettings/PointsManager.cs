@@ -38,4 +38,9 @@ public class PointsManager : MonoBehaviour {
 		total_score += points;
 		scoreText.text = "SCORE: " + total_score.ToString();
 	}
+
+	public void ResetPoint() {
+		total_score = 0;
+		scoreText.text = "SCORE: " + total_score.ToString();
+	}
 }
