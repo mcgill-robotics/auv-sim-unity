@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class CompetitionManager : MonoBehaviour {
 	TaskSelection taskSelection;
@@ -10,6 +11,10 @@ public class CompetitionManager : MonoBehaviour {
 	public Text competitionButtonText;
 	public AudioSource competitionAudioStart;
 	public AudioSource competitionAudioEnd;
+	public GameObject timeText;
+	public GameObject pidUI;
+	public GameObject taskSelectionUI;
+
 	private float pauseMovementSeconds = 4f;
 	
 	private string buttonTextStart = "start comp";
@@ -30,6 +35,10 @@ public class CompetitionManager : MonoBehaviour {
 		taskSelection.SetTaskEnvironment();
 
 		if (competitionButtonText.text == buttonTextStart) {
+			timeText.SetActive(true);
+			pidUI.SetActive(false);
+			taskSelectionUI.SetActive(false);
+
 			// Run the StopMovementCoroutine method asynchronously (don't pause everything).
 			StartCoroutine(PauseMovementCoroutine());
 			competitionAudioStart.Play();
@@ -40,6 +49,10 @@ public class CompetitionManager : MonoBehaviour {
 
 			competitionButtonText.text = buttonTextEnd;
 		} else {
+			timeText.SetActive(false);
+			pidUI.SetActive(true);
+			taskSelectionUI.SetActive(false);
+
 			competitionAudioEnd.Play();
 			FacingChecker.instance.StopScript();
 			PassThroughGate.instance.StopScript();
