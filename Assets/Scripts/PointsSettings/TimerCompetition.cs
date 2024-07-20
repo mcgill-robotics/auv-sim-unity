@@ -31,7 +31,6 @@ public class TimerCompetition : MonoBehaviour {
 	}
 
 	public void StopScript() {
-		ResetTimer();
 		this.enabled = false; // Disable the script.
 	}
 }
