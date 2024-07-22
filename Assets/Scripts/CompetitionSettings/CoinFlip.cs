@@ -42,7 +42,7 @@ public class CoinFlip : MonoBehaviour
 		float targetYaw = Mathf.Atan2(targetDirection.x, targetDirection.z) * Mathf.Rad2Deg;
 
 		float curYaw = auvRotation.y > 180 ? auvRotation.y - 360 : auvRotation.y;
-		curYaw += 90;
+		curYaw += intrinsicAuvYaw;
 
 		if (Mathf.Abs(targetYaw - curYaw) <= yawAngleThreshold)
 		{

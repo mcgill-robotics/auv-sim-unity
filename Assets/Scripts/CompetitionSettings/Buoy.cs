@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class BuoyCircumnavigate : MonoBehaviour
+public class Buoy : MonoBehaviour
 {
-	public static BuoyCircumnavigate instance;
+	public static Buoy instance;
 	public Transform buoy;
 	public Transform auv;
 	public int pointsAvailableWrong;
