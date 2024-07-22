@@ -46,7 +46,6 @@ public class CoinFlip : MonoBehaviour
 
 		if (Mathf.Abs(targetYaw - curYaw) <= yawAngleThreshold)
 		{
-			Debug.Log("YES");
 			facingTimer += Time.deltaTime;
 
 			if (facingTimer >= requiredFacingTime)

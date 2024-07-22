@@ -11,6 +11,8 @@ public class PointsManager : MonoBehaviour
 	public static PointsManager instance;
 	public TMP_Text scoreText;
 	public AudioSource[] pointSequenceAudio;
+	public string color = "none";
+
 	private int total_score = 0;
 	private Dictionary<string, int> tasksAudioIndex = new Dictionary<string, int> {
 		{"Gate", 0},
