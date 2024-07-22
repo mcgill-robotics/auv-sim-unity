@@ -1229,6 +1229,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 164637199}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &168527796 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7148656090891845374, guid: 748e9383638f6e24580c5dd29295e718,
+    type: 3}
+  m_PrefabInstance: {fileID: 3119400718368721923}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &176385663
 GameObject:
   m_ObjectHideFlags: 0
@@ -2050,6 +2056,7 @@ GameObject:
   - component: {fileID: 525631823}
   - component: {fileID: 525631824}
   - component: {fileID: 525631825}
+  - component: {fileID: 525631826}
   m_Layer: 5
   m_Name: CompetitionGUI
   m_TagString: Untagged
@@ -2094,6 +2101,8 @@ MonoBehaviour:
   gate: {fileID: 7591953641717288217}
   gatePole1: {fileID: 106151408}
   gatePole2: {fileID: 2140886687}
+  blueSign: {fileID: 168527796}
+  redSign: {fileID: 2056652379}
   auv: {fileID: 6207282852912111775}
   pointsAvailable: 250
 --- !u!114 &525631821
@@ -2133,6 +2142,7 @@ MonoBehaviour:
   - {fileID: 42758131}
   - {fileID: 962927124}
   - {fileID: 1066884452}
+  color: none
 --- !u!114 &525631823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2177,6 +2187,22 @@ MonoBehaviour:
   gate: {fileID: 7591953641717288217}
   auv: {fileID: 6207282852912111775}
   pointsAvailable: 300
+--- !u!114 &525631826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525631817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9bb455fb5c8c3499603309c7c92cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buoy: {fileID: 936232503}
+  auv: {fileID: 6207282852912111775}
+  pointsAvailableWrong: 600
+  pointsAvailableCorrect: 800
 --- !u!1 &577752435
 GameObject:
   m_ObjectHideFlags: 0
@@ -6374,6 +6400,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2019380268}
   m_CullTransparentMesh: 1
+--- !u!4 &2056652379 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5880372785956651853, guid: 748e9383638f6e24580c5dd29295e718,
+    type: 3}
+  m_PrefabInstance: {fileID: 3119400718368721923}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2140886687 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 970991445898045957, guid: 748e9383638f6e24580c5dd29295e718,
@@ -6742,6 +6774,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2318988042224773795, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
+      propertyPath: m_Name
+      value: Blue
+      objectReference: {fileID: 0}
+    - target: {fileID: 2318988042224773795, guid: 748e9383638f6e24580c5dd29295e718,
+        type: 3}
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
@@ -6794,6 +6831,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2711032256203046620, guid: 748e9383638f6e24580c5dd29295e718,
+        type: 3}
+      propertyPath: m_Name
+      value: Red
       objectReference: {fileID: 0}
     - target: {fileID: 2711032256203046620, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}

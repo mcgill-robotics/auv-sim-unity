@@ -57,32 +57,54 @@ public class BuoyCircumnavigate : MonoBehaviour
 
 		// Clockwise = Blue.
 		// Anti-clockwise = Red.
-		if (totalRotation >= 360)
+		if (CheckComplete())
 		{
-			if (PointsManager.instance.color == "blue" || PointsManager.instance.color != "red")
-			{
-				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
-			}
-			else
-			{
-				PointsManager.instance.AddPoint(pointsAvailableWrong, "Buoy");
-			}
-			StopScript();
-		}
-		else if (totalRotation <= -360)
-		{
-			if (PointsManager.instance.color == "red" || PointsManager.instance.color != "blue")
-			{
-				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
-			}
-			else
-			{
-				PointsManager.instance.AddPoint(pointsAvailableWrong, "Buoy");
-			}
 			StopScript();
 		}
 
 		previousAngle = currentAngle;
+	}
+
+
+	bool CheckComplete()
+	{
+		if (totalRotation <= -360)
+		{
+			if (PointsManager.instance.color == "blue")
+			{
+				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
+			}
+			else if (PointsManager.instance.color == "red")
+			{
+				PointsManager.instance.AddPoint(pointsAvailableWrong, "Buoy");
+			}
+			else
+			{
+				PointsManager.instance.color = "blue";
+				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
+			}
+		}
+		else if (totalRotation >= 360)
+		{
+			if (PointsManager.instance.color == "red")
+			{
+				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
+			}
+			else if (PointsManager.instance.color == "blue")
+			{
+				PointsManager.instance.AddPoint(pointsAvailableWrong, "Buoy");
+			}
+			else
+			{
+				PointsManager.instance.color = "red";
+				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
+			}
+		}
+		else
+		{
+			return false;
+		}
+		return true;
 	}
 
 

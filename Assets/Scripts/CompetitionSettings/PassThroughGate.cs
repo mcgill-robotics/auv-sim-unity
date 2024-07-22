@@ -8,6 +8,8 @@ public class PassThroughGate : MonoBehaviour
 	public Transform gate;
 	public Transform gatePole1;
 	public Transform gatePole2;
+	public Transform blueSign;
+	public Transform redSign;
 	public Transform auv;
 	public int pointsAvailable;
 	private bool hasEnteredGate = false;
@@ -42,7 +44,8 @@ public class PassThroughGate : MonoBehaviour
 			{
 				hasEnteredGate = false;
 				PointsManager.instance.AddPoint(pointsAvailable, "Gate");
-				this.enabled = false;
+				SetColor();
+				StopScript();
 			}
 		}
 	}
@@ -65,6 +68,20 @@ public class PassThroughGate : MonoBehaviour
 		bool withinYBounds = auvPosition.y <= gatePosition.y;
 
 		return withinZBounds && withinXBounds && withinYBounds;
+	}
+
+	void SetColor()
+	{
+		float distanceToRed = Vector3.Distance(auv.position, redSign.position);
+		float distanceToBlue = Vector3.Distance(auv.position, blueSign.position);
+		if (distanceToBlue < distanceToRed)
+		{
+			PointsManager.instance.color = "blue";
+		}
+		else
+		{
+			PointsManager.instance.color = "red";
+		}
 	}
 
 	public void StartScript()
