@@ -8,7 +8,8 @@ using RosMessageTypes.Std;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using TMPro;
 
-public class LogicManager1 : MonoBehaviour {
+public class LogicManager1 : MonoBehaviour
+{
 	[Header("CAMERA CONTROL VARIABLES")]
 
 	public GameObject downCam;
@@ -25,7 +26,7 @@ public class LogicManager1 : MonoBehaviour {
 	public string ySetpointTopicName;
 	public string zSetpointTopicName;
 	public string quatSetpointTopicName;
-	
+
 	public string xPositionTopicName;
 	public string yPositionTopicName;
 	public string zPositionTopicName;
@@ -70,7 +71,7 @@ public class LogicManager1 : MonoBehaviour {
 	public TMP_Text ActuatorStatusText;
 	public TMP_Text FrontCamStatusText;
 	public TMP_Text DownCamStatusText;
-	public TMP_Text IMUFrontCamStatusText;    
+	public TMP_Text IMUFrontCamStatusText;
 
 	[Header("FOR QUALITY SETTINGS")]
 	public TMP_Dropdown qualityDropdown;
@@ -89,14 +90,14 @@ public class LogicManager1 : MonoBehaviour {
 	public Toggle VisualizeBearing2Toggle;
 	public Toggle VisualizeBearing3Toggle;
 	public Toggle VisualizeBearing4Toggle;
-	
+
 	public LayerMask hiddenSimLayerMask;
-	private LayerMask followCamDefaultLayerMask; 
-	private LayerMask freeCamDefaultLayerMask; 
+	private LayerMask followCamDefaultLayerMask;
+	private LayerMask freeCamDefaultLayerMask;
 
 	public TMP_Dropdown HydrophonesNumberDropdown;
 
-	private ROSConnection roscon; 
+	private ROSConnection roscon;
 
 	public TMPro.TMP_InputField frontCamRateInputField;
 	public TMPro.TMP_InputField downCamRateInputField;
@@ -116,7 +117,8 @@ public class LogicManager1 : MonoBehaviour {
 
 
 	// Start is called before the first frame update
-	void Start() {
+	void Start()
+	{
 		roscon = ROSConnection.GetOrCreateInstance();
 		roscon.Subscribe<Float64Msg>(xPositionTopicName, xPositionCallback);
 		roscon.Subscribe<Float64Msg>(yPositionTopicName, yPositionCallback);
@@ -133,89 +135,107 @@ public class LogicManager1 : MonoBehaviour {
 		roscon.Subscribe<Int32Msg>(downCamStatusTopicName, downCamStatusCallback);
 		roscon.Subscribe<Int32Msg>(frontCamStatusTopicName, frontCamStatusCallback);
 		roscon.Subscribe<Int32Msg>(IMUFrontCamStatusTopicName, IMUFrontCamStatusCallback);
-		roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName); 
-		roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName); 
-		roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName); 
+		roscon.RegisterPublisher<Float64Msg>(xSetpointTopicName);
+		roscon.RegisterPublisher<Float64Msg>(ySetpointTopicName);
+		roscon.RegisterPublisher<Float64Msg>(zSetpointTopicName);
 		roscon.RegisterPublisher<BoolMsg>(pidQuatEnableName);
 		roscon.RegisterPublisher<BoolMsg>(pidXEnableName);
 		roscon.RegisterPublisher<BoolMsg>(pidYEnableName);
 		roscon.RegisterPublisher<BoolMsg>(pidZEnableName);
-		roscon.RegisterPublisher<RosMessageTypes.Geometry.QuaternionMsg>(quatSetpointTopicName); 
+		roscon.RegisterPublisher<RosMessageTypes.Geometry.QuaternionMsg>(quatSetpointTopicName);
 		activateFollowCam();
 		activateFreeCam();
 		followCamDefaultLayerMask = followCam.GetComponent<Camera>().cullingMask;
-		freeCamDefaultLayerMask = freeCam.GetComponent<Camera>().cullingMask;  
-		hydrophonesNumberOption = 0; 
-		HydrophonesNumberDropdown.onValueChanged.AddListener(delegate {
-				DropdownValueChanged(HydrophonesNumberDropdown);
+		freeCamDefaultLayerMask = freeCam.GetComponent<Camera>().cullingMask;
+		hydrophonesNumberOption = 0;
+		HydrophonesNumberDropdown.onValueChanged.AddListener(delegate
+		{
+			DropdownValueChanged(HydrophonesNumberDropdown);
 		});
 	}
 
-	void DropdownValueChanged(TMP_Dropdown change) {
+	void DropdownValueChanged(TMP_Dropdown change)
+	{
 		hydrophonesNumberOption = change.value;
 	}
 
-	void xPositionCallback(Float64Msg msg) {
+	void xPositionCallback(Float64Msg msg)
+	{
 		XPosText.text = "Current X: " + msg.data;
 	}
-	
-	void yPositionCallback(Float64Msg msg) {
+
+	void yPositionCallback(Float64Msg msg)
+	{
 		YPosText.text = "Current Y: " + msg.data;
 	}
-	
-	void zPositionCallback(Float64Msg msg) {
+
+	void zPositionCallback(Float64Msg msg)
+	{
 		ZPosText.text = "Current Z: " + msg.data;
 	}
-	
-	void thetaXCallback(Float64Msg msg) {
+
+	void thetaXCallback(Float64Msg msg)
+	{
 		RotXText.text = "Current Euler X: " + msg.data;
 	}
-	
-	void thetaYCallback(Float64Msg msg) {
+
+	void thetaYCallback(Float64Msg msg)
+	{
 		RotYText.text = "Current Euler Y: " + msg.data;
 	}
-	
-	void thetaZCallback(Float64Msg msg) {
+
+	void thetaZCallback(Float64Msg msg)
+	{
 		RotZText.text = "Current Euler Z: " + msg.data;
 	}
 
-	void missionStatusCallback(StringMsg msg) {
+	void missionStatusCallback(StringMsg msg)
+	{
 		MissionStatusText.text = "Mission status: " + msg.data;
 	}
 
-	void DVLStatusCallback(Int32Msg msg) {
+	void DVLStatusCallback(Int32Msg msg)
+	{
 		DVLStatusText.text = "DVL Status: " + msg.data.ToString();
 	}
 
-	void IMUStatusCallback(Int32Msg msg) {
+	void IMUStatusCallback(Int32Msg msg)
+	{
 		IMUStatusText.text = "IMU Status: " + msg.data.ToString();
 	}
 
-	void depthStatusCallback(Int32Msg msg) {
+	void depthStatusCallback(Int32Msg msg)
+	{
 		DepthStatusText.text = "Depth Status: " + msg.data.ToString();
 	}
 
-	void hydrophonesStatusCallback(Int32Msg msg) {
+	void hydrophonesStatusCallback(Int32Msg msg)
+	{
 		HydrophonesStatusText.text = "Hydrophones Status: " + msg.data.ToString();
 	}
 
-	void actuatorStatusCallback(Int32Msg msg) {
+	void actuatorStatusCallback(Int32Msg msg)
+	{
 		ActuatorStatusText.text = "Actuator Status: " + msg.data.ToString();
 	}
 
-	void downCamStatusCallback(Int32Msg msg) {
+	void downCamStatusCallback(Int32Msg msg)
+	{
 		DownCamStatusText.text = "Down Cam Status: " + msg.data.ToString();
 	}
 
-	void frontCamStatusCallback(Int32Msg msg) {
+	void frontCamStatusCallback(Int32Msg msg)
+	{
 		FrontCamStatusText.text = "Front Cam Status: " + msg.data.ToString();
 	}
 
-	void IMUFrontCamStatusCallback(Int32Msg msg) {
+	void IMUFrontCamStatusCallback(Int32Msg msg)
+	{
 		IMUFrontCamStatusText.text = "IMU Front Cam Status: " + msg.data.ToString();
 	}
 
-	public void activateDownCam() {
+	public void activateDownCam()
+	{
 		downCam.SetActive(true);
 		frontCam.SetActive(false);
 		freeCam.SetActive(false);
@@ -223,7 +243,8 @@ public class LogicManager1 : MonoBehaviour {
 		depthCam.SetActive(false);
 	}
 
-	public void activateFrontCam() {
+	public void activateFrontCam()
+	{
 		downCam.SetActive(false);
 		frontCam.SetActive(true);
 		freeCam.SetActive(false);
@@ -231,15 +252,17 @@ public class LogicManager1 : MonoBehaviour {
 		depthCam.SetActive(false);
 	}
 
-	public void activateFreeCam() {
+	public void activateFreeCam()
+	{
 		downCam.SetActive(false);
 		frontCam.SetActive(false);
 		freeCam.SetActive(true);
 		followCam.SetActive(false);
 		depthCam.SetActive(false);
 	}
-	
-	public void activateFollowCam() {
+
+	public void activateFollowCam()
+	{
 		downCam.SetActive(false);
 		frontCam.SetActive(false);
 		freeCam.SetActive(false);
@@ -247,7 +270,8 @@ public class LogicManager1 : MonoBehaviour {
 		depthCam.SetActive(false);
 	}
 
-	public void activateDepthCam() {
+	public void activateDepthCam()
+	{
 		downCam.SetActive(false);
 		frontCam.SetActive(false);
 		freeCam.SetActive(false);
@@ -255,70 +279,87 @@ public class LogicManager1 : MonoBehaviour {
 		depthCam.SetActive(true);
 	}
 
-	public void snapFreeCam() {
-		if (freeCam.activeSelf) {
+	public void snapFreeCam()
+	{
+		if (freeCam.activeSelf)
+		{
 			freeCam.transform.LookAt(auv);
 			Vector3 directionFromTarget = freeCam.transform.position - auv.position;
 			freeCam.transform.position = auv.position + directionFromTarget.normalized * distanceToAUVWhenSnapping;
 		}
 	}
-    
-	public void reloadScene() {   
+
+	public void reloadScene()
+	{
 		BoolMsg bool_msg = new BoolMsg(false);
 		roscon.Publish(pidXEnableName, bool_msg);
 		roscon.Publish(pidYEnableName, bool_msg);
 		roscon.Publish(pidZEnableName, bool_msg);
-		
+
 		Scene currentScene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(currentScene.name);
 	}
 
-	public void setXPID() {   
+	public void setXPID()
+	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidXEnableName, bool_msg);
 
-		if (float.TryParse(xInputField.text, out float result)) {
+		if (float.TryParse(xInputField.text, out float result))
+		{
 			Float64Msg msg = new Float64Msg();
 			msg.data = float.Parse(xInputField.text);
 			roscon.Publish(xSetpointTopicName, msg);
-		} else {
+		}
+		else
+		{
 			Debug.LogWarning("Invalid X PID input");
 		}
 	}
 
-	public void setYPID() {
+	public void setYPID()
+	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidYEnableName, bool_msg);
 
-		if (float.TryParse(yInputField.text, out float result)) {
+		if (float.TryParse(yInputField.text, out float result))
+		{
 			Float64Msg msg = new Float64Msg();
 			msg.data = float.Parse(yInputField.text);
 			roscon.Publish(ySetpointTopicName, msg);
-		} else {
+		}
+		else
+		{
 			Debug.LogWarning("Invalid Y PID input");
 		}
 	}
-	
-	public void setZPID() {   
+
+	public void setZPID()
+	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidZEnableName, bool_msg);
 
-		if (float.TryParse(zInputField.text, out float result)) {
+		if (float.TryParse(zInputField.text, out float result))
+		{
 			Float64Msg msg = new Float64Msg();
 			msg.data = float.Parse(zInputField.text);
 			roscon.Publish(zSetpointTopicName, msg);
-		} else {
+		}
+		else
+		{
 			Debug.LogWarning("Invalid Z PID input");
 		}
 	}
-	
-	public void setQuatPID() {   
+
+	public void setQuatPID()
+	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidQuatEnableName, bool_msg);
 
 		if (float.TryParse(rotXInputField.text, out float resultX) &&
 				float.TryParse(rotYInputField.text, out float resultY) &&
-				float.TryParse(rotZInputField.text, out float resultZ)) {
+				float.TryParse(rotZInputField.text, out float resultZ))
+		{
 			RosMessageTypes.Geometry.QuaternionMsg msg = new RosMessageTypes.Geometry.QuaternionMsg();
 			Quaternion rollQuaternion = Quaternion.Euler(0f, 0f, -resultX);
 			Quaternion pitchQuaternion = Quaternion.Euler(-resultY, 0f, 0f);
@@ -327,32 +368,43 @@ public class LogicManager1 : MonoBehaviour {
 
 			msg = setpoint.To<NED>();
 			roscon.Publish(quatSetpointTopicName, msg);
-		} else {
+		}
+		else
+		{
 			Debug.LogWarning("Invalid Rotation PID");
-		}		
+		}
 	}
 
-	public void setQualityLevel() {
+	public void setQualityLevel()
+	{
 		QualitySettings.SetQualityLevel(qualityDropdown.value, true);
 		PlayerPrefs.SetString("qualityLevel", qualityDropdown.value.ToString());
 		PlayerPrefs.Save();
-		if (qualityDropdown.value == 3) { //turn off water on barebones
+		if (qualityDropdown.value == 3)
+		{ //turn off water on barebones
 			waterObject.SetActive(false);
-		} else {
+		}
+		else
+		{
 			waterObject.SetActive(true);
 		}
 	}
 
-	public void setROSPublishToggle() {
+	public void setROSPublishToggle()
+	{
 		PlayerPrefs.SetString("PublishROSToggle", PublishROSToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void hideSimObjects() {
-		if (DisplaySimToggle.isOn) {
+	public void hideSimObjects()
+	{
+		if (DisplaySimToggle.isOn)
+		{
 			freeCam.GetComponent<Camera>().cullingMask = freeCamDefaultLayerMask;
 			followCam.GetComponent<Camera>().cullingMask = followCamDefaultLayerMask;
-		} else {
+		}
+		else
+		{
 			freeCam.GetComponent<Camera>().cullingMask = hiddenSimLayerMask;
 			followCam.GetComponent<Camera>().cullingMask = hiddenSimLayerMask;
 		}
@@ -361,97 +413,120 @@ public class LogicManager1 : MonoBehaviour {
 	}
 
 
-	public void setPublishDVLToggle() {
+	public void setPublishDVLToggle()
+	{
 		PlayerPrefs.SetString("PublishDVLToggle", PublishDVLToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void setPublishIMUToggle() {
+	public void setPublishIMUToggle()
+	{
 		PlayerPrefs.SetString("PublishIMUToggle", PublishIMUToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void setPublishDepthToggle() {
+	public void setPublishDepthToggle()
+	{
 		PlayerPrefs.SetString("PublishDepthToggle", PublishDepthToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void setPublishHydrophonesToggle() {
+	public void setPublishHydrophonesToggle()
+	{
 		PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophonesToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
-	public void setPublishFrontCamToggle() {
+	public void setPublishFrontCamToggle()
+	{
 		PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCamToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void setPublishDownCamToggle() {
+	public void setPublishDownCamToggle()
+	{
 		PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCamToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void OnButtonClick(Button clickedButton) {
-		if (!isCheckingKey) {
+	public void OnButtonClick(Button clickedButton)
+	{
+		if (!isCheckingKey)
+		{
 			Image buttonImage = clickedButton.GetComponent<Image>();
-				
-			if (buttonImage != null) {
-					originalButtonColor = buttonImage.color;
+
+			if (buttonImage != null)
+			{
+				originalButtonColor = buttonImage.color;
 			}
-				
+
 			ChangeButtonColor(clickedButton, new Color(1f, 0f, 0f, 0.5f));
 			StartCoroutine(CheckForKey(clickedButton));
 		}
 	}
 
-	public void OnClickRates(Button clickedButton){
-		if (clickedButton.name == "SetFrontCamRateBtn"){
+	public void OnClickRates(Button clickedButton)
+	{
+		if (clickedButton.name == "SetFrontCamRateBtn")
+		{
 			PlayerPrefs.SetString("frontCamRate", frontCamRateInputField.text);
 			frontCamPub.Initialize();
 			depthCamPub.Initialize();
 		}
-		if (clickedButton.name == "SetDownCamRateBtn"){
+		if (clickedButton.name == "SetDownCamRateBtn")
+		{
 			PlayerPrefs.SetString("downCamRate", downCamRateInputField.text);
 			downCamPub.Initialize();
 		}
-		if (clickedButton.name == "SetFrontCamResBtn"){
+		if (clickedButton.name == "SetFrontCamResBtn")
+		{
 			PlayerPrefs.SetString("frontCamWidth", frontCamWidthInputField.text);
 			PlayerPrefs.SetString("frontCamHeight", frontCamHeightInputField.text);
 			frontCamPub.Initialize();
 			depthCamPub.Initialize();
 		}
-		if (clickedButton.name == "SetDownCamResBtn"){
+		if (clickedButton.name == "SetDownCamResBtn")
+		{
 			PlayerPrefs.SetString("downCamHeight", downCamHeightInputField.text);
 			PlayerPrefs.SetString("downCamWidth", downCamWidthInputField.text);
 			downCamPub.Initialize();
 		}
-		if (clickedButton.name == "SetPoseRateBtn"){
+		if (clickedButton.name == "SetPoseRateBtn")
+		{
 			PlayerPrefs.SetString("poseRate", poseRateInputField.text);
 		}
 		PlayerPrefs.Save();
 	}
 
-	private System.Collections.IEnumerator CheckForKey(Button clickedButton) {
+	private System.Collections.IEnumerator CheckForKey(Button clickedButton)
+	{
 		isCheckingKey = true;
 
 		float startTime = Time.time;
 
-		while (Time.time - startTime < timeoutInSeconds) {
-			foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode))) {
-				if (Input.GetKeyDown(keyCode)) {
-					if (keyCode == KeyCode.Escape) {
+		while (Time.time - startTime < timeoutInSeconds)
+		{
+			foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode)))
+			{
+				if (Input.GetKeyDown(keyCode))
+				{
+					if (keyCode == KeyCode.Escape)
+					{
 						isCheckingKey = false;
 						ChangeButtonColor(clickedButton, originalButtonColor);
 						yield break;
-					}				
-					if ((keyCode >= KeyCode.A && keyCode <= KeyCode.Z) || (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9) || (keyCode == KeyCode.Space))	{
-						TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI >();
+					}
+					if ((keyCode >= KeyCode.A && keyCode <= KeyCode.Z) || (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9) || (keyCode == KeyCode.Space))
+					{
+						TextMeshProUGUI buttonText = clickedButton.GetComponentInChildren<TextMeshProUGUI>();
 						string newText = keyCode.ToString().ToLower();
 						buttonText.text = newText;
 						isCheckingKey = false;
 						setPlayerRefsKeys(clickedButton, newText);
 						ChangeButtonColor(clickedButton, originalButtonColor);
 						yield break;
-					} else {
+					}
+					else
+					{
 						yield return null;
 					}
 				}
@@ -462,72 +537,93 @@ public class LogicManager1 : MonoBehaviour {
 		ChangeButtonColor(clickedButton, originalButtonColor);
 	}
 
-	private void ChangeButtonColor(Button button, Color newColor) {
-		if (button != null) {
+	private void ChangeButtonColor(Button button, Color newColor)
+	{
+		if (button != null)
+		{
 			Image buttonImage = button.GetComponent<Image>();
-			if (buttonImage != null) {
+			if (buttonImage != null)
+			{
 				buttonImage.color = newColor;
-			} else	{
-			Debug.LogError("Image component not found on the button GameObject.");
 			}
-		} else {
+			else
+			{
+				Debug.LogError("Image component not found on the button GameObject.");
+			}
+		}
+		else
+		{
 			Debug.LogError("Button component not assigned.");
 		}
 	}
 
-	private void setPlayerRefsKeys(Button button, string keyCode) {
+	private void setPlayerRefsKeys(Button button, string keyCode)
+	{
 		// movement keybinds
-		if (button.name == "ForwardKeybind"){
+		if (button.name == "ForwardKeybind")
+		{
 			PlayerPrefs.SetString("surgeKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "BackwardKeybind"){
+		if (button.name == "BackwardKeybind")
+		{
 			PlayerPrefs.SetString("negSurgeKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "LeftKeybind"){
+		if (button.name == "LeftKeybind")
+		{
 			PlayerPrefs.SetString("swayKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "RightKeybind"){
+		if (button.name == "RightKeybind")
+		{
 			PlayerPrefs.SetString("negSwayKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "HeaveKeybind"){
+		if (button.name == "HeaveKeybind")
+		{
 			PlayerPrefs.SetString("heaveKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "NegativeHeaveKeybind"){
+		if (button.name == "NegativeHeaveKeybind")
+		{
 			PlayerPrefs.SetString("negHeaveKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
 
 		// rotations keybinds
-		if (button.name == "YawKeybind"){
+		if (button.name == "YawKeybind")
+		{
 			PlayerPrefs.SetString("yawKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "NegativeYawKeybind"){
+		if (button.name == "NegativeYawKeybind")
+		{
 			PlayerPrefs.SetString("negYawKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "PitchKeybind"){
+		if (button.name == "PitchKeybind")
+		{
 			PlayerPrefs.SetString("pitchKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "NegativePitchKeybind"){
+		if (button.name == "NegativePitchKeybind")
+		{
 			PlayerPrefs.SetString("negPitchKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "RollKeybind"){
+		if (button.name == "RollKeybind")
+		{
 			PlayerPrefs.SetString("rollKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "NegativeRollKeybind"){
+		if (button.name == "NegativeRollKeybind")
+		{
 			PlayerPrefs.SetString("negRollKeybind", keyCode);
 			PlayerPrefs.Save();
 		}
-		if (button.name == "FreezeKeybind"){
+		if (button.name == "FreezeKeybind")
+		{
 			PlayerPrefs.SetString("freezeKeybind", keyCode);
 			PlayerPrefs.Save();
 		}

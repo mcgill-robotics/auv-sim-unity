@@ -1,7 +1,8 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class UnderwaterCameraEffect : MonoBehaviour {
+public class UnderwaterCameraEffect : MonoBehaviour
+{
 	public LayerMask waterLayers;
 	public Shader shader;
 
@@ -17,7 +18,8 @@ public class UnderwaterCameraEffect : MonoBehaviour {
 
 
 	// Start is called before the first frame update.
-	void Start() {
+	void Start()
+	{
 		cam = GetComponent<Camera>();
 
 		// Make our camera send depth information (i.e. how far a pizel is from the screen)
@@ -52,12 +54,14 @@ public class UnderwaterCameraEffect : MonoBehaviour {
 		material.SetTexture("_DepthMap", depthTexture);
 	}
 
-	private void OnApplicationQuit() {
+	private void OnApplicationQuit()
+	{
 		RenderTexture.ReleaseTemporary(depthTexture);
 		RenderTexture.ReleaseTemporary(colourTexture);
 	}
 
-	private void FixedUpdate()  {
+	private void FixedUpdate()
+	{
 		// Get the camera frustum of the near plane.
 		Vector3[] corners = new Vector3[4];
 
@@ -70,14 +74,19 @@ public class UnderwaterCameraEffect : MonoBehaviour {
 		Vector3 start = transform.position + transform.TransformVector(corners[1]), end = transform.position + transform.TransformVector(corners[0]);
 
 		Collider[] c = Physics.OverlapSphere(end, 0.01f, waterLayers);
-		if (c.Length > 0) {
+		if (c.Length > 0)
+		{
 			inWater = true;
 
 			c = Physics.OverlapSphere(start, 0.01f, waterLayers);
-			if (c.Length > 0) {
+			if (c.Length > 0)
+			{
 				material.SetVector("_WaterLevel", new Vector2(0, 1));
-			} else {
-				if (Physics.Linecast(start,end,out hit, waterLayers)) {
+			}
+			else
+			{
+				if (Physics.Linecast(start, end, out hit, waterLayers))
+				{
 					// Get the interpolation value (delta) of the point the linecast hit
 					// the reverse of a lerp function gives us the delta.
 					float delta = hit.distance / (end - start).magnitude;
@@ -89,18 +98,23 @@ public class UnderwaterCameraEffect : MonoBehaviour {
 					material.SetVector("_WaterLevel", new Vector2(0, 1 - delta));
 				}
 			}
-		} else {
-				inWater = false;
+		}
+		else
+		{
+			inWater = false;
 		}
 	}
 
 	// Automatically finds and assigned inspector variables so the script can be 
 	// immediately used when attached to a gameObject.
-	private void Reset() {
+	private void Reset()
+	{
 		//Look for the shader we created
 		Shader[] shaders = Resources.FindObjectsOfTypeAll<Shader>();
-		foreach(Shader s in shaders) {
-			if (s.name.Contains(this.GetType().Name)) {
+		foreach (Shader s in shaders)
+		{
+			if (s.name.Contains(this.GetType().Name))
+			{
 				shader = s;
 				return;
 			}
@@ -108,20 +122,24 @@ public class UnderwaterCameraEffect : MonoBehaviour {
 	}
 
 	// This is where the image effect is applied.
-	private void OnRenderImage(RenderTexture source, RenderTexture destination) {
-		if (material && inWater) {
-				// Update the depth render texture.
-				depthCam.Render();
+	private void OnRenderImage(RenderTexture source, RenderTexture destination)
+	{
+		if (material && inWater)
+		{
+			// Update the depth render texture.
+			depthCam.Render();
 
-				// We pass the information to our material.
-				material.SetColor("_DepthColor", depthColor);
-				material.SetFloat("_DepthStart", depthStart);
-				material.SetFloat("_DepthEnd", depthEnd);
+			// We pass the information to our material.
+			material.SetColor("_DepthColor", depthColor);
+			material.SetFloat("_DepthStart", depthStart);
+			material.SetFloat("_DepthEnd", depthEnd);
 
-				// Apply to the image using blit.
-				Graphics.Blit(source, destination, material);
-		} else {
-				Graphics.Blit(source, destination);
+			// Apply to the image using blit.
+			Graphics.Blit(source, destination, material);
+		}
+		else
+		{
+			Graphics.Blit(source, destination);
 		}
 	}
 }
