@@ -2046,10 +2046,10 @@ GameObject:
   - component: {fileID: 525631818}
   - component: {fileID: 525631822}
   - component: {fileID: 525631821}
-  - component: {fileID: 525631820}
   - component: {fileID: 525631819}
   - component: {fileID: 525631823}
   - component: {fileID: 525631824}
+  - component: {fileID: 525631825}
   m_Layer: 5
   m_Name: CompetitionGUI
   m_TagString: Untagged
@@ -2096,21 +2096,6 @@ MonoBehaviour:
   gatePole2: {fileID: 2140886687}
   auv: {fileID: 6207282852912111775}
   pointsAvailable: 250
---- !u!114 &525631820
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 525631817}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3050b49fae75a0f41abe2aaa5b235b70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 7591953641717288217}
-  auv: {fileID: 6207282852912111775}
-  pointsAvailable: 300
 --- !u!114 &525631821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2128,6 +2113,7 @@ MonoBehaviour:
   competitionAudioStart: {fileID: 460052433}
   competitionAudioEnd: {fileID: 1550300398}
   timeText: {fileID: 916888154}
+  scoreText: {fileID: 603001058}
   pidUI: {fileID: 1975073269}
   taskSelectionUI: {fileID: 129474769}
 --- !u!114 &525631822
@@ -2176,6 +2162,21 @@ MonoBehaviour:
   targetProp: {fileID: 7591953641717288217}
   pointYawAvailable: 400
   pointPitchRollAvailable: 800
+--- !u!114 &525631825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525631817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b51b712dd9078346a6f2388cbb63e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gate: {fileID: 7591953641717288217}
+  auv: {fileID: 6207282852912111775}
+  pointsAvailable: 300
 --- !u!1 &577752435
 GameObject:
   m_ObjectHideFlags: 0
@@ -2233,7 +2234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &603001059
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2250,7 +2251,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 40}
+  m_AnchoredPosition: {x: 0, y: 25}
   m_SizeDelta: {x: 400, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &603001060
@@ -3200,10 +3201,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 525631818}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 240, y: 40}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 400, y: 25}
+  m_SizeDelta: {x: 400, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &916888156
 MonoBehaviour:
@@ -3227,15 +3228,16 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 004b1618e03426947af89004a2f0c2bb, type: 2}
+  m_sharedMaterial: {fileID: -1354654705530426433, guid: 004b1618e03426947af89004a2f0c2bb,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4279631616
+  m_fontColor: {r: 0, g: 1, b: 0.08218217, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3252,15 +3254,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
