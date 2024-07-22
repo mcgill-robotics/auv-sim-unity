@@ -10,7 +10,6 @@ public class PassThroughGate : MonoBehaviour
 	public Transform gatePole2;
 	public Transform auv;
 	public int pointsAvailable;
-	private float gateHeight = 1.5f;
 	private bool hasEnteredGate = false;
 
 	void Awake()
@@ -63,9 +62,7 @@ public class PassThroughGate : MonoBehaviour
 		bool withinXBounds = auvPosition.x <= Math.Max(pole1Position.x, pole2Position.x) && auvPosition.x >= Math.Min(pole1Position.x, pole2Position.x);
 
 		// Y axis check (unity).
-		float topGate = gatePosition.y + (gateHeight / 2);
-		float bottomGate = gatePosition.y - (gateHeight / 2);
-		bool withinYBounds = auvPosition.y <= topGate;
+		bool withinYBounds = auvPosition.y <= gatePosition.y;
 
 		return withinZBounds && withinXBounds && withinYBounds;
 	}
