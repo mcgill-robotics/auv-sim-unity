@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraFollower : MonoBehaviour {
+public class CameraFollower : MonoBehaviour
+{
 	public GameObject targetObject;
 	public float rigidity = 5f;
 
@@ -10,13 +11,15 @@ public class CameraFollower : MonoBehaviour {
 	private Quaternion offsetRotation;
 
 	// Awake is called before Start
-	void Awake() {
+	void Awake()
+	{
 		offsetPosition = targetObject.transform.InverseTransformPoint(transform.position);
 		offsetRotation = Quaternion.Inverse(targetObject.transform.rotation) * transform.rotation;
 	}
 
 	// Update is called once per frame
-	void Update() {
+	void Update()
+	{
 		Vector3 relativeOffset = targetObject.transform.TransformPoint(offsetPosition);
 		transform.position = Vector3.Lerp(transform.position, relativeOffset, Time.deltaTime * rigidity);
 

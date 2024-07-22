@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 
-public class Thrusters : MonoBehaviour {
+public class Thrusters : MonoBehaviour
+{
 	ROSConnection roscon;
 	public float sinkForce = 30f;
 	public float floatForce = 12f;
@@ -17,11 +18,12 @@ public class Thrusters : MonoBehaviour {
 
 	private bool isFrozen = false;
 	private Rigidbody auvRb;
-	private double[] current_ros_thruster_forces = new double[8];    
-	private double[] current_keyboard_thruster_forces = new double[8];    
+	private double[] current_ros_thruster_forces = new double[8];
+	private double[] current_keyboard_thruster_forces = new double[8];
 	private float massScalarRealToSim;
 
-	void thrusterForceCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg) {
+	void thrusterForceCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg)
+	{
 		current_ros_thruster_forces[0] = msg.FRONT_LEFT;
 		current_ros_thruster_forces[1] = msg.FRONT_RIGHT;
 		current_ros_thruster_forces[2] = msg.BACK_LEFT;
@@ -31,33 +33,42 @@ public class Thrusters : MonoBehaviour {
 		current_ros_thruster_forces[6] = msg.HEAVE_BACK_LEFT;
 		current_ros_thruster_forces[7] = msg.HEAVE_BACK_RIGHT;
 	}
-	
+
 	// Start is called before the first frame update.
-	void Start() {
+	void Start()
+	{
 		massScalarRealToSim = 1f / AUVRealForceMultiplier;
 		roscon = ROSConnection.GetOrCreateInstance();
 		auvRb = GetComponent<Rigidbody>();
 		roscon.Subscribe<RosMessageTypes.Auv.ThrusterForcesMsg>(thrusterForcesTopicName, thrusterForceCallback);
 	}
 
-	void Update() {
+	void Update()
+	{
 		HandleFreezeInput();
 		HandleMovementInput();
 	}
 
-	void HandleFreezeInput() {
-		if (Input.GetKeyDown(PlayerPrefs.GetString("freezeKeybind", "space"))) {
+	void HandleFreezeInput()
+	{
+		if (Input.GetKeyDown(PlayerPrefs.GetString("freezeKeybind", "space")))
+		{
 			isFrozen = !isFrozen;
-			if (isFrozen)	{
+			if (isFrozen)
+			{
 				auvRb.isKinematic = true;
-			} else {
+			}
+			else
+			{
 				auvRb.isKinematic = false;
 			}
 		}
 	}
-	
-	void HandleMovementInput() {
-		if (!isFrozen) {
+
+	void HandleMovementInput()
+	{
+		if (!isFrozen)
+		{
 			current_keyboard_thruster_forces[0] = 0;
 			current_keyboard_thruster_forces[1] = 0;
 			current_keyboard_thruster_forces[2] = 0;
@@ -67,74 +78,86 @@ public class Thrusters : MonoBehaviour {
 			current_keyboard_thruster_forces[6] = 0;
 			current_keyboard_thruster_forces[7] = 0;
 			// Control orientation.
-			if (Input.GetKey(PlayerPrefs.GetString("pitchKeybind", "i"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("pitchKeybind", "i")))
+			{
 				current_keyboard_thruster_forces[5] += rotationForce / 4;
 				current_keyboard_thruster_forces[2] += rotationForce / 4;
 				current_keyboard_thruster_forces[1] -= rotationForce / 4;
 				current_keyboard_thruster_forces[6] -= rotationForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("yawKeybind", "j"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("yawKeybind", "j")))
+			{
 				current_keyboard_thruster_forces[4] += rotationForce / 4;
 				current_keyboard_thruster_forces[3] -= rotationForce / 4;
 				current_keyboard_thruster_forces[7] -= rotationForce / 4;
 				current_keyboard_thruster_forces[0] += rotationForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("negPitchKeybind", "k"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("negPitchKeybind", "k")))
+			{
 				current_keyboard_thruster_forces[5] -= rotationForce / 4;
 				current_keyboard_thruster_forces[2] -= rotationForce / 4;
 				current_keyboard_thruster_forces[1] += rotationForce / 4;
 				current_keyboard_thruster_forces[6] += rotationForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("negYawKeybind", "l"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("negYawKeybind", "l")))
+			{
 				current_keyboard_thruster_forces[4] -= rotationForce / 4;
 				current_keyboard_thruster_forces[3] += rotationForce / 4;
 				current_keyboard_thruster_forces[7] += rotationForce / 4;
 				current_keyboard_thruster_forces[0] -= rotationForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("negRollKeybind", "u"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("negRollKeybind", "u")))
+			{
 				current_keyboard_thruster_forces[5] += rotationForce / 4;
 				current_keyboard_thruster_forces[2] -= rotationForce / 4;
 				current_keyboard_thruster_forces[6] += rotationForce / 4;
 				current_keyboard_thruster_forces[1] -= rotationForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("rollKeybind", "o"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("rollKeybind", "o")))
+			{
 				current_keyboard_thruster_forces[5] -= rotationForce / 4;
 				current_keyboard_thruster_forces[2] += rotationForce / 4;
 				current_keyboard_thruster_forces[6] -= rotationForce / 4;
 				current_keyboard_thruster_forces[1] += rotationForce / 4;
 			}
 			// Control position.
-			if (Input.GetKey(PlayerPrefs.GetString("surgeKeybind", "w"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("surgeKeybind", "w")))
+			{
 				current_keyboard_thruster_forces[4] -= moveForce / 4;
 				current_keyboard_thruster_forces[3] -= moveForce / 4;
 				current_keyboard_thruster_forces[7] += moveForce / 4;
 				current_keyboard_thruster_forces[0] += moveForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("swayKeybind", "a"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("swayKeybind", "a")))
+			{
 				current_keyboard_thruster_forces[4] += moveForce / 2;
 				current_keyboard_thruster_forces[3] -= moveForce / 2;
 				current_keyboard_thruster_forces[7] += moveForce / 2;
 				current_keyboard_thruster_forces[0] -= moveForce / 2;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("negSurgeKeybind", "s"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("negSurgeKeybind", "s")))
+			{
 				current_keyboard_thruster_forces[4] += moveForce / 4;
 				current_keyboard_thruster_forces[3] += moveForce / 4;
 				current_keyboard_thruster_forces[7] -= moveForce / 4;
 				current_keyboard_thruster_forces[0] -= moveForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("negSwayKeybind", "d"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("negSwayKeybind", "d")))
+			{
 				current_keyboard_thruster_forces[4] -= moveForce / 2;
 				current_keyboard_thruster_forces[3] += moveForce / 2;
 				current_keyboard_thruster_forces[7] -= moveForce / 2;
 				current_keyboard_thruster_forces[0] += moveForce / 2;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("negHeaveKeybind", "q"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("negHeaveKeybind", "q")))
+			{
 				current_keyboard_thruster_forces[5] += sinkForce / 4;
 				current_keyboard_thruster_forces[2] += sinkForce / 4;
 				current_keyboard_thruster_forces[6] += sinkForce / 4;
 				current_keyboard_thruster_forces[1] += sinkForce / 4;
 			}
-			if (Input.GetKey(PlayerPrefs.GetString("heaveKeybind", "e"))) {
+			if (Input.GetKey(PlayerPrefs.GetString("heaveKeybind", "e")))
+			{
 				current_keyboard_thruster_forces[5] -= floatForce / 4;
 				current_keyboard_thruster_forces[2] -= floatForce / 4;
 				current_keyboard_thruster_forces[6] -= floatForce / 4;
@@ -144,13 +167,19 @@ public class Thrusters : MonoBehaviour {
 	}
 
 	// Update is called once per frame.
-	void FixedUpdate() {
-		for (int i = 0; i < thrusters.Length; i++) {
-			if (thrusters[i].position.y < 0) {
+	void FixedUpdate()
+	{
+		for (int i = 0; i < thrusters.Length; i++)
+		{
+			if (thrusters[i].position.y < 0)
+			{
 				double current_thruster_force = current_ros_thruster_forces[i] + current_keyboard_thruster_forces[i];
-				if (Math.Abs(current_thruster_force) > 0 && QualitySettings.GetQualityLevel() < 2) {
+				if (Math.Abs(current_thruster_force) > 0 && QualitySettings.GetQualityLevel() < 2)
+				{
 					thrusterParticles[i].Play();
-				} else {
+				}
+				else
+				{
 					thrusterParticles[i].Stop();
 				}
 				Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);

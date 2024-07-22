@@ -1,20 +1,24 @@
 using UnityEngine;
 using TMPro;
 
-public class TimerCompetition : MonoBehaviour {
-	public static TimerCompetition instance; 
+public class TimerCompetition : MonoBehaviour
+{
+	public static TimerCompetition instance;
 	public TMP_Text timerText;
 	private float timer = 0f;
 
-	void Awake() {
+	void Awake()
+	{
 		instance = this;
 	}
 
-	void Start() {
+	void Start()
+	{
 		this.enabled = false; // Start disabled.
 	}
 
-	void Update() {
+	void Update()
+	{
 		timer += Time.deltaTime;
 
 		int minutes = Mathf.FloorToInt(timer / 60F);
@@ -22,15 +26,18 @@ public class TimerCompetition : MonoBehaviour {
 
 		timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
 	}
-	public void ResetTimer() {
+	public void ResetTimer()
+	{
 		timer = 0f;
 	}
 
-	public void StartScript() {
+	public void StartScript()
+	{
 		this.enabled = true; // Enable the script.
 	}
 
-	public void StopScript() {
+	public void StopScript()
+	{
 		this.enabled = false; // Disable the script.
 	}
 }
