@@ -10,8 +10,8 @@ public class TricksChecker : MonoBehaviour
 	public int pointPitchRollAvailable;
 
 	private bool isInitialRotation;
-	private Vector3 initialRotation;
-	private Vector3 lastRotation;
+	private Quaternion initialRotation;
+	private Quaternion lastRotation;
 	private float maxDistance = 3f;
 	private int tricksAllowed = 2;
 	private int rollCount = 0;
@@ -28,7 +28,7 @@ public class TricksChecker : MonoBehaviour
 
 	void Start()
 	{
-		this.enabled = enabled;
+		this.enabled = false;
 	}
 
 	void Update()
@@ -49,7 +49,7 @@ public class TricksChecker : MonoBehaviour
 			return;
 		}
 
-		Vector3 curRotation = auv.eulerAngles;
+		Quaternion curRotation = auv.rotation;
 
 		if (isInitialRotation)
 		{
@@ -58,54 +58,39 @@ public class TricksChecker : MonoBehaviour
 			isInitialRotation = false;
 		}
 
-		float deltaRoll = CalculateDelta(curRotation.x, lastRotation.x);
-		float deltaPitch = CalculateDelta(curRotation.z, lastRotation.z);
-		float deltaYaw = CalculateDelta(curRotation.y, lastRotation.y);
-		Debug.Log(string.Format("deltaRoll = {0} | curRotation = {1} | lastRoration = {2}", deltaRoll, curRotation.x, lastRotation.x));
-		// Debug.Log(string.Format("rollTotal = {0} | curRotation = {1} | lastRoration = {2}", rollTotal, curRotation.x, lastRotation.x));
+		Quaternion deltaRotation = Quaternion.Inverse(lastRotation) * curRotation;
 
-		// Accumulate rotation.
+		Vector3 deltaEuler = deltaRotation.eulerAngles;
+
+		float deltaRoll = Mathf.DeltaAngle(0, deltaEuler.x);
+		float deltaPitch = Mathf.DeltaAngle(0, deltaEuler.z);
+		float deltaYaw = Mathf.DeltaAngle(0, deltaEuler.y);
+
 		rollTotal += deltaRoll;
 		pitchTotal += deltaPitch;
 		yawTotal += deltaYaw;
 
-		// Check for full 360 degree rotations.
+		// Check for full 360-degree rotations.
 		if (Mathf.Abs(rollTotal) >= 360f)
 		{
 			rollCount++;
 			rollTotal = 0;
-			Debug.Log("ROLL COMPLETED");
 			PointsManager.instance.AddPoint(pointPitchRollAvailable, "Gate");
 		}
 		if (Mathf.Abs(pitchTotal) >= 360f)
 		{
 			pitchCount++;
 			pitchTotal = 0;
-			Debug.Log("PITCH COMPLETED");
 			PointsManager.instance.AddPoint(pointPitchRollAvailable, "Gate");
 		}
 		if (Mathf.Abs(yawTotal) >= 360f)
 		{
 			yawCount++;
 			yawTotal = 0;
-			Debug.Log("YAW COMPLETED");
 			PointsManager.instance.AddPoint(pointYawAvailable, "Gate");
 		}
 
 		lastRotation = curRotation;
-	}
-
-	private float CalculateDelta(float currentAngle, float lastAngle)
-	{
-		if (lastAngle - currentAngle > 180)
-		{
-			return 360 - lastAngle - currentAngle;
-		}
-		else if (lastAngle - currentAngle < -180)
-		{
-			return -(360 - lastAngle - currentAngle);
-		}
-		return currentAngle - lastAngle;
 	}
 
 	public void StartScript()
