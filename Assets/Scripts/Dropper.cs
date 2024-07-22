@@ -5,40 +5,48 @@ using RosMessageTypes.Std;
 using RosMessageTypes.Auv;
 using RosMessageTypes.Geometry;
 
-public class Dropper : MonoBehaviour {
-    public Transform DroppingSphere;
-    ROSConnection roscon;
-    private string dropperTopicName = "/actuators/grab";
+public class Dropper : MonoBehaviour
+{
+	public Transform DroppingSphere;
+	ROSConnection roscon;
+	private string dropperTopicName = "/actuators/grab";
 
-    void dropSphere(GameObject sphere) {
-        // Get the Rigidbody component of the sphere
-        Rigidbody rb = sphere.GetComponent<Rigidbody>();
+	void dropSphere(GameObject sphere)
+	{
+		// Get the Rigidbody component of the sphere
+		Rigidbody rb = sphere.GetComponent<Rigidbody>();
 
-        // Ensure Rigidbody component exists
-        if (rb != null) {
-            // Make the sphere kinematic
-            rb.isKinematic = false; // Set to false to allow gravity to affect the sphere
-            rb.detectCollisions = true;
+		// Ensure Rigidbody component exists
+		if (rb != null)
+		{
+			// Make the sphere kinematic
+			rb.isKinematic = false; // Set to false to allow gravity to affect the sphere
+			rb.detectCollisions = true;
 
-            // Remove the parent (Diana) so it can drop)
-            sphere.transform.parent = null;
-        }
-    }
+			// Remove the parent (Diana) so it can drop)
+			sphere.transform.parent = null;
+		}
+	}
 
-    void dropSphereCallback(BoolMsg message) {
-        if (message.data) { // Check if boolmsg is true
-            dropSphere(DroppingSphere.gameObject);
-        }
-    }
+	void dropSphereCallback(BoolMsg message)
+	{
+		if (message.data)
+		{ // Check if boolmsg is true
+			dropSphere(DroppingSphere.gameObject);
+		}
+	}
 
-    void Start() {
-        roscon = ROSConnection.GetOrCreateInstance();
-        roscon.Subscribe<BoolMsg>("/actuators/grab", dropSphereCallback);
-    }
+	void Start()
+	{
+		roscon = ROSConnection.GetOrCreateInstance();
+		roscon.Subscribe<BoolMsg>("/actuators/grab", dropSphereCallback);
+	}
 
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.Comma)) {
-            dropSphere(DroppingSphere.gameObject);
-        }
-    }
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Comma))
+		{
+			dropSphere(DroppingSphere.gameObject);
+		}
+	}
 }

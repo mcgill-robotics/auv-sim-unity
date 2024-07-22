@@ -7,7 +7,8 @@ using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
-public class VisualizeAUVBeliefs : MonoBehaviour {
+public class VisualizeAUVBeliefs : MonoBehaviour
+{
 	ROSConnection roscon;
 	LogicManager1 classLogicManager;
 	public GameObject dianaVisualization;
@@ -49,14 +50,18 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 	private Vector3 currentAUVPos = Vector3.zero;
 	private Vector3 currentAUVRot = Vector3.zero;
 
-	void Start() {
+	void Start()
+	{
 		classLogicManager = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
-		if (classLogicManager != null) {
+		if (classLogicManager != null)
+		{
 			SubscribeToggle(classLogicManager.VisualizeBearing1Toggle, UpdateVisualizeBearing1);
 			SubscribeToggle(classLogicManager.VisualizeBearing2Toggle, UpdateVisualizeBearing2);
 			SubscribeToggle(classLogicManager.VisualizeBearing3Toggle, UpdateVisualizeBearing3);
 			SubscribeToggle(classLogicManager.VisualizeBearing4Toggle, UpdateVisualizeBearing4);
-		} else {
+		}
+		else
+		{
 			Debug.LogError("[in VisualizeAUVBeliefs.cs] LogiManager class is not assigned.");
 		}
 
@@ -71,39 +76,48 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 		roscon.Subscribe<Float64Msg>(posZTopicName, posZCallback);
 	}
 
-	private void SubscribeToggle(Toggle toggle, Action<bool> updateAction) {
-		if (toggle != null) {
+	private void SubscribeToggle(Toggle toggle, Action<bool> updateAction)
+	{
+		if (toggle != null)
+		{
 			// Initialize isActive[...] var with initial toggle value.
 			updateAction(toggle.isOn);
 
 			// Subscribe to the toggle's onValueChanged event.
 			toggle.onValueChanged.AddListener((isOn) => updateAction(isOn));
-		} else {
+		}
+		else
+		{
 			Debug.LogError("Pub Sensor Toggle is not assigned.");
 		}
 	}
 
-	void UpdateVisualizeBearing1(bool isActive) {
+	void UpdateVisualizeBearing1(bool isActive)
+	{
 		trueBearingPinger1.SetActive(isActive);
 		expectedBearingPinger1.SetActive(isActive);
 	}
 
-	void UpdateVisualizeBearing2(bool isActive) {
+	void UpdateVisualizeBearing2(bool isActive)
+	{
 		trueBearingPinger2.SetActive(isActive);
 		expectedBearingPinger2.SetActive(isActive);
 	}
 
-	void UpdateVisualizeBearing3(bool isActive) {
+	void UpdateVisualizeBearing3(bool isActive)
+	{
 		trueBearingPinger3.SetActive(isActive);
 		expectedBearingPinger3.SetActive(isActive);
 	}
 
-	void UpdateVisualizeBearing4(bool isActive) {
+	void UpdateVisualizeBearing4(bool isActive)
+	{
 		trueBearingPinger4.SetActive(isActive);
 		expectedBearingPinger4.SetActive(isActive);
 	}
 
-	void OnDestroy() {
+	void OnDestroy()
+	{
 		// Unsubscribe from the events to prevent memory leaks.
 		UnsubscribeToggle(classLogicManager.VisualizeBearing1Toggle, UpdateVisualizeBearing1);
 		UnsubscribeToggle(classLogicManager.VisualizeBearing2Toggle, UpdateVisualizeBearing2);
@@ -111,84 +125,114 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 		UnsubscribeToggle(classLogicManager.VisualizeBearing4Toggle, UpdateVisualizeBearing4);
 	}
 
-	private void UnsubscribeToggle(Toggle toggle, Action<bool> updateAction) {
-		if (toggle != null) {
+	private void UnsubscribeToggle(Toggle toggle, Action<bool> updateAction)
+	{
+		if (toggle != null)
+		{
 			toggle.onValueChanged.RemoveListener((isOn) => updateAction(isOn));
 		}
 	}
 
-	void thetaXCallback(Float64Msg thetaX) {
+	void thetaXCallback(Float64Msg thetaX)
+	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVRot.z = (float)-thetaX.data;
 	}
-	void thetaYCallback(Float64Msg thetaY) {
+	void thetaYCallback(Float64Msg thetaY)
+	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVRot.x = (float)thetaY.data;
 	}
-	void thetaZCallback(Float64Msg thetaZ) {
+	void thetaZCallback(Float64Msg thetaZ)
+	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVRot.y = (float)-thetaZ.data;
 	}
-	void posXCallback(Float64Msg X) {
+	void posXCallback(Float64Msg X)
+	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVPos.z = (float)X.data;
 	}
-	void posYCallback(Float64Msg Y) {
+	void posYCallback(Float64Msg Y)
+	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVPos.x = (float)-Y.data;
 	}
-	void posZCallback(Float64Msg Z) {
+	void posZCallback(Float64Msg Z)
+	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVPos.y = (float)Z.data;
 	}
-    
-	void objectMapCallback(RosMessageTypes.Auv.VisionObjectArrayMsg map) {
+
+	void objectMapCallback(RosMessageTypes.Auv.VisionObjectArrayMsg map)
+	{
 		int num_lane_markers_in_map = 0;
 		int num_abydos_symbols_in_map = 0;
 		int num_earth_symbols_in_map = 0;
 		bool buoyInMap = false;
 		bool gateInMap = false;
 		bool octagonTableInMap = false;
-		foreach (RosMessageTypes.Auv.VisionObjectMsg detection in map.array) {
-			if (detection.label == "Lane Marker") {
-				if (num_lane_markers_in_map == 0) {
+		foreach (RosMessageTypes.Auv.VisionObjectMsg detection in map.array)
+		{
+			if (detection.label == "Lane Marker")
+			{
+				if (num_lane_markers_in_map == 0)
+				{
 					laneMarker1FromVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 					laneMarker1ToVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
-					laneMarker1FromVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.theta_z, 0) * Quaternion.Euler(0,0,90);
-					laneMarker1ToVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.extra_field, 0) * Quaternion.Euler(0,0,90);
-				} else {
+					laneMarker1FromVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.theta_z, 0) * Quaternion.Euler(0, 0, 90);
+					laneMarker1ToVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.extra_field, 0) * Quaternion.Euler(0, 0, 90);
+				}
+				else
+				{
 					laneMarker2FromVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 					laneMarker2ToVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
-					laneMarker2FromVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.theta_z, 0) * Quaternion.Euler(0,0,90);
-					laneMarker2ToVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.extra_field, 0) * Quaternion.Euler(0,0,90);
+					laneMarker2FromVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.theta_z, 0) * Quaternion.Euler(0, 0, 90);
+					laneMarker2ToVisualization.transform.rotation = Quaternion.Euler(-90, (float)-detection.extra_field, 0) * Quaternion.Euler(0, 0, 90);
 				}
 				num_lane_markers_in_map += 1;
-			} else if (detection.label == "Gate") {
+			}
+			else if (detection.label == "Gate")
+			{
 				gateInMap = true;
 				gateVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 				gateVisualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z, 0);
 				if (detection.extra_field > 0.5) gateVisualization.transform.localScale = new Vector3(-1, 1, 1);
-			} else if (detection.label == "Buoy") {
+			}
+			else if (detection.label == "Buoy")
+			{
 				buoyInMap = true;
 				buoyVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 				buoyVisualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z + 90, 0);
-			} else if (detection.label == "Octagon Table") {
+			}
+			else if (detection.label == "Octagon Table")
+			{
 				octagonTableInMap = true;
 				octagonTableVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
-			} else if (detection.label == "Abydos Symbol") {
-				if (num_abydos_symbols_in_map == 0) {
+			}
+			else if (detection.label == "Abydos Symbol")
+			{
+				if (num_abydos_symbols_in_map == 0)
+				{
 					abydosSymbol1Visualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 					abydosSymbol1Visualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z, 0);
-				} else {
+				}
+				else
+				{
 					abydosSymbol2Visualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 					abydosSymbol2Visualization.transform.rotation = Quaternion.Euler(0, (float)-detection.extra_field, 0);
 				}
 				num_abydos_symbols_in_map += 1;
-			} else if (detection.label == "Earth Symbol") {
-				if (num_earth_symbols_in_map == 0) {
+			}
+			else if (detection.label == "Earth Symbol")
+			{
+				if (num_earth_symbols_in_map == 0)
+				{
 					earthSymbol1Visualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 					earthSymbol1Visualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z, 0);
-				} else {
+				}
+				else
+				{
 					earthSymbol2Visualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 					earthSymbol2Visualization.transform.rotation = Quaternion.Euler(0, (float)-detection.extra_field, 0);
 				}
@@ -209,13 +253,18 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 		}
 	}
 
-	void detectionFrameCallback(RosMessageTypes.Auv.VisionObjectArrayMsg detectionFrame) {
-		foreach (RosMessageTypes.Auv.VisionObjectMsg detection in detectionFrame.array)	{
+	void detectionFrameCallback(RosMessageTypes.Auv.VisionObjectArrayMsg detectionFrame)
+	{
+		foreach (RosMessageTypes.Auv.VisionObjectMsg detection in detectionFrame.array)
+		{
 			GameObject detectionObject;
-			if (detectionFrameIndicators.Count >= maxDetectionFrameIndicators) {
+			if (detectionFrameIndicators.Count >= maxDetectionFrameIndicators)
+			{
 				detectionObject = detectionFrameIndicators[0];
 				detectionFrameIndicators.RemoveAt(0);
-			} else {
+			}
+			else
+			{
 				detectionObject = GameObject.Instantiate(detectionIndicatorPrefab);
 			}
 			detectionObject.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
@@ -223,8 +272,9 @@ public class VisualizeAUVBeliefs : MonoBehaviour {
 		}
 	}
 
-	void Update() {
+	void Update()
+	{
 		dianaVisualization.transform.position = currentAUVPos;
-		dianaVisualization.transform.rotation = Quaternion.Euler(currentAUVRot.x, currentAUVRot.y, currentAUVRot.z) * Quaternion.Euler(0,-90,0);
+		dianaVisualization.transform.rotation = Quaternion.Euler(currentAUVRot.x, currentAUVRot.y, currentAUVRot.z) * Quaternion.Euler(0, -90, 0);
 	}
 }

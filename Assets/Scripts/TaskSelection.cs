@@ -6,7 +6,8 @@ using UnityEngine.UI;
 using TMPro;
 
 
-public class TaskSelection : MonoBehaviour {
+public class TaskSelection : MonoBehaviour
+{
 	public GameObject Diana;
 	public GameObject PoleQuali;
 	public GameObject GateQuali;
@@ -17,11 +18,11 @@ public class TaskSelection : MonoBehaviour {
 	public GameObject Pinger1;
 	public GameObject Pinger2;
 	public GameObject Pinger3;
-	public GameObject Pinger4;	
+	public GameObject Pinger4;
 	public GameObject OctagonTable;
 	public GameObject Bin;
 	Dictionary<string, GameObject> objectsDictionary = new Dictionary<string, GameObject>();
-	public TMP_Dropdown TaskSelectionDropdown;	
+	public TMP_Dropdown TaskSelectionDropdown;
 	List<Dictionary<string, Vector3>> objectsPosition = new List<Dictionary<string, Vector3>>() {
 		// Competition 
 		new Dictionary<string, Vector3> {
@@ -79,9 +80,9 @@ public class TaskSelection : MonoBehaviour {
 			{"Pinger2", new Vector3(10, -3, -10)},
 			{"Pinger3", new Vector3(-10, -3, -10)},
 			{"Pinger4", new Vector3(-10, -3, 10)}
-		} 
+		}
 	};
-	
+
 	List<Dictionary<string, Vector3>> objectsEulerAngles = new List<Dictionary<string, Vector3>>() {
 		// Competition 
 		new Dictionary<string, Vector3> {
@@ -139,12 +140,13 @@ public class TaskSelection : MonoBehaviour {
 			{"Pinger2", new Vector3(0, 0, 0)},
 			{"Pinger3", new Vector3(0, 0, 0)},
 			{"Pinger4", new Vector3(0, 0, 0)}
-		} 
+		}
 	};
 	List<string> tasksNameList;
 	public int current_option = 0;
 
-	void Start () {	
+	void Start()
+	{
 		objectsDictionary.Add("AUV", Diana);
 		objectsDictionary.Add("PoleQuali", PoleQuali);
 		objectsDictionary.Add("GateQuali", GateQuali);
@@ -162,26 +164,33 @@ public class TaskSelection : MonoBehaviour {
 		tasksNameList = new List<string>(objectsDictionary.Keys);
 		SetTaskEnvironment();
 
-		TaskSelectionDropdown.onValueChanged.AddListener(delegate {
-				DropdownValueChanged(TaskSelectionDropdown);
+		TaskSelectionDropdown.onValueChanged.AddListener(delegate
+		{
+			DropdownValueChanged(TaskSelectionDropdown);
 		});
 	}
 
-	void DropdownValueChanged(TMP_Dropdown change) {
+	void DropdownValueChanged(TMP_Dropdown change)
+	{
 		current_option = change.value;
 		SetTaskEnvironment();
 	}
 
-	public void SetTaskEnvironment() {
-		foreach (string tasksName in tasksNameList) {
+	public void SetTaskEnvironment()
+	{
+		foreach (string tasksName in tasksNameList)
+		{
 			objectsDictionary[tasksName].SetActive(false);
-			if (objectsPosition[current_option].ContainsKey(tasksName) && objectsEulerAngles[current_option].ContainsKey(tasksName)) {	
+			if (objectsPosition[current_option].ContainsKey(tasksName) && objectsEulerAngles[current_option].ContainsKey(tasksName))
+			{
 				objectsDictionary[tasksName].transform.position = objectsPosition[current_option][tasksName];
 				objectsDictionary[tasksName].transform.eulerAngles = objectsEulerAngles[current_option][tasksName];
-			}	else {
+			}
+			else
+			{
 				objectsDictionary[tasksName].transform.position = new Vector3(0, -100, 0);
 				objectsDictionary[tasksName].transform.eulerAngles = new Vector3(0, -100, 0);
-			}		
+			}
 			objectsDictionary[tasksName].SetActive(true);
 		}
 	}
