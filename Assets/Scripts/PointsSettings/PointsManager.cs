@@ -39,6 +39,7 @@ public class PointsManager : MonoBehaviour
 			return;
 		}
 		int audioIndex = tasksAudioIndex[task] >= pointSequenceAudio.Length ? pointSequenceAudio.Length - 1 : tasksAudioIndex[task];
+		tasksAudioIndex[task]++;
 		pointSequenceAudio[audioIndex].Play();
 		total_score += points;
 		scoreText.text = "SCORE: " + total_score.ToString();
