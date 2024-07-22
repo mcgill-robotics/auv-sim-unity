@@ -13,6 +13,7 @@ public class CompetitionManager : MonoBehaviour
 	public AudioSource competitionAudioStart;
 	public AudioSource competitionAudioEnd;
 	public GameObject timeText;
+	public GameObject scoreText;
 	public GameObject pidUI;
 	public GameObject taskSelectionUI;
 
@@ -41,6 +42,7 @@ public class CompetitionManager : MonoBehaviour
 		if (competitionButtonText.text == buttonTextStart)
 		{
 			timeText.SetActive(true);
+			scoreText.SetActive(true);
 			pidUI.SetActive(false);
 			taskSelectionUI.SetActive(false);
 
@@ -58,6 +60,7 @@ public class CompetitionManager : MonoBehaviour
 		else
 		{
 			timeText.SetActive(false);
+			scoreText.SetActive(false);
 			pidUI.SetActive(true);
 			taskSelectionUI.SetActive(false);
 

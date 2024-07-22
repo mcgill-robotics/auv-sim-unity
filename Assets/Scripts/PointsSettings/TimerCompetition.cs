@@ -13,7 +13,7 @@ public class TimerCompetition : MonoBehaviour
 	void Awake()
 	{
 		instance = this;
-		timerText.text = "00:00";
+		ResetTimer();
 	}
 
 	void Start()
@@ -37,6 +37,7 @@ public class TimerCompetition : MonoBehaviour
 	public void ResetTimer()
 	{
 		timer = 0f;
+		timerText.text = "00:00";
 	}
 
 	public void StartScript()
@@ -47,6 +48,8 @@ public class TimerCompetition : MonoBehaviour
 
 	public void StopScript()
 	{
+		ResetTimer();
+		isCounting = false;
 		this.enabled = false; // Disable the script.
 	}
 
