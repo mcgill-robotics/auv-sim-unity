@@ -66,6 +66,8 @@
         "editor.formatOnSave": true,
         "editor.codeLens": false,
         "editor.tabSize": 2,
-        "editor.defaultFormatter": "ms-dotnettools.csharp"
-    }
+        "editor.defaultFormatter": "ms-dotnettools.csharp",
+        "editor.wordWrap": "wordWrapColumn"
+    },
+    "dotnet.defaultSolution": "disable"
 }
