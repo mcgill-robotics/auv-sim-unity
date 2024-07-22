@@ -50,7 +50,7 @@ public class CompetitionManager : MonoBehaviour
 			StartCoroutine(PauseMovementCoroutine());
 			competitionAudioStart.Play();
 
-			FacingChecker.instance.StartScript();
+			CoinFlip.instance.StartScript();
 			PassThroughGate.instance.StartScript();
 			TimerCompetition.instance.StartScript();
 			TricksChecker.instance.StartScript();
@@ -65,7 +65,7 @@ public class CompetitionManager : MonoBehaviour
 			taskSelectionUI.SetActive(false);
 
 			competitionAudioEnd.Play();
-			FacingChecker.instance.StopScript();
+			CoinFlip.instance.StopScript();
 			PassThroughGate.instance.StopScript();
 			TimerCompetition.instance.StopScript();
 			TricksChecker.instance.StopScript();
