@@ -2203,6 +2203,9 @@ MonoBehaviour:
   auv: {fileID: 6207282852912111775}
   pointsAvailableWrong: 600
   pointsAvailableCorrect: 800
+  distanceThreshold: 3
+  previousAngle: 0
+  totalRotation: 0
 --- !u!1 &577752435
 GameObject:
   m_ObjectHideFlags: 0
@@ -9851,6 +9854,11 @@ PrefabInstance:
       propertyPath: pinger4
       value: 
       objectReference: {fileID: 1707856123}
+    - target: {fileID: 5558434845062824359, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6642039138362327368, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: m_Name
