@@ -54,7 +54,7 @@ public class CompetitionManager : MonoBehaviour
 			PassThroughGate.instance.StartScript();
 			TimerCompetition.instance.StartScript();
 			TricksChecker.instance.StartScript();
-			Buoy.instance.StartScript();
+			BuoyCircumnavigate.instance.StartScript();
 
 			competitionButtonText.text = buttonTextEnd;
 		}
@@ -70,7 +70,7 @@ public class CompetitionManager : MonoBehaviour
 			PassThroughGate.instance.StopScript();
 			TimerCompetition.instance.StopScript();
 			TricksChecker.instance.StopScript();
-			Buoy.instance.StopScript();
+			BuoyCircumnavigate.instance.StopScript();
 
 			competitionButtonText.text = buttonTextStart;
 		}
