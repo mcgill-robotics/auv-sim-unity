@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -51,5 +52,15 @@ public class PointsManager : MonoBehaviour
 	{
 		total_score = 0;
 		scoreText.text = "SCORE: " + total_score.ToString();
+		ResetTaskAudioIndex();
+	}
+
+	private void ResetTaskAudioIndex()
+	{
+		string[] keysArray = tasksAudioIndex.Keys.ToArray();
+		foreach (string key in keysArray)
+		{
+			tasksAudioIndex[key] = 0;
+		}
 	}
 }

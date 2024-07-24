@@ -1,21 +1,21 @@
-"Gate: Coin Flip", 300
-"Gate: Pass through", 100
-"Gate: Maintain a fixed heading", 150 --> 
+DONE - "Gate: Coin Flip", 300
+DONE - "Gate: Pass through", 100
+GIVEN - "Gate: Maintain a fixed heading", 150 --> 
                "it means that its clear the robot is being controlled 
                by a PID or something like that as opposed to being 
                pointed in the right direction and just firing 
                thrusters with no feed back to how they are moving the 
                robot." -- from robotics
-"Gate: Style Yaw", 100 --> Every 90 degrees (8x max)
-"Gate: Style Roll/Pitch", 200 --> Every 90 degrees (8x max)
+DONE - "Gate: Style Yaw", 100 --> Every 90 degrees (8x max)
+DONE - "Gate: Style Roll/Pitch", 200 --> Every 90 degrees (8x max)
 
-"Hydrothermal Vent: Touch", 300
-"Hydrothermal Vent: Circumnavigate (wrong)", 600
-"Hydrothermal Vent: Circumnavigate (correct)", 800
-"Hydrothermal Vent: Fire torpedoes", 200 --> Per torpedo
+DONE (but no partial points) - "Hydrothermal Vent: Touch", 300
+DONE - "Hydrothermal Vent: Circumnavigate (wrong)", 600
+DONE - "Hydrothermal Vent: Circumnavigate (correct)", 800
+TODO - "Hydrothermal Vent: Fire torpedoes", 200 --> Per torpedo
 
-"Ocean Temperature: Any bin", 400 --> Per marker (max 2)
-"Ocean Temperature: Correct side", 800 --> Per marker (max 2)
+DONE - "Ocean Temperature: Any bin", 400 --> Per marker (max 2)
+DONE - "Ocean Temperature: Correct side", 800 --> Per marker (max 2)
 
 "Mapping: Any", 600 --> Per torpedo (max 2) 
 "Mapping: Correct sequence", 1400  
