@@ -21,7 +21,7 @@ public class BuoyTouch : MonoBehaviour
 		if (col.gameObject.name == "Diana")
 		{
 			PointsManager.instance.AddPoint(pointsAvailable, "Buoy");
-			MessageBox.instance.AddMessage("Buoy Touch +300pts");
+			MessageBox.instance.AddMessage(string.Format("Buoy Touch +{0}pts", pointsAvailable));
 			StopScript();
 		}
 	}

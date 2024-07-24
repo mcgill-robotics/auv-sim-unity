@@ -102,18 +102,18 @@ public class BuoyCircumnavigate : MonoBehaviour
 			if (PointsManager.instance.color == "red")
 			{
 				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
-				MessageBox.instance.AddMessage("Buoy Circumnavigate correct (clockwise) +800pts");
+				MessageBox.instance.AddMessage(string.Format("Buoy Circumnavigate correct (clockwise) +{0}pts", pointsAvailableCorrect));
 			}
 			else if (PointsManager.instance.color == "blue")
 			{
 				PointsManager.instance.AddPoint(pointsAvailableWrong, "Buoy");
-				MessageBox.instance.AddMessage("Buoy Circumnavigate wrong (counterclockwise) +600pts");
+				MessageBox.instance.AddMessage(string.Format("Buoy Circumnavigate wrong (counterclockwise) +{0}pts", pointsAvailableWrong));
 			}
 			else
 			{
 				PointsManager.instance.color = "red";
 				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
-				MessageBox.instance.AddMessage("Buoy Circumnavigate correct (clockwise) +800pts");
+				MessageBox.instance.AddMessage(string.Format("Buoy Circumnavigate correct (clockwise) +{0}pts", pointsAvailableCorrect));
 				MessageBox.instance.AddMessage("Setting competition color to RED");
 			}
 		}
@@ -122,19 +122,19 @@ public class BuoyCircumnavigate : MonoBehaviour
 			if (PointsManager.instance.color == "blue")
 			{
 				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
-				MessageBox.instance.AddMessage("Buoy Circumnavigate correct (counterclockwise) +800pts");
+				MessageBox.instance.AddMessage(string.Format("Buoy Circumnavigate correct (counterclockwise) +{0}pts", pointsAvailableCorrect));
 			}
 			else if (PointsManager.instance.color == "red")
 			{
 				PointsManager.instance.AddPoint(pointsAvailableWrong, "Buoy");
-				MessageBox.instance.AddMessage("Buoy Circumnavigate wrong (clockwise) +600pts");
+				MessageBox.instance.AddMessage(string.Format("Buoy Circumnavigate wrong (clockwise) +{0}pts", pointsAvailableWrong));
 			}
 			else
 			{
 				PointsManager.instance.color = "blue";
 				PointsManager.instance.AddPoint(pointsAvailableCorrect, "Buoy");
-				MessageBox.instance.AddMessage("Buoy Circumnavigate correct (counterclockwise) +800pts");
-				MessageBox.instance.AddMessage("Setting competition color to BLUE");
+				MessageBox.instance.AddMessage(string.Format("Buoy Circumnavigate correct (counterclockwise) +{0}pts", pointsAvailableCorrect));
+				MessageBox.instance.AddMessage(string.Format("Setting competition color to BLUE"));
 			}
 		}
 	}

@@ -51,7 +51,7 @@ public class CoinFlip : MonoBehaviour
 			if (facingTimer >= requiredFacingTime)
 			{
 				PointsManager.instance.AddPoint(pointsAvailable, "Gate");
-				MessageBox.instance.AddMessage("Coin Flip +300pts");
+				MessageBox.instance.AddMessage(string.Format("Coin Flip +{0}pts", pointsAvailable));
 				StopScript();
 			}
 		}
