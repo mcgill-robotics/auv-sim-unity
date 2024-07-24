@@ -76,18 +76,21 @@ public class TricksChecker : MonoBehaviour
 			rollCount++;
 			rollTotal = 0;
 			PointsManager.instance.AddPoint(pointPitchRollAvailable, "Gate");
+			MessageBox.instance.AddMessage("Tricks Roll +800pts");
 		}
 		if (Mathf.Abs(pitchTotal) >= 360f)
 		{
 			pitchCount++;
 			pitchTotal = 0;
 			PointsManager.instance.AddPoint(pointPitchRollAvailable, "Gate");
+			MessageBox.instance.AddMessage("Tricks Pitch +800pts");
 		}
 		if (Mathf.Abs(yawTotal) >= 360f)
 		{
 			yawCount++;
 			yawTotal = 0;
 			PointsManager.instance.AddPoint(pointYawAvailable, "Gate");
+			MessageBox.instance.AddMessage("Tricks Yaw +400pts");
 		}
 
 		lastRotation = curRotation;
