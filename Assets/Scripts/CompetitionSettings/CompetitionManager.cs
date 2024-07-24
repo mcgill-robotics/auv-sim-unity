@@ -59,6 +59,7 @@ public class CompetitionManager : MonoBehaviour
 			BuoyCircumnavigate.instance.StartScript();
 			BuoyTouch.instance.StartScript();
 			BinsManager.instance.StartAllBinsScripts();
+			OctagonSurface.instance.StartScript();
 
 			competitionButtonText.text = buttonTextEnd;
 		}
@@ -78,6 +79,7 @@ public class CompetitionManager : MonoBehaviour
 			BuoyCircumnavigate.instance.StopScript();
 			BuoyTouch.instance.StopScript();
 			BinsManager.instance.StopAllBinsScripts();
+			OctagonSurface.instance.StopScript();
 
 			competitionButtonText.text = buttonTextStart;
 		}
