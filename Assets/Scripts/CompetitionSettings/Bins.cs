@@ -19,12 +19,12 @@ public class Bins : MonoBehaviour
 			if (PointsManager.instance.color == "none" || PointsManager.instance.color == gameObject.name)
 			{
 				PointsManager.instance.AddPoint(BinsManager.instance.pointsAvailableCorrect, "Bins");
-				MessageBox.instance.AddMessage("Bins correct side +800pts");
+				MessageBox.instance.AddMessage(string.Format("Bins correct side +{0}pts", BinsManager.instance.pointsAvailableCorrect));
 			}
 			else
 			{
 				PointsManager.instance.AddPoint(BinsManager.instance.pointsAvailableWrong, "Bins");
-				MessageBox.instance.AddMessage("Bins any side +400pts");
+				MessageBox.instance.AddMessage(string.Format("Bins any side +{0}pts", BinsManager.instance.pointsAvailableWrong));
 			}
 			BinsManager.instance.StopAllBinsScripts();
 		}

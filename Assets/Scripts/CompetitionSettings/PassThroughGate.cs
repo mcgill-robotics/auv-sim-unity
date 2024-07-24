@@ -44,7 +44,7 @@ public class PassThroughGate : MonoBehaviour
 			{
 				hasEnteredGate = false;
 				PointsManager.instance.AddPoint(pointsAvailable, "Gate");
-				MessageBox.instance.AddMessage("Gate Pass Through +100pts");
+				MessageBox.instance.AddMessage(string.Format("Gate Pass Through +{0}pts", pointsAvailable));
 				SetColor();
 				StopScript();
 			}
