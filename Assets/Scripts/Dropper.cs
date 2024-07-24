@@ -8,8 +8,23 @@ using RosMessageTypes.Geometry;
 public class Dropper : MonoBehaviour
 {
 	public Transform DroppingSphere;
-	ROSConnection roscon;
+
+	private ROSConnection roscon;
 	private string dropperTopicName = "/actuators/grab";
+
+	void Start()
+	{
+		roscon = ROSConnection.GetOrCreateInstance();
+		roscon.Subscribe<BoolMsg>(dropperTopicName, dropSphereCallback);
+	}
+
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Comma))
+		{
+			dropSphere(DroppingSphere.gameObject);
+		}
+	}
 
 	void dropSphere(GameObject sphere)
 	{
@@ -23,7 +38,7 @@ public class Dropper : MonoBehaviour
 			rb.isKinematic = false; // Set to false to allow gravity to affect the sphere
 			rb.detectCollisions = true;
 
-			// Remove the parent (Diana) so it can drop)
+			// Remove the parent (Diana) so it can drop
 			sphere.transform.parent = null;
 		}
 	}
@@ -32,20 +47,6 @@ public class Dropper : MonoBehaviour
 	{
 		if (message.data)
 		{ // Check if boolmsg is true
-			dropSphere(DroppingSphere.gameObject);
-		}
-	}
-
-	void Start()
-	{
-		roscon = ROSConnection.GetOrCreateInstance();
-		roscon.Subscribe<BoolMsg>("/actuators/grab", dropSphereCallback);
-	}
-
-	void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Comma))
-		{
 			dropSphere(DroppingSphere.gameObject);
 		}
 	}

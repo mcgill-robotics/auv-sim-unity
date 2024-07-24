@@ -16,6 +16,7 @@ public class CompetitionManager : MonoBehaviour
 	public GameObject scoreText;
 	public GameObject pidUI;
 	public GameObject taskSelectionUI;
+	public GameObject messageBox;
 
 	private float pauseMovementSeconds = 4f;
 
@@ -45,6 +46,7 @@ public class CompetitionManager : MonoBehaviour
 			scoreText.SetActive(true);
 			pidUI.SetActive(false);
 			taskSelectionUI.SetActive(false);
+			messageBox.SetActive(true);
 
 			// Run the StopMovementCoroutine method asynchronously (don't pause everything).
 			StartCoroutine(PauseMovementCoroutine());
@@ -55,6 +57,8 @@ public class CompetitionManager : MonoBehaviour
 			TimerCompetition.instance.StartScript();
 			TricksChecker.instance.StartScript();
 			BuoyCircumnavigate.instance.StartScript();
+			BuoyTouch.instance.StartScript();
+			BinsManager.instance.StartAllBinsScripts();
 
 			competitionButtonText.text = buttonTextEnd;
 		}
@@ -63,7 +67,8 @@ public class CompetitionManager : MonoBehaviour
 			timeText.SetActive(false);
 			scoreText.SetActive(false);
 			pidUI.SetActive(true);
-			taskSelectionUI.SetActive(false);
+			taskSelectionUI.SetActive(true);
+			messageBox.SetActive(false);
 
 			competitionAudioEnd.Play();
 			CoinFlip.instance.StopScript();
@@ -71,6 +76,8 @@ public class CompetitionManager : MonoBehaviour
 			TimerCompetition.instance.StopScript();
 			TricksChecker.instance.StopScript();
 			BuoyCircumnavigate.instance.StopScript();
+			BuoyTouch.instance.StopScript();
+			BinsManager.instance.StopAllBinsScripts();
 
 			competitionButtonText.text = buttonTextStart;
 		}

@@ -44,6 +44,7 @@ public class PassThroughGate : MonoBehaviour
 			{
 				hasEnteredGate = false;
 				PointsManager.instance.AddPoint(pointsAvailable, "Gate");
+				MessageBox.instance.AddMessage("Gate Pass Through +100pts");
 				SetColor();
 				StopScript();
 			}
@@ -77,10 +78,12 @@ public class PassThroughGate : MonoBehaviour
 		if (distanceToBlue < distanceToRed)
 		{
 			PointsManager.instance.color = "blue";
+			MessageBox.instance.AddMessage("Setting competition color to BLUE");
 		}
 		else
 		{
 			PointsManager.instance.color = "red";
+			MessageBox.instance.AddMessage("Setting competition color to RED");
 		}
 	}
 

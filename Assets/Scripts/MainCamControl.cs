@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System;
 using TMPro;
 
@@ -31,7 +32,7 @@ public class MainCamControl : MonoBehaviour
 
 	void Update()
 	{
-		if (IsMouseOverTMPDropdown())
+		if (IsMouseOverTMPDropdownOrScrollView())
 		{
 			return;
 		}
@@ -76,9 +77,8 @@ public class MainCamControl : MonoBehaviour
 		}
 	}
 
-	bool IsMouseOverTMPDropdown()
+	bool IsMouseOverTMPDropdownOrScrollView()
 	{
-		// Check if the mouse is over any TMP dropdown using Unity's event system
 		PointerEventData eventData = new PointerEventData(EventSystem.current);
 		eventData.position = Input.mousePosition;
 
@@ -88,7 +88,8 @@ public class MainCamControl : MonoBehaviour
 		foreach (RaycastResult result in results)
 		{
 			TMP_Dropdown dropdown = result.gameObject.GetComponentInParent<TMP_Dropdown>();
-			if (dropdown != null)
+			ScrollRect scrollRect = result.gameObject.GetComponentInParent<ScrollRect>();
+			if (dropdown != null || scrollRect != null)
 			{
 				return true;
 			}
