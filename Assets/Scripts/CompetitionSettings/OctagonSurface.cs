@@ -25,33 +25,39 @@ public class OctagonSurface : MonoBehaviour
 		Vector3 auvPosition = auv.position;
 
 		// Not close to the surface.
-		if (auvPosition.y < -0.3)
+		if (auvPosition.y <= -0.3)
 		{
 			return;
 		}
 
-		int crossingNumber = 0;
-		int pointCount = octagonCylinders.Length;
+		auvPosition.y = 0;
 
-		// Ray-casting algorithm for polygons.
-		for (int i = 0; i < pointCount; i++)
-		{
-			Vector3 vertex1 = octagonCylinders[i].position;
-			Vector3 vertex2 = octagonCylinders[(i + 1) % pointCount].position;
-
-			if (((vertex1.z <= auvPosition.z && auvPosition.z < vertex2.z) || (vertex2.z <= auvPosition.z && auvPosition.z < vertex1.z)) &&
-					(auvPosition.x < (vertex2.x - vertex1.x) * (auvPosition.z - vertex1.z) / (vertex2.z - vertex1.z) + vertex1.x))
-			{
-				crossingNumber++;
-			}
-		}
-
-		if (crossingNumber % 2 != 0)
+		if (IsObjectInsidePolygon(auvPosition))
 		{
 			PointsManager.instance.AddPoint(pointsAvailable, "Octagon");
 			MessageBox.instance.AddMessage(string.Format("Octagon Surface +{0}pts", pointsAvailable));
 			StopScript();
 		}
+	}
+
+	bool IsObjectInsidePolygon(Vector3 auvPosition)
+	{
+		bool isInside = true;
+		for (int i = 0; i < octagonCylinders.Length / 2; i++)
+		{
+			Vector3 cylinderA = octagonCylinders[i * 2].position;
+			Vector3 cylinderB = octagonCylinders[i * 2 + 1].position;
+			cylinderA.y = 0;
+			cylinderB.y = 0;
+
+			Vector3 cylinderA_auv = auvPosition - cylinderA;
+			Vector3 cylinderA_cylinderB = cylinderB - cylinderA;
+			float distSqr = cylinderA_cylinderB.sqrMagnitude;
+			float d = Vector3.Dot(cylinderA_auv, cylinderA_cylinderB) / distSqr;
+			isInside = isInside && d > 0 && d < 1;
+		}
+
+		return isInside;
 	}
 
 	public void StartScript()
