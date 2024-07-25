@@ -2610,11 +2610,11 @@ MonoBehaviour:
   - {fileID: 1620223134}
   - {fileID: 547913056}
   - {fileID: 1213049914}
-  - {fileID: 928256960}
-  - {fileID: 1229006705}
   - {fileID: 1285850427}
-  - {fileID: 90134308}
+  - {fileID: 928256960}
   - {fileID: 739925554}
+  - {fileID: 1229006705}
+  - {fileID: 90134308}
   pointsAvailable: 800
 --- !u!4 &547913056 stripped
 Transform:
