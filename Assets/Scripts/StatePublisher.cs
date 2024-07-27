@@ -97,10 +97,10 @@ public class StatePublisher : MonoBehaviour
 	void OnDestroy()
 	{
 		// Unsubscribe from the events to prevent memory leaks.
-		UnsubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
-		UnsubscribeToggle(classLogicManager.PublishDepthToggle, UpdateisDepthSensorActive);
-		UnsubscribeToggle(classLogicManager.PublishIMUToggle, UpdateisIMUActive);
-		UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, UpdateisHydrophonesActive);
+		// UnsubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
+		// UnsubscribeToggle(classLogicManager.PublishDepthToggle, UpdateisDepthSensorActive);
+		// UnsubscribeToggle(classLogicManager.PublishIMUToggle, UpdateisIMUActive);
+		// UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, UpdateisHydrophonesActive);
 	}
 
 	private void UnsubscribeToggle(Toggle toggle, Action<bool> updateAction)
