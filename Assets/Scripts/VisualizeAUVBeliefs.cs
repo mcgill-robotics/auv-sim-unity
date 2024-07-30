@@ -33,7 +33,8 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 	public GameObject expectedBearingPinger3;
 	public GameObject expectedBearingPinger4;
 
-	public int maxDetectionFrameIndicators = 50;
+	public int maxDetectionFrameIndicators = 10;
+	private int currentIndex = 0;
 
 	public string thetaXTopicName = "/state/theta/x";
 	public string thetaYTopicName = "/state/theta/y";
@@ -161,7 +162,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 	void posZCallback(Float64Msg Z)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
-		currentAUVPos.y = (float)Z.data;
+		currentAUVPos.y = (float)-Z.data;
 	}
 
 	void objectMapCallback(RosMessageTypes.Auv.VisionObjectArrayMsg map)
@@ -260,12 +261,13 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 			GameObject detectionObject;
 			if (detectionFrameIndicators.Count >= maxDetectionFrameIndicators)
 			{
-				detectionObject = detectionFrameIndicators[0];
-				detectionFrameIndicators.RemoveAt(0);
+				detectionObject = detectionFrameIndicators[currentIndex % maxDetectionFrameIndicators];
+				currentIndex++;
 			}
 			else
 			{
 				detectionObject = GameObject.Instantiate(detectionIndicatorPrefab);
+				detectionFrameIndicators.Add(detectionObject);
 			}
 			detectionObject.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 			detectionObject.transform.SetParent(transform);
