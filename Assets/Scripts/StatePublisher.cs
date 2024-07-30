@@ -136,6 +136,7 @@ public class StatePublisher : MonoBehaviour
 		lastVelocity = currentVelocity;
 
 		msg.position = auv.transform.position.To<RUF>();
+		msg.position.y *= -1;
 
 		Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
 		msg.orientation = rotation.To<NED>();
