@@ -7840,6 +7840,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: VisualizationObjects
       objectReference: {fileID: 0}
+    - target: {fileID: 4014665394318296922, guid: 43a06d251454db744b1961d17085d98a,
+        type: 3}
+      propertyPath: maxDetectionFrameIndicators
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 4470355773774608868, guid: 43a06d251454db744b1961d17085d98a,
         type: 3}
       propertyPath: Diana
