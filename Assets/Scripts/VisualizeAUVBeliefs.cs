@@ -162,7 +162,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 	void posZCallback(Float64Msg Z)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
-		currentAUVPos.y = (float)-Z.data;
+		currentAUVPos.y = (float)Z.data;
 	}
 
 	void objectMapCallback(RosMessageTypes.Auv.VisionObjectArrayMsg map)
