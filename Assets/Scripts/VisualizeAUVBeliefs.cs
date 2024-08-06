@@ -32,6 +32,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 	public GameObject expectedBearingPinger2;
 	public GameObject expectedBearingPinger3;
 	public GameObject expectedBearingPinger4;
+	public GameObject binVisualization;
 
 	public int maxDetectionFrameIndicators = 10;
 	private int currentIndex = 0;
@@ -173,6 +174,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 		bool buoyInMap = false;
 		bool gateInMap = false;
 		bool octagonTableInMap = false;
+		bool binInMap = false;
 		foreach (RosMessageTypes.Auv.VisionObjectMsg detection in map.array)
 		{
 			if (detection.label == "Lane Marker")
@@ -205,6 +207,12 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 				buoyInMap = true;
 				buoyVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
 				buoyVisualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z + 90, 0);
+			}
+			else if (detection.label == "Bin")
+			{
+				binInMap = true;
+				binVisualization.transform.position = new Vector3((float)-detection.y, (float)detection.z, (float)detection.x);
+				binVisualization.transform.rotation = Quaternion.Euler(0, (float)-detection.theta_z, 0);
 			}
 			else if (detection.label == "Octagon Table")
 			{
@@ -246,6 +254,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 			laneMarker2ToVisualization.SetActive(num_lane_markers_in_map > 1);
 			buoyVisualization.SetActive(buoyInMap);
 			gateVisualization.SetActive(gateInMap);
+			binVisualization.SetActive(binInMap);
 			octagonTableVisualization.SetActive(octagonTableInMap);
 			abydosSymbol1Visualization.SetActive(num_abydos_symbols_in_map > 0);
 			abydosSymbol2Visualization.SetActive(num_abydos_symbols_in_map > 1);
