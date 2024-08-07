@@ -10,7 +10,7 @@ public class Dropper : MonoBehaviour
 	public Transform DroppingSphere;
 
 	private ROSConnection roscon;
-	private string dropperTopicName = "/actuators/grab";
+	private string dropperTopicName = "/actuators/grabber/close";
 
 	void Start()
 	{
