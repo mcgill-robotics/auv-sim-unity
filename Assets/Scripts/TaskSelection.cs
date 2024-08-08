@@ -86,7 +86,7 @@ public class TaskSelection : MonoBehaviour
 	List<Dictionary<string, Vector3>> objectsEulerAngles = new List<Dictionary<string, Vector3>>() {
 		// Competition 
 		new Dictionary<string, Vector3> {
-			{"AUV", new Vector3(0, -90, 0)},
+			{"AUV", new Vector3(0, 90, 0)},
 			{"Gate", new Vector3(0, 75, 0)},
 			{"LaneMarkerStraight", new Vector3(0, 75, 0)},
 			{"Buoy", new Vector3(4, 0, -13)},
