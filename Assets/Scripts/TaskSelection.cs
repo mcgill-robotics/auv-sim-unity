@@ -13,6 +13,7 @@ public class TaskSelection : MonoBehaviour
 	public GameObject GateQuali;
 	public GameObject Gate;
 	public GameObject LaneMarkerStraight;
+	public GameObject LaneMarkerStraight2;
 	public GameObject LaneMarker45Left;
 	public GameObject Buoy;
 	public GameObject Pinger1;
@@ -80,6 +81,19 @@ public class TaskSelection : MonoBehaviour
 			{"Pinger2", new Vector3(10, -3, -10)},
 			{"Pinger3", new Vector3(-10, -3, -10)},
 			{"Pinger4", new Vector3(-10, -3, 10)}
+		},
+		// Semi finals (course D) width pool = 22.7
+		new Dictionary<string, Vector3> {
+			{"AUV", new Vector3(0, -0.2f, -15)},
+			{"Gate", new Vector3(2, -1, -13)},
+			{"LaneMarkerStraight", new Vector3(2, -5, -10)},
+			{"Buoy", new Vector3(-3, 0, -5)},
+			{"LaneMarkerStraight2", new Vector3(-2, -5, -4)}, //how to have two objects same name?
+			{"Bin", new Vector3(4, -5, 0)},
+			// {"Pinger1", new Vector3(9, -5, -5)},
+			// Missing Torpedos prop
+			{"Pinger2", new Vector3(-3, -4, 3)},
+			{"OctagonTable", new Vector3(-3, -4, 3)}
 		}
 	};
 
@@ -140,6 +154,19 @@ public class TaskSelection : MonoBehaviour
 			{"Pinger2", new Vector3(0, 0, 0)},
 			{"Pinger3", new Vector3(0, 0, 0)},
 			{"Pinger4", new Vector3(0, 0, 0)}
+		},
+		// Semi finals (course D) 
+		new Dictionary<string, Vector3> {
+			{"AUV", new Vector3(0, 90, 0)},
+			{"Gate", new Vector3(0, 0, 0)},
+			{"LaneMarkerStraight", new Vector3(0, 130, 0)},
+			{"Buoy", new Vector3(4, 0, -13)},
+			{"LaneMarkerStraight2", new Vector3(0, 30, 0)},
+			{"Bin", new Vector3(0, 45, 0)},
+			// {"Pinger1", new Vector3(0, 0, 0)},
+			// Missing Torpedos prop
+			{"Pinger2", new Vector3(0, 0, 0)},
+			{"OctagonTable", new Vector3(0, 0, 0)}
 		}
 	};
 	List<string> tasksNameList;
@@ -153,6 +180,7 @@ public class TaskSelection : MonoBehaviour
 		objectsDictionary.Add("Gate", Gate);
 		objectsDictionary.Add("LaneMarkerStraight", LaneMarkerStraight);
 		objectsDictionary.Add("LaneMarker45Left", LaneMarker45Left);
+		objectsDictionary.Add("LaneMarkerStraight2", LaneMarkerStraight2);
 		objectsDictionary.Add("Buoy", Buoy);
 		objectsDictionary.Add("Pinger1", Pinger1);
 		objectsDictionary.Add("Pinger2", Pinger2);
