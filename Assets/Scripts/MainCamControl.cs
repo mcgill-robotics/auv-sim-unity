@@ -25,10 +25,10 @@ public class MainCamControl : MonoBehaviour
 	private Vector3 initialMousePosition;
 	private Vector3 initialCamDirection;
 
-	void FixedUpdate()
-	{
-		Update();
-	}
+	// void FixedUpdate()
+	// {
+	// 	Update();
+	// }
 
 	void Update()
 	{
