@@ -6,33 +6,35 @@ using UnityEngine;
 
 public class Buoyancy : MonoBehaviour
 {
-    Rigidbody auv;
+    Rigidbody auvRb;
     public float buoyancyForce;
 
     private float auvLengthOver4;
     private Vector3 buoyancyForceVector;
-    private Vector3 buoyancyForceVectorOverAuvLength;
+    private Vector3 buoyancyForceVectorScaled;
 
     // Start is called before the first frame update
     void Start()
     {
-        auv = GetComponent<Rigidbody>();
-        auvLengthOver4 = auv.transform.localScale.x / 4;
+        auvRb = GetComponent<Rigidbody>();
+        auvLengthOver4 = auvRb.transform.localScale.x / 4;
         buoyancyForceVector = Vector3.up * buoyancyForce;
-        buoyancyForceVectorOverAuvLength = buoyancyForceVector / auvLengthOver4;
+        buoyancyForceVectorScaled = buoyancyForceVector / auvLengthOver4;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        float level = Math.Min(0, auv.transform.position.y);
-        if (level > -auv.transform.localScale.x / 4)
+        float auvDistBelowSurface = -Math.Min(0, auvRb.transform.position.y);
+        if (auvDistBelowSurface < auvLengthOver4)
         {
-            auv.AddForceAtPosition(Math.Abs(level) * buoyancyForceVectorOverAuvLength, transform.position, ForceMode.Force);
+            // AUV is partially submerged, apply buoyancy force scaled to the submerged volume
+            auvRb.AddForceAtPosition(auvDistBelowSurface * buoyancyForceVectorScaled, transform.position, ForceMode.Force);
         }
         else
         {
-            auv.AddForceAtPosition(buoyancyForceVector, transform.position, ForceMode.Force);
+            // AUV is fully submerged, apply full buoyancy force
+            auvRb.AddForceAtPosition(buoyancyForceVector, transform.position, ForceMode.Force);
         }
     }
 }
