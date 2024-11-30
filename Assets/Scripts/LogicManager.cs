@@ -110,6 +110,7 @@ public class LogicManager1 : MonoBehaviour
 	private static bool isCheckingKey = false;
 	private Color originalButtonColor;
 	private int timeoutInSeconds = 7;
+	public StatePublisher statePub;
 	public CameraPublisher frontCamPub;
 	public CameraPublisher downCamPub;
 	public CameraDepthPublisher depthCamPub;
@@ -493,6 +494,7 @@ public class LogicManager1 : MonoBehaviour
 		if (clickedButton.name == "SetPoseRateBtn")
 		{
 			PlayerPrefs.SetString("poseRate", poseRateInputField.text);
+			statePub.UpdatePublishRate(int.Parse(poseRateInputField.text));
 		}
 		PlayerPrefs.Save();
 	}

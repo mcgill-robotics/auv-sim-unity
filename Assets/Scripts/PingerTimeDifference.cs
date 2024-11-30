@@ -52,7 +52,7 @@ public class PingerTimeDifference : MonoBehaviour
 		pingersList.Add(pinger4);
 	}
 
-	public (uint[], int) CalculateTimeDifference(int pinger_index)
+	public (uint[], int) CalculateTimeDifference(int pingerIndex)
 	{
 		/* 
 		Simulate absolute the time that each hydrophones detected a signal.
@@ -63,12 +63,18 @@ public class PingerTimeDifference : MonoBehaviour
 
 		// 1. Calculate  the time it takes for frequency wave to get to each hydrophone. 
 		// Delta_time = Delta_space / Velocity_of_sound
+		double minDeltaTime = double.MaxValue;
 		for (int i = 0; i < hydrophoneToPingerDistances.Length; i++)
 		{
-			hydrophoneToPingerDistances[i] = Vector3.Distance(hydrophoneList[i].position, pingersList[pinger_index].position);
+			hydrophoneToPingerDistances[i] = Vector3.Distance(hydrophoneList[i].position, pingersList[pingerIndex].position);
 			pingerToHydrophonesTime[i] = hydrophoneToPingerDistances[i] / speedOfSound;
+			if (pingerToHydrophonesTime[i] < minDeltaTime)
+			{
+				minDeltaTime = pingerToHydrophonesTime[i];
+			}
 		}
 
+		/*
 		// 2. Get min Delta_time and calculate the difference to the other Delta_time.
 		double minDeltaTime = pingerToHydrophonesTime.Min();
 		double[] differences = pingerToHydrophonesTime.Select(value => value - minDeltaTime).ToArray();
@@ -78,7 +84,16 @@ public class PingerTimeDifference : MonoBehaviour
 
 		// 4. Scale times & 5. Simulate overflow.
 		scaledTimes = hydrophonesTimes.Select(time => (uint)((time * scaledTimeUnit) % doubleUintMaxValue)).ToArray();
-
-		return (scaledTimes[..(logicManager1.hydrophonesNumberOption + 3)], frequencies[pinger_index]);
+		*/
+		
+		// 2, 3, 4 & 5.
+		scaledTimes = new uint[pingerToHydrophonesTime.Length];
+		for (int i = 0; i < pingerToHydrophonesTime.Length; i++)
+		{
+			double hydrophoneTime = currentTime + (pingerToHydrophonesTime[i] - minDeltaTime);
+			scaledTimes[i] = (uint)((hydrophoneTime * scaledTimeUnit) % doubleUintMaxValue);
+		}
+		
+		return (scaledTimes[..(logicManager1.hydrophonesNumberOption + 3)], frequencies[pingerIndex]);
 	}
 }

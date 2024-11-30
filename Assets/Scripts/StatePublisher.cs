@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using System;
+using UnityEngine.Serialization;
 
 public class StatePublisher : MonoBehaviour
 {
@@ -15,30 +16,33 @@ public class StatePublisher : MonoBehaviour
 	int numberOfPingers = 4;
 	public string stateTopicName = "/unity/state";
 	public GameObject auv;
-	public Rigidbody auvRigidBody;
+	public Rigidbody auvRb;
 	Vector3 acceleration;
 	Vector3 lastVelocity;
 	Vector3 currentVelocity;
 
 	private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
-	private float timeSinceLastUpdate;
+	private float timeSinceLastPublish;
 	bool isDVLActive;
 	bool isDepthSensorActive;
 	bool isIMUActive;
 	bool isHydrophonesActive;
 	bool publishToRos;
-
-	int updateFrequency = 10;
+	float publishRate = 0.1f;
+	
+	uint[][] times;
+	int[] frequencies;
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		lastVelocity = auvRigidBody.velocity;
+		lastVelocity = auvRb.velocity;
 		acceleration = new Vector3(0, 0, 0);
 		classLogicManager = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
 		if (classLogicManager != null)
 		{
 			SubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
+			SubscribeToggle(classLogicManager.PublishROSToggle, UpdatePublishToRos);
 			SubscribeToggle(classLogicManager.PublishDepthToggle, UpdateisDepthSensorActive);
 			SubscribeToggle(classLogicManager.PublishIMUToggle, UpdateisIMUActive);
 			SubscribeToggle(classLogicManager.PublishHydrophonesToggle, UpdateisHydrophonesActive);
@@ -53,7 +57,10 @@ public class StatePublisher : MonoBehaviour
 		{
 			Debug.LogError("[in StatePublisher.cs] PingerTimeDifference class is not assigned.");
 		}
-
+		
+		publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
+		UpdatePublishRate(int.Parse(PlayerPrefs.GetString("poseRate", "50")));
+		
 		roscon = ROSConnection.GetOrCreateInstance();
 		roscon.RegisterPublisher<RosMessageTypes.Auv.UnityStateMsg>(stateTopicName);
 	}
@@ -78,6 +85,16 @@ public class StatePublisher : MonoBehaviour
 	{
 		isDVLActive = value;
 	}
+	
+	private void UpdatePublishToRos(bool value)
+	{
+		publishToRos = value;
+	}
+
+	public void UpdatePublishRate(int publishFrequency)
+	{
+		publishRate =  1f / publishFrequency;
+	}
 
 	private void UpdateisDepthSensorActive(bool value)
 	{
@@ -98,6 +115,7 @@ public class StatePublisher : MonoBehaviour
 	{
 		// Unsubscribe from the events to prevent memory leaks.
 		UnsubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
+		UnsubscribeToggle(classLogicManager.PublishROSToggle, UpdatePublishToRos);
 		UnsubscribeToggle(classLogicManager.PublishDepthToggle, UpdateisDepthSensorActive);
 		UnsubscribeToggle(classLogicManager.PublishIMUToggle, UpdateisIMUActive);
 		UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, UpdateisHydrophonesActive);
@@ -114,24 +132,21 @@ public class StatePublisher : MonoBehaviour
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
-		updateFrequency = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
+		// publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
+		// publishRate = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
 
-		timeSinceLastUpdate += Time.deltaTime;
-		if (timeSinceLastUpdate < 1.0 / updateFrequency || !publishToRos)
-		{
-			return;
-		}
-		timeSinceLastUpdate = 0;
+		timeSinceLastPublish += Time.fixedDeltaTime;
+		if (!publishToRos || timeSinceLastPublish < publishRate) return;
+		timeSinceLastPublish = 0;
 
-		uint[][] times = new uint[numberOfPingers][];
-		int[] frequencies = new int[numberOfPingers];
+		times = new uint[numberOfPingers][];
+		frequencies = new int[numberOfPingers];
 		for (int i = 0; i < numberOfPingers; i++)
 		{
 			(times[i], frequencies[i]) = classPingerTimeDifference.CalculateTimeDifference(i);
 		}
 
-		currentVelocity = auvRigidBody.velocity;
+		currentVelocity = auvRb.velocity;
 		acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
 		lastVelocity = currentVelocity;
 
@@ -140,8 +155,8 @@ public class StatePublisher : MonoBehaviour
 
 		Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
 		msg.orientation = rotation.To<NED>();
-		msg.angular_velocity = auv.GetComponent<Rigidbody>().angularVelocity.To<RUF>();
-		msg.velocity = auv.GetComponent<Rigidbody>().velocity.To<RUF>();
+		msg.angular_velocity = auvRb.angularVelocity.To<RUF>();
+		msg.velocity = currentVelocity.To<RUF>();
 		msg.frequencies = frequencies;
 		msg.times_pinger_1 = times[0];
 		msg.times_pinger_2 = times[1];

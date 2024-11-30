@@ -8271,6 +8271,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f530d6fe7ff924eafbaf47e789bbc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6636075807003561220 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 668416996780181483, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6636075807003561213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ba04a4037578127db0775e2f83e0c3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!54 &6636075807003561222 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 9150705416908342384, guid: 1b569bfd0ceba054590bd50d26375651,
+    type: 3}
+  m_PrefabInstance: {fileID: 8685048131078817679}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7177869497111605333
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8689,6 +8707,11 @@ PrefabInstance:
       propertyPath: frontCam
       value: 
       objectReference: {fileID: 2662973749672493237}
+    - target: {fileID: 1277170570262263766, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: statePub
+      value: 
+      objectReference: {fileID: 6636075807003561220}
     - target: {fileID: 1277170570262263766, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: followCam
@@ -10902,6 +10925,11 @@ PrefabInstance:
       propertyPath: depthLayers.m_Bits
       value: 4880
       objectReference: {fileID: 0}
+    - target: {fileID: 668416996780181483, guid: 1b569bfd0ceba054590bd50d26375651,
+        type: 3}
+      propertyPath: auvRb
+      value: 
+      objectReference: {fileID: 6636075807003561222}
     - target: {fileID: 709341525689035954, guid: 1b569bfd0ceba054590bd50d26375651,
         type: 3}
       propertyPath: ROSClock

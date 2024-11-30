@@ -63,6 +63,10 @@ public class CameraPublisher : MonoBehaviour
 			publishWidth = int.Parse(PlayerPrefs.GetString("downCamWidth", "640"));
 			publishHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
 		}
+		
+		FPS = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
+		publishToRos = FPS >= 1 && bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
+
 
 		renderTexture = new RenderTexture(publishWidth, publishHeight, 24, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
 		renderTexture.Create();
@@ -86,6 +90,7 @@ public class CameraPublisher : MonoBehaviour
 
 	void Update()
 	{
+		if (!publishToRos) return;
 		StartCoroutine(WaitForEndOfFrameToPublish());
 	}
 
@@ -97,16 +102,16 @@ public class CameraPublisher : MonoBehaviour
 
 	void SendImage()
 	{
-		publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
-
-		FPS = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
-		if (FPS < 1)
-		{
-			publishToRos = false;
-		}
+		// publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
+		//
+		// FPS = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
+		// if (FPS < 1)
+		// {
+		// 	publishToRos = false;
+		// }
 		timeElapsed += Time.deltaTime;
 
-		if (timeElapsed > 1.0f / FPS && publishToRos)
+		if (publishToRos && timeElapsed > 1.0f / FPS)
 		{
 			cam.targetTexture = renderTexture;
 			lastTexture = RenderTexture.active;
