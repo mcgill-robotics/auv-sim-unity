@@ -33,7 +33,7 @@ public class CameraPublisher : MonoBehaviour
 	ImageMsg img_msg;
 	int publishHeight;
 	int publishWidth;
-	int FPS;
+	float timeBetweenFrames;
 	string camPublishPreferenceKey;
 	string camFPSPreferenceKey;
 	bool publishToRos = true;
@@ -64,16 +64,16 @@ public class CameraPublisher : MonoBehaviour
 			publishHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
 		}
 		
-		FPS = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
-		publishToRos = FPS >= 1 && bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
-
+		var fps = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
+		publishToRos = fps >= 1 && bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
+		timeBetweenFrames = 1.0f / fps;
 
 		renderTexture = new RenderTexture(publishWidth, publishHeight, 24, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm);
 		renderTexture.Create();
 
 		cam.targetTexture = renderTexture;
 
-		rowSize = (int)image_step * (int)publishWidth;
+		rowSize = (int)image_step * publishWidth;
 
 		frame = new Rect(0, 0, publishWidth, publishHeight);
 
@@ -91,6 +91,7 @@ public class CameraPublisher : MonoBehaviour
 	void Update()
 	{
 		if (!publishToRos) return;
+		timeElapsed += Time.deltaTime;
 		StartCoroutine(WaitForEndOfFrameToPublish());
 	}
 
@@ -102,41 +103,31 @@ public class CameraPublisher : MonoBehaviour
 
 	void SendImage()
 	{
-		// publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
-		//
-		// FPS = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
-		// if (FPS < 1)
-		// {
-		// 	publishToRos = false;
-		// }
-		timeElapsed += Time.deltaTime;
+		if (!publishToRos || timeElapsed <= timeBetweenFrames) return;
+		
+		cam.targetTexture = renderTexture;
+		lastTexture = RenderTexture.active;
+		RenderTexture.active = renderTexture;
+		cam.Render();
+		cameraTexture.ReadPixels(frame, 0, 0);
+		cameraTexture.Apply();
+		cam.targetTexture = lastTexture;
+		cam.targetTexture = null;
 
-		if (publishToRos && timeElapsed > 1.0f / FPS)
-		{
-			cam.targetTexture = renderTexture;
-			lastTexture = RenderTexture.active;
-			RenderTexture.active = renderTexture;
-			cam.Render();
-			cameraTexture.ReadPixels(frame, 0, 0);
-			cameraTexture.Apply();
-			cam.targetTexture = lastTexture;
-			cam.targetTexture = null;
+		byte[] imageData = flipTextureVertically(cameraTexture);
 
-			byte[] imageData = flipTextureVertically(cameraTexture);
+		img_msg.data = imageData;
+		img_msg.header.stamp.sec = ROSClock.sec;
+		img_msg.header.stamp.nanosec = ROSClock.nanosec;
 
-			img_msg.data = imageData;
-			img_msg.header.stamp.sec = ROSClock.sec;
-			img_msg.header.stamp.nanosec = ROSClock.nanosec;
+		roscon.Publish(imageTopic, img_msg);
+		CameraInfoMsg cameraInfoMessage = CameraInfoGenerator.ConstructCameraInfoMessage(cam, img_msg.header, 0.0f, 0.01f);
+		cameraInfoMessage.width = (uint)publishWidth;
+		cameraInfoMessage.height = (uint)publishHeight;
+		cameraInfoMessage.K = GetIntrinsic(cam);
+		roscon.Publish(infoTopic, cameraInfoMessage);
 
-			roscon.Publish(imageTopic, img_msg);
-			CameraInfoMsg cameraInfoMessage = CameraInfoGenerator.ConstructCameraInfoMessage(cam, img_msg.header, 0.0f, 0.01f);
-			cameraInfoMessage.width = (uint)publishWidth;
-			cameraInfoMessage.height = (uint)publishHeight;
-			cameraInfoMessage.K = GetIntrinsic(cam);
-			roscon.Publish(infoTopic, cameraInfoMessage);
-
-			timeElapsed = 0;
-		}
+		timeElapsed = 0;
 	}
 
 	private byte[] flipTextureVertically(Texture2D texture2D)
@@ -160,24 +151,14 @@ public class CameraPublisher : MonoBehaviour
 
 	private double[] GetIntrinsic(Camera cam)
 	{
-		float pixel_aspect_ratio = (float)publishWidth / (float)publishHeight;
-
-		float alpha_u = cam.focalLength * ((float)publishWidth / cam.sensorSize.x);
-		float alpha_v = cam.focalLength * pixel_aspect_ratio * ((float)publishHeight / cam.sensorSize.y);
-
-		float u_0 = (float)publishWidth / 2;
-		float v_0 = (float)publishHeight / 2;
-
 		//IntrinsicMatrix in row major
-		double[] camIntriMatrix = new double[9];
-		camIntriMatrix[0] = alpha_u;
+		var camIntriMatrix = new double[9];
+		camIntriMatrix[0] = cam.focalLength * (publishWidth / cam.sensorSize.x);  // alpha_u
 		camIntriMatrix[1] = 0f;
-		camIntriMatrix[2] = u_0;
-
+		camIntriMatrix[2] = publishWidth * 0.5f;  // u_0
 		camIntriMatrix[3] = 0f;
-		camIntriMatrix[4] = alpha_v;
-		camIntriMatrix[5] = v_0;
-
+		camIntriMatrix[4] = cam.focalLength * (publishWidth / (float)publishHeight) * (publishHeight / cam.sensorSize.y);  // alpha_v
+		camIntriMatrix[5] = publishHeight * 0.5f;  // v_0
 		camIntriMatrix[6] = 0f;
 		camIntriMatrix[7] = 0f;
 		camIntriMatrix[8] = 1f;

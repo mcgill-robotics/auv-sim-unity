@@ -38,6 +38,9 @@ public class StatePublisher : MonoBehaviour
 	{
 		lastVelocity = auvRb.velocity;
 		acceleration = new Vector3(0, 0, 0);
+		times = new uint[numberOfPingers][];
+		frequencies = new int[numberOfPingers];
+		
 		classLogicManager = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
 		if (classLogicManager != null)
 		{
@@ -139,8 +142,8 @@ public class StatePublisher : MonoBehaviour
 		if (!publishToRos || timeSinceLastPublish < publishRate) return;
 		timeSinceLastPublish = 0;
 
-		times = new uint[numberOfPingers][];
-		frequencies = new int[numberOfPingers];
+		// times = new uint[numberOfPingers][];
+		// frequencies = new int[numberOfPingers];
 		for (int i = 0; i < numberOfPingers; i++)
 		{
 			(times[i], frequencies[i]) = classPingerTimeDifference.CalculateTimeDifference(i);
