@@ -1,20 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Buoyancy : MonoBehaviour
 {
-    Rigidbody auvRb;
     public float buoyancyForce;
+
+    private Rigidbody auvRb;
 
     private float auvLengthOver4;
     private Vector3 buoyancyForceVector;
     private Vector3 buoyancyForceVectorScaled;
 
-    // Start is called before the first frame update
-    void Start()
+    
+    private void Start()
     {
         auvRb = GetComponent<Rigidbody>();
         auvLengthOver4 = auvRb.transform.localScale.x / 4;
@@ -22,8 +22,7 @@ public class Buoyancy : MonoBehaviour
         buoyancyForceVectorScaled = buoyancyForceVector / auvLengthOver4;
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         float auvDistBelowSurface = -Math.Min(0, auvRb.transform.position.y);
         if (auvDistBelowSurface < auvLengthOver4)

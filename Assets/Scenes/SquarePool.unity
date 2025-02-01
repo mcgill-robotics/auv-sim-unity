@@ -1715,7 +1715,7 @@ RectTransform:
   m_Father: {fileID: 341441854}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -6928,7 +6928,7 @@ RectTransform:
   m_Father: {fileID: 1607835843}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8517,6 +8517,11 @@ PrefabInstance:
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 735923769328108292, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 788049921132715567, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -8799,6 +8804,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1546323681754135202, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetXPID
+      objectReference: {fileID: 0}
+    - target: {fileID: 1546323681754135202, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: Play
       objectReference: {fileID: 0}
@@ -9056,6 +9066,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2135197571631334179, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetQualityLevel
       objectReference: {fileID: 0}
     - target: {fileID: 2135197571631334179, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
@@ -9274,6 +9289,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3156879837582039896, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetZPID
+      objectReference: {fileID: 0}
+    - target: {fileID: 3156879837582039896, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: Play
       objectReference: {fileID: 0}
@@ -9326,6 +9346,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 4069685514126919822, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4266502580183162951, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
@@ -9702,6 +9727,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4498899587632911842, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4507384356116550748, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.size
@@ -9759,6 +9789,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4509785195490455079, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetYPID
+      objectReference: {fileID: 0}
+    - target: {fileID: 4509785195490455079, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: Play
       objectReference: {fileID: 0}
@@ -9771,6 +9806,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4535995352606918702, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4819367260512657352, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
@@ -10021,6 +10061,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5588300119217045839, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetQuatPID
       objectReference: {fileID: 0}
     - target: {fileID: 5588300119217045839, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
@@ -10671,6 +10716,11 @@ PrefabInstance:
         type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[10].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938128084334252559, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[5].m_MethodName
+      value: SetROSPublishToggle
       objectReference: {fileID: 0}
     - target: {fileID: 8938128084334252559, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}

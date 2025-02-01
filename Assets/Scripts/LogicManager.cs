@@ -117,8 +117,7 @@ public class LogicManager1 : MonoBehaviour
 	public int hydrophonesNumberOption;
 
 
-	// Start is called before the first frame update
-	void Start()
+	private void Start()
 	{
 		roscon = ROSConnection.GetOrCreateInstance();
 		roscon.Subscribe<Float64Msg>(xPositionTopicName, xPositionCallback);
@@ -301,7 +300,7 @@ public class LogicManager1 : MonoBehaviour
 		SceneManager.LoadScene(currentScene.name);
 	}
 
-	public void setXPID()
+	public void SetXPID()
 	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidXEnableName, bool_msg);
@@ -318,7 +317,7 @@ public class LogicManager1 : MonoBehaviour
 		}
 	}
 
-	public void setYPID()
+	public void SetYPID()
 	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidYEnableName, bool_msg);
@@ -335,7 +334,7 @@ public class LogicManager1 : MonoBehaviour
 		}
 	}
 
-	public void setZPID()
+	public void SetZPID()
 	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidZEnableName, bool_msg);
@@ -352,7 +351,7 @@ public class LogicManager1 : MonoBehaviour
 		}
 	}
 
-	public void setQuatPID()
+	public void SetQuatPID()
 	{
 		BoolMsg bool_msg = new BoolMsg(true);
 		roscon.Publish(pidQuatEnableName, bool_msg);
@@ -376,7 +375,7 @@ public class LogicManager1 : MonoBehaviour
 		}
 	}
 
-	public void setQualityLevel()
+	public void SetQualityLevel()
 	{
 		QualitySettings.SetQualityLevel(qualityDropdown.value, true);
 		PlayerPrefs.SetString("qualityLevel", qualityDropdown.value.ToString());
@@ -391,10 +390,13 @@ public class LogicManager1 : MonoBehaviour
 		}
 	}
 
-	public void setROSPublishToggle()
+	public void SetROSPublishToggle()
 	{
 		PlayerPrefs.SetString("PublishROSToggle", PublishROSToggle.isOn.ToString());
 		PlayerPrefs.Save();
+		downCamPub.SetPublishToRos(PublishDownCamToggle.isOn && PublishROSToggle.isOn);
+		frontCamPub.SetPublishToRos(PublishFrontCamToggle.isOn && PublishROSToggle.isOn);
+		depthCamPub.SetPublishToRos(PublishDepthToggle.isOn && PublishROSToggle.isOn);
 	}
 
 	public void hideSimObjects()
@@ -414,39 +416,42 @@ public class LogicManager1 : MonoBehaviour
 	}
 
 
-	public void setPublishDVLToggle()
+	public void SetPublishDVLToggle()
 	{
 		PlayerPrefs.SetString("PublishDVLToggle", PublishDVLToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void setPublishIMUToggle()
+	public void SetPublishIMUToggle()
 	{
 		PlayerPrefs.SetString("PublishIMUToggle", PublishIMUToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
 
-	public void setPublishDepthToggle()
+	public void SetPublishDepthToggle()
 	{
 		PlayerPrefs.SetString("PublishDepthToggle", PublishDepthToggle.isOn.ToString());
 		PlayerPrefs.Save();
+		depthCamPub.SetPublishToRos(PublishDepthToggle.isOn && PublishROSToggle.isOn);
 	}
 
-	public void setPublishHydrophonesToggle()
+	public void SetPublishHydrophonesToggle()
 	{
 		PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophonesToggle.isOn.ToString());
 		PlayerPrefs.Save();
 	}
-	public void setPublishFrontCamToggle()
+	public void SetPublishFrontCamToggle()
 	{
 		PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCamToggle.isOn.ToString());
 		PlayerPrefs.Save();
+		frontCamPub.SetPublishToRos(PublishFrontCamToggle.isOn && PublishROSToggle.isOn);
 	}
 
-	public void setPublishDownCamToggle()
+	public void SetPublishDownCamToggle()
 	{
 		PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCamToggle.isOn.ToString());
 		PlayerPrefs.Save();
+		downCamPub.SetPublishToRos(PublishDownCamToggle.isOn && PublishROSToggle.isOn);
 	}
 
 	public void OnButtonClick(Button clickedButton)
@@ -470,31 +475,31 @@ public class LogicManager1 : MonoBehaviour
 		if (clickedButton.name == "SetFrontCamRateBtn")
 		{
 			PlayerPrefs.SetString("frontCamRate", frontCamRateInputField.text);
-			frontCamPub.Initialize();
-			depthCamPub.Initialize();
+			frontCamPub.SetPublishRate(int.Parse(frontCamRateInputField.text));
+			depthCamPub.SetPublishRate(int.Parse(frontCamRateInputField.text));
 		}
 		if (clickedButton.name == "SetDownCamRateBtn")
 		{
 			PlayerPrefs.SetString("downCamRate", downCamRateInputField.text);
-			downCamPub.Initialize();
+			downCamPub.SetPublishRate(int.Parse(downCamRateInputField.text));
 		}
 		if (clickedButton.name == "SetFrontCamResBtn")
 		{
 			PlayerPrefs.SetString("frontCamWidth", frontCamWidthInputField.text);
 			PlayerPrefs.SetString("frontCamHeight", frontCamHeightInputField.text);
-			frontCamPub.Initialize();
-			depthCamPub.Initialize();
+			frontCamPub.SetPublishResolution(int.Parse(frontCamWidthInputField.text), int.Parse(frontCamHeightInputField.text));
+			depthCamPub.SetPublishResolution(int.Parse(frontCamWidthInputField.text), int.Parse(frontCamHeightInputField.text));
 		}
 		if (clickedButton.name == "SetDownCamResBtn")
 		{
 			PlayerPrefs.SetString("downCamHeight", downCamHeightInputField.text);
 			PlayerPrefs.SetString("downCamWidth", downCamWidthInputField.text);
-			downCamPub.Initialize();
+			downCamPub.SetPublishResolution(int.Parse(downCamHeightInputField.text), int.Parse(downCamWidthInputField.text));
 		}
 		if (clickedButton.name == "SetPoseRateBtn")
 		{
 			PlayerPrefs.SetString("poseRate", poseRateInputField.text);
-			statePub.UpdatePublishRate(int.Parse(poseRateInputField.text));
+			statePub.SetPublishRate(int.Parse(poseRateInputField.text));
 		}
 		PlayerPrefs.Save();
 	}
@@ -523,7 +528,7 @@ public class LogicManager1 : MonoBehaviour
 						string newText = keyCode.ToString().ToLower();
 						buttonText.text = newText;
 						isCheckingKey = false;
-						setPlayerRefsKeys(clickedButton, newText);
+						SetPlayerRefsKeys(clickedButton, newText);
 						ChangeButtonColor(clickedButton, originalButtonColor);
 						yield break;
 					}
@@ -559,7 +564,7 @@ public class LogicManager1 : MonoBehaviour
 		}
 	}
 
-	private void setPlayerRefsKeys(Button button, string keyCode)
+	private void SetPlayerRefsKeys(Button button, string keyCode)
 	{
 		// movement keybinds
 		if (button.name == "ForwardKeybind")

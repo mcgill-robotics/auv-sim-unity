@@ -9,63 +9,134 @@ using UnityEngine.Serialization;
 
 public class StatePublisher : MonoBehaviour
 {
-	private ROSConnection roscon;
-
 	LogicManager1 classLogicManager;
 	PingerTimeDifference classPingerTimeDifference;
-	int numberOfPingers = 4;
 	public string stateTopicName = "/unity/state";
 	public GameObject auv;
 	public Rigidbody auvRb;
-	Vector3 acceleration;
-	Vector3 lastVelocity;
-	Vector3 currentVelocity;
 
-	private RosMessageTypes.Auv.UnityStateMsg msg = new RosMessageTypes.Auv.UnityStateMsg();
+	private ROSConnection roscon;
+
+	private Vector3 acceleration;
+	private Vector3 lastVelocity;
+	private Vector3 currentVelocity;
+
+	private RosMessageTypes.Auv.UnityStateMsg stateMsg = new RosMessageTypes.Auv.UnityStateMsg();
 	private float timeSinceLastPublish;
-	bool isDVLActive;
-	bool isDepthSensorActive;
-	bool isIMUActive;
-	bool isHydrophonesActive;
-	bool publishToRos;
-	float publishRate = 0.1f;
-	
-	uint[][] times;
-	int[] frequencies;
+	private bool isDVLActive;
+	private bool isDepthSensorActive;
+	private bool isIMUActive;
+	private bool isHydrophonesActive;
+	private bool publishToRos;
+	private float timeBetweenPublishes = 0.1f;
 
-	// Start is called before the first frame update
-	void Start()
+	private int numberOfPingers = 4;
+	private uint[][] times;
+	private int[] frequencies;
+	
+
+	private void Start()
 	{
+		// Start the ROS connection
+		roscon = ROSConnection.GetOrCreateInstance();
+		roscon.RegisterPublisher<RosMessageTypes.Auv.UnityStateMsg>(stateTopicName);
+		Initialize();
+	}
+
+	private void Initialize()
+	{
+		// Set initial values
 		lastVelocity = auvRb.velocity;
 		acceleration = new Vector3(0, 0, 0);
 		times = new uint[numberOfPingers][];
 		frequencies = new int[numberOfPingers];
 		
-		classLogicManager = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
-		if (classLogicManager != null)
-		{
-			SubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
-			SubscribeToggle(classLogicManager.PublishROSToggle, UpdatePublishToRos);
-			SubscribeToggle(classLogicManager.PublishDepthToggle, UpdateisDepthSensorActive);
-			SubscribeToggle(classLogicManager.PublishIMUToggle, UpdateisIMUActive);
-			SubscribeToggle(classLogicManager.PublishHydrophonesToggle, UpdateisHydrophonesActive);
-		}
-		else
-		{
-			Debug.LogError("[in StatePublisher.cs] LogiManager class is not assigned.");
-		}
-
+		// Find the PingerTimeDifference class
 		classPingerTimeDifference = FindObjectOfType<PingerTimeDifference>(); ;
 		if (classPingerTimeDifference == null)
 		{
 			Debug.LogError("[in StatePublisher.cs] PingerTimeDifference class is not assigned.");
 		}
 		
-		publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
-		UpdatePublishRate(int.Parse(PlayerPrefs.GetString("poseRate", "50")));
+		// Subscribe to toggle events
+		classLogicManager = FindObjectOfType<LogicManager1>();
+		if (classLogicManager != null)
+		{
+			SubscribeToggle(classLogicManager.PublishDVLToggle, SetisDVLActive);
+			SubscribeToggle(classLogicManager.PublishDepthToggle, SetisDepthSensorActive);
+			SubscribeToggle(classLogicManager.PublishIMUToggle, SetisIMUActive);
+			SubscribeToggle(classLogicManager.PublishHydrophonesToggle, SetisHydrophonesActive);
+			SubscribeToggle(classLogicManager.PublishROSToggle, SetPublishToRos);
+		}
+		else
+		{
+			Debug.LogError("[in StatePublisher.cs] LogiManager class is not assigned.");
+		}
 		
-		roscon = ROSConnection.GetOrCreateInstance();
-		roscon.RegisterPublisher<RosMessageTypes.Auv.UnityStateMsg>(stateTopicName);
+		// Update publishing preferences and affected variables
+		var publish = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
+		var frequency = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
+		SetPublishToRos(publish);
+		SetPublishRate(frequency);
+	}
+	
+	private void FixedUpdate()
+	{
+		timeSinceLastPublish += Time.fixedDeltaTime;
+		if (!publishToRos || timeSinceLastPublish < timeBetweenPublishes) return;
+		
+		// Publishing is enabled and enough time has elapsed since the last publish,
+		// so let's publish the next state:
+		SendState();
+	}
+	
+	private void OnDestroy()
+	{
+		// Unsubscribe from the events to prevent memory leaks.
+		UnsubscribeToggle(classLogicManager.PublishDVLToggle, SetisDVLActive);
+		UnsubscribeToggle(classLogicManager.PublishROSToggle, SetPublishToRos);
+		UnsubscribeToggle(classLogicManager.PublishDepthToggle, SetisDepthSensorActive);
+		UnsubscribeToggle(classLogicManager.PublishIMUToggle, SetisIMUActive);
+		UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, SetisHydrophonesActive);
+	}
+
+	private void SendState()
+	{
+		// Calculate time differences for each pinger
+		for (int i = 0; i < numberOfPingers; i++)
+		{
+			(times[i], frequencies[i]) = classPingerTimeDifference.CalculateTimeDifference(i);
+		}
+
+		// Get the current velocity and acceleration
+		currentVelocity = auvRb.velocity;
+		acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
+		lastVelocity = currentVelocity;
+
+		// Update the state message with the current state
+		stateMsg.position = auv.transform.position.To<RUF>();
+		stateMsg.position.y *= -1;
+
+		Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
+		stateMsg.orientation = rotation.To<NED>();
+		stateMsg.angular_velocity = auvRb.angularVelocity.To<RUF>();
+		stateMsg.velocity = currentVelocity.To<RUF>();
+		stateMsg.frequencies = frequencies;
+		stateMsg.times_pinger_1 = times[0];
+		stateMsg.times_pinger_2 = times[1];
+		stateMsg.times_pinger_3 = times[2];
+		stateMsg.times_pinger_4 = times[3];
+		stateMsg.linear_acceleration = acceleration.To<RUF>();
+
+		stateMsg.isDVLActive = Convert.ToInt32(isDVLActive);
+		stateMsg.isDepthSensorActive = Convert.ToInt32(isDepthSensorActive);
+		stateMsg.isIMUActive = Convert.ToInt32(isIMUActive);
+		stateMsg.isHydrophonesActive = Convert.ToInt32(isHydrophonesActive);
+
+		roscon.Publish(stateTopicName, stateMsg);
+		
+		// Reset time until next publish
+		timeSinceLastPublish = 0;
 	}
 
 	private void SubscribeToggle(Toggle toggle, Action<bool> updateAction)
@@ -83,47 +154,7 @@ public class StatePublisher : MonoBehaviour
 			Debug.LogError("Pub Sensor Toggle is not assigned.");
 		}
 	}
-
-	private void UpdateisDVLActive(bool value)
-	{
-		isDVLActive = value;
-	}
 	
-	private void UpdatePublishToRos(bool value)
-	{
-		publishToRos = value;
-	}
-
-	public void UpdatePublishRate(int publishFrequency)
-	{
-		publishRate =  1f / publishFrequency;
-	}
-
-	private void UpdateisDepthSensorActive(bool value)
-	{
-		isDepthSensorActive = value;
-	}
-
-	private void UpdateisIMUActive(bool value)
-	{
-		isIMUActive = value;
-	}
-
-	private void UpdateisHydrophonesActive(bool value)
-	{
-		isHydrophonesActive = value;
-	}
-
-	void OnDestroy()
-	{
-		// Unsubscribe from the events to prevent memory leaks.
-		UnsubscribeToggle(classLogicManager.PublishDVLToggle, UpdateisDVLActive);
-		UnsubscribeToggle(classLogicManager.PublishROSToggle, UpdatePublishToRos);
-		UnsubscribeToggle(classLogicManager.PublishDepthToggle, UpdateisDepthSensorActive);
-		UnsubscribeToggle(classLogicManager.PublishIMUToggle, UpdateisIMUActive);
-		UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, UpdateisHydrophonesActive);
-	}
-
 	private void UnsubscribeToggle(Toggle toggle, Action<bool> updateAction)
 	{
 		if (toggle != null)
@@ -132,46 +163,33 @@ public class StatePublisher : MonoBehaviour
 		}
 	}
 
-	// Update is called once per frame
-	void FixedUpdate()
+	private void SetisDVLActive(bool active)
 	{
-		// publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
-		// publishRate = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
+		isDVLActive = active;
+	}
 
-		timeSinceLastPublish += Time.fixedDeltaTime;
-		if (!publishToRos || timeSinceLastPublish < publishRate) return;
-		timeSinceLastPublish = 0;
+	private void SetisDepthSensorActive(bool active)
+	{
+		isDepthSensorActive = active;
+	}
 
-		// times = new uint[numberOfPingers][];
-		// frequencies = new int[numberOfPingers];
-		for (int i = 0; i < numberOfPingers; i++)
-		{
-			(times[i], frequencies[i]) = classPingerTimeDifference.CalculateTimeDifference(i);
-		}
+	private void SetisIMUActive(bool active)
+	{
+		isIMUActive = active;
+	}
 
-		currentVelocity = auvRb.velocity;
-		acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
-		lastVelocity = currentVelocity;
-
-		msg.position = auv.transform.position.To<RUF>();
-		msg.position.y *= -1;
-
-		Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
-		msg.orientation = rotation.To<NED>();
-		msg.angular_velocity = auvRb.angularVelocity.To<RUF>();
-		msg.velocity = currentVelocity.To<RUF>();
-		msg.frequencies = frequencies;
-		msg.times_pinger_1 = times[0];
-		msg.times_pinger_2 = times[1];
-		msg.times_pinger_3 = times[2];
-		msg.times_pinger_4 = times[3];
-		msg.linear_acceleration = acceleration.To<RUF>();
-
-		msg.isDVLActive = Convert.ToInt32(isDVLActive);
-		msg.isDepthSensorActive = Convert.ToInt32(isDepthSensorActive);
-		msg.isIMUActive = Convert.ToInt32(isIMUActive);
-		msg.isHydrophonesActive = Convert.ToInt32(isHydrophonesActive);
-
-		roscon.Publish(stateTopicName, msg);
+	private void SetisHydrophonesActive(bool active)
+	{
+		isHydrophonesActive = active;
+	}
+	
+	private void SetPublishToRos(bool active)
+	{
+		publishToRos = active;
+	}
+	
+	public void SetPublishRate(int frequency)
+	{
+		timeBetweenPublishes =  1f / frequency;
 	}
 }

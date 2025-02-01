@@ -6,7 +6,6 @@ using Unity.Robotics.ROSTCPConnector;
 
 public class Thrusters : MonoBehaviour
 {
-	ROSConnection roscon;
 	public float sinkForce = 30f;
 	public float floatForce = 12f;
 	public float moveForce = 15f;
@@ -16,6 +15,8 @@ public class Thrusters : MonoBehaviour
 	public float AUVRealForceMultiplier = 3;
 	public string thrusterForcesTopicName = "/propulsion/forces";
 
+	private ROSConnection roscon;
+
 	private bool isFrozen = false;
 	private Rigidbody auvRb;
 	private double[] rosThrusterForces = new double[8];
@@ -24,28 +25,16 @@ public class Thrusters : MonoBehaviour
 	
 	// Pre-calculated force multipliers
 	private float moveForceOver4, moveForceOver2, sinkForceOver4, floatForceOver4, rotationForceOver4;
+	
 
-	void thrusterForceCallback(RosMessageTypes.Auv.ThrusterForcesMsg msg)
+	private void Start()
 	{
-		rosThrusterForces[0] = msg.FRONT_LEFT;
-		rosThrusterForces[1] = msg.FRONT_RIGHT;
-		rosThrusterForces[2] = msg.BACK_LEFT;
-		rosThrusterForces[3] = msg.BACK_RIGHT;
-		rosThrusterForces[4] = msg.HEAVE_FRONT_LEFT;
-		rosThrusterForces[5] = msg.HEAVE_FRONT_RIGHT;
-		rosThrusterForces[6] = msg.HEAVE_BACK_LEFT;
-		rosThrusterForces[7] = msg.HEAVE_BACK_RIGHT;
-	}
-
-	// Start is called before the first frame update.
-	void Start()
-	{
-		massScalarRealToSim = 1f / AUVRealForceMultiplier;
 		roscon = ROSConnection.GetOrCreateInstance();
 		auvRb = GetComponent<Rigidbody>();
-		roscon.Subscribe<RosMessageTypes.Auv.ThrusterForcesMsg>(thrusterForcesTopicName, thrusterForceCallback);
+		roscon.Subscribe<RosMessageTypes.Auv.ThrusterForcesMsg>(thrusterForcesTopicName, SetThrusterForces);
 		
 		// Pre-calculate force multipliers as they are the same every frame
+		massScalarRealToSim = 1f / AUVRealForceMultiplier;
 		moveForceOver4 = moveForce / 4;
 		moveForceOver2 = moveForce / 2;
 		sinkForceOver4 = sinkForce / 4;
@@ -53,13 +42,40 @@ public class Thrusters : MonoBehaviour
 		rotationForceOver4 = rotationForce / 4;
 	}
 
-	void Update()
+	private void Update()
 	{
 		HandleFreezeInput();
 		HandleMovementInput();
 	}
+	
+	private void FixedUpdate()
+	{
+		for (int i = 0; i < thrusters.Length; i++)
+		{
+			// Don't calculate forces for thrusters above/out of the water
+			if (thrusters[i].position.y >= 0) continue;
+			
+			// Calculate the force vector for each thruster
+			float thrusterForceMagnitude = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
+			Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
+			Vector3 thrusterForceVector = worldForceDirection * (thrusterForceMagnitude * massScalarRealToSim);
+			
+			// Apply the force to the AUV, at the thruster's position
+			auvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
+			
+			// Play particles if force is positive (i.e. forward thrust) and quality settings are high enough
+			if (Math.Abs(thrusterForceMagnitude) > 0 && QualitySettings.GetQualityLevel() < 2)
+			{
+				thrusterParticles[i].Play();
+			}
+			else
+			{
+				thrusterParticles[i].Stop();
+			}
+		}
+	}
 
-	void HandleFreezeInput()
+	private void HandleFreezeInput()
 	{
 		if (Input.GetKeyDown(PlayerPrefs.GetString("freezeKeybind", "space")))
 		{
@@ -68,7 +84,7 @@ public class Thrusters : MonoBehaviour
 		}
 	}
 
-	void HandleMovementInput()
+	private void HandleMovementInput()
 	{
 		if (isFrozen) return;
 		
@@ -165,32 +181,16 @@ public class Thrusters : MonoBehaviour
 			inputThrusterForces[1] -= floatForceOver4;
 		}
 	}
-
-	// Update is called once per frame.
-	void FixedUpdate()
+	
+	private void SetThrusterForces(RosMessageTypes.Auv.ThrusterForcesMsg msg)
 	{
-		for (int i = 0; i < thrusters.Length; i++)
-		{
-			// Don't calculate forces for thrusters above/out of the water
-			if (thrusters[i].position.y >= 0) continue;
-			
-			// Calculate the force vector for each thruster
-			float thrusterForceMagnitude = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
-			Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
-			Vector3 thrusterForceVector = worldForceDirection * (thrusterForceMagnitude * massScalarRealToSim);
-			
-			// Apply the force to the AUV, at the thruster's position
-			auvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
-			
-			// Play particles if force is positive (i.e. forward thrust) and quality settings are high enough
-			if (Math.Abs(thrusterForceMagnitude) > 0 && QualitySettings.GetQualityLevel() < 2)
-			{
-				thrusterParticles[i].Play();
-			}
-			else
-			{
-				thrusterParticles[i].Stop();
-			}
-		}
+		rosThrusterForces[0] = msg.FRONT_LEFT;
+		rosThrusterForces[1] = msg.FRONT_RIGHT;
+		rosThrusterForces[2] = msg.BACK_LEFT;
+		rosThrusterForces[3] = msg.BACK_RIGHT;
+		rosThrusterForces[4] = msg.HEAVE_FRONT_LEFT;
+		rosThrusterForces[5] = msg.HEAVE_FRONT_RIGHT;
+		rosThrusterForces[6] = msg.HEAVE_BACK_LEFT;
+		rosThrusterForces[7] = msg.HEAVE_BACK_RIGHT;
 	}
 }

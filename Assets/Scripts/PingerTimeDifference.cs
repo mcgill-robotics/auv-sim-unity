@@ -6,10 +6,6 @@ using System.Linq;
 
 public class PingerTimeDifference : MonoBehaviour
 {
-	double speedOfSound = 1480.0;
-
-	LogicManager1 logicManager1;
-
 	public Transform hydrophoneO;
 	public Transform hydrophoneX;
 	public Transform hydrophoneY;
@@ -20,19 +16,23 @@ public class PingerTimeDifference : MonoBehaviour
 	public Transform pinger4;
 	public int[] frequencies = new int[4];
 
-	List<Transform> hydrophoneList = new List<Transform>();
-	List<Transform> pingersList = new List<Transform>();
+	private double speedOfSound = 1480.0;
+	private LogicManager1 logicManager1;
+	
+	private List<Transform> hydrophoneList = new List<Transform>();
+	private List<Transform> pingersList = new List<Transform>();
 
-	double[] pingerToHydrophonesTime = new double[4];
-	double[] hydrophoneToPingerDistances = new double[4];
-	double[] hydrophonesTimes = new double[3];
-	double currentTime; // in seconds.
-	int scaledTimeUnit = 10000000; // 10e-7 --> 1 second = 10,000,000
-	uint uintMaxValue = uint.MaxValue;
-	double doubleUintMaxValue;
-	uint[] scaledTimes = new uint[3];
+	private double[] pingerToHydrophonesTime = new double[4];
+	private double[] hydrophoneToPingerDistances = new double[4];
+	private double[] hydrophonesTimes = new double[3];
+	private double currentTime; // in seconds.
+	private int scaledTimeUnit = 10_000_000; // 10e-7 --> 1 second = 10,000,000
+	private uint uintMaxValue = uint.MaxValue;
+	private double doubleUintMaxValue;
+	private uint[] scaledTimes = new uint[3];
 
-	void Start()
+	
+	private void Start()
 	{
 		doubleUintMaxValue = (double)uintMaxValue;
 
@@ -52,13 +52,13 @@ public class PingerTimeDifference : MonoBehaviour
 		pingersList.Add(pinger4);
 	}
 
+	/// <summary>
+	/// Simulate the absolute time that each hydrophones detected a signal.
+	/// </summary>
+	/// <param name="pingerIndex">The pinger to calculate the time difference for.</param>
+	/// <returns>Absolute time for each hydrophone of when it detected signal, frequency of signal.</returns>
 	public (uint[], int) CalculateTimeDifference(int pingerIndex)
 	{
-		/* 
-		Simulate absolute the time that each hydrophones detected a signal.
-		Returns: (Absolute time for eachc hydrophone of when it detected signal, frequency of signal)
-		*/
-
 		currentTime = Time.time;
 
 		// 1. Calculate  the time it takes for frequency wave to get to each hydrophone. 
@@ -86,7 +86,7 @@ public class PingerTimeDifference : MonoBehaviour
 		scaledTimes = hydrophonesTimes.Select(time => (uint)((time * scaledTimeUnit) % doubleUintMaxValue)).ToArray();
 		*/
 		
-		// 2, 3, 4 & 5.
+		// 2, 3, 4 & 5 (combined).
 		scaledTimes = new uint[pingerToHydrophonesTime.Length];
 		for (int i = 0; i < pingerToHydrophonesTime.Length; i++)
 		{
