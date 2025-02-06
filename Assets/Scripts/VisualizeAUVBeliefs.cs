@@ -9,8 +9,6 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 public class VisualizeAUVBeliefs : MonoBehaviour
 {
-	ROSConnection roscon;
-	LogicManager1 classLogicManager;
 	public GameObject dianaVisualization;
 	public GameObject laneMarker1FromVisualization;
 	public GameObject laneMarker1ToVisualization;
@@ -46,13 +44,16 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 	public string objectMapTopicName = "/vision/object_map";
 	public string detectionFrameTopicName = "/vision/viewframe_detection";
 
+	private ROSConnection roscon;
+	private LogicManager1 classLogicManager;
+	
 	private List<GameObject> detectionFrameIndicators = new List<GameObject>();
-
-
+	
 	private Vector3 currentAUVPos = Vector3.zero;
 	private Vector3 currentAUVRot = Vector3.zero;
 
-	void Start()
+	
+	private void Start()
 	{
 		classLogicManager = FindObjectOfType<LogicManager1>(); // Find an instance of the other class
 		if (classLogicManager != null)
@@ -78,6 +79,21 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 		roscon.Subscribe<Float64Msg>(posZTopicName, posZCallback);
 	}
 
+	private void Update()
+	{
+		dianaVisualization.transform.position = currentAUVPos;
+		dianaVisualization.transform.rotation = Quaternion.Euler(currentAUVRot.x, currentAUVRot.y, currentAUVRot.z) * Quaternion.Euler(0, -90, 0);
+	}
+	
+	private void OnDestroy()
+	{
+		// Unsubscribe from the events to prevent memory leaks.
+		UnsubscribeToggle(classLogicManager.VisualizeBearing1Toggle, UpdateVisualizeBearing1);
+		UnsubscribeToggle(classLogicManager.VisualizeBearing2Toggle, UpdateVisualizeBearing2);
+		UnsubscribeToggle(classLogicManager.VisualizeBearing3Toggle, UpdateVisualizeBearing3);
+		UnsubscribeToggle(classLogicManager.VisualizeBearing4Toggle, UpdateVisualizeBearing4);
+	}
+	
 	private void SubscribeToggle(Toggle toggle, Action<bool> updateAction)
 	{
 		if (toggle != null)
@@ -94,39 +110,6 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 		}
 	}
 
-	void UpdateVisualizeBearing1(bool isActive)
-	{
-		trueBearingPinger1.SetActive(isActive);
-		expectedBearingPinger1.SetActive(isActive);
-	}
-
-	void UpdateVisualizeBearing2(bool isActive)
-	{
-		trueBearingPinger2.SetActive(isActive);
-		expectedBearingPinger2.SetActive(isActive);
-	}
-
-	void UpdateVisualizeBearing3(bool isActive)
-	{
-		trueBearingPinger3.SetActive(isActive);
-		expectedBearingPinger3.SetActive(isActive);
-	}
-
-	void UpdateVisualizeBearing4(bool isActive)
-	{
-		trueBearingPinger4.SetActive(isActive);
-		expectedBearingPinger4.SetActive(isActive);
-	}
-
-	void OnDestroy()
-	{
-		// Unsubscribe from the events to prevent memory leaks.
-		UnsubscribeToggle(classLogicManager.VisualizeBearing1Toggle, UpdateVisualizeBearing1);
-		UnsubscribeToggle(classLogicManager.VisualizeBearing2Toggle, UpdateVisualizeBearing2);
-		UnsubscribeToggle(classLogicManager.VisualizeBearing3Toggle, UpdateVisualizeBearing3);
-		UnsubscribeToggle(classLogicManager.VisualizeBearing4Toggle, UpdateVisualizeBearing4);
-	}
-
 	private void UnsubscribeToggle(Toggle toggle, Action<bool> updateAction)
 	{
 		if (toggle != null)
@@ -134,39 +117,63 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 			toggle.onValueChanged.RemoveListener((isOn) => updateAction(isOn));
 		}
 	}
+	
+	private void UpdateVisualizeBearing1(bool isActive)
+	{
+		trueBearingPinger1.SetActive(isActive);
+		expectedBearingPinger1.SetActive(isActive);
+	}
 
-	void thetaXCallback(Float64Msg thetaX)
+	private void UpdateVisualizeBearing2(bool isActive)
+	{
+		trueBearingPinger2.SetActive(isActive);
+		expectedBearingPinger2.SetActive(isActive);
+	}
+
+	private void UpdateVisualizeBearing3(bool isActive)
+	{
+		trueBearingPinger3.SetActive(isActive);
+		expectedBearingPinger3.SetActive(isActive);
+	}
+
+	private void UpdateVisualizeBearing4(bool isActive)
+	{
+		trueBearingPinger4.SetActive(isActive);
+		expectedBearingPinger4.SetActive(isActive);
+	}
+
+	private void thetaXCallback(Float64Msg thetaX)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVRot.z = (float)-thetaX.data;
 	}
-	void thetaYCallback(Float64Msg thetaY)
+	private void thetaYCallback(Float64Msg thetaY)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVRot.x = (float)thetaY.data;
 	}
-	void thetaZCallback(Float64Msg thetaZ)
+	private void thetaZCallback(Float64Msg thetaZ)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVRot.y = (float)-thetaZ.data;
 	}
-	void posXCallback(Float64Msg X)
+	private void posXCallback(Float64Msg X)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVPos.z = (float)X.data;
 	}
-	void posYCallback(Float64Msg Y)
+	private void posYCallback(Float64Msg Y)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVPos.x = (float)-Y.data;
 	}
-	void posZCallback(Float64Msg Z)
+	private void posZCallback(Float64Msg Z)
 	{
 		if (!dianaVisualization.activeSelf) dianaVisualization.SetActive(true);
 		currentAUVPos.y = (float)Z.data;
 	}
 
-	void objectMapCallback(RosMessageTypes.Auv.VisionObjectArrayMsg map)
+	private void objectMapCallback(RosMessageTypes.Auv.VisionObjectArrayMsg map)
 	{
 		int num_lane_markers_in_map = 0;
 		int num_abydos_symbols_in_map = 0;
@@ -263,7 +270,7 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 		}
 	}
 
-	void detectionFrameCallback(RosMessageTypes.Auv.VisionObjectArrayMsg detectionFrame)
+	private void detectionFrameCallback(RosMessageTypes.Auv.VisionObjectArrayMsg detectionFrame)
 	{
 		foreach (RosMessageTypes.Auv.VisionObjectMsg detection in detectionFrame.array)
 		{
@@ -283,9 +290,4 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 		}
 	}
 
-	void Update()
-	{
-		dianaVisualization.transform.position = currentAUVPos;
-		dianaVisualization.transform.rotation = Quaternion.Euler(currentAUVRot.x, currentAUVRot.y, currentAUVRot.z) * Quaternion.Euler(0, -90, 0);
-	}
 }

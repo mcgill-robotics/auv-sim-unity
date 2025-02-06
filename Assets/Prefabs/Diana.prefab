@@ -30053,7 +30053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateTopicName: /unity/state
   auv: {fileID: 6642039138362327368}
-  auvRigidBody: {fileID: 9150705416908342384}
+  auvRb: {fileID: 0}
 --- !u!114 &1042058618123832615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40292,7 +40292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7471dd4ec65ee28459d604ba6b3c93ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DroppingSphere: {fileID: 4280303695290914712}
+  DroppingSphereRb: {fileID: 878723973705385781}
 --- !u!54 &878723973705385781
 Rigidbody:
   m_ObjectHideFlags: 0

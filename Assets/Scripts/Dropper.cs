@@ -1,53 +1,49 @@
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
-using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Std;
-using RosMessageTypes.Auv;
-using RosMessageTypes.Geometry;
 
 public class Dropper : MonoBehaviour
 {
-	public Transform DroppingSphere;
+	public Rigidbody DroppingSphereRb;
 
 	private ROSConnection roscon;
 	private string dropperTopicName = "/actuators/grabber/close";
 
-	void Start()
+	
+	private void Start()
 	{
+		// Start the ROS connection
 		roscon = ROSConnection.GetOrCreateInstance();
-		roscon.Subscribe<BoolMsg>(dropperTopicName, dropSphereCallback);
+		roscon.Subscribe<BoolMsg>(dropperTopicName, DropSphereCallback);
 	}
 
-	void Update()
+	private void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.Comma))
 		{
-			dropSphere(DroppingSphere.gameObject);
+			DropSphere();
 		}
 	}
 
-	void dropSphere(GameObject sphere)
+	private void DropSphere()
 	{
-		// Get the Rigidbody component of the sphere
-		Rigidbody rb = sphere.GetComponent<Rigidbody>();
-
 		// Ensure Rigidbody component exists
-		if (rb != null)
-		{
-			// Make the sphere kinematic
-			rb.isKinematic = false; // Set to false to allow gravity to affect the sphere
-			rb.detectCollisions = true;
+		if (DroppingSphereRb == null) return;
+		
+		// Make the sphere kinematic
+		DroppingSphereRb.isKinematic = false; // Set to false to allow gravity to affect the sphere
+		DroppingSphereRb.detectCollisions = true;
 
-			// Remove the parent (Diana) so it can drop
-			sphere.transform.parent = null;
-		}
+		// Remove the parent (Diana) so it can drop
+		DroppingSphereRb.transform.parent = null;
 	}
 
-	void dropSphereCallback(BoolMsg message)
+	private void DropSphereCallback(BoolMsg message)
 	{
+		// If the "/actuators/grabber/close" message is true then drop the sphere
 		if (message.data)
-		{ // Check if boolmsg is true
-			dropSphere(DroppingSphere.gameObject);
+		{
+			DropSphere();
 		}
 	}
 }

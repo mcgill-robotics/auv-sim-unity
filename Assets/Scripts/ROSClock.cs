@@ -15,42 +15,50 @@ public class ROSClock : MonoBehaviour
 	public uint nanosec;
 
 	private ROSConnection roscon;
+	private LogicManager1 classLogicManager;
+	private bool publishToRos = true;
 	private ClockMsg message;
 	private double clockTimePassed;
 
-	void Start()
+	private void Start()
 	{
-		// setup ROS
+		// Start the ROS connection
 		roscon = ROSConnection.GetOrCreateInstance();
 		roscon.RegisterPublisher<ClockMsg>(this.topicName);
 
-		// setup ROS Message
+		// Set up the clock message
 		message = new ClockMsg();
 		message.clock.sec = 0;
 		message.clock.nanosec = 0;
 
 		clockTimePassed = double.Parse(PlayerPrefs.GetString("ROSClock", "0"));
+		
+		// Subscribe to toggle events
+		classLogicManager = FindObjectOfType<LogicManager1>();
+		if (classLogicManager != null)
+		{
+			classLogicManager.PublishROSToggle?.onValueChanged.AddListener(isOn => publishToRos = isOn);
+		}
+		else
+		{
+			Debug.LogError("[in StatePublisher.cs] LogiManager class is not assigned.");
+		}
+	}
+	
+	private void Update()
+	{
+		if (publishToRos) SendClock();
 	}
 
-
-
-	void PublishMessage()
+	private void SendClock()
 	{
 		var publishTime = Time.fixedTimeAsDouble + clockTimePassed;
 
-		sec = (uint)Math.Floor(publishTime);
-		nanosec = (uint)((publishTime - Math.Floor(publishTime)) * 1e9f);
-
-		message.clock.sec = sec;
-		message.clock.nanosec = nanosec;
+		message.clock.sec = (uint)Math.Floor(publishTime);
+		message.clock.nanosec = (uint)((publishTime - Math.Floor(publishTime)) * 1e9f);
 
 		roscon.Publish(topicName, message);
 		PlayerPrefs.SetString("ROSClock", publishTime.ToString());
-	}
-
-	private void Update()
-	{
-		if (bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"))) PublishMessage();
 	}
 
 }
