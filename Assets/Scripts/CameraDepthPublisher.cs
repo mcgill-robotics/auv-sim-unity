@@ -13,14 +13,10 @@ using System.IO;
 
 public class CameraDepthPublisher : MonoBehaviour
 {
-	ROSConnection ros;
+	ROSConnection roscon;
 	public Camera cam;
 
 	public string imageTopic = "vision/front_cam/aligned_depth_to_rgb/image_raw/compressed";
-
-	int publishWidth;
-	int publishHeight;
-	int FPS;
 
 	public ROSClock ROSClock;
 
@@ -28,14 +24,19 @@ public class CameraDepthPublisher : MonoBehaviour
 	public Shader uberReplacementShader;
 	public float opticalFlowSensitivity = 1.0f;
 
-	private float timeElapsed;
-	private uint image_step = 4;
 	private bool publishToRos = true;
-	private ImageMsg img_msg;
+	private float timeSinceLastPublish, timeBetweenPublishes;
+
+	private int publishWidth, publishHeight;
+	private Rect publishRect;
+	private Texture2D cameraTexture;
+	private int imageStepSize = 4;
+	private int imageStep;
+	private ImageMsg imageMsg;
+	private RenderTexture activeRenderTexture;
+	
 	private CapturePass capturePass = new CapturePass() { name = "_depth" };
-	private Texture2D texture2D;
-	private Rect rect;
-	private RenderTexture rt;
+	
 	struct CapturePass
 	{
 		public string name;
@@ -65,44 +66,48 @@ public class CameraDepthPublisher : MonoBehaviour
 		DepthMultichannel = 3,
 		Normals = 4
 	};
-	void Start()
+	
+	
+	private void Start()
 	{
-		// start the ROS connection
-		ros = ROSConnection.GetOrCreateInstance();
-		ros.RegisterPublisher<ImageMsg>(imageTopic);
+		// Start the ROS connection
+		roscon = ROSConnection.GetOrCreateInstance();
+		roscon.RegisterPublisher<ImageMsg>(imageTopic);
 		Initialize();
 	}
 
-	public void Initialize()
+	private void Initialize()
 	{
-		publishWidth = int.Parse(PlayerPrefs.GetString("frontCamWidth", "640"));
-		publishHeight = int.Parse(PlayerPrefs.GetString("frontCamHeight", "480"));
-		texture2D = new Texture2D(publishWidth, publishHeight, TextureFormat.RFloat, false);
-		rect = new Rect(0, 0, publishWidth, publishHeight);
-
-		img_msg = new ImageMsg();
-		img_msg.width = (uint)publishWidth;
-		img_msg.height = (uint)publishHeight;
-		img_msg.step = image_step * (uint)publishWidth;
-		img_msg.encoding = "32FC1";
+		// Set up image message that will be published to ROS
+		imageMsg = new ImageMsg();
+		imageMsg.encoding = "32FC1";
 		HeaderMsg header = new HeaderMsg();
-		img_msg.header = header;
-
-		//set up camera shader
+		imageMsg.header = header;
+		
+		// Update publishing preferences and affected variables
+		var publish = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) 
+		              && bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "true"));
+		var fps = int.Parse(PlayerPrefs.GetString("frontCamRate", "10"));
+		var width = int.Parse(PlayerPrefs.GetString("frontCamWidth", "640"));
+		var height = int.Parse(PlayerPrefs.GetString("frontCamHeight", "480"));
+		SetPublishToRos(publish);
+		SetPublishRate(fps);
+		SetPublishResolution(width, height);
+		
+		// Set up the depth camera shader
 		SetupCameraWithReplacementShader(cam, uberReplacementShader, ReplacementMode.DepthCompressed, Color.white);
 
-		capturePass.camera = cam;
-
-		bool supportsAntialiasing = true;
-		var depth = 32;
-		var format = RenderTextureFormat.Default;
-		var readWrite = RenderTextureReadWrite.Default;
-		var antiAliasing = (supportsAntialiasing) ? Mathf.Max(1, QualitySettings.antiAliasing) : 1;
-		rt = RenderTexture.GetTemporary(publishWidth, publishHeight, depth, format, readWrite, antiAliasing);
+		capturePass.camera = cam;  // Do we need this?
 	}
-
+	
 	void Update()
 	{
+		if (!publishToRos) return;
+		timeSinceLastPublish += Time.deltaTime;
+		if (timeSinceLastPublish < timeBetweenPublishes) return;
+		
+		// Publishing is enabled and enough time has elapsed since the last publish,
+		// so publish the next image at the end of the frame
 		StartCoroutine(WaitForEndOfFrameToPublish());
 	}
 
@@ -114,72 +119,82 @@ public class CameraDepthPublisher : MonoBehaviour
 
 	private void SendImage()
 	{
-		publishToRos = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true")) && bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "true"));
-		timeElapsed += Time.deltaTime;
-		FPS = int.Parse(PlayerPrefs.GetString("frontCamRate", "10"));
-		if (FPS < 1)
-		{
-			publishToRos = false;
-		}
+		// Render the camera image to an offscreen texture (readonly from CPU side)
+		var prevActiveRenderTexture = RenderTexture.active;
+		RenderTexture.active = activeRenderTexture;
+		cam.targetTexture = activeRenderTexture;
+	
+		// Render the camera image to the texture
+		cam.Render();
+		cameraTexture.ReadPixels(publishRect, 0, 0);
+		cameraTexture.Apply();
+		cam.targetTexture = prevActiveRenderTexture;
+		cam.targetTexture = null;
 
-		if (timeElapsed > 1.0f / FPS && publishToRos)
-		{
-			var prevActiveRT = RenderTexture.active;
-			// render to offscreen texture (readonly from CPU side)
-			RenderTexture.active = rt;
-			cam.targetTexture = rt;
+		// Process the texture, update the image message, and publish
+		ScaleTexture(cameraTexture);
+		imageMsg.data = CameraPublisher.FlipTextureVertically(cameraTexture, imageStep);
+		imageMsg.header.stamp.sec = ROSClock.sec;
+		imageMsg.header.stamp.nanosec = ROSClock.nanosec;
+		roscon.Publish(imageTopic, imageMsg);
 
-			cam.Render();
-			texture2D.ReadPixels(rect, 0, 0);
-			texture2D.Apply();
-			cam.targetTexture = prevActiveRT;
-			cam.targetTexture = null;
-
-			scaleTexture(texture2D);
-			byte[] imageData = flipTextureVertically(image_step, publishWidth, publishHeight, texture2D);
-
-			img_msg.data = imageData;
-			img_msg.header.stamp.sec = ROSClock.sec;
-			img_msg.header.stamp.nanosec = ROSClock.nanosec;
-
-			ros.Publish(imageTopic, img_msg);
-
-			timeElapsed = 0;
-		}
+		// Reset time until next publish
+		timeSinceLastPublish = 0;
 	}
 
-	private byte[] flipTextureVertically(uint image_step, int publishWidth, int publishHeight, Texture2D texture2D)
-	{
-		int rowSize = (int)image_step * (int)publishWidth;
-		byte[] imageData = texture2D.GetRawTextureData();
-		for (int y = 0; y < publishHeight / 2; y++)
-		{
-			int rowIndex1 = y * rowSize;
-			int rowIndex2 = (publishHeight - 1 - y) * rowSize;
-
-			for (int i = 0; i < rowSize; i++)
-			{
-				byte temp = imageData[rowIndex1 + i];
-				imageData[rowIndex1 + i] = imageData[rowIndex2 + i];
-				imageData[rowIndex2 + i] = temp;
-			}
-		}
-
-		return imageData;
-	}
-
-	private void scaleTexture(Texture2D depthImage)
+	private void ScaleTexture(Texture2D depthImage)
 	{
 		float near = cam.nearClipPlane;
 		float far = cam.farClipPlane;
+		float depth = far - near;
 
 		Color[] pixels = depthImage.GetPixels();
 		for (int i = 0; i < pixels.Length; i++)
 		{
-			pixels[i].r = near + (pixels[i].r * (far - near));
+			pixels[i].r = near + pixels[i].r * depth;
 		}
 
 		depthImage.SetPixels(pixels);
 		depthImage.Apply();
+	}
+	
+	public void SetPublishRate(int fps)
+	{
+		timeBetweenPublishes = fps > 0 ? 1.0f / fps : Mathf.Infinity;
+	}
+	
+	public void SetPublishToRos(bool publish)
+	{
+		publishToRos = publish;
+	}
+
+	public void SetPublishResolution(int width, int height)
+	{
+		publishWidth = width;
+		publishHeight = height;
+		
+		// Update the affected variables
+		publishRect = new Rect(0, 0, publishWidth, publishHeight);
+		cameraTexture = new Texture2D(publishWidth, publishHeight, TextureFormat.RFloat, false);
+		imageStep = imageStepSize * publishWidth;
+		
+		UpdateActiveRenderTexture();
+		
+		imageMsg.width = (uint)publishWidth;
+		imageMsg.height = (uint)publishHeight;
+		imageMsg.step = (uint)imageStep;
+	}
+	
+	/// <summary>
+	/// Sets the texture that the camera will render a frame to.
+	/// </summary>
+	private void UpdateActiveRenderTexture()
+	{
+		bool supportsAntialiasing = true;
+		var depth = 32;
+		var format = RenderTextureFormat.Default;
+		var readWrite = RenderTextureReadWrite.Default;
+		var antiAliasing = (supportsAntialiasing) ? Mathf.Max(1, QualitySettings.antiAliasing) : 1;
+		activeRenderTexture = RenderTexture.GetTemporary(publishWidth, publishHeight, depth, format, readWrite, antiAliasing);
 	}
 }

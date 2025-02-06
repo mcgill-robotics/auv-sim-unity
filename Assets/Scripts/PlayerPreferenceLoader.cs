@@ -102,7 +102,7 @@ public class PlayerPreferenceLoader : MonoBehaviour
 		settingsGUI.SetActive(false);
 
 		// CALL LOGIC MANAGER SCRIPT FUNCTIONS TO APPLY LOADING
-		logicManagerScript.setQualityLevel();
+		logicManagerScript.SetQualityLevel();
 
 	}
 

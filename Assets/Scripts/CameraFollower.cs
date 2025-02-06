@@ -10,15 +10,14 @@ public class CameraFollower : MonoBehaviour
 	private Vector3 offsetPosition;
 	private Quaternion offsetRotation;
 
-	// Awake is called before Start
-	void Awake()
+	
+	private void Awake()
 	{
 		offsetPosition = targetObject.transform.InverseTransformPoint(transform.position);
 		offsetRotation = Quaternion.Inverse(targetObject.transform.rotation) * transform.rotation;
 	}
 
-	// Update is called once per frame
-	void Update()
+	private void Update()
 	{
 		Vector3 relativeOffset = targetObject.transform.TransformPoint(offsetPosition);
 		transform.position = Vector3.Lerp(transform.position, relativeOffset, Time.deltaTime * rigidity);
