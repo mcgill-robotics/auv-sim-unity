@@ -82,7 +82,11 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 	private void Update()
 	{
 		dianaVisualization.transform.position = currentAUVPos;
-		dianaVisualization.transform.rotation = Quaternion.Euler(currentAUVRot.x, currentAUVRot.y, currentAUVRot.z) * Quaternion.Euler(0, -90, 0);
+		dianaVisualization.transform.rotation = Quaternion.Euler(
+			currentAUVRot.x * Mathf.Rad2Deg, 
+			currentAUVRot.y * Mathf.Rad2Deg, 
+			currentAUVRot.z * Mathf.Rad2Deg
+		) * Quaternion.Euler(0f, -90f, 0f);	// use efloating point
 	}
 	
 	private void OnDestroy()
