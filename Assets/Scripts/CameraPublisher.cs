@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.Rendering;
-using Unity.Robotics.ROSTCPConnector;
-using Unity.Robotics.ROSTCPConnector.MessageGeneration;
+using RosMessageTypes.BuiltinInterfaces;
 using RosMessageTypes.Sensor;
 using RosMessageTypes.Std;
-using RosMessageTypes.BuiltinInterfaces;
+using Unity.Robotics.ROSTCPConnector;
+using Unity.Robotics.ROSTCPConnector.MessageGeneration;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 public class CameraPublisher : MonoBehaviour
 {
@@ -20,13 +20,13 @@ public class CameraPublisher : MonoBehaviour
 	public ROSClock ROSClock;
 
 	public bool isFrontCam = false;
-	
+
 	private ROSConnection roscon;
 
 	private string camPublishPreferenceKey, camFPSPreferenceKey, camWidthPreferenceKey, camHeightPreferenceKey;
 	private bool publishToRos = true;
 	private float timeSinceLastPublish, timeBetweenPublishes;
-	
+
 	private int publishWidth, publishHeight;
 	private Rect publishRect;
 	private Texture2D cameraTexture;
@@ -34,8 +34,8 @@ public class CameraPublisher : MonoBehaviour
 	private int imageStep;  // = publish width * image step size
 	private ImageMsg imageMsg;
 	private RenderTexture activeRenderTexture;
-	
-	
+
+
 	private void Start()
 	{
 		// Start the ROS connection
@@ -52,10 +52,11 @@ public class CameraPublisher : MonoBehaviour
 		imageMsg.encoding = "rgba8";
 		HeaderMsg header = new HeaderMsg();
 		imageMsg.header = header;
-		
+
 		// Determine which camera this is
 		if (isFrontCam)
 		{
+			imageMsg.header.frame_id = "camera";
 			camPublishPreferenceKey = "PublishFrontCamToggle";
 			camFPSPreferenceKey = "frontCamRate";
 			camWidthPreferenceKey = "frontCamWidth";
@@ -63,15 +64,16 @@ public class CameraPublisher : MonoBehaviour
 		}
 		else
 		{
+			imageMsg.header.frame_id = "down_cam";
 			camPublishPreferenceKey = "PublishDownCamToggle";
 			camFPSPreferenceKey = "downCamRate";
 			camWidthPreferenceKey = "downCamWidth";
 			camHeightPreferenceKey = "downCamHeight";
 		}
-		
+
 		// Update publishing preferences and affected variables
 		var publish = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"))
-		              && bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
+									&& bool.Parse(PlayerPrefs.GetString(camPublishPreferenceKey, "true"));
 		var fps = int.Parse(PlayerPrefs.GetString(camFPSPreferenceKey, "10"));
 		var width = int.Parse(PlayerPrefs.GetString(camWidthPreferenceKey, "640"));
 		var height = int.Parse(PlayerPrefs.GetString(camHeightPreferenceKey, "480"));
@@ -85,7 +87,7 @@ public class CameraPublisher : MonoBehaviour
 		if (!publishToRos) return;
 		timeSinceLastPublish += Time.deltaTime;
 		if (timeSinceLastPublish < timeBetweenPublishes) return;
-		
+
 		// Publishing is enabled and enough time has elapsed since the last publish,
 		// so publish the next image at the end of the frame
 		StartCoroutine(WaitForEndOfFrameToPublish());
@@ -103,7 +105,7 @@ public class CameraPublisher : MonoBehaviour
 		var prevActiveRenderTexture = RenderTexture.active;
 		RenderTexture.active = activeRenderTexture;
 		cam.targetTexture = activeRenderTexture;
-		
+
 		// Render the camera image to the texture
 		cam.Render();
 		cameraTexture.ReadPixels(publishRect, 0, 0);
@@ -112,11 +114,11 @@ public class CameraPublisher : MonoBehaviour
 		cam.targetTexture = null;
 
 		// Process the texture, update the image message, and publish
-		imageMsg.data = FlipTextureVertically(cameraTexture, imageStep);;
+		imageMsg.data = FlipTextureVertically(cameraTexture, imageStep); ;
 		imageMsg.header.stamp.sec = ROSClock.sec;
 		imageMsg.header.stamp.nanosec = ROSClock.nanosec;
 		roscon.Publish(imageTopic, imageMsg);
-		
+
 		// Also generate camera info and publish
 		CameraInfoMsg cameraInfoMessage = CameraInfoGenerator.ConstructCameraInfoMessage(cam, imageMsg.header, 0.0f, 0.01f);
 		cameraInfoMessage.width = (uint)publishWidth;
@@ -131,7 +133,7 @@ public class CameraPublisher : MonoBehaviour
 	public static byte[] FlipTextureVertically(Texture2D texture2D, int texRowSize)
 	{
 		byte[] imageData = texture2D.GetRawTextureData();
-		
+
 		// Loop through the top half of the rows, and swap with the equivalent row from the bottom half
 		for (int y = 0; y < texture2D.height / 2; y++)
 		{
@@ -152,49 +154,49 @@ public class CameraPublisher : MonoBehaviour
 	{
 		// IntrinsicMatrix in row major
 		var camIntrinsicMatrix = new double[9];
-		
+
 		camIntrinsicMatrix[0] = cam.focalLength * (publishWidth / cam.sensorSize.x);  // alpha_u
 		camIntrinsicMatrix[1] = 0f;
 		camIntrinsicMatrix[2] = publishWidth * 0.5f;  // u_0
-		
+
 		camIntrinsicMatrix[3] = 0f;
 		camIntrinsicMatrix[4] = cam.focalLength * (publishWidth / (float)publishHeight) * (publishHeight / cam.sensorSize.y);  // alpha_v
 		camIntrinsicMatrix[5] = publishHeight * 0.5f;  // v_0
-		
+
 		camIntrinsicMatrix[6] = 0f;
 		camIntrinsicMatrix[7] = 0f;
 		camIntrinsicMatrix[8] = 1f;
 
 		return camIntrinsicMatrix;
 	}
-	
+
 	public void SetPublishRate(int fps)
 	{
 		timeBetweenPublishes = fps > 0 ? 1.0f / fps : Mathf.Infinity;
 	}
-	
+
 	public void SetPublishToRos(bool publish)
 	{
 		publishToRos = publish;
 	}
-	
+
 	public void SetPublishResolution(int width, int height)
 	{
 		publishWidth = width;
 		publishHeight = height;
-		
+
 		// Update the affected variables
 		publishRect = new Rect(0, 0, publishWidth, publishHeight);
 		cameraTexture = new Texture2D(publishWidth, publishHeight, TextureFormat.RGBA32, false);
 		imageStep = imageStepSize * publishWidth;
-		
+
 		UpdateActiveRenderTexture();
-		
+
 		imageMsg.width = (uint)publishWidth;
 		imageMsg.height = (uint)publishHeight;
 		imageMsg.step = (uint)imageStep;
 	}
-	
+
 	/// <summary>
 	/// Sets the texture that the camera will render a frame to.
 	/// </summary>

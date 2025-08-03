@@ -148,14 +148,14 @@ public class CameraDepthPublisher : MonoBehaviour
 		float far = cam.farClipPlane;
 		float depth = far - near;
 
-		Color[] pixels = depthImage.GetPixels();
-		for (int i = 0; i < pixels.Length; i++)
+		// Normalize and scale the depth pixels appropriately
+		var raw = depthImage.GetRawTextureData<float>(); 		// Returns NativeArray<float> which is more optimal
+		for (int i = 0; i < raw.Length; ++i)
 		{
-			pixels[i].r = near + pixels[i].r * depth;
+			raw[i] = (near * far) / Mathf.Lerp(far, near, raw[i]);
 		}
 
-		depthImage.SetPixels(pixels);
-		depthImage.Apply();
+		depthImage.Apply(false, false);
 	}
 	
 	public void SetPublishRate(int fps)
