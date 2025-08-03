@@ -86,7 +86,8 @@ public class VisualizeAUVBeliefs : MonoBehaviour
 			currentAUVRot.x * Mathf.Rad2Deg, 
 			currentAUVRot.y * Mathf.Rad2Deg, 
 			currentAUVRot.z * Mathf.Rad2Deg
-		) * Quaternion.Euler(0f, -90f, 0f);	// use efloating point
+		) * Quaternion.Euler(0f, -90f, 0f);
+
 	}
 	
 	private void OnDestroy()
