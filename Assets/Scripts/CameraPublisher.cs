@@ -114,8 +114,8 @@ public class CameraPublisher : MonoBehaviour
 		cam.targetTexture = null;
 
 		// Process the texture, update the image message, and publish
-		imageMsg.data = FlipTextureVertically(cameraTexture, imageStep); ;
-		imageMsg.header.stamp.sec = ROSClock.sec;
+		imageMsg.data = FlipTextureVertically(cameraTexture, imageStep); 
+		imageMsg.header.stamp.sec = (int)ROSClock.sec;
 		imageMsg.header.stamp.nanosec = ROSClock.nanosec;
 		roscon.Publish(imageTopic, imageMsg);
 
