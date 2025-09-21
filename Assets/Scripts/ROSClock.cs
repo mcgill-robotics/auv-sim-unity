@@ -54,7 +54,7 @@ public class ROSClock : MonoBehaviour
 	{
 		var publishTime = Time.fixedTimeAsDouble + clockTimePassed;
 
-		message.clock.sec = (uint)Math.Floor(publishTime);
+		message.clock.sec = (int)Math.Floor(publishTime);
 		message.clock.nanosec = (uint)((publishTime - Math.Floor(publishTime)) * 1e9f);
 
 		roscon.Publish(topicName, message);

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 4763716915498289636}
-  m_IndirectSpecularColor: {r: 1.4595089, g: 1.250288, b: 1.343623, a: 1}
+  m_IndirectSpecularColor: {r: 1.4595089, g: 1.250284, b: 1.3436244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -7808,6 +7808,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Ros Connection
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798632748547098708, guid: 25cd8633a8a0ac648aa1883997bc26b8,
+        type: 3}
+      propertyPath: m_RosIPAddress
+      value: localhost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
