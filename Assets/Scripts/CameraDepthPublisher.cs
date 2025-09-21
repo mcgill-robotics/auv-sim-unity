@@ -134,7 +134,7 @@ public class CameraDepthPublisher : MonoBehaviour
 		// Process the texture, update the image message, and publish
 		ScaleTexture(cameraTexture);
 		imageMsg.data = CameraPublisher.FlipTextureVertically(cameraTexture, imageStep);
-		imageMsg.header.stamp.sec = ROSClock.sec;
+		imageMsg.header.stamp.sec = (int)ROSClock.sec;
 		imageMsg.header.stamp.nanosec = ROSClock.nanosec;
 		roscon.Publish(imageTopic, imageMsg);
 
