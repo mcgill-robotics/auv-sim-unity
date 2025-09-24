@@ -11,7 +11,8 @@ using RosMessageTypes.Std;
 public class IMUPublisher : MonoBehaviour
 {
 	[Header("IMU Configuration")]
-	public string imuTopicName = "/imu/data";
+	public string imuTopicName = "/sensors/imu/data";
+	// Optionally change to an IMU object and rigidbody instead of the AUV
 	public GameObject auv;
 	public Rigidbody auvRb;
 	public ROSClock ROSClock;
@@ -39,10 +40,11 @@ public class IMUPublisher : MonoBehaviour
 	// Monte Carlo Random Walk variables
 	private Vector3 accelerometerBiasWalk = Vector3.zero;
 	private Vector3 gyroscopeBiasWalk = Vector3.zero;
-	private Vector3 lastAcceleration = Vector3.zero;
+	private Vector3 lastVelocity = Vector3.zero;
 	private Vector3 lastAngularVelocity = Vector3.zero;
 	
 	// Noise generation
+	// Note: Generates pseudo-random numbers with .Next()
 	private System.Random random = new System.Random();
 	
 	private void Start()
@@ -84,9 +86,6 @@ public class IMUPublisher : MonoBehaviour
 		var frequency = Mathf.Clamp(int.Parse(PlayerPrefs.GetString("imuRate", "100")), 1, 100);
 		SetPublishToRos(publish);
 		SetPublishRate(frequency);
-		
-		// Initialize random walk
-		InitializeRandomWalk();
 	}
 	
 	private void FixedUpdate()
@@ -94,8 +93,7 @@ public class IMUPublisher : MonoBehaviour
 		timeSinceLastPublish += Time.fixedDeltaTime;
 		if (!publishToRos || timeSinceLastPublish < timeBetweenPublishes) return;
 		
-		// Publishing is enabled and enough time has elapsed since the last publish,
-		// so let's publish the next IMU data:
+		// Publishing is enabled and enough time has elapsed since the last publish:
 		SendIMUData();
 	}
 	
@@ -111,9 +109,8 @@ public class IMUPublisher : MonoBehaviour
 
 	private void SendIMUData()
 	{
-		// Update timestamp
-		imuMsg.header.stamp.sec = (int)ROSClock.sec;
-		imuMsg.header.stamp.nanosec = (int)ROSClock.nanosec;
+		// imuMsg.header.stamp.sec = (int) ROSClock.sec;
+		// imuMsg.header.stamp.nanosec = (uint) ROSClock.nanosec;
 		
 		// Get true orientation from Unity transform
 		Quaternion trueOrientation = auv.transform.rotation;
@@ -143,15 +140,18 @@ public class IMUPublisher : MonoBehaviour
 	{
 		// Calculate acceleration from velocity change
 		Vector3 currentVelocity = auvRb.velocity;
-		Vector3 acceleration = (currentVelocity - lastAcceleration) / Time.fixedDeltaTime;
-		lastAcceleration = currentVelocity;
+		Vector3 acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
+		lastVelocity = currentVelocity;
+
+		// note: Time.fixedDeltaTime is the time in seconds between fixed updates with the physics engine
 		
 		// Add gravity (IMU measures specific force, not coordinate acceleration)
 		// Unity's gravity is typically (0, -9.81, 0)
-		Vector3 gravity = Physics.gravity;
-		Vector3 specificForce = acceleration - gravity;
+		// Vector3 gravity = Physics.gravity;
+		// Vector3 specificForce = acceleration - gravity;
 		
-		return specificForce;
+		// return specificForce;
+		return acceleration;
 	}
 	
 	private void ApplyMonteCarloNoise(ref Vector3 acceleration, ref Vector3 angularVelocity)
@@ -160,58 +160,43 @@ public class IMUPublisher : MonoBehaviour
 		UpdateRandomWalkBias();
 		
 		// Apply bias and white noise to acceleration
-		acceleration.x += accelerometerBiasWalk.x + GenerateWhiteNoise() * accelerometerNoise;
-		acceleration.y += accelerometerBiasWalk.y + GenerateWhiteNoise() * accelerometerNoise;
-		acceleration.z += accelerometerBiasWalk.z + GenerateWhiteNoise() * accelerometerNoise;
+		// No random walk bias for acceleration
+		acceleration.x += GenerateGaussianNoise() * accelerometerNoise;
+		acceleration.y += GenerateGaussianNoise() * accelerometerNoise;
+		acceleration.z += GenerateGaussianNoise() * accelerometerNoise;
 		
 		// Apply bias and white noise to angular velocity
-		angularVelocity.x += gyroscopeBiasWalk.x + GenerateWhiteNoise() * gyroscopeNoise;
-		angularVelocity.y += gyroscopeBiasWalk.y + GenerateWhiteNoise() * gyroscopeNoise;
-		angularVelocity.z += gyroscopeBiasWalk.z + GenerateWhiteNoise() * gyroscopeNoise;
+		angularVelocity.x += gyroscopeBiasWalk.x + GenerateGaussianNoise() * gyroscopeNoise;
+		angularVelocity.y += gyroscopeBiasWalk.y + GenerateGaussianNoise() * gyroscopeNoise;
+		angularVelocity.z += gyroscopeBiasWalk.z + GenerateGaussianNoise() * gyroscopeNoise;
 	}
 	
 	private void UpdateRandomWalkBias()
 	{
 		// Monte Carlo random walk for accelerometer bias
-		accelerometerBiasWalk.x += GenerateWhiteNoise() * randomWalkStepSize * accelerometerBias;
-		accelerometerBiasWalk.y += GenerateWhiteNoise() * randomWalkStepSize * accelerometerBias;
-		accelerometerBiasWalk.z += GenerateWhiteNoise() * randomWalkStepSize * accelerometerBias;
+		// accelerometerBiasWalk.x += GenerateGaussianNoise() * randomWalkStepSize * accelerometerBias;
+		// accelerometerBiasWalk.y += GenerateGaussianNoise() * randomWalkStepSize * accelerometerBias;
+		// accelerometerBiasWalk.z += GenerateGaussianNoise() * randomWalkStepSize * accelerometerBias;
 		
 		// Monte Carlo random walk for gyroscope bias
-		gyroscopeBiasWalk.x += GenerateWhiteNoise() * randomWalkStepSize * gyroscopeBias;
-		gyroscopeBiasWalk.y += GenerateWhiteNoise() * randomWalkStepSize * gyroscopeBias;
-		gyroscopeBiasWalk.z += GenerateWhiteNoise() * randomWalkStepSize * gyroscopeBias;
+		gyroscopeBiasWalk.x += GenerateGaussianNoise() * randomWalkStepSize * gyroscopeBias;
+		gyroscopeBiasWalk.y += GenerateGaussianNoise() * randomWalkStepSize * gyroscopeBias;
+		gyroscopeBiasWalk.z += GenerateGaussianNoise() * randomWalkStepSize * gyroscopeBias;
 		
 		// Clamp bias values to prevent them from growing unbounded
-		accelerometerBiasWalk = Vector3.ClampMagnitude(accelerometerBiasWalk, accelerometerBias * 10f);
+		// accelerometerBiasWalk = Vector3.ClampMagnitude(accelerometerBiasWalk, accelerometerBias * 10f);
 		gyroscopeBiasWalk = Vector3.ClampMagnitude(gyroscopeBiasWalk, gyroscopeBias * 10f);
 	}
 	
-	private float GenerateWhiteNoise()
+	private float GenerateGaussianNoise()
 	{
-		// Box-Muller transform for Gaussian white noise
+		// x transform for Gaussian white noise
 		float u1 = (float)random.NextDouble();
 		float u2 = (float)random.NextDouble();
 		float randStdNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
 		return randStdNormal;
 	}
-	
-	private void InitializeRandomWalk()
-	{
-		// Initialize bias walks with small random values
-		accelerometerBiasWalk = new Vector3(
-			GenerateWhiteNoise() * accelerometerBias * 0.1f,
-			GenerateWhiteNoise() * accelerometerBias * 0.1f,
-			GenerateWhiteNoise() * accelerometerBias * 0.1f
-		);
-		
-		gyroscopeBiasWalk = new Vector3(
-			GenerateWhiteNoise() * gyroscopeBias * 0.1f,
-			GenerateWhiteNoise() * gyroscopeBias * 0.1f,
-			GenerateWhiteNoise() * gyroscopeBias * 0.1f
-		);
-	}
-	
+
 	private void SetCovarianceMatrices()
 	{
 		// Set diagonal covariance matrices based on noise parameters
