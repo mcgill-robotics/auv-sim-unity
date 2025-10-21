@@ -35,7 +35,7 @@ namespace RosMessageTypes.Auv
             this.HEAVE_BACK_RIGHT = 0.0;
         }
 
-        public ThrusterForcesMsg(double FRONT_LEFT, double FRONT_RIGHT, double BACK_LEFT, double BACK_RIGHT, double HEAVE_FRONT_LEFT, double HEAVE_FRONT_RIGHT, double HEAVE_BACK_LEFT, double HEAVE_BACK_RIGHT)
+        public ThrusterForcesMsg(double BACK_RIGHT, double HEAVE_BACK_RIGHT, double HEAVE_FRONT_RIGHT, double FRONT_RIGHT, double FRONT_LEFT, double HEAVE_FRONT_LEFT, double HEAVE_BACK_LEFT, double BACK_LEFT)
         {
             this.FRONT_LEFT = FRONT_LEFT;
             this.FRONT_RIGHT = FRONT_RIGHT;

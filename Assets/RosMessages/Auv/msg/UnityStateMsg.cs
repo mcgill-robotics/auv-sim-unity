@@ -19,14 +19,14 @@ namespace RosMessageTypes.Auv
         public Geometry.Vector3Msg angular_velocity;
         public Geometry.Vector3Msg linear_acceleration;
         public int[] frequencies;
-        public uint[] times_pinger_1;
-        public uint[] times_pinger_2;
-        public uint[] times_pinger_3;
-        public uint[] times_pinger_4;
-        public int isDVLActive;
-        public int isDepthSensorActive;
-        public int isIMUActive;
-        public int isHydrophonesActive;
+        public uint[] hydrophone_one_freqs;
+        public uint[] hydrophone_two_freqs;
+        public uint[] hydrophone_three_freqs;
+        public uint[] hydrophone_four_freqs;
+        public int is_dvl_active;
+        public int is_depth_sensor_active;
+        public int is_imu_active;
+        public int is_hydrophones_active;
 
         public UnityStateMsg()
         {
@@ -36,17 +36,17 @@ namespace RosMessageTypes.Auv
             this.angular_velocity = new Geometry.Vector3Msg();
             this.linear_acceleration = new Geometry.Vector3Msg();
             this.frequencies = new int[0];
-            this.times_pinger_1 = new uint[0];
-            this.times_pinger_2 = new uint[0];
-            this.times_pinger_3 = new uint[0];
-            this.times_pinger_4 = new uint[0];
-            this.isDVLActive = 0;
-            this.isDepthSensorActive = 0;
-            this.isIMUActive = 0;
-            this.isHydrophonesActive = 0;
+            this.hydrophone_one_freqs = new uint[0];
+            this.hydrophone_two_freqs = new uint[0];
+            this.hydrophone_three_freqs = new uint[0];
+            this.hydrophone_four_freqs = new uint[0];
+            this.is_dvl_active = 0;
+            this.is_depth_sensor_active = 0;
+            this.is_imu_active = 0;
+            this.is_hydrophones_active = 0;
         }
 
-        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, Geometry.Vector3Msg linear_acceleration, int[] frequencies, uint[] times_pinger_1, uint[] times_pinger_2, uint[] times_pinger_3, uint[] times_pinger_4, int isDVLActive, int isDepthSensorActive, int isIMUActive, int isHydrophonesActive)
+        public UnityStateMsg(Geometry.Vector3Msg position, Geometry.QuaternionMsg orientation, Geometry.Vector3Msg velocity, Geometry.Vector3Msg angular_velocity, Geometry.Vector3Msg linear_acceleration, int[] frequencies, uint[] hydrophone_one_freqs, uint[] hydrophone_two_freqs, uint[] hydrophone_three_freqs, uint[] hydrophone_four_freqs, int is_dvl_active, int is_depth_sensor_active, int is_imu_active, int is_hydrophones_active)
         {
             this.position = position;
             this.orientation = orientation;
@@ -54,14 +54,14 @@ namespace RosMessageTypes.Auv
             this.angular_velocity = angular_velocity;
             this.linear_acceleration = linear_acceleration;
             this.frequencies = frequencies;
-            this.times_pinger_1 = times_pinger_1;
-            this.times_pinger_2 = times_pinger_2;
-            this.times_pinger_3 = times_pinger_3;
-            this.times_pinger_4 = times_pinger_4;
-            this.isDVLActive = isDVLActive;
-            this.isDepthSensorActive = isDepthSensorActive;
-            this.isIMUActive = isIMUActive;
-            this.isHydrophonesActive = isHydrophonesActive;
+            this.hydrophone_one_freqs = hydrophone_one_freqs;
+            this.hydrophone_two_freqs = hydrophone_two_freqs;
+            this.hydrophone_three_freqs = hydrophone_three_freqs;
+            this.hydrophone_four_freqs = hydrophone_four_freqs;
+            this.is_dvl_active = is_dvl_active;
+            this.is_depth_sensor_active = is_depth_sensor_active;
+            this.is_imu_active = is_imu_active;
+            this.is_hydrophones_active = is_hydrophones_active;
         }
 
         public static UnityStateMsg Deserialize(MessageDeserializer deserializer) => new UnityStateMsg(deserializer);
@@ -74,14 +74,14 @@ namespace RosMessageTypes.Auv
             this.angular_velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             this.linear_acceleration = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.frequencies, sizeof(int), deserializer.ReadLength());
-            deserializer.Read(out this.times_pinger_1, sizeof(uint), deserializer.ReadLength());
-            deserializer.Read(out this.times_pinger_2, sizeof(uint), deserializer.ReadLength());
-            deserializer.Read(out this.times_pinger_3, sizeof(uint), deserializer.ReadLength());
-            deserializer.Read(out this.times_pinger_4, sizeof(uint), deserializer.ReadLength());
-            deserializer.Read(out this.isDVLActive);
-            deserializer.Read(out this.isDepthSensorActive);
-            deserializer.Read(out this.isIMUActive);
-            deserializer.Read(out this.isHydrophonesActive);
+            deserializer.Read(out this.hydrophone_one_freqs, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.hydrophone_two_freqs, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.hydrophone_three_freqs, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.hydrophone_four_freqs, sizeof(uint), deserializer.ReadLength());
+            deserializer.Read(out this.is_dvl_active);
+            deserializer.Read(out this.is_depth_sensor_active);
+            deserializer.Read(out this.is_imu_active);
+            deserializer.Read(out this.is_hydrophones_active);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
@@ -93,18 +93,18 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.linear_acceleration);
             serializer.WriteLength(this.frequencies);
             serializer.Write(this.frequencies);
-            serializer.WriteLength(this.times_pinger_1);
-            serializer.Write(this.times_pinger_1);
-            serializer.WriteLength(this.times_pinger_2);
-            serializer.Write(this.times_pinger_2);
-            serializer.WriteLength(this.times_pinger_3);
-            serializer.Write(this.times_pinger_3);
-            serializer.WriteLength(this.times_pinger_4);
-            serializer.Write(this.times_pinger_4);
-            serializer.Write(this.isDVLActive);
-            serializer.Write(this.isDepthSensorActive);
-            serializer.Write(this.isIMUActive);
-            serializer.Write(this.isHydrophonesActive);
+            serializer.WriteLength(this.hydrophone_one_freqs);
+            serializer.Write(this.hydrophone_one_freqs);
+            serializer.WriteLength(this.hydrophone_two_freqs);
+            serializer.Write(this.hydrophone_two_freqs);
+            serializer.WriteLength(this.hydrophone_three_freqs);
+            serializer.Write(this.hydrophone_three_freqs);
+            serializer.WriteLength(this.hydrophone_four_freqs);
+            serializer.Write(this.hydrophone_four_freqs);
+            serializer.Write(this.is_dvl_active);
+            serializer.Write(this.is_depth_sensor_active);
+            serializer.Write(this.is_imu_active);
+            serializer.Write(this.is_hydrophones_active);
         }
 
         public override string ToString()
@@ -116,14 +116,14 @@ namespace RosMessageTypes.Auv
             "\nangular_velocity: " + angular_velocity.ToString() +
             "\nlinear_acceleration: " + linear_acceleration.ToString() +
             "\nfrequencies: " + System.String.Join(", ", frequencies.ToList()) +
-            "\ntimes_pinger_1: " + System.String.Join(", ", times_pinger_1.ToList()) +
-            "\ntimes_pinger_2: " + System.String.Join(", ", times_pinger_2.ToList()) +
-            "\ntimes_pinger_3: " + System.String.Join(", ", times_pinger_3.ToList()) +
-            "\ntimes_pinger_4: " + System.String.Join(", ", times_pinger_4.ToList()) +
-            "\nisDVLActive: " + isDVLActive.ToString() +
-            "\nisDepthSensorActive: " + isDepthSensorActive.ToString() +
-            "\nisIMUActive: " + isIMUActive.ToString() +
-            "\nisHydrophonesActive: " + isHydrophonesActive.ToString();
+            "\nhydrophone_one_freqs: " + System.String.Join(", ", hydrophone_one_freqs.ToList()) +
+            "\nhydrophone_two_freqs: " + System.String.Join(", ", hydrophone_two_freqs.ToList()) +
+            "\nhydrophone_three_freqs: " + System.String.Join(", ", hydrophone_three_freqs.ToList()) +
+            "\nhydrophone_four_freqs: " + System.String.Join(", ", hydrophone_four_freqs.ToList()) +
+            "\nis_dvl_active: " + is_dvl_active.ToString() +
+            "\nis_depth_sensor_active: " + is_depth_sensor_active.ToString() +
+            "\nis_imu_active: " + is_imu_active.ToString() +
+            "\nis_hydrophones_active: " + is_hydrophones_active.ToString();
         }
 
 #if UNITY_EDITOR
