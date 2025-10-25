@@ -184,13 +184,13 @@ public class Thrusters : MonoBehaviour
 	
 	private void SetThrusterForces(RosMessageTypes.Auv.ThrusterForcesMsg msg)
 	{
-		rosThrusterForces[7] = msg.BACK_RIGHT;
-		rosThrusterForces[6] = msg.HEAVE_BACK_RIGHT;
-		rosThrusterForces[5] = msg.HEAVE_FRONT_RIGHT;
-		rosThrusterForces[4] = msg.FRONT_RIGHT;
-		rosThrusterForces[3] = msg.FRONT_LEFT;
-		rosThrusterForces[2] = msg.HEAVE_FRONT_LEFT;
-		rosThrusterForces[1] = msg.HEAVE_BACK_LEFT;
-		rosThrusterForces[0] = msg.BACK_LEFT;
+		rosThrusterForces[0] = msg.BACK_RIGHT;
+		rosThrusterForces[1] = msg.HEAVE_BACK_RIGHT;
+		rosThrusterForces[2] = msg.HEAVE_FRONT_RIGHT;
+		rosThrusterForces[3] = msg.FRONT_RIGHT;
+		rosThrusterForces[4] = msg.FRONT_LEFT;
+		rosThrusterForces[5] = msg.HEAVE_FRONT_LEFT;
+		rosThrusterForces[6] = msg.HEAVE_BACK_LEFT;
+		rosThrusterForces[7] = msg.BACK_LEFT;
 	}
 }

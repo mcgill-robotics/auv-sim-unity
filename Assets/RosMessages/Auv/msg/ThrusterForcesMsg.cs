@@ -35,7 +35,7 @@ namespace RosMessageTypes.Auv
             this.HEAVE_BACK_RIGHT = 0.0;
         }
 
-        public ThrusterForcesMsg(double BACK_LEFT, double FRONT_LEFT, double BACK_RIGHT, double BACK_LEFT, double HEAVE_FRONT_RIGHT, double HEAVE_FRONT_LEFT, double HEAVE_BACK_RIGHT, double HEAVE_BACK_LEFT)
+        public ThrusterForcesMsg(double BACK_RIGHT, double HEAVE_BACK_RIGHT, double HEAVE_FRONT_RIGHT, double FRONT_RIGHT, double FRONT_LEFT, double HEAVE_FRONT_LEFT, double HEAVE_BACK_LEFT, double BACK_LEFT)
         {
             this.FRONT_LEFT = FRONT_LEFT;
             this.FRONT_RIGHT = FRONT_RIGHT;
@@ -51,26 +51,26 @@ namespace RosMessageTypes.Auv
 
         private ThrusterForcesMsg(MessageDeserializer deserializer)
         {
-            deserializer.Read(out this.FRONT_LEFT);
-            deserializer.Read(out this.FRONT_RIGHT);
-            deserializer.Read(out this.BACK_LEFT);
             deserializer.Read(out this.BACK_RIGHT);
-            deserializer.Read(out this.HEAVE_FRONT_LEFT);
-            deserializer.Read(out this.HEAVE_FRONT_RIGHT);
-            deserializer.Read(out this.HEAVE_BACK_LEFT);
             deserializer.Read(out this.HEAVE_BACK_RIGHT);
+            deserializer.Read(out this.HEAVE_FRONT_RIGHT);
+            deserializer.Read(out this.FRONT_RIGHT);
+            deserializer.Read(out this.FRONT_LEFT);
+            deserializer.Read(out this.HEAVE_FRONT_LEFT);
+            deserializer.Read(out this.HEAVE_BACK_LEFT);
+            deserializer.Read(out this.BACK_LEFT);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
-            serializer.Write(this.FRONT_LEFT);
-            serializer.Write(this.FRONT_RIGHT);
-            serializer.Write(this.BACK_LEFT);
             serializer.Write(this.BACK_RIGHT);
-            serializer.Write(this.HEAVE_FRONT_LEFT);
-            serializer.Write(this.HEAVE_FRONT_RIGHT);
-            serializer.Write(this.HEAVE_BACK_LEFT);
             serializer.Write(this.HEAVE_BACK_RIGHT);
+            serializer.Write(this.HEAVE_FRONT_RIGHT);
+            serializer.Write(this.FRONT_RIGHT);
+            serializer.Write(this.FRONT_LEFT);
+            serializer.Write(this.HEAVE_FRONT_LEFT);
+            serializer.Write(this.HEAVE_BACK_LEFT);
+            serializer.Write(this.BACK_LEFT);
         }
 
         public override string ToString()
