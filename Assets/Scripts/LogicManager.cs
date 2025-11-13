@@ -55,6 +55,14 @@ public class LogicManager1 : MonoBehaviour
 	public TMPro.TMP_InputField rotYInputField;
 	public TMPro.TMP_InputField rotZInputField;
 
+	[Header("MECHANICAL PARAMETERS")]
+	public Rigidbody auvRb;        
+	public TMP_InputField massInputField;              
+	public TMP_InputField centerOfMassInputField;     
+	public TMP_InputField inertiaInputField; 
+	public TMP_InputField dragInputField;  
+	public TMP_InputField angularDragInputField;              
+
 	[Header("DEBUG INFO VARIABLES")]
 
 	public TMP_Text XPosText;
@@ -152,6 +160,8 @@ public class LogicManager1 : MonoBehaviour
 		{
 			DropdownValueChanged(HydrophonesNumberDropdown);
 		});
+		if (auvRb == null && auv != null)
+			auvRb = auv.GetComponent<Rigidbody>();
 	}
 
 	void DropdownValueChanged(TMP_Dropdown change)
@@ -372,6 +382,75 @@ public class LogicManager1 : MonoBehaviour
 		else
 		{
 			Debug.LogWarning("Invalid Rotation PID");
+		}
+	}
+
+	public void SetMass()
+	{
+		if (float.TryParse(massInputField.text, out float result))
+		{
+			auvRb.mass = float.Parse(massInputField.text);
+		}
+		else
+		{
+			Debug.LogWarning("Invalid Mass input");
+		}
+	}
+
+	public void SetCenterOfMass()
+	{
+		string[] tokens = centerOfMassInputField.text.Split(',');
+		if (tokens.Length == 3 &&
+			float.TryParse(tokens[0], out float x) &&
+			float.TryParse(tokens[1], out float y) &&
+			float.TryParse(tokens[2], out float z))
+		{
+			auvRb.centerOfMass = new Vector3(float.Parse(tokens[0]), float.Parse(tokens[1]), float.Parse(tokens[2]));
+		}
+		else
+		{
+			Debug.LogWarning("Invalid Center of Mass input");
+		}
+	}
+
+	public void SetInertia()
+	{
+		string[] tokens = inertiaInputField.text.Split(',');
+		if (tokens.Length == 3 &&
+			float.TryParse(tokens[0], out float x) &&
+			float.TryParse(tokens[1], out float y) &&
+			float.TryParse(tokens[2], out float z))
+		{
+			auvRb.inertiaTensor = new Vector3(float.Parse(tokens[0]), float.Parse(tokens[1]), float.Parse(tokens[2]));
+		}
+		else
+		{
+			Debug.LogWarning("Invalid Inertia input");
+		}
+	}
+
+
+	public void SetDrag()
+	{
+		if (float.TryParse(dragInputField.text, out float result))
+		{
+			auvRb.drag = float.Parse(dragInputField.text);
+		}
+		else
+		{
+			Debug.LogWarning("Invalid Drag input");
+		}
+	}
+
+	public void SetAngularDrag()
+	{
+		if (float.TryParse(angularDragInputField.text, out float result))
+		{
+			auvRb.angularDrag = float.Parse(angularDragInputField.text);
+		}
+		else
+		{
+			Debug.LogWarning("Invalid Angular Drag input");
 		}
 	}
 

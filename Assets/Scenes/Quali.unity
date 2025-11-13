@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 4763716915498289636}
-  m_IndirectSpecularColor: {r: 0.25330132, g: 0.21698837, b: 0.23319197, a: 1}
+  m_IndirectSpecularColor: {r: 1.4595089, g: 1.250284, b: 1.3436244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1537,19 +1537,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8090097978268664174, guid: 6462d786a647a1c4baac67c96ac333d7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 1916313604988729779, guid: 6462d786a647a1c4baac67c96ac333d7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 1689988267769892611, guid: 6462d786a647a1c4baac67c96ac333d7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6462d786a647a1c4baac67c96ac333d7, type: 3}
 --- !u!33 &556768373560390839
 MeshFilter:
@@ -7323,6 +7311,15 @@ MonoBehaviour:
     type: 3}
   detectionIndicatorPrefab: {fileID: 2912857602779895438, guid: 82c94487e50d8924d9a39362737a6fb6,
     type: 3}
+  trueBearingPinger1: {fileID: 0}
+  trueBearingPinger2: {fileID: 0}
+  trueBearingPinger3: {fileID: 0}
+  trueBearingPinger4: {fileID: 0}
+  expectedBearingPinger1: {fileID: 0}
+  expectedBearingPinger2: {fileID: 0}
+  expectedBearingPinger3: {fileID: 0}
+  expectedBearingPinger4: {fileID: 0}
+  binVisualization: {fileID: 0}
   maxDetectionFrameIndicators: 50
   thetaXTopicName: /state/theta/x
   thetaYTopicName: /state/theta/y
@@ -7628,6 +7625,11 @@ PrefabInstance:
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[6].m_Target
       value: 
       objectReference: {fileID: 116261656}
+    - target: {fileID: 1277170570262263766, guid: bbc9cbf680109cd46b643acbf3ee2aad,
+        type: 3}
+      propertyPath: auvRb
+      value: 
+      objectReference: {fileID: 466873917056680959}
     - target: {fileID: 2375954132243874053, guid: bbc9cbf680109cd46b643acbf3ee2aad,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -44443,6 +44445,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateTopicName: /unity/state
   auv: {fileID: 2641992461186729671}
+  auvRb: {fileID: 0}
 --- !u!1 &8248910016144693023
 GameObject:
   m_ObjectHideFlags: 0
