@@ -1,0 +1,301 @@
+:root {
+    --mcgill-red: rgb(237, 27, 47);
+    --mcgill-red-dim: rgba(237, 27, 47, 0.3);
+    --mcgill-black: rgba(20, 20, 20, 0.95);
+    --mcgill-grey: rgb(60, 60, 60);
+    --color-background: var(--mcgill-black);
+    --color-text-highlight: rgb(255, 255, 255);
+    --color-text-dim: rgb(180, 180, 180);
+    --status-active: rgb(50, 255, 100);
+    --status-standby: rgb(255, 200, 0);
+    --status-error: rgb(255, 80, 80);
+    --panel-border-width: 2px;
+    --panel-radius: 4px;
+    --font-header-size: 22px;
+}
+
+.root-container {
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+    color: var(--color-text-highlight);
+}
+
+Label {
+    color: var(--color-text-highlight);
+}
+
+.panel {
+    position: absolute;
+    background-color: var(--color-background);
+    border-width: var(--panel-border-width);
+    border-color: var(--mcgill-grey);
+    border-top-color: var(--mcgill-red);
+    border-radius: var(--panel-radius);
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.left-panel {
+    left: 20px;
+    top: 20px;
+    bottom: 220px;
+    width: 300px;
+}
+
+.bottom-left-panel {
+    left: 20px;
+    bottom: 20px;
+    width: 300px;
+    height: 180px;
+}
+
+.top-center-panel {
+    top: 20px;
+    left: 50%;
+    translate: -50% 0;
+    width: 450px;
+    height: 90px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(237, 27, 47, 0.9);
+    border-color: white;
+}
+
+.top-right-panel {
+    top: 20px;
+    right: 20px;
+    width: 260px;
+}
+
+.right-center-panel {
+    top: 280px;
+    right: 20px;
+    width: 260px;
+}
+
+.bottom-right-panel {
+    bottom: 20px;
+    right: 20px;
+    width: 420px;
+    height: 320px;
+    border-color: var(--mcgill-red);
+}
+
+.bottom-center-panel {
+    bottom: 20px;
+    left: 50%;
+    translate: -50% 0;
+    width: 600px;
+    height: 80px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-width: 1px;
+    border-color: var(--mcgill-grey);
+}
+
+.header {
+    color: var(--mcgill-red);
+    font-size: var(--font-header-size);
+    -unity-font-style: bold;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--mcgill-grey);
+    padding-bottom: 5px;
+}
+
+.top-center-panel .header {
+    color: white;
+    border-bottom-width: 0;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.data-row {
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+    margin-bottom: 4px;
+}
+
+.data-label {
+    color: var(--color-text-dim);
+    -unity-font-style: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.data-value {
+    color: var(--color-text-highlight);
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+.keybind-row {
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--color-text-dim);
+    margin-bottom: 2px;
+}
+
+.large-stat {
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: white;
+    text-shadow: 1px 1px 0 black;
+}
+
+.mcgill-button {
+    background-color: transparent;
+    border-width: 2px;
+    border-color: var(--mcgill-red);
+    border-radius: 2px;
+    color: white;
+    -unity-font-style: bold;
+    height: 35px;
+    font-size: 14px;
+    margin-top: 5px;
+    transition: 0.2s;
+}
+
+.mcgill-button:hover {
+    background-color: var(--mcgill-red);
+    color: white;
+}
+
+.mcgill-button:active {
+    background-color: white;
+    border-color: white;
+    color: var(--mcgill-red);
+}
+
+.unity-base-field {
+    margin-bottom: 6px;
+}
+
+.unity-base-field__label {
+    color: var(--color-text-dim);
+    min-width: 130px;
+}
+
+.unity-base-field__input {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: var(--mcgill-grey);
+    color: white;
+    border-radius: 2px;
+}
+
+.unity-toggle {
+    margin-bottom: 2px;
+    padding: 2px 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.unity-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.unity-toggle__label {
+    color: var(--color-text-highlight);
+    flex-grow: 1;
+    min-width: auto;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+    -unity-text-align: middle-left;
+}
+
+.unity-toggle__input {
+    width: 45px;
+    min-width: 45px;
+    max-width: 45px;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-color: var(--color-text-dim);
+    border-width: 1px;
+    border-radius: 2px;
+    margin-left: 10px;
+    padding: 0;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.unity-toggle__checkmark {
+    width: 18px;
+    height: 18px;
+    margin-left: 2px;
+    background-color: var(--color-text-dim);
+    border-radius: 1px;
+    border-width: 0;
+    background-image: none;
+    transition: translate 0.15s ease-out-circ;
+}
+
+.unity-toggle:checked .unity-toggle__input {
+    border-color: var(--mcgill-red);
+    background-color: rgba(237, 27, 47, 0.15);
+}
+
+.unity-toggle:checked .unity-toggle__checkmark {
+    background-color: var(--mcgill-red);
+    translate: 21px 0;
+}
+
+.unity-toggle:focus .unity-toggle__input {
+    border-color: white;
+}
+
+.unity-popup-field__label {
+    color: var(--color-text-dim);
+}
+
+.unity-popup-field__input {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.camera-feed {
+    flex-grow: 1;
+    background-color: black;
+    margin-top: 10px;
+    border-width: 1px;
+    border-color: var(--color-text-dim);
+}
+
+.text-accent {
+    color: var(--mcgill-red);
+}
+
+.status-ok {
+    color: var(--status-active);
+}
+
+.status-bad {
+    color: var(--status-error);
+}
+
+.status-wait {
+    color: var(--status-standby);
+}
+
+.margin-top-small {
+    margin-top: 5px;
+}
+
+.margin-top-medium {
+    margin-top: 10px;
+}
+
+.margin-top-large {
+    margin-top: 15px;
+}

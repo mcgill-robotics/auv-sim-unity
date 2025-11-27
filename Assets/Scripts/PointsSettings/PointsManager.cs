@@ -1,66 +1,40 @@
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-
+using System.Collections;
 
 public class PointsManager : MonoBehaviour
 {
-	public static PointsManager instance;
-	public TMP_Text scoreText;
-	public AudioSource[] pointSequenceAudio;
-	public string color = "none";
+    public static PointsManager instance;
+    public string color = "none";
+    private int currentScore = 0;
 
-	private int total_score = 0;
-	private Dictionary<string, int> tasksAudioIndex = new Dictionary<string, int> {
-		{"Gate", 0},
-		{"Buoy", 0},
-		{"Bins", 0},
-		{"Torpedo", 0},
-		{"Octagon", 0},
-		{"Pinger", 0}
-	};
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
-	void Awake()
-	{
-		instance = this;
-	}
+    public void AddPoint(int points, string taskName)
+    {
+        currentScore += points;
+        if (SimulatorHUD.Instance != null)
+        {
+            SimulatorHUD.Instance.UpdateScore(currentScore.ToString());
+            SimulatorHUD.Instance.Log($"Task Complete: {taskName} (+{points} pts)");
+        }
+    }
 
-	void Start()
-	{
-		scoreText.text = "SCORE: " + total_score.ToString();
-	}
-
-	public void AddPoint(int points, string task)
-	{
-		if (!tasksAudioIndex.ContainsKey(task))
-		{
-			Debug.Log(string.Format("[PointsManager.cs] {0} is NOT a valid task!", task));
-			return;
-		}
-		int audioIndex = tasksAudioIndex[task] >= pointSequenceAudio.Length ? pointSequenceAudio.Length - 1 : tasksAudioIndex[task];
-		tasksAudioIndex[task]++;
-		pointSequenceAudio[audioIndex].Play();
-		total_score += points;
-		scoreText.text = "SCORE: " + total_score.ToString();
-	}
-
-	public void ResetPoint()
-	{
-		total_score = 0;
-		scoreText.text = "SCORE: " + total_score.ToString();
-		ResetTaskAudioIndex();
-	}
-
-	private void ResetTaskAudioIndex()
-	{
-		string[] keysArray = tasksAudioIndex.Keys.ToArray();
-		foreach (string key in keysArray)
-		{
-			tasksAudioIndex[key] = 0;
-		}
-	}
+    public void ResetPoints()
+    {
+        currentScore = 0;
+        if (SimulatorHUD.Instance != null)
+        {
+            SimulatorHUD.Instance.UpdateScore("0");
+        }
+    }
 }
