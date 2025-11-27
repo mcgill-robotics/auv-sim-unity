@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-public class BackgroundMusicManager : MonoBehaviour
+public class SoundtrackSelector : MonoBehaviour
 {
 	public TMP_Dropdown audioDropdown;
 	public AudioSource audioSource;

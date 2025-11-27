@@ -1,36 +1,46 @@
 using UnityEngine;
 
-public class BinsManager : MonoBehaviour
+public class BinsManager : MonoBehaviour, ICompetitionTask
 {
-	public static BinsManager instance;
-	public int pointsAvailableCorrect;
-	public int pointsAvailableWrong;
+    public static BinsManager instance;
+    public int pointsAvailableCorrect;
+    public int pointsAvailableWrong;
 
-	private Bins[] binsArray;
+    private Bins[] binsArray;
 
-	void Awake()
-	{
-		instance = this;
-	}
+    void Awake()
+    {
+        instance = this;
+    }
 
-	void Start()
-	{
-		binsArray = FindObjectsOfType<Bins>();
-	}
+    void Start()
+    {
+        binsArray = FindObjectsOfType<Bins>();
+    }
 
-	public void StartAllBinsScripts()
-	{
-		foreach (Bins bin in binsArray)
-		{
-			bin.StartScript();
-		}
-	}
+    public void StartAllBinsScripts()
+    {
+        foreach (Bins bin in binsArray)
+        {
+            bin.StartScript();
+        }
+    }
 
-	public void StopAllBinsScripts()
-	{
-		foreach (Bins bin in binsArray)
-		{
-			bin.StopScript();
-		}
-	}
+    public void StopAllBinsScripts()
+    {
+        foreach (Bins bin in binsArray)
+        {
+            bin.StopScript();
+        }
+    }
+
+    public void StartScript()
+    {
+        StartAllBinsScripts();
+    }
+
+    public void StopScript()
+    {
+        StopAllBinsScripts();
+    }
 }

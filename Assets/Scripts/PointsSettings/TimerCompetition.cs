@@ -1,61 +1,60 @@
 using UnityEngine;
 using System.Collections;
-using TMPro;
 
 public class TimerCompetition : MonoBehaviour
 {
-	public static TimerCompetition instance;
-	public TMP_Text timerText;
-	private float timer = 0f;
-	private float timerStartDelay = 4f; // Depends on the countdown audio.
-	private bool isCounting = false;
+    public static TimerCompetition instance;
+    
+    private float currentTime = 0f;
+    private bool isRunning = false;
 
-	void Awake()
-	{
-		instance = this;
-		ResetTimer();
-	}
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
-	void Start()
-	{
-		this.enabled = false;
-	}
+    void Update()
+    {
+        if (isRunning)
+        {
+            currentTime += Time.deltaTime;
+            UpdateTimerUI();
+        }
+    }
 
-	void Update()
-	{
-		if (isCounting)
-		{
-			timer += Time.deltaTime;
+    public void StartTimer()
+    {
+        isRunning = true;
+        currentTime = 0f;
+    }
 
-			int minutes = Mathf.FloorToInt(timer / 60F);
-			int seconds = Mathf.FloorToInt(timer % 60F);
+    public void StopTimer()
+    {
+        isRunning = false;
+    }
 
-			timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-		}
-	}
+    public void ResetTimer()
+    {
+        isRunning = false;
+        currentTime = 0f;
+        UpdateTimerUI();
+    }
 
-	public void ResetTimer()
-	{
-		timer = 0f;
-		timerText.text = "00:00";
-	}
-
-	public void StartScript()
-	{
-		this.enabled = true; // Enable the script.
-		StartCoroutine(StartTimerWithDelay(timerStartDelay)); // Start coroutine with 4-second delay. 
-	}
-
-	public void StopScript()
-	{
-		ResetTimer();
-		isCounting = false;
-		this.enabled = false; // Disable the script.
-	}
-
-	private IEnumerator StartTimerWithDelay(float delay)
-	{
-		yield return new WaitForSeconds(delay); // Wait for the specified delay.
-		isCounting = true; // Start counting after the delay.
-	}
+    private void UpdateTimerUI()
+    {
+        if (SimulatorHUD.Instance != null)
+        {
+            int minutes = Mathf.FloorToInt(currentTime / 60F);
+            int seconds = Mathf.FloorToInt(currentTime % 60F);
+            string timeStr = string.Format("{0:00}:{1:00}", minutes, seconds);
+            SimulatorHUD.Instance.UpdateTimer(timeStr);
+        }
+    }
 }

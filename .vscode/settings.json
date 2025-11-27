@@ -69,5 +69,5 @@
         "editor.defaultFormatter": "ms-dotnettools.csharp",
         "editor.wordWrap": "wordWrapColumn"
     },
-    "dotnet.defaultSolution": "disable"
+    "dotnet.defaultSolution": "auv-sim-unity.slnx"
 }

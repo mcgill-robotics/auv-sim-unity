@@ -4,31 +4,27 @@ using TMPro;
 
 public class MessageBox : MonoBehaviour
 {
-	public static MessageBox instance;
-	public TMP_Text messageText;
+    public static MessageBox instance;
 
-	void Awake()
-	{
-		instance = this;
-		ResetMessage();
-	}
+    void Awake()
+    {
+        instance = this;
+    }
 
-	public void AddMessage(string newMessage)
-	{
-		messageText.text += newMessage + "\n";
-		AdjustHeightToFitContent();
-	}
+    public void AddMessage(string newMessage)
+    {
+        if (SimulatorHUD.Instance != null)
+        {
+            SimulatorHUD.Instance.Log(newMessage);
+        }
+        else
+        {
+            Debug.Log($"[MessageBox] {newMessage}");
+        }
+    }
 
-	void AdjustHeightToFitContent()
-	{
-		RectTransform rectTransform = messageText.GetComponent<RectTransform>();
-
-		float preferredHeight = messageText.preferredHeight;
-		rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, preferredHeight);
-	}
-
-	public void ResetMessage()
-	{
-		messageText.text = "";
-	}
+    public void ResetMessage()
+    {
+        // No-op for now as HUD log is persistent or handled by HUD
+    }
 }
