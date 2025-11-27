@@ -14,76 +14,77 @@ namespace RosMessageTypes.Auv
         public override string RosMessageName => k_RosMessageName;
 
         //  force with which to spin each thruster (N)
-        public double FRONT_LEFT;
-        public double FRONT_RIGHT;
-        public double BACK_LEFT;
-        public double BACK_RIGHT;
-        public double HEAVE_FRONT_LEFT;
-        public double HEAVE_FRONT_RIGHT;
-        public double HEAVE_BACK_LEFT;
-        public double HEAVE_BACK_RIGHT;
+        //  force with which to spin each thruster (N)
+        public double back_right;
+        public double heave_back_right;
+        public double heave_front_right;
+        public double front_right;
+        public double front_left;
+        public double heave_front_left;
+        public double heave_back_left;
+        public double back_left;
 
         public ThrusterForcesMsg()
         {
-            this.FRONT_LEFT = 0.0;
-            this.FRONT_RIGHT = 0.0;
-            this.BACK_LEFT = 0.0;
-            this.BACK_RIGHT = 0.0;
-            this.HEAVE_FRONT_LEFT = 0.0;
-            this.HEAVE_FRONT_RIGHT = 0.0;
-            this.HEAVE_BACK_LEFT = 0.0;
-            this.HEAVE_BACK_RIGHT = 0.0;
+            this.back_right = 0.0;
+            this.heave_back_right = 0.0;
+            this.heave_front_right = 0.0;
+            this.front_right = 0.0;
+            this.front_left = 0.0;
+            this.heave_front_left = 0.0;
+            this.heave_back_left = 0.0;
+            this.back_left = 0.0;
         }
 
-        public ThrusterForcesMsg(double FRONT_LEFT, double FRONT_RIGHT, double BACK_LEFT, double BACK_RIGHT, double HEAVE_FRONT_LEFT, double HEAVE_FRONT_RIGHT, double HEAVE_BACK_LEFT, double HEAVE_BACK_RIGHT)
+        public ThrusterForcesMsg(double back_right, double heave_back_right, double heave_front_right, double front_right, double front_left, double heave_front_left, double heave_back_left, double back_left)
         {
-            this.FRONT_LEFT = FRONT_LEFT;
-            this.FRONT_RIGHT = FRONT_RIGHT;
-            this.BACK_LEFT = BACK_LEFT;
-            this.BACK_RIGHT = BACK_RIGHT;
-            this.HEAVE_FRONT_LEFT = HEAVE_FRONT_LEFT;
-            this.HEAVE_FRONT_RIGHT = HEAVE_FRONT_RIGHT;
-            this.HEAVE_BACK_LEFT = HEAVE_BACK_LEFT;
-            this.HEAVE_BACK_RIGHT = HEAVE_BACK_RIGHT;
+            this.back_right = back_right;
+            this.heave_back_right = heave_back_right;
+            this.heave_front_right = heave_front_right;
+            this.front_right = front_right;
+            this.front_left = front_left;
+            this.heave_front_left = heave_front_left;
+            this.heave_back_left = heave_back_left;
+            this.back_left = back_left;
         }
 
         public static ThrusterForcesMsg Deserialize(MessageDeserializer deserializer) => new ThrusterForcesMsg(deserializer);
 
         private ThrusterForcesMsg(MessageDeserializer deserializer)
         {
-            deserializer.Read(out this.FRONT_LEFT);
-            deserializer.Read(out this.FRONT_RIGHT);
-            deserializer.Read(out this.BACK_LEFT);
-            deserializer.Read(out this.BACK_RIGHT);
-            deserializer.Read(out this.HEAVE_FRONT_LEFT);
-            deserializer.Read(out this.HEAVE_FRONT_RIGHT);
-            deserializer.Read(out this.HEAVE_BACK_LEFT);
-            deserializer.Read(out this.HEAVE_BACK_RIGHT);
+            deserializer.Read(out this.back_right);
+            deserializer.Read(out this.heave_back_right);
+            deserializer.Read(out this.heave_front_right);
+            deserializer.Read(out this.front_right);
+            deserializer.Read(out this.front_left);
+            deserializer.Read(out this.heave_front_left);
+            deserializer.Read(out this.heave_back_left);
+            deserializer.Read(out this.back_left);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
-            serializer.Write(this.FRONT_LEFT);
-            serializer.Write(this.FRONT_RIGHT);
-            serializer.Write(this.BACK_LEFT);
-            serializer.Write(this.BACK_RIGHT);
-            serializer.Write(this.HEAVE_FRONT_LEFT);
-            serializer.Write(this.HEAVE_FRONT_RIGHT);
-            serializer.Write(this.HEAVE_BACK_LEFT);
-            serializer.Write(this.HEAVE_BACK_RIGHT);
+            serializer.Write(this.back_right);
+            serializer.Write(this.heave_back_right);
+            serializer.Write(this.heave_front_right);
+            serializer.Write(this.front_right);
+            serializer.Write(this.front_left);
+            serializer.Write(this.heave_front_left);
+            serializer.Write(this.heave_back_left);
+            serializer.Write(this.back_left);
         }
 
         public override string ToString()
         {
             return "ThrusterForcesMsg: " +
-            "\nFRONT_LEFT: " + FRONT_LEFT.ToString() +
-            "\nFRONT_RIGHT: " + FRONT_RIGHT.ToString() +
-            "\nBACK_LEFT: " + BACK_LEFT.ToString() +
-            "\nBACK_RIGHT: " + BACK_RIGHT.ToString() +
-            "\nHEAVE_FRONT_LEFT: " + HEAVE_FRONT_LEFT.ToString() +
-            "\nHEAVE_FRONT_RIGHT: " + HEAVE_FRONT_RIGHT.ToString() +
-            "\nHEAVE_BACK_LEFT: " + HEAVE_BACK_LEFT.ToString() +
-            "\nHEAVE_BACK_RIGHT: " + HEAVE_BACK_RIGHT.ToString();
+            "\nback_right: " + back_right.ToString() +
+            "\nheave_back_right: " + heave_back_right.ToString() +
+            "\nheave_front_right: " + heave_front_right.ToString() +
+            "\nfront_right: " + front_right.ToString() +
+            "\nfront_left: " + front_left.ToString() +
+            "\nheave_front_left: " + heave_front_left.ToString() +
+            "\nheave_back_left: " + heave_back_left.ToString() +
+            "\nback_left: " + back_left.ToString();
         }
 
 #if UNITY_EDITOR

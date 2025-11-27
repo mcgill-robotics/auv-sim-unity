@@ -6,3 +6,5 @@
 *.tif binary
 *.asset text
 *.unity text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
