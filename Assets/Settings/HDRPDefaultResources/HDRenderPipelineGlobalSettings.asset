@@ -302,8 +302,8 @@ MonoBehaviour:
           materialQuality: 0
         m_RealtimeReflection:
           bitDatas:
-            data1: 4638910381585229
-            data2: 12898310333516513304
+            data1: 4638910381577037
+            data2: 12898309921199652888
           lodBias: 1
           lodBiasMode: 0
           lodBiasQualityLevel: 0

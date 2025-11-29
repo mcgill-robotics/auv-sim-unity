@@ -3,13 +3,28 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class UnderwaterCameraEffect : MonoBehaviour
 {
-	public LayerMask waterLayers;
-	public Shader shader;
+    [Header("Water Detection")]
+    [Tooltip("Layer mask for water surfaces to detect submersion")]
+    public LayerMask waterLayers;
+    
+    [Tooltip("Shader for underwater depth effect rendering")]
+    public Shader shader;
 
-	[Header("Depth Effect")]
-	public Color depthColor = new Color(0, 0.42f, 0.87f);
-	public float depthStart = -12, depthEnd = 98;
-	public LayerMask depthLayers = ~0; // All layers selected by default.
+    [Space(10)]
+    [Header("Underwater Depth Effect")]
+    [Tooltip("Color tint applied at maximum depth")]
+    public Color depthColor = new Color(0, 0.42f, 0.87f);
+    
+    [Tooltip("Distance (m) where depth effect starts")]
+    [Range(-50f, 0f)]
+    public float depthStart = -12f;
+    
+    [Tooltip("Distance (m) where depth effect reaches maximum")]
+    [Range(0f, 200f)]
+    public float depthEnd = 98f;
+    
+    [Tooltip("Layer mask for objects affected by depth rendering")]
+    public LayerMask depthLayers = ~0; // All layers selected by default.
 
 	Camera cam, depthCam;
 	RenderTexture depthTexture, colourTexture;

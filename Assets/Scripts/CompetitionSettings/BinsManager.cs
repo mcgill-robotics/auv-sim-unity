@@ -15,7 +15,7 @@ public class BinsManager : MonoBehaviour, ICompetitionTask
 
     void Start()
     {
-        binsArray = FindObjectsOfType<Bins>();
+        binsArray = FindObjectsByType<Bins>(FindObjectsSortMode.None);
     }
 
     public void StartAllBinsScripts()

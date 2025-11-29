@@ -8,30 +8,86 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 public class VisualizeAUVBeliefs : MonoBehaviour
 {
+    [Header("AUV Visualization")]
+    [Tooltip("GameObject representing the AUV's estimated pose from ROS state")]
     public GameObject dianaVisualization;
+    
+    [Space(10)]
+    [Header("Lane Marker Visualizations")]
+    [Tooltip("Lane marker 1 start position visualization")]
     public GameObject laneMarker1FromVisualization;
+    
+    [Tooltip("Lane marker 1 end position visualization")]
     public GameObject laneMarker1ToVisualization;
+    
+    [Tooltip("Lane marker 2 start position visualization")]
     public GameObject laneMarker2FromVisualization;
+    
+    [Tooltip("Lane marker 2 end position visualization")]
     public GameObject laneMarker2ToVisualization;
+    
+    [Space(10)]
+    [Header("Task Object Visualizations")]
+    [Tooltip("Gate object visualization from object map")]
     public GameObject gateVisualization;
+    
+    [Tooltip("Buoy object visualization from object map")]
     public GameObject buoyVisualization;
+    
+    [Tooltip("Octagon table visualization from object map")]
     public GameObject octagonTableVisualization;
-    public GameObject abydosSymbol1Visualization;
-    public GameObject abydosSymbol2Visualization;
-    public GameObject earthSymbol1Visualization;
-    public GameObject earthSymbol2Visualization;
-    public GameObject detectionIndicatorPrefab;
-    public GameObject trueBearingPinger1;
-    public GameObject trueBearingPinger2;
-    public GameObject trueBearingPinger3;
-    public GameObject trueBearingPinger4;
-    public GameObject expectedBearingPinger1;
-    public GameObject expectedBearingPinger2;
-    public GameObject expectedBearingPinger3;
-    public GameObject expectedBearingPinger4;
+    
+    [Tooltip("Bin object visualization from object map")]
     public GameObject binVisualization;
-
+    
+    [Space(5)]
+    [Tooltip("Abydos symbol 1 visualization from object map")]
+    public GameObject abydosSymbol1Visualization;
+    
+    [Tooltip("Abydos symbol 2 visualization from object map")]
+    public GameObject abydosSymbol2Visualization;
+    
+    [Tooltip("Earth symbol 1 visualization from object map")]
+    public GameObject earthSymbol1Visualization;
+    
+    [Tooltip("Earth symbol 2 visualization from object map")]
+    public GameObject earthSymbol2Visualization;
+    
+    [Space(10)]
+    [Header("Detection Indicators")]
+    [Tooltip("Prefab for instantiating detection frame indicators")]
+    public GameObject detectionIndicatorPrefab;
+    
+    [Tooltip("Maximum number of detection frame indicators before reusing")]
+    [Range(1, 50)]
     public int maxDetectionFrameIndicators = 10;
+    
+    [Space(10)]
+    [Header("Pinger Bearing Visualizations")]
+    [Tooltip("True bearing line for pinger 1")]
+    public GameObject trueBearingPinger1;
+    
+    [Tooltip("True bearing line for pinger 2")]
+    public GameObject trueBearingPinger2;
+    
+    [Tooltip("True bearing line for pinger 3")]
+    public GameObject trueBearingPinger3;
+    
+    [Tooltip("True bearing line for pinger 4")]
+    public GameObject trueBearingPinger4;
+    
+    [Space(5)]
+    [Tooltip("Expected bearing line for pinger 1 from ROS estimate")]
+    public GameObject expectedBearingPinger1;
+    
+    [Tooltip("Expected bearing line for pinger 2 from ROS estimate")]
+    public GameObject expectedBearingPinger2;
+    
+    [Tooltip("Expected bearing line for pinger 3 from ROS estimate")]
+    public GameObject expectedBearingPinger3;
+    
+    [Tooltip("Expected bearing line for pinger 4 from ROS estimate")]
+    public GameObject expectedBearingPinger4;
     private int currentIndex = 0;
 
     private ROSConnection roscon;
