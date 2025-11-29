@@ -20,7 +20,7 @@ MonoBehaviour:
       bakeScene: 1
       bounds:
         m_Center: {x: 0, y: 0, z: 0}
-        m_Extent: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 243, y: 243, z: 243}
   singleSceneMode: 1
   dialogNoProbeVolumeInSetShown: 1
   settings:
@@ -48,7 +48,9 @@ MonoBehaviour:
   cellDescs:
     m_Keys: 
     m_Values: []
-  m_SerializedPerSceneCellList: []
+  m_SerializedPerSceneCellList:
+  - sceneGUID: 43be4edadbccf3a40b4e2605973bb089
+    cellList: 
   cellSharedDataAsset:
     m_AssetGUID: 
     m_StreamableAssetPath: 
@@ -113,7 +115,7 @@ MonoBehaviour:
   version: 2
   freezePlacement: 0
   probeOffset: {x: 0, y: 0, z: 0}
-  simplificationLevels: 3
+  simplificationLevels: 4
   minDistanceBetweenProbes: 1
   renderersLayerMask:
     serializedVersion: 2

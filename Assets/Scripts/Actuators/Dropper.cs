@@ -6,6 +6,8 @@ using RosMessageTypes.Std;
 
 public class Dropper : MonoBehaviour
 {
+    [Header("Dropper Configuration")]
+    [Tooltip("The sphere GameObject to drop when triggered")]
     public GameObject sphere;
 
     private ROSConnection roscon;

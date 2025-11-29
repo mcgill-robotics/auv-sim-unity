@@ -5,7 +5,12 @@ using RosMessageTypes.Std;
 public class CameraPublisher : ROSPublisher
 {
     public enum CameraType { Front, Down }
+    
+    [Header("Camera Configuration")]
+    [Tooltip("Camera type determines which settings and topic to use")]
     public CameraType cameraType;
+    
+    [Tooltip("Unity Camera component to capture from. Must have a target RenderTexture")]
     public Camera cam;
 
 
@@ -26,6 +31,9 @@ public class CameraPublisher : ROSPublisher
 
     protected override void Start()
     {
+        // Disable automatic rendering to save performance
+        if (cam != null) cam.enabled = false;
+        
         // Disable front camera ROS publishing if ZED streaming is active
         if (cameraType == CameraType.Front && 
             SimulationSettings.Instance != null && 
@@ -39,9 +47,6 @@ public class CameraPublisher : ROSPublisher
         base.Start();
         InitializeTexture();
         InitializeCameraInfo();
-        
-        // Disable automatic rendering to save performance
-        if (cam != null) cam.enabled = false;
     }
 
     protected override void RegisterPublisher()

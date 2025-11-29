@@ -30,7 +30,7 @@
                 <ui:Label text="x" style="align-self: center; color: rgb(180, 180, 180); margin-top: 5px;" />
                 <ui:IntegerField name="Input-DownH" value="480" style="flex-grow: 1; margin-left: 2px;" />
             </ui:VisualElement>
-            <ui:DropdownField name="Dropdown-Quality" label="GFX Quality" choices="Low,Medium,High,Ultra" index="2" class="margin-top-small" />
+            <ui:DropdownField name="Dropdown-Quality" label="GFX Quality" choices="Ultra,High,Medium,Low" index="3" class="margin-top-small" />
             <ui:Button name="Btn-Save" text="APPLY CONFIGURATION" class="mcgill-button" style="margin-top: 15px;" />
         </ui:ScrollView>
         <ui:VisualElement name="KeybindsPanel" class="panel bottom-left-panel" style="width: 351px; height: 210px; top: 850px; bottom: 21px; left: 20px;">

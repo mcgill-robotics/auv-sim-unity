@@ -12,13 +12,22 @@ public class SimulatorHUD : MonoBehaviour
 {
     public static SimulatorHUD Instance { get; private set; }
 
-    [Header("Configuration")]
+    [Header("UI Configuration")]
+    [Tooltip("Reference to the UI Toolkit UIDocument component")]
     public UIDocument uiDocument;
 
-    [Header("Camera Sources")]
+    [Space(10)]
+    [Header("Camera Sources for HUD Display")]
+    [Tooltip("Front-left camera for stereo display")]
     public Camera frontLeftCamera;
+    
+    [Tooltip("Front-right camera for stereo display")]
     public Camera frontRightCamera;
+    
+    [Tooltip("Downward-facing camera")]
     public Camera downCamera;
+    
+    [Tooltip("Depth camera publisher for viewing depth feed in HUD")]
     public CameraDepthPublisher depthPublisher;
 
     // UI Elements - Settings
@@ -141,6 +150,7 @@ public class SimulatorHUD : MonoBehaviour
         if (ros != null)
         {
             SubscribeToTelemetry();
+            UpdateROSConnectionState(); // Ensure connection state matches settings
         }
 
         // Wait for end of frame to ensure other scripts (CameraPublisher, ZED2iSimSender)
@@ -200,9 +210,41 @@ public class SimulatorHUD : MonoBehaviour
         
         SimulationSettings.Instance.QualityLevel = dropdownQuality.index;
         QualitySettings.SetQualityLevel(SimulationSettings.Instance.QualityLevel);
+        
+        // Update Thrusters cached quality level
+        var thrusters = FindFirstObjectByType<Thrusters>();
+        if (thrusters != null)
+        {
+            thrusters.UpdateQualityLevel(SimulationSettings.Instance.QualityLevel);
+        }
 
         SimulationSettings.Instance.SaveSettings();
         Log("Configuration Saved.");
+
+        UpdateROSConnectionState();
+    }
+
+    private void UpdateROSConnectionState()
+    {
+        if (ros != null)
+        {
+            if (SimulationSettings.Instance.PublishROS)
+            {
+                if (!ros.HasConnectionThread)
+                {
+                    ros.Connect(ros.RosIPAddress, ros.RosPort);
+                    Log("Connecting to ROS...");
+                }
+            }
+            else
+            {
+                if (ros.HasConnectionThread)
+                {
+                    ros.Disconnect();
+                    Log("Disconnected from ROS.");
+                }
+            }
+        }
     }
 
     // --- Telemetry Logic ---

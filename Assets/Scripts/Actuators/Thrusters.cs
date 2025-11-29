@@ -5,17 +5,43 @@ using RosMessageTypes.Auv;
 
 public class Thrusters : MonoBehaviour
 {
+    [Header("Manual Control Forces")]
+    [Tooltip("Force (N) applied per thruster when sinking (Q key)")]
+    [Range(1f, 100f)]
     public float sinkForce = 30f;
+    
+    [Tooltip("Force (N) applied per thruster when floating (E key)")]
+    [Range(1f, 50f)]
     public float floatForce = 12f;
+    
+    [Tooltip("Force (N) applied per thruster for forward/backward movement (WASD)")]
+    [Range(1f, 50f)]
     public float moveForce = 15f;
+    
+    [Tooltip("Force (N) applied per thruster for rotation (IJKL/UO)")]
+    [Range(0.1f, 10f)]
     public float rotationForce = 1.0f;
+    
+    [Space(10)]
+    [Header("Thruster Configuration")]
+    [Tooltip("Array of thruster transforms (8 total: 4 horizontal, 4 vertical)")]
     public Transform[] thrusters;
+    
+    [Tooltip("Particle systems for each thruster (visual feedback)")]
     public ParticleSystem[] thrusterParticles;
+    
+    [Tooltip("Real-to-sim force scaling factor. Higher = more sensitive to ROS commands")]
+    [Range(1f, 10f)]
     public float AUVRealForceMultiplier = 3;
     
-    [Header("Visualization")]
+    [Space(10)]
+    [Header("Force Visualization")]
+    [Tooltip("Show 3D arrows indicating thruster force direction and magnitude")]
     public bool enableForceVisualization = true;
-    public float forceVisualScale = 0.02f; // Adjusted for 3D object scale
+    
+    [Tooltip("Scale factor for arrow length (magnitude visualization)")]
+    [Range(0.001f, 0.1f)]
+    public float forceVisualScale = 0.02f;
     
     private GameObject[] arrowInstances;
 
@@ -28,6 +54,9 @@ public class Thrusters : MonoBehaviour
     
     // Pre-calculated force multipliers
     private float moveForceOver4, moveForceOver2, sinkForceOver4, floatForceOver4, rotationForceOver4;
+    
+    // Cached quality level to avoid repeated calls
+    private int cachedQualityLevel;
 
     private void Start()
     {
@@ -43,6 +72,14 @@ public class Thrusters : MonoBehaviour
         rotationForceOver4 = rotationForce / 4;
 
         InitializeArrows();
+        
+        // Cache quality level
+        cachedQualityLevel = QualitySettings.GetQualityLevel();
+    }
+    
+    public void UpdateQualityLevel(int newQualityLevel)
+    {
+        cachedQualityLevel = newQualityLevel;
     }
 
     private void InitializeArrows()
@@ -109,7 +146,7 @@ public class Thrusters : MonoBehaviour
             bool hasForce = Math.Abs(thrusterForceMagnitude) > 0.01f;
 
             // Particles
-            if (hasForce && QualitySettings.GetQualityLevel() < 2)
+            if (hasForce && cachedQualityLevel < 2)
             {
                 if (!thrusterParticles[i].isPlaying) thrusterParticles[i].Play();
             }
