@@ -1,22 +1,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 using UnityEngine.UI;
 using TMPro;
 
 public class FreeCameraController : MonoBehaviour
 {
-    [Header("Camera Settings")]
+    [Header("Camera Reference")]
+    [Tooltip("Camera component to control. Auto-assigned if null")]
     public Camera cam;
-    [Tooltip("Speed of camera movement when dragging")]
+    
+    [Space(10)]
+    [Header("Movement Settings")]
+    [Tooltip("Speed of camera movement when panning (middle mouse drag)")]
+    [Range(0.1f, 10f)]
     public float moveSpeed = 2.5f;
-    [Tooltip("Speed of rotation around X axis")]
+    
+    [Space(5)]
+    [Tooltip("Speed of rotation around X axis (up/down)")]
+    [Range(50f, 1000f)]
     public float xRotateSpeed = 400f;
-    [Tooltip("Speed of rotation around Y axis")]
+    
+    [Tooltip("Speed of rotation around Y axis (left/right). Negative inverts direction")]
+    [Range(-1000f, 1000f)]
     public float yRotateSpeed = -400f;
+    
+    [Space(5)]
     [Tooltip("Speed of zooming with scroll wheel")]
+    [Range(1f, 20f)]
     public float scrollSpeed = 6f;
-    [Tooltip("Default distance to pivot if no object is under mouse")]
+    
+    [Tooltip("Default pivot distance (m) when no object is under mouse cursor")]
+    [Range(1f, 50f)]
     public float defaultPivotDistance = 5f;
 
     private bool isDragging = false;
@@ -93,27 +109,22 @@ public class FreeCameraController : MonoBehaviour
 
     private bool IsMouseOverUI()
     {
-        if (EventSystem.current == null) return false;
-
-        PointerEventData eventData = new PointerEventData(EventSystem.current)
+        // UI Toolkit detection
+        var hudDocument = SimulatorHUD.Instance?.uiDocument;
+        if (hudDocument != null && hudDocument.rootVisualElement != null)
         {
-            position = Input.mousePosition
-        };
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-
-        foreach (RaycastResult result in results)
-        {
-            // Check for specific UI elements that should block camera control
-            if (result.gameObject.GetComponentInParent<TMP_Dropdown>() != null ||
-                result.gameObject.GetComponentInParent<ScrollRect>() != null ||
-                result.gameObject.GetComponentInParent<InputField>() != null ||
-                result.gameObject.GetComponentInParent<TMP_InputField>() != null)
+            var panelPosition = RuntimePanelUtils.ScreenToPanel(
+                hudDocument.rootVisualElement.panel,
+                new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y)
+            );
+            
+            var pickedElement = hudDocument.rootVisualElement.panel.Pick(panelPosition);
+            if (pickedElement != null && pickedElement != hudDocument.rootVisualElement)
             {
-                return true;
+                return true; // Mouse is over a UI element
             }
         }
+        
         return false;
     }
 

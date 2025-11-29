@@ -7,13 +7,27 @@ public class StatePublisher : ROSPublisher
 {
     protected override string Topic => ROSSettings.Instance.StateTopic;
 
+    [Header("Physical Setup")]
+    [Tooltip("AUV root GameObject for transform data")]
     public GameObject auv;
+    
+    [Tooltip("AUV Rigidbody for velocity and acceleration data")]
     public Rigidbody auvRb;
 
+    [Space(10)]
+    [Header("Hydrophone System")]
+    [Tooltip("Reference to pinger time difference calculator. Leave empty to disable hydrophone data publishing")]
     [SerializeField] private PingerTimeDifference pingerTimeDifference;
     private UnityStateMsg stateMsg;
     private Vector3 lastVelocity;
     private int numberOfPingers = 4;
+    
+    // Reusable arrays to avoid per-frame allocations
+    private int[] frequencies;
+    private uint[][] times;
+    
+    // Cached quaternion to avoid per-frame allocation
+    private static readonly Quaternion rotationOffset = Quaternion.Euler(0f, 90f, 0f);
 
     protected override void Start()
     {
@@ -26,6 +40,10 @@ public class StatePublisher : ROSPublisher
         
         stateMsg = new UnityStateMsg();
         lastVelocity = auvRb.linearVelocity;
+        
+        // Initialize reusable arrays
+        frequencies = new int[numberOfPingers];
+        times = new uint[numberOfPingers][];
     }
 
     protected override void RegisterPublisher()
@@ -42,7 +60,7 @@ public class StatePublisher : ROSPublisher
         stateMsg.position = auv.transform.position.To<RUF>();
         stateMsg.position.y *= -1; // Convert to depth
 
-        Quaternion rotation = auv.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
+        Quaternion rotation = auv.transform.rotation * rotationOffset;
         stateMsg.orientation = rotation.To<NED>();
         stateMsg.angular_velocity = auvRb.angularVelocity.To<RUF>();
         stateMsg.velocity = currentVelocity.To<RUF>();
@@ -57,8 +75,7 @@ public class StatePublisher : ROSPublisher
         // Pinger data
         if (pingerTimeDifference != null)
         {
-            int[] frequencies = new int[numberOfPingers];
-            uint[][] times = new uint[numberOfPingers][];
+            // Reuse existing arrays
             for (int i = 0; i < numberOfPingers; i++)
             {
                 (times[i], frequencies[i]) = pingerTimeDifference.CalculateTimeDifference(i);

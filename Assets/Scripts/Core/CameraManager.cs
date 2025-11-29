@@ -5,7 +5,10 @@ public class CameraManager : MonoBehaviour
     public static CameraManager Instance { get; private set; }
 
     [Header("User Cameras")]
+    [Tooltip("Free roam camera GameObject (toggle with C key)")]
     public GameObject freeCam;
+    
+    [Tooltip("Follow camera GameObject that tracks the AUV (toggle with C key)")]
     public GameObject followCam;
 
     private void Awake()

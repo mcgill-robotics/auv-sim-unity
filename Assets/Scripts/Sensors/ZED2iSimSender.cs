@@ -7,29 +7,45 @@ using Unity.Collections.LowLevel.Unsafe;
 
 public class ZED2iSimSender : MonoBehaviour
 {
-    [Header("ZED Streaming Settings")]
+    [Header("ZED Streaming Configuration")]
+    [Tooltip("Port for ZED SDK local streaming connection")]
+    [Range(1024, 65535)]
     public int streamPort = 30000;
+    
+    [Tooltip("ZED camera serial number identifier")]
     public int serialNumber = 41116066; // ZED X Serial
+    
+    [Tooltip("Target streaming framerate (Hz). Will be clamped by ZED SDK limits")]
+    [Range(1, 60)]
     public int targetFPS = 30;
 
-    [Header("Unity Sensors")]
+    [Space(10)]
+    [Header("Camera References")]
     [Tooltip("Assign THIS GameObject (Left Camera) here")]
     public Camera leftCamera;
+    
     [Tooltip("Assign the Right Camera GameObject here")]
     public Camera rightCamera;
 
-    [Header("Axis Tuning")]
-    // Based on previous logs: 
-    // Unity Right Turn (+Y) -> ZED Right Turn (+Y). 
-    // We Invert Y to map LHS to RHS correctly for the ZED Bridge.
-    public bool invertRotY = true; 
-    public bool invertRotX = true;
-    public bool invertRotZ = true; 
+    [Space(10)]
+    [Header("Coordinate System Mapping")]
+    [Tooltip("Invert rotation Y axis to convert Unity LHS to ZED RHS")]
+    public bool invertRotY = true;
     
-    // Unity Static = +9.81 Y. Bridge flips Y internally.
-    // We send +9.81 (False). It arrives as -9.81. SDK is happy.
-    public bool invertAccelY = false; 
+    [Tooltip("Invert rotation X axis")]
+    public bool invertRotX = true;
+    
+    [Tooltip("Invert rotation Z axis")]
+    public bool invertRotZ = true;
+    
+    [Space(5)]
+    [Tooltip("Invert acceleration Y axis. Unity static = +9.81 Y, Bridge flips Y internally, so we send +9.81 (False)")]
+    public bool invertAccelY = false;
+    
+    [Tooltip("Invert acceleration X axis")]
     public bool invertAccelX = false;
+    
+    [Tooltip("Invert acceleration Z axis")]
     public bool invertAccelZ = false;
 
     // Camera settings are loaded from SimulationSettings
@@ -87,6 +103,11 @@ public class ZED2iSimSender : MonoBehaviour
 
     void Start()
     {
+
+        // Disable automatic rendering
+        if (leftCamera != null) leftCamera.enabled = false;
+        if (rightCamera != null) rightCamera.enabled = false;
+        
         // Check if ZED streaming is enabled in settings
         if (SimulationSettings.Instance != null && !SimulationSettings.Instance.StreamZEDCamera)
         {
@@ -116,10 +137,6 @@ public class ZED2iSimSender : MonoBehaviour
         // rb = GetComponentInParent<Rigidbody>();
 
         InitializeCameraCapture();
-        
-        // Disable automatic rendering
-        // if (leftCamera != null) leftCamera.enabled = false;
-        // if (rightCamera != null) rightCamera.enabled = false;
 
         StartCoroutine(InitializeNativeStreamer());
     }
@@ -172,12 +189,12 @@ public class ZED2iSimSender : MonoBehaviour
     {
         while (isStreaming)
         {
-            // yield return new WaitForSeconds(1.0f / targetFPS);
+            yield return new WaitForSeconds(1.0f / targetFPS);
             yield return waitForEndOfFrame;
 
             // Manual Render
-            // if (leftCamera) leftCamera.Render();
-            // if (rightCamera) rightCamera.Render();
+            if (leftCamera) leftCamera.Render();
+            if (rightCamera) rightCamera.Render();
 
             // --- 1. Flip Images ---
             // Ensure flipRT is created

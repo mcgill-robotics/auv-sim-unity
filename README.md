@@ -224,6 +224,34 @@ The simulator communicates over the following default topics (configurable in `R
 *   `/auv/thruster_forces`: Individual thruster commands (Newtons).
 *   `/auv/dropper`: Bool trigger for the dropper mechanism.
 
+## Roadmap & TODO
+
+**Priority 1: Sensor Verification**
+*   [ ] **Sensor Validation:** Rigorously test all sensor outputs (DVL, IMU, Depth) against Unity ground truth.
+*   [ ] **Frame of Reference:** Verify that all coordinate conversions (Unity Left-Handed --> ROS FLU) are mathematically correct.
+*   [ ] **Frame IDs:** Ensure `frame_id` fields in ROS messages match the TF tree expected by the ROS stack.
+
+**Priority 2: Critical Fixes**
+*   [ ] **ZED Bridge IMU:** Fix the IMU data transformation in `ZED2iSimSender`. Currently, sending rotational data breaks the ZED SDK's positional tracking loop.
+
+**Priority 3: Usability & Workflow**
+*   [ ] **Modular Camera Modes:** Implement presets in `SimulationSettings` to quickly toggle specific configurations:
+    *   Down-Cam only (navigation testing).
+    *   Front-Left only (YOLO/Object detection).
+    *   Stereo Front (VIO/SLAM).
+
+**Priority 4: Competition Logic**
+*   [ ] **Task State Machines:** Finalize the internal logic for individual tasks (Gate, Buoy, Bins, Octagon).
+*   [ ] **End-to-End Workflow:** Validate the full competition run flow via `CompetitionManager`, ensuring tasks reset and score correctly.
+
+**Priority 5: Integration**
+*   [ ] **ROS Integration:** Audit `ROSSettings.cs` against the external ROS 2 codebase. Ensure all topic strings and message definitions match exactly.
+
+**Priority 6: Documentation**
+*   [ ] **Architecture:** Document the new UI Toolkit structure (`.uxml`, `.uss`, and bindings) and the Core Manager pattern.
+*   [ ] **Sensor Models:** Document the math behind the DVL acoustics simulation and IMU noise models.
+*   [ ] **Setup Guide:** specific instructions for configuring the Unity 6 environment.
+
 ## Directory Structure
 
 *   **Assets/Scripts/Core:** Managers and Singletons.
