@@ -15,6 +15,11 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
 *   Implemented native ZED X camera streaming via `ZED2iSimSender` to interface directly with the ZED SDK Bridge.
 *   Refactored sensor architecture into a modular `ROSPublisher` inheritance system.
 *   Centralized configuration via singleton Managers.
+*   Stochastic Sensor Simulation: Implemented realistic noise models for sensors.
+    *   IMU: Gauss-Markov bias instability and white noise models.
+    *   DVL: 4-beam Janus configuration, acoustic raycasting, grazing angle checks, and outlier simulation.
+*   Debug Visualization: Added 3D debug arrows (LineRenderers) for visualizing sensor data (DVL beams, Velocity, Acceleration) in the Scene view.
+*   Refactored Project Structure: Moved all custom scripts into `_Project/` for cleaner organization.
 
 **Known Issues:**
 *   **ZED IMU:** Rotational data sent to the ZED Bridge currently causes tracking instability.
@@ -130,8 +135,15 @@ All sensors inherit from the abstract `ROSPublisher` class. This base class hand
 *   Standardized `FixedUpdate` loops for physics consistency.
 
 **Implemented Sensors:**
-*   **DVL:** Publishes `VelocityReportMsg` (Surge/Sway/Heave velocities and Altitude).
-*   **IMU:** Publishes `ImuMsg` with simulated noise and bias models.
+*   **DVL:** Publishes `VelocityReportMsg`.
+    *   Simulates A50 4-beam Janus geometry (22.5° tilt).
+    *   Models acoustic lock loss due to pitch/roll (grazing angles) and minimum altitude.
+    *   Includes Gauss-Markov bias drift and random outliers.
+*   **IMU:** Publishes `ImuMsg`.
+    *   Simulates "Proper Acceleration" (Gravity subtraction).
+    *   Includes Lever Arm effects (centripetal force) based on mounting position.
+    *   Models Bias Instability (Random Walk) for Gyro and Accel.
+    *   Supports "Raw Mode" (no orientation) or "AHRS Mode" (noisy orientation) for EKF testing.
 *   **Cameras:** `CameraPublisher` and `CameraDepthPublisher` utilize RenderTextures and Compute Shaders to efficiently output RGB and 32-bit float Depth images.
 *   **ZED X:** Uses `ZED2iSimSender` and native plugins (`libsl_zed.so` / `sl_zed64.dll`) to emulate the ZED hardware stream directly.
 
@@ -253,12 +265,13 @@ The simulator communicates over the following default topics (configurable in `R
 *   [ ] **Setup Guide:** specific instructions for configuring the Unity 6 environment.
 
 ## Directory Structure
-
-*   **Assets/Scripts/Core:** Managers and Singletons.
-*   **Assets/Scripts/Sensors:** ROS publishing logic and ZED interface.
-*   **Assets/Scripts/Actuators:** Thrusters and physical manipulators.
-*   **Assets/Scripts/Physics:** Hydrodynamics and buoyancy.
-*   **Assets/Scripts/UI:** UI Toolkit scripts and view logic.
-*   **Assets/Scripts/CompetitionSettings:** Task-specific logic and scoring.
+*   **Assets/_Project:** Contains all custom simulator code and assets.
+    *   **Scripts/Core:** Managers and Singletons.
+    *   **Scripts/Sensors:** ROS publishing logic and ZED interface.
+    *   **Scripts/Actuators:** Thrusters and physical manipulators.
+    *   **Scripts/Physics:** Hydrodynamics and buoyancy.
+    *   **Scripts/UI:** UI Toolkit scripts and view logic.
+    *   **Scripts/CompetitionSettings:** Task-specific logic and scoring.
+    *   **UI:** `.uxml` layouts and `.uss` stylesheets.
+*   **Assets/3rdParty:** External assets (SkySeries, TextMesh Pro).
 *   **Assets/RosMessages:** Generated C# classes for ROS messages.
-*   **Assets/UI:** `.uxml` layouts and `.uss` stylesheets.
