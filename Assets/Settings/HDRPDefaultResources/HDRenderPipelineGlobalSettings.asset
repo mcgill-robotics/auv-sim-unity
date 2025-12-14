@@ -287,7 +287,7 @@ MonoBehaviour:
         m_CustomOrBakedReflection:
           bitDatas:
             data1: 4643523019153229
-            data2: 12898309406071980048
+            data2: 12898309440431718416
           lodBias: 1
           lodBiasMode: 0
           lodBiasQualityLevel: 0
@@ -332,7 +332,7 @@ MonoBehaviour:
         asm: Unity.RenderPipelines.HighDefinition.Runtime}
       data:
         m_Version: 0
-        m_VolumeProfile: {fileID: 11400000, guid: 84084913255b19c8e97f9d92cfa6cdbe,
+        m_VolumeProfile: {fileID: 11400000, guid: 302e77519d4d43a28bc75aeee7035089,
           type: 2}
     - rid: 8472889991648248057
       type: {class: HDRPRayTracingResources, ns: UnityEngine.Rendering.HighDefinition,
@@ -453,7 +453,7 @@ MonoBehaviour:
         asm: Unity.RenderPipelines.HighDefinition.Runtime}
       data:
         m_Version: 0
-        m_VolumeProfile: {fileID: 11400000, guid: 102017702da1198bab40782b3ab25385,
+        m_VolumeProfile: {fileID: 11400000, guid: 5fc45568e7e613a53920205cd9ce3368,
           type: 2}
     - rid: 8472889991648248062
       type: {class: HDRenderPipelineEditorShaders, ns: UnityEngine.Rendering.HighDefinition,
