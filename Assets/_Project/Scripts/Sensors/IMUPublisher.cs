@@ -7,7 +7,7 @@ using Utils;
 
 public class IMUPublisher : ROSPublisher
 {
-    protected override string Topic => ROSSettings.Instance.IMUTopic;
+    public override string Topic => ROSSettings.Instance.IMUTopic;
 
     [Header("Physical Setup")]
     [Tooltip("AUV Rigidbody - used to calculate point velocity and acceleration at sensor location")]
@@ -114,9 +114,11 @@ public class IMUPublisher : ROSPublisher
         gyroBias = new GaussMarkovVector(gyroBiasCorrelationTime, gyroBiasSigma, dt);
         accelBias = new GaussMarkovVector(accelBiasCorrelationTime, accelBiasSigma, dt);
         
-        if (enableVisualization)
+        // Always setup visualization objects (so they can be toggled at runtime)
+        SetupVisualization();
+        if (visualizationRoot != null)
         {
-            SetupVisualization();
+            visualizationRoot.SetActive(enableVisualization);
         }
     }
 
@@ -223,21 +225,41 @@ public class IMUPublisher : ROSPublisher
 
     protected override void FixedUpdate()
     {
-        if (!SimulationSettings.Instance.PublishIMU || auvRb == null) return;
+        if (auvRb == null) return;
         
-        // Update bias models every physics step
+        // Bias models must update every physics step for accurate simulation
         gyroBias.Step();
         accelBias.Step();
         
-        PublishMessage();
+        // Always simulate sensor for visualization (updates LastAcceleration, LastAngularVelocity, etc.)
+        SimulateSensor();
         
+        // Only publish to ROS if enabled
+        if (SimulationSettings.Instance.PublishIMU && SimulationSettings.Instance.PublishROS)
+        {
+            // Let base class handle publish rate timing
+            base.FixedUpdate();
+        }
+        
+        // Update visualization every frame regardless of publish rate
         if (enableVisualization && visualizationRoot != null)
         {
             UpdateVisualization();
         }
     }
 
-    protected override void PublishMessage()
+    public override void PublishMessage()
+    {
+        // Timestamp and publish the pre-calculated message
+        imuMsg.header.stamp = ROSClock.GetROSTimestamp();
+        ros.Publish(Topic, imuMsg);
+    }
+    
+    /// <summary>
+    /// Simulate the IMU sensor: calculate acceleration, angular velocity, orientation.
+    /// This runs independently of ROS publishing for visualization support.
+    /// </summary>
+    private void SimulateSensor()
     {
         float dt = Time.fixedDeltaTime;
 
@@ -296,12 +318,9 @@ public class IMUPublisher : ROSPublisher
             imuMsg.orientation = new QuaternionMsg { x = 0, y = 0, z = 0, w = 0 };
         }
 
-        // 4. Populate message
+        // 4. Populate message (ready for publishing)
         imuMsg.linear_acceleration = noisyAccel.To<FLU>();
         imuMsg.angular_velocity = noisyAngVel.To<FLU>();
-        imuMsg.header.stamp = ROSClock.GetROSTimestamp();
-
-        ros.Publish(Topic, imuMsg);
     }
 
     private void SetCovarianceMatrices()
@@ -407,6 +426,17 @@ public class IMUPublisher : ROSPublisher
         
         // Toggle visualization
         if (visualizationRoot != null) visualizationRoot.SetActive(enableVisualization);
+    }
+    
+    /// <summary>
+    /// Sets the visualization GameObject active state. Called by UI toggles.
+    /// </summary>
+    public void SetVisualizationActive(bool active)
+    {
+        if (visualizationRoot != null)
+        {
+            visualizationRoot.SetActive(active);
+        }
     }
 
     private void OnDestroy()

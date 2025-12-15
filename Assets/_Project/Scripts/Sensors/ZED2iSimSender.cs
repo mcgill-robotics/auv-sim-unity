@@ -113,10 +113,7 @@ public class ZED2iSimSender : MonoBehaviour
 
     void Start()
     {
-
-        // Disable automatic rendering
-        if (leftCamera != null) leftCamera.enabled = false;
-        if (rightCamera != null) rightCamera.enabled = false;
+        // CameraRenderManager handles camera state
         
         // Check if ZED streaming is enabled in settings
         if (SimulationSettings.Instance != null && !SimulationSettings.Instance.StreamZEDCamera)
@@ -202,9 +199,8 @@ public class ZED2iSimSender : MonoBehaviour
             yield return new WaitForSeconds(1.0f / targetFPS);
             yield return waitForEndOfFrame;
 
-            // Manual Render
-            if (leftCamera) leftCamera.Render();
-            if (rightCamera) rightCamera.Render();
+            // CameraRenderManager handles camera rendering
+            // We just read from the RenderTextures
 
             // --- 1. Flip Images ---
             // Ensure flipRT is created

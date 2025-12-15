@@ -5,7 +5,7 @@ using System;
 
 public class StatePublisher : ROSPublisher
 {
-    protected override string Topic => ROSSettings.Instance.StateTopic;
+    public override string Topic => ROSSettings.Instance.StateTopic;
 
     [Header("Physical Setup")]
     [Tooltip("AUV root GameObject for transform data")]
@@ -51,7 +51,7 @@ public class StatePublisher : ROSPublisher
         ros.RegisterPublisher<UnityStateMsg>(Topic);
     }
 
-    protected override void PublishMessage()
+    public override void PublishMessage()
     {
         Vector3 currentVelocity = auvRb.linearVelocity;
         Vector3 acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
