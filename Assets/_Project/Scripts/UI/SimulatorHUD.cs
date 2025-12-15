@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
 using RosMessageTypes.Sensor;
@@ -57,6 +58,7 @@ public class SimulatorHUD : MonoBehaviour
     private IntegerField inputDownW;
     private IntegerField inputDownH;
     private DropdownField dropdownQuality;
+    private DropdownField dropdownScreenRes;
     private Button btnSave;
     private Button btnSaveImage;
 
@@ -69,6 +71,8 @@ public class SimulatorHUD : MonoBehaviour
     private Label textDVLVx, textDVLVy, textDVLVz, textDVLAlt, textDVLLock;
     private Label textIMUAx, textIMUAy, textIMUAz;
     private Label textIMUWx, textIMUWy, textIMUWz;
+    private Toggle toggleDVLViz;
+    private Toggle toggleIMUViz;
 
     // UI Elements - Competition
     private Label textTimer;
@@ -79,10 +83,31 @@ public class SimulatorHUD : MonoBehaviour
     // UI Elements - Camera
     private DropdownField dropdownCamTopic;
     private Image cameraFeedImage;
+    private Image fullscreenCameraBackground;
+    private Button btnFullscreen;
+    private bool isFullscreenCamera = false;
     private Label textLog;
+    private Label logToggle;
+    private ScrollView logScrollView;
+
+    // UI Elements - Drawers
+    private VisualElement configDrawer;
+    private VisualElement controlsDrawer;
+    private VisualElement telemetryDrawer;
+    private VisualElement sensorsDrawer;
+    private VisualElement cameraDrawer;
+    private VisualElement logPanel;
+    
+    // Drawer Indicators (updated when collapsed)
+    private Label configIndicator;
+    private Label telemetryIndicator;
+    private Label sensorsIndicator;
+    private Label cameraIndicator;
 
     // Internal State
     private ROSConnection ros;
+    private const string DRAWER_OPEN_CLASS = "drawer-open";
+    private const string DRAWER_COLLAPSED_CLASS = "drawer-collapsed";
 
     private void Awake()
     {
@@ -177,6 +202,7 @@ public class SimulatorHUD : MonoBehaviour
         inputDownH = root.Q<IntegerField>("Input-DownH");
         
         dropdownQuality = root.Q<DropdownField>("Dropdown-Quality");
+        dropdownScreenRes = root.Q<DropdownField>("Dropdown-ScreenRes");
         btnSave = root.Q<Button>("Btn-Save");
 
         // Telemetry
@@ -200,6 +226,32 @@ public class SimulatorHUD : MonoBehaviour
         textIMUWx = root.Q<Label>("Text-IMUWx");
         textIMUWy = root.Q<Label>("Text-IMUWy");
         textIMUWz = root.Q<Label>("Text-IMUWz");
+        
+        // Sensor Visualization Toggles
+        toggleDVLViz = root.Q<Toggle>("Toggle-DVLViz");
+        toggleIMUViz = root.Q<Toggle>("Toggle-IMUViz");
+        
+        if (toggleDVLViz != null)
+        {
+            toggleDVLViz.RegisterValueChangedCallback(evt => {
+                if (dvlPublisher != null)
+                {
+                    dvlPublisher.enableVisualization = evt.newValue;
+                    dvlPublisher.SetVisualizationActive(evt.newValue);
+                }
+            });
+        }
+        
+        if (toggleIMUViz != null)
+        {
+            toggleIMUViz.RegisterValueChangedCallback(evt => {
+                if (imuPublisher != null)
+                {
+                    imuPublisher.enableVisualization = evt.newValue;
+                    imuPublisher.SetVisualizationActive(evt.newValue);
+                }
+            });
+        }
 
         // Competition
         textTimer = root.Q<Label>("Text-Timer");
@@ -211,9 +263,35 @@ public class SimulatorHUD : MonoBehaviour
         dropdownCamTopic = root.Q<DropdownField>("Dropdown-CamTopic");
         cameraFeedImage = root.Q<Image>("CameraFeedImage");
         btnSaveImage = root.Q<Button>("Btn-SaveImage");
+        fullscreenCameraBackground = root.Q<Image>("FullscreenCameraBackground");
+        btnFullscreen = root.Q<Button>("Btn-Fullscreen");
+        
+        if (btnFullscreen != null)
+        {
+            btnFullscreen.clicked += ToggleFullscreenCamera;
+        }
 
         // Log
         textLog = root.Q<Label>("Text-Log");
+        logToggle = root.Q<Label>("LogPanel-Toggle");
+        logPanel = root.Q<VisualElement>("LogPanel");
+        logScrollView = root.Q<ScrollView>("LogScroll");
+
+        // Drawers
+        configDrawer = root.Q<VisualElement>("ConfigDrawer");
+        controlsDrawer = root.Q<VisualElement>("ControlsDrawer");
+        telemetryDrawer = root.Q<VisualElement>("TelemetryDrawer");
+        sensorsDrawer = root.Q<VisualElement>("SensorsDrawer");
+        cameraDrawer = root.Q<VisualElement>("CameraDrawer");
+        
+        // Drawer Indicators
+        configIndicator = root.Q<Label>("ConfigDrawer-Indicator");
+        telemetryIndicator = root.Q<Label>("TelemetryDrawer-Indicator");
+        sensorsIndicator = root.Q<Label>("SensorsDrawer-Indicator");
+        cameraIndicator = root.Q<Label>("CameraDrawer-Indicator");
+        
+        // Initialize Drawer Interactions
+        InitializeDrawers();
 
         // Global Click Handler (Click-to-Blur)
         // Register on the root so clicks on background clear focus
@@ -226,6 +304,101 @@ public class SimulatorHUD : MonoBehaviour
         });
     }
 
+    // --- Drawer System ---
+    
+    private void InitializeDrawers()
+    {
+        // Register click handlers on drawer tabs
+        RegisterDrawerTab("ConfigDrawer-Tab", configDrawer);
+        RegisterDrawerTab("ControlsDrawer-Tab", controlsDrawer);
+        RegisterDrawerTab("TelemetryDrawer-Tab", telemetryDrawer);
+        RegisterDrawerTab("SensorsDrawer-Tab", sensorsDrawer);
+        RegisterDrawerTab("CameraDrawer-Tab", cameraDrawer);
+        
+        // Log panel toggle
+        if (logToggle != null && logPanel != null)
+        {
+            logToggle.RegisterCallback<PointerDownEvent>(evt => {
+                ToggleLogPanel();
+                evt.StopPropagation();
+            });
+        }
+    }
+    
+    private void RegisterDrawerTab(string tabName, VisualElement drawer)
+    {
+        if (drawer == null) return;
+        
+        var root = uiDocument.rootVisualElement;
+        var tab = root.Q<VisualElement>(tabName);
+        
+        if (tab != null)
+        {
+            tab.RegisterCallback<PointerDownEvent>(evt => {
+                ToggleDrawer(drawer);
+                evt.StopPropagation();
+            });
+        }
+    }
+    
+    private void ToggleDrawer(VisualElement drawer)
+    {
+        if (drawer == null) return;
+        
+        bool isOpen = drawer.ClassListContains(DRAWER_OPEN_CLASS);
+        
+        if (isOpen)
+        {
+            // Close drawer
+            drawer.RemoveFromClassList(DRAWER_OPEN_CLASS);
+            drawer.AddToClassList(DRAWER_COLLAPSED_CLASS);
+        }
+        else
+        {
+            // Open drawer
+            drawer.RemoveFromClassList(DRAWER_COLLAPSED_CLASS);
+            drawer.AddToClassList(DRAWER_OPEN_CLASS);
+        }
+    }
+    
+    private void ToggleLogPanel()
+    {
+        if (logPanel == null) return;
+        
+        bool isCollapsed = logPanel.ClassListContains("log-overlay-collapsed");
+        
+        if (isCollapsed)
+        {
+            logPanel.RemoveFromClassList("log-overlay-collapsed");
+            if (logToggle != null) logToggle.text = "▼ LOGS";
+        }
+        else
+        {
+            logPanel.AddToClassList("log-overlay-collapsed");
+            if (logToggle != null) logToggle.text = "▲ LOGS";
+        }
+    }
+    
+    private void ToggleFullscreenCamera()
+    {
+        if (fullscreenCameraBackground == null) return;
+        
+        isFullscreenCamera = !isFullscreenCamera;
+        
+        if (isFullscreenCamera)
+        {
+            // Show fullscreen background
+            fullscreenCameraBackground.style.display = DisplayStyle.Flex;
+            if (btnFullscreen != null) btnFullscreen.text = "✕";
+        }
+        else
+        {
+            // Hide fullscreen background
+            fullscreenCameraBackground.style.display = DisplayStyle.None;
+            if (btnFullscreen != null) btnFullscreen.text = "⛶";
+        }
+    }
+    
     private IEnumerator Start()
     {
         // Initialize ROS
@@ -251,6 +424,10 @@ public class SimulatorHUD : MonoBehaviour
 
         // Initialize camera dropdown
         InitializeCameraDropdown();
+        
+        // Debug: verify log system is working
+        Log("HUD initialized successfully.");
+        Debug.Log($"[SimulatorHUD] textLog is {(textLog != null ? "found" : "NULL")}");
     }
 
     // --- Settings Logic ---
@@ -303,6 +480,21 @@ public class SimulatorHUD : MonoBehaviour
         SimulationSettings.Instance.QualityLevel = dropdownQuality.index;
         QualitySettings.SetQualityLevel(SimulationSettings.Instance.QualityLevel);
         
+        // Apply screen resolution
+        if (dropdownScreenRes != null)
+        {
+            string resSelection = dropdownScreenRes.value;
+            if (resSelection != "Native")
+            {
+                string[] parts = resSelection.Split('x');
+                if (parts.Length == 2 && int.TryParse(parts[0], out int width) && int.TryParse(parts[1], out int height))
+                {
+                    Screen.SetResolution(width, height, Screen.fullScreenMode);
+                }
+            }
+            // Note: "Native" keeps current resolution
+        }
+        
         // Update Thrusters cached quality level
         var thrusters = FindFirstObjectByType<Thrusters>();
         if (thrusters != null)
@@ -311,9 +503,7 @@ public class SimulatorHUD : MonoBehaviour
         }
 
         SimulationSettings.Instance.SaveSettings();
-        Log("Configuration Saved.");
-
-        UpdateROSConnectionState();
+        Log("Settings saved. Please restart the game for changes to take effect.");
     }
 
     private void UpdateROSConnectionState()
@@ -372,6 +562,12 @@ public class SimulatorHUD : MonoBehaviour
         if (depthPublisher == null) depthPublisher = FindFirstObjectByType<CameraDepthPublisher>();
         if (dvlPublisher == null) dvlPublisher = FindFirstObjectByType<DVLPublisher>();
         if (imuPublisher == null) imuPublisher = FindFirstObjectByType<IMUPublisher>();
+        
+        // Initialize sensor viz toggle values from publishers
+        if (toggleDVLViz != null && dvlPublisher != null)
+            toggleDVLViz.SetValueWithoutNotify(dvlPublisher.enableVisualization);
+        if (toggleIMUViz != null && imuPublisher != null)
+            toggleIMUViz.SetValueWithoutNotify(imuPublisher.enableVisualization);
     }
 
     private void InitializeCameraDropdown()
@@ -379,42 +575,73 @@ public class SimulatorHUD : MonoBehaviour
         FindPublishers();
 
         var choices = new List<string>();
+        choices.Add("None"); // Allow disabling camera feed for performance
         if (frontLeftCamera != null) choices.Add("Front Left");
         if (downCamera != null) choices.Add("Down");
         if (depthPublisher != null) choices.Add("Front Depth");
 
         dropdownCamTopic.choices = choices;
-        if (choices.Count > 0) dropdownCamTopic.index = 0;
+        dropdownCamTopic.index = 0; // Start with None selected
 
         dropdownCamTopic.RegisterValueChangedCallback(evt => UpdateCameraFeed(evt.newValue));
         
         // Initial update
-        if (choices.Count > 0) UpdateCameraFeed(choices[0]);
+        UpdateCameraFeed(choices[0]);
     }
 
     private void UpdateCameraFeed(string selection)
     {
-        // Reset
+        // Reset all feeds
         cameraFeedImage.image = null;
+        if (fullscreenCameraBackground != null) fullscreenCameraBackground.image = null;
 
-        // Update ForceCaptureForUI for depth publisher
-        if (depthPublisher != null) depthPublisher.ForceCaptureForUI = (selection == "Front Depth");
+        // Reset CameraRenderManager UI flags
+        if (CameraRenderManager.Instance != null)
+        {
+            CameraRenderManager.Instance.frontCameraUINeeded = false;
+            CameraRenderManager.Instance.frontDepthUINeeded = false;
+            CameraRenderManager.Instance.downCameraUINeeded = false;
+        }
+        
+        // Exit early if None selected (no camera feed)
+        if (selection == "None")
+        {
+            // Disable fullscreen mode if active
+            if (isFullscreenCamera)
+            {
+                ToggleFullscreenCamera();
+            }
+            return;
+        }
 
-        // Update ForceCaptureForUI for standard publishers
-        if (!SimulationSettings.Instance.StreamZEDCamera && frontPub != null) frontPub.ForceCaptureForUI = (selection == "Front Left");
-        if (downPub != null) downPub.ForceCaptureForUI = (selection == "Down");
+        // Update CameraRenderManager UI flags for selected camera
+        if (CameraRenderManager.Instance != null)
+        {
+            CameraRenderManager.Instance.frontCameraUINeeded = (selection == "Front Left");
+            CameraRenderManager.Instance.frontDepthUINeeded = (selection == "Front Depth");
+            CameraRenderManager.Instance.downCameraUINeeded = (selection == "Down");
+        }
 
+        Texture selectedTexture = null;
+        
         if (selection == "Front Left" && frontLeftCamera != null)
         {
-            cameraFeedImage.image = frontLeftCamera.targetTexture;
+            selectedTexture = frontLeftCamera.targetTexture;
         }
         else if (selection == "Down" && downCamera != null)
         {
-            cameraFeedImage.image = downCamera.targetTexture;
+            selectedTexture = downCamera.targetTexture;
         }
         else if (selection == "Front Depth" && depthPublisher != null)
         {
-            cameraFeedImage.image = depthPublisher.VisualizationTexture;
+            selectedTexture = depthPublisher.VisualizationTexture;
+        }
+        
+        // Set both preview and fullscreen background
+        cameraFeedImage.image = selectedTexture;
+        if (fullscreenCameraBackground != null)
+        {
+            fullscreenCameraBackground.image = selectedTexture;
         }
     }
 
@@ -502,7 +729,24 @@ public class SimulatorHUD : MonoBehaviour
 
     public void Log(string message)
     {
-        if (textLog != null) textLog.text += $"\n> {message}";
+        Debug.Log($"[HUD Log] {message}");
+        
+        if (textLog != null)
+        {
+            textLog.text += $"\n> {message}";
+            
+            // Auto-scroll to bottom
+            if (logScrollView != null)
+            {
+                logScrollView.schedule.Execute(() => {
+                    logScrollView.scrollOffset = new Vector2(0, logScrollView.contentContainer.layout.height);
+                });
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[SimulatorHUD] textLog is null - cannot log to UI");
+        }
     }
 
     private void Update()

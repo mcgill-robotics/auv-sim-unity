@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-100)]
 public class ROSSettings : MonoBehaviour
 {
     public static ROSSettings Instance { get; private set; }

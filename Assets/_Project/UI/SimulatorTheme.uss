@@ -96,14 +96,14 @@ Label {
 
 .header {
     color: var(--mcgill-red);
-    font-size: var(--font-header-size);
+    font-size: 16px;
     -unity-font-style: bold;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    border-bottom-width: 2px;
+    letter-spacing: 1px;
+    border-bottom-width: 1px;
     border-bottom-color: var(--mcgill-grey);
-    padding-bottom: 5px;
+    padding-bottom: 3px;
 }
 
 .top-center-panel .header {
@@ -116,16 +116,16 @@ Label {
 .data-row {
     flex-direction: row;
     justify-content: space-between;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
     border-bottom-width: 1px;
     border-bottom-color: rgba(255, 255, 255, 0.1);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .data-label {
     color: var(--color-text-dim);
     -unity-font-style: bold;
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
 }
 
@@ -138,9 +138,9 @@ Label {
 .keybind-row {
     flex-direction: row;
     justify-content: space-between;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--color-text-dim);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .large-stat {
@@ -298,4 +298,242 @@ Label {
 
 .margin-top-large {
     margin-top: 15px;
+}
+
+/* ============================================
+   DRAWER SYSTEM STYLES
+   ============================================ */
+
+/* Drawer container - wraps tab + content */
+.drawer-container {
+    position: absolute;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.drawer-container-right {
+    flex-direction: row-reverse;
+}
+
+/* Drawer tab - always visible edge strip */
+.drawer-tab {
+    width: 36px;
+    background-color: var(--mcgill-black);
+    border-width: 2px;
+    border-color: var(--mcgill-grey);
+    border-radius: var(--panel-radius);
+    padding: 8px 4px;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.drawer-tab:hover {
+    background-color: rgba(60, 60, 60, 0.9);
+    border-color: var(--mcgill-red);
+}
+
+.drawer-tab-left {
+    border-top-color: var(--mcgill-red);
+    border-right-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.drawer-tab-right {
+    border-top-color: var(--mcgill-red);
+    border-left-width: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Tab icon */
+.drawer-tab-icon {
+    font-size: 18px;
+    color: var(--mcgill-red);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 8px;
+}
+
+/* Tab label - vertically stacked text */
+.drawer-tab-label {
+    font-size: 10px;
+    color: var(--color-text-highlight);
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    white-space: normal;
+    -unity-text-align: upper-center;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.drawer-tab-label-right {
+    /* Right side labels use same vertical stacking */
+}
+
+/* Mini-indicator shown when collapsed */
+.drawer-tab-indicator {
+    font-size: 9px;
+    color: var(--color-text-dim);
+    -unity-text-align: middle-center;
+    rotate: -90deg;
+    white-space: nowrap;
+    margin-top: 15px;
+}
+
+.drawer-tab-indicator-right {
+    rotate: 90deg;
+}
+
+.drawer-tab-indicator-active {
+    color: var(--status-active);
+}
+
+.drawer-tab-indicator-error {
+    color: var(--status-error);
+}
+
+/* Drawer content panel - the sliding part */
+.drawer-content {
+    background-color: var(--color-background);
+    border-width: var(--panel-border-width);
+    border-color: var(--mcgill-grey);
+    border-top-color: var(--mcgill-red);
+    border-radius: var(--panel-radius);
+    padding: 15px;
+    overflow: hidden;
+    transition: width 0.25s ease-out, opacity 0.2s;
+}
+
+.drawer-content-left {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+}
+
+.drawer-content-right {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+}
+
+/* Collapsed state - content hidden and non-interactive */
+.drawer-collapsed .drawer-content {
+    width: 0;
+    padding: 0;
+    border-width: 0;
+    opacity: 0;
+    display: none;
+}
+
+/* Open state */
+.drawer-open .drawer-content {
+    opacity: 1;
+}
+
+.drawer-open .drawer-tab {
+    border-color: var(--mcgill-red);
+}
+
+/* ============================================
+   TOP BAR (Always Visible Competition Panel)
+   ============================================ */
+
+.top-bar {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    translate: -50% 0;
+    height: 50px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(237, 27, 47, 0.95);
+    border-width: 2px;
+    border-color: white;
+    border-radius: var(--panel-radius);
+    padding: 0 20px;
+}
+
+.top-bar-section {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.top-bar-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    -unity-font-style: bold;
+    margin-right: 8px;
+    letter-spacing: 1px;
+}
+
+.top-bar-value {
+    font-size: 22px;
+    color: white;
+    -unity-font-style: bold;
+}
+
+.top-bar-divider {
+    width: 1px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 10px;
+}
+
+.top-bar-button {
+    background-color: white;
+    color: var(--mcgill-red);
+    border-width: 0;
+    border-radius: 2px;
+    height: 30px;
+    padding: 0 15px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    transition: 0.15s;
+}
+
+.top-bar-button:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.top-bar-button:active {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================
+   LOG OVERLAY (Togglable)
+   ============================================ */
+
+.log-overlay {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    translate: -50% 0;
+    width: 500px;
+    max-height: 300px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-width: 1px;
+    border-color: var(--mcgill-grey);
+    border-radius: var(--panel-radius);
+    padding: 10px;
+    transition: opacity 0.2s, max-height 0.25s;
+}
+
+.log-overlay-collapsed {
+    max-height: 30px;
+    padding: 5px 10px;
+    overflow: hidden;
+}
+
+.log-toggle-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 10px;
+    color: var(--color-text-dim);
+    cursor: pointer;
 }

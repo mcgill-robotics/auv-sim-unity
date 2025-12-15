@@ -3,7 +3,7 @@ using RosMessageTypes.Rosgraph;
 
 public class ROSClock : ROSPublisher
 {
-    protected override string Topic => ROSSettings.Instance.ClockTopic;
+    public override string Topic => ROSSettings.Instance.ClockTopic;
 
     private ClockMsg clockMsg;
     private double clockTimePassed = 0;
@@ -44,7 +44,7 @@ public class ROSClock : ROSPublisher
         base.FixedUpdate();
     }
 
-    protected override void PublishMessage()
+    public override void PublishMessage()
     {
         clockTimePassed += Time.fixedDeltaTime;
         int secs = (int)clockTimePassed;

@@ -15,14 +15,10 @@ public class CameraPublisher : ROSPublisher
 
 
 
-    protected override string Topic => cameraType == CameraType.Front ? ROSSettings.Instance.FrontCameraTopic : ROSSettings.Instance.DownCameraTopic;
+    public override string Topic => cameraType == CameraType.Front ? ROSSettings.Instance.FrontCameraTopic : ROSSettings.Instance.DownCameraTopic;
 
     private int resolutionWidth = 640;
     private int resolutionHeight = 480;
-    
-    // Rendering Loop
-    private float timeBetweenCaptures;
-    private float timeSinceLastCapture;
 
     private ImageMsg message;
     private Texture2D texture2D;
@@ -35,9 +31,6 @@ public class CameraPublisher : ROSPublisher
 
     protected override void Start()
     {
-        // Disable automatic rendering to save performance
-        if (cam != null) cam.enabled = false;
-        
         // Disable front camera ROS publishing if ZED streaming is active
         if (cameraType == CameraType.Front && 
             SimulationSettings.Instance != null && 
@@ -49,12 +42,12 @@ public class CameraPublisher : ROSPublisher
         }
 
         base.Start();
+        
+        // Camera uses custom rendering logic, not base class rate limiting
+        useBaseRateLimiting = false;
+        
         InitializeTexture();
         InitializeCameraInfo();
-        
-        // Initialize timing
-        timeBetweenCaptures = 1f / publishRate;
-        timeSinceLastCapture = 0f;
     }
 
     protected override void RegisterPublisher()
@@ -96,14 +89,14 @@ public class CameraPublisher : ROSPublisher
         {
             resolutionWidth = SimulationSettings.Instance.FrontCamWidth;
             resolutionHeight = SimulationSettings.Instance.FrontCamHeight;
-            publishRate = SimulationSettings.Instance.FrontCamRate;
+            PublishRate = SimulationSettings.Instance.FrontCamRate;
             cam.fieldOfView = SimulationSettings.Instance.FrontCamFOV;
         }
         else
         {
             resolutionWidth = SimulationSettings.Instance.DownCamWidth;
             resolutionHeight = SimulationSettings.Instance.DownCamHeight;
-            publishRate = SimulationSettings.Instance.DownCamRate;
+            PublishRate = SimulationSettings.Instance.DownCamRate;
         }
 
 
@@ -139,58 +132,40 @@ public class CameraPublisher : ROSPublisher
         message.step = (uint)(resolutionWidth * 3);
     }
 
-    public bool ForceCaptureForUI { get; set; } = false;
-
     protected override void FixedUpdate()
     {
-        // Determine if we should render
-        bool shouldRender = false;
-        bool shouldPublishROS = false;
-
-        // 1. Check ROS Publishing
+        // Check if we should publish to ROS
+        bool shouldPublish = false;
         if (SimulationSettings.Instance.PublishROS)
         {
-            if (cameraType == CameraType.Front && SimulationSettings.Instance.PublishFrontCam) shouldPublishROS = true;
-            if (cameraType == CameraType.Down && SimulationSettings.Instance.PublishDownCam) shouldPublishROS = true;
+            if (cameraType == CameraType.Front && SimulationSettings.Instance.PublishFrontCam) shouldPublish = true;
+            if (cameraType == CameraType.Down && SimulationSettings.Instance.PublishDownCam) shouldPublish = true;
         }
 
-        // 2. Check ZED Streaming (Front Only)
-        // Removed: ZED logic handled by disabling component in Start
-
-        // 3. Combine Conditions
-        if (shouldPublishROS || ForceCaptureForUI)
-        {
-            shouldRender = true;
-        }
-
-        if (!shouldRender) return;
+        if (!shouldPublish) return;
         
-        // Rendering Loop
-        timeSinceLastCapture += Time.fixedDeltaTime;
-        if (timeSinceLastCapture >= timeBetweenCaptures)
+        // Rate limiting
+        timeSinceLastPublish += Time.fixedDeltaTime;
+        if (timeSinceLastPublish >= timeBetweenPublishes)
         {
-            timeSinceLastCapture = 0f;
+            timeSinceLastPublish = 0f;
 
-            // Safety Check: Ensure textures are still valid before rendering
+            // Safety Check
             if (cam == null || texture2D == null || renderTexture == null || !renderTexture.IsCreated()) return;
             
-            // 1. Render Camera
+            // Read from RenderTexture (CameraRenderManager handles the actual rendering)
             RenderTexture currentRT = RenderTexture.active;
             RenderTexture.active = renderTexture;
-            cam.Render();
             texture2D.ReadPixels(rect, 0, 0);
             texture2D.Apply();
             RenderTexture.active = currentRT;
             
-            // 2. Publish to ROS (if enabled)
-            if (shouldPublishROS)
-            {
-                PublishMessage();
-            }
+            // Publish to ROS
+            PublishMessage();
         }
     }
 
-    protected override void PublishMessage()
+    public override void PublishMessage()
     {
         // Note: Rendering is now done in FixedUpdate loop
         

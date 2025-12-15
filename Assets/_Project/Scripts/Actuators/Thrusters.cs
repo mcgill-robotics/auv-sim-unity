@@ -44,6 +44,12 @@ public class Thrusters : MonoBehaviour
     public float forceVisualScale = 0.02f;
 
     [Space(10)]
+    [Header("Thruster Limits")]
+    [Tooltip("Maximum force (N) a single thruster can output. T200 ≈ 50N, T500 ≈ 150N")]
+    [Range(10f, 200f)]
+    public float maxThrusterForce = 50f;
+
+    [Space(10)]
     [Tooltip("Rate at which thruster force changes (N/s). Simulates motor inertia.")]
     public float rampRate = 100f;
 
@@ -61,6 +67,11 @@ public class Thrusters : MonoBehaviour
     private float[] thrusterEfficiencyScalars = new float[8];
     private float[] currentThrusterLevels = new float[8];
     private float massScalarRealToSim;
+    
+    // Performance: State tracking to avoid redundant updates
+    private bool[] particlesPlaying = new bool[8];
+    private float[] previousForces = new float[8];
+    private const float FORCE_UPDATE_THRESHOLD = 0.5f;  // Only update arrows if force changes by this amount
     
     // Pre-calculated force multipliers
     private float moveForceOver4, moveForceOver2, sinkForceOver4, floatForceOver4, rotationForceOver4;
@@ -118,14 +129,14 @@ public class Thrusters : MonoBehaviour
         shaft.transform.parent = arrowRoot.transform;
         shaft.transform.localPosition = new Vector3(0, 0.5f, 0); // Pivot at base
         shaft.transform.localScale = new Vector3(0.1f, 0.5f, 0.1f); // Height is 2*scaleY = 1.0
-        Destroy(shaft.GetComponent<Collider>()); // No physics
+        DestroyImmediate(shaft.GetComponent<Collider>()); // Remove immediately before instantiation
 
         // Head (Cube as simple pointer)
         GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
         head.transform.parent = arrowRoot.transform;
         head.transform.localPosition = new Vector3(0, 1.0f, 0);
         head.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-        Destroy(head.GetComponent<Collider>());
+        DestroyImmediate(head.GetComponent<Collider>()); // Remove immediately before instantiation
 
         // Material color
         Renderer shaftRen = shaft.GetComponent<Renderer>();
@@ -150,6 +161,9 @@ public class Thrusters : MonoBehaviour
             
             float targetForce = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
             
+            // Clamp to max thruster output
+            targetForce = Mathf.Clamp(targetForce, -maxThrusterForce, maxThrusterForce);
+            
             // Apply Ramp-up (Inertia)
             currentThrusterLevels[i] = Mathf.MoveTowards(currentThrusterLevels[i], targetForce, rampRate * Time.fixedDeltaTime);
             float finalForce = currentThrusterLevels[i];
@@ -162,43 +176,46 @@ public class Thrusters : MonoBehaviour
             
             auvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
             
-            bool hasForce = Math.Abs(finalForce) > 0.01f;
+            bool shouldPlay = Math.Abs(finalForce) > 0.01f && cachedQualityLevel < 2;
 
-            // Particles
-            if (hasForce && cachedQualityLevel < 2)
+            // Particles - only change state when needed
+            if (shouldPlay != particlesPlaying[i])
             {
-                if (!thrusterParticles[i].isPlaying) thrusterParticles[i].Play();
-            }
-            else
-            {
-                thrusterParticles[i].Stop();
+                particlesPlaying[i] = shouldPlay;
+                if (shouldPlay)
+                    thrusterParticles[i].Play();
+                else
+                    thrusterParticles[i].Stop();
             }
 
-            // 3D Arrows
+            // 3D Arrows - only update when force changes significantly
             if (enableForceVisualization && arrowInstances != null && i < arrowInstances.Length)
             {
+                bool hasForce = Math.Abs(finalForce) > 0.01f;
+                float forceDelta = Math.Abs(finalForce - previousForces[i]);
+                
                 if (hasForce)
                 {
-                    arrowInstances[i].SetActive(true);
-                    
-                    // Position: At thruster
-                    arrowInstances[i].transform.position = thrusters[i].position;
-                    
-                    // Rotation: Point in force direction
-                    if (thrusterForceVector.sqrMagnitude > 0.001f)
+                    // Only update transforms if force changed significantly
+                    if (forceDelta > FORCE_UPDATE_THRESHOLD || !arrowInstances[i].activeSelf)
                     {
-                        arrowInstances[i].transform.rotation = Quaternion.LookRotation(thrusterForceVector) * Quaternion.Euler(90, 0, 0); 
-                        // Note: Default cylinder is Y-up. LookRotation is Z-forward. 
-                        // We need to rotate 90 deg on X to align Y-up cylinder with Z-forward look.
-                    }
+                        arrowInstances[i].SetActive(true);
+                        arrowInstances[i].transform.position = thrusters[i].position;
+                        
+                        if (thrusterForceVector.sqrMagnitude > 0.001f)
+                        {
+                            arrowInstances[i].transform.rotation = Quaternion.LookRotation(thrusterForceVector) * Quaternion.Euler(90, 0, 0);
+                        }
 
-                    // Scale: Length based on magnitude
-                    float length = Math.Abs(finalForce) * forceVisualScale;
-                    arrowInstances[i].transform.localScale = new Vector3(1, length, 1);
+                        float length = Math.Abs(finalForce) * forceVisualScale;
+                        arrowInstances[i].transform.localScale = new Vector3(1, length, 1);
+                        previousForces[i] = finalForce;
+                    }
                 }
-                else
+                else if (arrowInstances[i].activeSelf)
                 {
                     arrowInstances[i].SetActive(false);
+                    previousForces[i] = 0;
                 }
             }
         }
