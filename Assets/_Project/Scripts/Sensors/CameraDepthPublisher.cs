@@ -1,215 +1,380 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using RosMessageTypes.Sensor;
 using RosMessageTypes.Std;
 
 /// <summary>
-/// Publishes depth data from the front camera's depth texture.
-/// Uses Unity's built-in depth buffer instead of a separate camera.
+/// Publishes depth images from the front camera with actual metric distances.
+/// HDRP compatible - uses CustomPass for depth capture, creates all resources at runtime.
 /// </summary>
 public class CameraDepthPublisher : ROSPublisher
 {
-    protected override string Topic => ROSSettings.Instance.DepthCameraTopic;
+    public override string Topic => ROSSettings.Instance != null ? ROSSettings.Instance.DepthCameraTopic : null;
 
     [Header("Camera Reference")]
     [Tooltip("The front/left camera to extract depth from")]
     public Camera sourceCamera;
+    
+    [Header("Depth Settings")]
+    [Tooltip("Maximum depth distance in meters for visualization")]
+    [Range(1f, 100f)]
+    public float maxDepth = 20f;
+    
+    [Tooltip("Minimum depth distance in meters for visualization")]
+    [Range(0.1f, 5f)]
+    public float minDepth = 0.3f;
+    
+    [Tooltip("Encoding format for ROS image: '32FC1' for float meters, '16UC1' for uint16 millimeters")]
+    public string encoding = "32FC1";
 
-    [Header("Settings")]
-
-
-    private int publishWidth;
-    private int publishHeight;
-    private Texture2D depthTexture;
-    private RenderTexture depthRT;
-    public RenderTexture DepthTexture => depthRT;
-    private ImageMsg imageMsg;
-    private Material depthMaterial;
-    private Material visualizerMaterial;
-    private RenderTexture visualizationRT;
+    // Runtime-created resources
+    private int publishWidth = 960;
+    private int publishHeight = 600;
+    private RenderTexture depthRT;           // Linear depth in meters (for ROS)
+    private RenderTexture visualizationRT;   // Heatmap for UI display
+    private Material linearDepthMaterial;
+    private Material heatmapMaterial;
+    private Texture2D depthTexture2D;
+    
+    // CustomPass references
+    private CustomPassVolume customPassVolume;
+    private DepthCapturePass depthCapturePass;
+    private DepthCapturePass heatmapCapturePass;
+    
+    // ROS messages
+    private ImageMsg depthMsg;
+    private CameraInfoMsg cameraInfoMsg;
+    private string cameraInfoTopic;
+    
+    // For UI display
     public RenderTexture VisualizationTexture => visualizationRT;
-
-    // Shader to convert depth buffer to linear depth
-
+    
+    private float lastCaptureTime;
 
     protected override void Start()
     {
-        base.Start();
-        
-        // Disable depth publishing when ZED is active (ZED SDK computes depth from stereo)
-        if (SimulationSettings.Instance != null && SimulationSettings.Instance.StreamZEDCamera)
-        {
-            enabled = false;
-            Debug.Log("[CameraDepthPublisher] Disabled (ZED streaming active - ZED SDK computes depth)");
-            return;
-        }
-        
-        if (sourceCamera == null)
-        {
-            Debug.LogError("[CameraDepthPublisher] Source camera not assigned!");
-            enabled = false;
-            return;
-        }
-
+        // Initialize resources FIRST (before base.Start which calls RegisterPublisher)
         Initialize();
         
-        // Disable automatic rendering
-        if (sourceCamera != null) sourceCamera.enabled = false;
+        // Now call base.Start which will call RegisterPublisher
+        base.Start();
+        useBaseRateLimiting = false;
     }
-
-    private CommandBuffer cmdBuffer;
 
     private void Initialize()
     {
+        Debug.Log("[CameraDepthPublisher] Starting initialization...");
+        
         // Get resolution from settings
-        publishRate = SimulationSettings.Instance.FrontCamRate;
+        PublishRate = SimulationSettings.Instance.FrontCamRate;
         publishWidth = SimulationSettings.Instance.FrontCamWidth;
         publishHeight = SimulationSettings.Instance.FrontCamHeight;
-
-        // Enable depth texture on source camera
-        sourceCamera.depthTextureMode = DepthTextureMode.Depth;
-
-        // Create depth extraction material
-        Shader depthShader = Shader.Find("Hidden/DepthExtractor");
-        if (depthShader == null) depthShader = Resources.Load<Shader>("Shaders/DepthExtractor");
         
-        if (depthShader == null)
-        {
-            Debug.LogError("[CameraDepthPublisher] Could not find 'Hidden/DepthExtractor' shader!");
-            enabled = false;
-            return;
-        }
+        Debug.Log($"[CameraDepthPublisher] Resolution: {publishWidth}x{publishHeight}, Rate: {PublishRate}Hz");
 
-        depthMaterial = new Material(depthShader);
-        depthMaterial.SetFloat("_Near", sourceCamera.nearClipPlane);
-        depthMaterial.SetFloat("_Far", sourceCamera.farClipPlane);
-
-        // Create visualization material
-        Shader visualizerShader = Shader.Find("Hidden/DepthVisualizer");
-        if (visualizerShader == null) visualizerShader = Resources.Load<Shader>("Shaders/DepthVisualizer");
+        // Create RenderTextures at runtime
+        CreateRenderTextures();
         
-        if (visualizerShader != null)
+        // Create materials at runtime
+        CreateMaterials();
+        
+        // Setup CustomPass (runs even if materials failed - we check inside)
+        SetupCustomPass();
+        
+        // Create readback texture for ROS
+        depthTexture2D = new Texture2D(publishWidth, publishHeight, TextureFormat.RFloat, false);
+        
+        // Initialize ROS messages
+        InitializeMessages();
+        
+        Debug.Log("[CameraDepthPublisher] Initialization complete.");
+    }
+
+    private void CreateRenderTextures()
+    {
+        // Linear depth RT (RFloat for metric depth values)
+        depthRT = new RenderTexture(publishWidth, publishHeight, 0, RenderTextureFormat.RFloat);
+        depthRT.name = "DepthRT_Linear";
+        depthRT.Create();
+        Debug.Log($"[CameraDepthPublisher] Created depthRT: {depthRT.name}");
+        
+        // Visualization RT (ARGB32 for heatmap display)
+        visualizationRT = new RenderTexture(publishWidth, publishHeight, 0, RenderTextureFormat.ARGB32);
+        visualizationRT.name = "DepthRT_Heatmap";
+        visualizationRT.Create();
+        Debug.Log($"[CameraDepthPublisher] Created visualizationRT: {visualizationRT.name}");
+    }
+
+    private void CreateMaterials()
+    {
+        // Find shaders
+        Shader linearDepthShader = Shader.Find("Hidden/LinearDepthResampler");
+        Shader heatmapShader = Shader.Find("Hidden/DepthHeatmap");
+        
+        if (linearDepthShader == null)
         {
-            visualizerMaterial = new Material(visualizerShader);
-            visualizerMaterial.SetFloat("_MaxDepth", 20.0f); // Adjust max depth for visualization
+            Debug.LogError("[CameraDepthPublisher] Could not find Hidden/LinearDepthResampler shader! Make sure the shader is in the project and not stripped.");
         }
         else
         {
-            Debug.LogWarning("[CameraDepthPublisher] Could not find 'Hidden/DepthVisualizer' shader. Visualization might be incorrect.");
+            linearDepthMaterial = new Material(linearDepthShader);
+            linearDepthMaterial.name = "LinearDepthMaterial_Runtime";
+            Debug.Log("[CameraDepthPublisher] Created linearDepthMaterial");
         }
-
-        // Create textures
-        depthRT = new RenderTexture(publishWidth, publishHeight, 0, RenderTextureFormat.RFloat);
-        depthRT.enableRandomWrite = true;
-        depthRT.Create();
         
-        visualizationRT = new RenderTexture(publishWidth, publishHeight, 0, RenderTextureFormat.ARGB32);
-        visualizationRT.Create();
-
-        depthTexture = new Texture2D(publishWidth, publishHeight, TextureFormat.RFloat, false);
-
-        // Setup ROS message
-        imageMsg = new ImageMsg
+        if (heatmapShader == null)
         {
-            header = new HeaderMsg { frame_id = ROSSettings.Instance.DepthCamFrameId },
-            encoding = "32FC1",
-            width = (uint)publishWidth,
-            height = (uint)publishHeight,
-            step = (uint)(publishWidth * sizeof(float))
-        };
-
-        // --- Setup Command Buffer ---
-        cmdBuffer = new CommandBuffer();
-        cmdBuffer.name = "Depth Extraction";
-        
-        // Blit to Depth RT (Raw)
-        cmdBuffer.Blit(null, depthRT, depthMaterial);
-        
-        // Blit to Visualization RT (Normalized)
-        if (visualizerMaterial != null)
-        {
-            cmdBuffer.Blit(null, visualizationRT, visualizerMaterial);
+            Debug.LogError("[CameraDepthPublisher] Could not find Hidden/DepthHeatmap shader! Make sure the shader is in the project and not stripped.");
         }
-
-        // Attach to camera
-        sourceCamera.AddCommandBuffer(CameraEvent.AfterEverything, cmdBuffer);
+        else
+        {
+            heatmapMaterial = new Material(heatmapShader);
+            heatmapMaterial.name = "DepthHeatmapMaterial_Runtime";
+            heatmapMaterial.SetFloat("_MinDist", minDepth);
+            heatmapMaterial.SetFloat("_MaxDist", maxDepth);
+            Debug.Log("[CameraDepthPublisher] Created heatmapMaterial");
+        }
     }
 
-    protected override void RegisterPublisher()
+    private void SetupCustomPass()
     {
-        ros.RegisterPublisher<ImageMsg>(Topic);
-    }
-
-    public bool ForceCaptureForUI { get; set; } = false;
-    private float lastCaptureTime = 0f;
-
-    protected override void FixedUpdate()
-    {
-        // 1. If ROS publishing is enabled, let the base class handle the timing and calling PublishMessage
-        if (SimulationSettings.Instance.PublishDepth)
+        if (sourceCamera == null)
         {
-            base.FixedUpdate();
+            Debug.LogError("[CameraDepthPublisher] sourceCamera is not assigned!");
+            return;
         }
-        // 2. If ROS is disabled but UI needs the feed
-        else if (ForceCaptureForUI)
+        
+        Debug.Log($"[CameraDepthPublisher] Setting up CustomPass on camera: {sourceCamera.gameObject.name}");
+        
+        // Find or create CustomPassVolume on the camera
+        customPassVolume = sourceCamera.GetComponent<CustomPassVolume>();
+        if (customPassVolume == null)
         {
-            // Simple rate limiting to match the configured rate
-            float interval = 1.0f / publishRate;
-            if (Time.time - lastCaptureTime >= interval)
+            Debug.Log("[CameraDepthPublisher] CustomPassVolume not found, creating new one...");
+            customPassVolume = sourceCamera.gameObject.AddComponent<CustomPassVolume>();
+            Debug.Log("[CameraDepthPublisher] Created CustomPassVolume");
+        }
+        else
+        {
+            Debug.Log("[CameraDepthPublisher] Found existing CustomPassVolume");
+        }
+        
+        // Configure CustomPassVolume for Camera mode
+        customPassVolume.isGlobal = false;
+        customPassVolume.targetCamera = sourceCamera;  // Assign target camera
+        customPassVolume.injectionPoint = CustomPassInjectionPoint.AfterPostProcess;
+        
+        // Add DepthCapturePass for linear depth (ROS) - only if material exists
+        if (linearDepthMaterial != null && depthRT != null)
+        {
+            depthCapturePass = customPassVolume.AddPassOfType<DepthCapturePass>() as DepthCapturePass;
+            if (depthCapturePass != null)
             {
-                Capture();
-                lastCaptureTime = Time.time;
+                depthCapturePass.name = "DepthCapture_Linear";
+                depthCapturePass.linearDepthMaterial = linearDepthMaterial;
+                depthCapturePass.outputRenderTexture = depthRT;
+                depthCapturePass.targetColorBuffer = CustomPass.TargetBuffer.Camera;
+                Debug.Log("[CameraDepthPublisher] Added DepthCapturePass for linear depth");
+            }
+            else
+            {
+                Debug.LogError("[CameraDepthPublisher] Failed to create DepthCapturePass for linear depth!");
+            }
+        }
+        
+        // Add DepthCapturePass for heatmap (UI visualization) - only if material exists
+        if (heatmapMaterial != null && visualizationRT != null)
+        {
+            heatmapCapturePass = customPassVolume.AddPassOfType<DepthCapturePass>() as DepthCapturePass;
+            if (heatmapCapturePass != null)
+            {
+                heatmapCapturePass.name = "DepthCapture_Heatmap";
+                heatmapCapturePass.linearDepthMaterial = heatmapMaterial;
+                heatmapCapturePass.outputRenderTexture = visualizationRT;
+                heatmapCapturePass.targetColorBuffer = CustomPass.TargetBuffer.Camera;
+                Debug.Log("[CameraDepthPublisher] Added DepthCapturePass for heatmap");
+            }
+            else
+            {
+                Debug.LogError("[CameraDepthPublisher] Failed to create DepthCapturePass for heatmap!");
             }
         }
     }
 
-    protected override void PublishMessage()
+    private void InitializeMessages()
     {
-        // Called by base.FixedUpdate when it's time to publish
-        Capture();
-        RequestReadback();
-        lastCaptureTime = Time.time;
-    }
-
-    private void Capture()
-    {
-        // Manual Render to ensure depth buffer is updated and CommandBuffer executes
-        if (sourceCamera) sourceCamera.Render();
-    }
-
-    private void RequestReadback()
-    {
-        // Request async readback
-        AsyncGPUReadback.Request(depthRT, 0, TextureFormat.RFloat, OnDepthReadback);
-    }
-
-    private void OnDepthReadback(AsyncGPUReadbackRequest request)
-    {
-        if (request.hasError)
+        depthMsg = new ImageMsg();
+        depthMsg.header = new HeaderMsg { frame_id = ROSSettings.Instance.DepthCamFrameId };
+        depthMsg.width = (uint)publishWidth;
+        depthMsg.height = (uint)publishHeight;
+        depthMsg.encoding = encoding;
+        depthMsg.is_bigendian = 0;
+        
+        if (encoding == "32FC1")
         {
-            Debug.LogWarning("[CameraDepthPublisher] GPU Readback error detected.");
-            return;
+            depthMsg.step = (uint)(publishWidth * 4);
+        }
+        else if (encoding == "16UC1")
+        {
+            depthMsg.step = (uint)(publishWidth * 2);
         }
 
-        // Get raw float data directly from the request
-        imageMsg.data = request.GetData<byte>().ToArray();
+        cameraInfoMsg = new CameraInfoMsg();
+        cameraInfoMsg.header = new HeaderMsg { frame_id = ROSSettings.Instance.DepthCamFrameId };
+        cameraInfoMsg.width = (uint)publishWidth;
+        cameraInfoMsg.height = (uint)publishHeight;
+        cameraInfoMsg.distortion_model = "plumb_bob";
+        cameraInfoMsg.D = new double[] { 0, 0, 0, 0, 0 };
 
-        imageMsg.header.stamp = ROSClock.GetROSTimestamp();
-        ros.Publish(Topic, imageMsg);
+        if (sourceCamera != null)
+        {
+            double f = (publishHeight / 2.0) / Mathf.Tan(sourceCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+            double cx = publishWidth / 2.0;
+            double cy = publishHeight / 2.0;
+
+            cameraInfoMsg.K = new double[] { f, 0, cx, 0, f, cy, 0, 0, 1 };
+            cameraInfoMsg.P = new double[] { f, 0, cx, 0, 0, f, cy, 0, 0, 0, 1, 0 };
+            cameraInfoMsg.R = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+        }
+
+        cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
+    }
+
+    protected override void RegisterPublisher()
+    {
+        if (string.IsNullOrEmpty(Topic))
+        {
+            Debug.LogError("[CameraDepthPublisher] Topic is null or empty! Check ROSSettings.Instance.");
+            return;
+        }
+        
+        if (string.IsNullOrEmpty(cameraInfoTopic))
+        {
+            cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
+        }
+        
+        ros.RegisterPublisher<ImageMsg>(Topic);
+        ros.RegisterPublisher<CameraInfoMsg>(cameraInfoTopic);
+        Debug.Log($"[CameraDepthPublisher] Registered publishers: {Topic}, {cameraInfoTopic}");
+    }
+
+    protected override void FixedUpdate()
+    {
+        if (sourceCamera == null || depthRT == null) return;
+        
+        // Check if we should publish to ROS
+        bool shouldPublish = SimulationSettings.Instance.PublishDepth && SimulationSettings.Instance.PublishROS;
+        
+        if (!shouldPublish) return;
+        
+        // Rate limiting
+        float interval = 1.0f / PublishRate;
+        if (Time.time - lastCaptureTime >= interval)
+        {
+            // Update heatmap material parameters
+            if (heatmapMaterial != null)
+            {
+                heatmapMaterial.SetFloat("_MinDist", minDepth);
+                heatmapMaterial.SetFloat("_MaxDist", maxDepth);
+            }
+            
+            // CameraRenderManager handles rendering - CustomPasses run when camera renders
+            // We just need to read back the data for ROS publishing
+            ReadbackAndPublish();
+            
+            lastCaptureTime = Time.time;
+        }
+    }
+
+    private bool isReading = false;  // Prevent overlapping async reads
+    
+    private void ReadbackAndPublish()
+    {
+        if (depthRT == null || depthTexture2D == null || isReading) return;
+        
+        isReading = true;
+        
+        // Use async GPU readback to avoid stalling main thread
+        AsyncGPUReadback.Request(depthRT, 0, TextureFormat.RFloat, OnReadbackComplete);
+    }
+    
+    private void OnReadbackComplete(AsyncGPUReadbackRequest request)
+    {
+        isReading = false;
+        
+        if (request.hasError)
+        {
+            Debug.LogWarning("[CameraDepthPublisher] AsyncGPUReadback failed");
+            return;
+        }
+        
+        // Copy data to texture
+        var data = request.GetData<float>();
+        if (data.Length > 0 && depthTexture2D != null)
+        {
+            depthTexture2D.SetPixelData(data, 0);
+            depthTexture2D.Apply();
+            PublishMessage();
+        }
+    }
+
+    public override void PublishMessage()
+    {
+        if (depthTexture2D == null) return;
+
+        byte[] depthData = depthTexture2D.GetRawTextureData();
+        
+        // Convert to millimeters if using 16UC1 encoding
+        if (encoding == "16UC1")
+        {
+            float[] floatData = new float[publishWidth * publishHeight];
+            System.Buffer.BlockCopy(depthData, 0, floatData, 0, depthData.Length);
+            
+            ushort[] millimeterData = new ushort[floatData.Length];
+            for (int i = 0; i < floatData.Length; i++)
+            {
+                millimeterData[i] = (ushort)Mathf.Clamp(floatData[i] * 1000f, 0, 65535);
+            }
+            
+            depthData = new byte[millimeterData.Length * 2];
+            System.Buffer.BlockCopy(millimeterData, 0, depthData, 0, depthData.Length);
+        }
+
+        depthMsg.data = depthData;
+        depthMsg.header.stamp = ROSClock.GetROSTimestamp();
+        ros.Publish(Topic, depthMsg);
+
+        cameraInfoMsg.header.stamp = depthMsg.header.stamp;
+        ros.Publish(cameraInfoTopic, cameraInfoMsg);
     }
 
     private void OnDestroy()
     {
-        if (sourceCamera != null && cmdBuffer != null)
+        // Cleanup CustomPass
+        if (customPassVolume != null)
         {
-            sourceCamera.RemoveCommandBuffer(CameraEvent.AfterEverything, cmdBuffer);
+            if (depthCapturePass != null) customPassVolume.customPasses.Remove(depthCapturePass);
+            if (heatmapCapturePass != null) customPassVolume.customPasses.Remove(heatmapCapturePass);
         }
         
-        if (cmdBuffer != null) cmdBuffer.Release();
-
-        if (depthRT != null) depthRT.Release();
-        if (visualizationRT != null) visualizationRT.Release();
-        if (depthMaterial != null) Destroy(depthMaterial);
-        if (visualizerMaterial != null) Destroy(visualizerMaterial);
+        // Cleanup RenderTextures
+        if (depthRT != null)
+        {
+            depthRT.Release();
+            Destroy(depthRT);
+        }
+        if (visualizationRT != null)
+        {
+            visualizationRT.Release();
+            Destroy(visualizationRT);
+        }
+        
+        // Cleanup Materials
+        if (linearDepthMaterial != null) Destroy(linearDepthMaterial);
+        if (heatmapMaterial != null) Destroy(heatmapMaterial);
+        
+        // Cleanup Textures
+        if (depthTexture2D != null) Destroy(depthTexture2D);
     }
 }

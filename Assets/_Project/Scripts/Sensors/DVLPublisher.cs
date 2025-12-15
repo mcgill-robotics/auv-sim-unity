@@ -5,7 +5,7 @@ using Utils;
 
 public class DVLPublisher : ROSPublisher
 {
-    protected override string Topic => ROSSettings.Instance.DVLTopic;
+    public override string Topic => ROSSettings.Instance.DVLTopic;
 
     [Header("Physical Setup")]
     [Tooltip("AUV Rigidbody - used to calculate point velocity at sensor location")]
@@ -101,6 +101,7 @@ public class DVLPublisher : ROSPublisher
     
     // Visualization (3D mesh arrows)
     private GameObject[] beamArrows;
+    private Renderer[][] beamArrowRenderers;  // Cached renderers to avoid per-frame allocation
     private GameObject velocityArrow;
     private GameObject visualizationRoot;
     private Material beamValidMat;
@@ -110,6 +111,10 @@ public class DVLPublisher : ROSPublisher
     protected override void Start()
     {
         base.Start();
+        
+        // DVL uses its own adaptive timing based on altitude, not base class rate limiting
+        useBaseRateLimiting = false;
+        
         msg = new VelocityReportMsg();
         msg.covariance = new double[9];
         
@@ -130,10 +135,11 @@ public class DVLPublisher : ROSPublisher
         // Initialize Gauss-Markov bias model with pre-calculated coefficients
         velocityBias = new GaussMarkovVector(biasCorrelationTime, biasSigma, Time.fixedDeltaTime);
         
-        // Setup visualization
-        if (enableVisualization)
+        // Always setup visualization objects (so they can be toggled at runtime)
+        SetupVisualization();
+        if (visualizationRoot != null)
         {
-            SetupVisualization();
+            visualizationRoot.SetActive(enableVisualization);
         }
     }
 
@@ -149,12 +155,14 @@ public class DVLPublisher : ROSPublisher
         beamInvalidMat = CreateMaterial(Color.red);
         velocityMat = CreateMaterial(new Color(1f, 0.8f, 0.2f)); // Yellow/Gold
         
-        // Create beam arrows
+        // Create beam arrows and cache their renderers
         beamArrows = new GameObject[4];
+        beamArrowRenderers = new Renderer[4][];
         for (int i = 0; i < 4; i++)
         {
             beamArrows[i] = CreateArrow($"Beam_{i}", beamValidMat, 0.02f);
             beamArrows[i].transform.SetParent(visualizationRoot.transform);
+            beamArrowRenderers[i] = beamArrows[i].GetComponentsInChildren<Renderer>();
         }
         
         // Create velocity arrow
@@ -219,17 +227,32 @@ public class DVLPublisher : ROSPublisher
 
     protected override void FixedUpdate()
     {
-        if (!SimulationSettings.Instance.PublishDVL || auvRb == null) return;
+        if (auvRb == null) return;
 
-        // Update bias every physics step
+        // Update bias every physics step (always needed for accurate simulation)
         velocityBias.Step();
 
+        // Run simulation and update sensor data (always, for visualization)
         if (Time.time >= nextPublishTime)
         {
-            PublishMessage();
+            SimulateSensor();
+            
+            // Only publish to ROS if enabled
+            if (SimulationSettings.Instance.PublishDVL && SimulationSettings.Instance.PublishROS)
+            {
+                PublishMessage();
+            }
+            
+            // Calculate next update time
+            float rate = 26f;
+            if (simulateAdaptiveRate && IsValid)
+            {
+                rate = Mathf.Lerp(26f, 4f, LastAltitude / 50.0f);
+            }
+            nextPublishTime = Time.time + (1.0f / rate);
         }
         
-        // Update visualization
+        // Update visualization (always if enabled)
         if (enableVisualization && visualizationRoot != null)
         {
             UpdateVisualization();
@@ -241,7 +264,19 @@ public class DVLPublisher : ROSPublisher
         ros.RegisterPublisher<VelocityReportMsg>(Topic);
     }
 
-    protected override void PublishMessage()
+    public override void PublishMessage()
+    {
+        // Timestamp and publish the pre-calculated message
+        var rosTime = ROSClock.GetROSTimestamp();
+        msg.time = rosTime.sec + rosTime.nanosec * 1e-9;
+        ros.Publish(Topic, msg);
+    }
+    
+    /// <summary>
+    /// Simulate the DVL sensor: perform raycasting, calculate velocity, update message.
+    /// This runs independently of ROS publishing for visualization support.
+    /// </summary>
+    private void SimulateSensor()
     {
         // 1. Perform 4-Beam Raycasting
         int validBeams = 0;
@@ -362,19 +397,6 @@ public class DVLPublisher : ROSPublisher
             msg.covariance[4] = 10000;
             msg.covariance[8] = 10000;
         }
-
-        // 4. Timestamp and publish
-        var rosTime = ROSClock.GetROSTimestamp();
-        msg.time = rosTime.sec + rosTime.nanosec * 1e-9;
-        ros.Publish(Topic, msg);
-
-        // 5. Calculate next update time (adaptive rate based on altitude)
-        float rate = 26f;
-        if (simulateAdaptiveRate && IsValid)
-        {
-            rate = Mathf.Lerp(26f, 4f, LastAltitude / 50.0f);
-        }
-        nextPublishTime = Time.time + (1.0f / rate);
     }
 
     private void UpdateVisualization()
@@ -402,10 +424,12 @@ public class DVLPublisher : ROSPublisher
                 // Scale length based on beam distance
                 beamArrows[i].transform.localScale = new Vector3(1, beamLength, 1);
                 
-                // Update material color based on validity
-                Renderer[] renderers = beamArrows[i].GetComponentsInChildren<Renderer>();
-                Material mat = BeamValid[i] ? beamValidMat : beamInvalidMat;
-                foreach (var r in renderers) r.material = mat;
+                // Update material color based on validity (using cached renderers)
+                if (beamArrowRenderers != null && beamArrowRenderers[i] != null)
+                {
+                    Material mat = BeamValid[i] ? beamValidMat : beamInvalidMat;
+                    foreach (var r in beamArrowRenderers[i]) r.material = mat;
+                }
             }
         }
         
@@ -462,6 +486,17 @@ public class DVLPublisher : ROSPublisher
         if (visualizationRoot != null)
         {
             visualizationRoot.SetActive(enableVisualization);
+        }
+    }
+    
+    /// <summary>
+    /// Sets the visualization GameObject active state. Called by UI toggles.
+    /// </summary>
+    public void SetVisualizationActive(bool active)
+    {
+        if (visualizationRoot != null)
+        {
+            visualizationRoot.SetActive(active);
         }
     }
 
