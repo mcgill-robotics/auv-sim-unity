@@ -28,6 +28,8 @@
                 <ui:Toggle name="Toggle-PublishROS" label="ROS Bridge" value="true" />
                 <ui:Toggle name="Toggle-SimObjects" label="Debug Viz" value="true" />
                 <ui:Toggle name="Toggle-StreamZED" label="ZED X Stream" value="false" />
+                <ui:Toggle name="Toggle-NoWater" label="No Water Mode" value="false" />
+                <ui:Toggle name="Toggle-FreeCamera" label="Free Camera" value="false" />
                 <ui:Label text="SENSORS" class="data-label text-accent margin-top-small" />
                 <ui:Toggle name="Toggle-DVL" label="Doppler Velocity" value="true" />
                 <ui:Toggle name="Toggle-IMU" label="IMU / AHRS" value="true" />

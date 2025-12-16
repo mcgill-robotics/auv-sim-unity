@@ -13,6 +13,15 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Show simulation objects (gates, buoys, etc.) in scene")]
     public bool DisplaySimObjects = false;
     
+    [Tooltip("Disable water volume and rendering for performance (when vision isn't needed)")]
+    public bool NoWaterMode = false;
+    
+    [Tooltip("Water surface GameObject to disable in No Water Mode")]
+    public GameObject waterSurfaceObject;
+    
+    [Tooltip("Optional: Pool post-processing volume to disable in No Water Mode")]
+    public GameObject poolPostProcessingVolume;
+    
     [Tooltip("Number of hydrophones option (0-4)")]
     [Range(0, 4)]
     public int HydrophonesNumberOption = 0;
@@ -135,11 +144,43 @@ public class SimulationSettings : MonoBehaviour
             Application.targetFrameRate = SimulationTargetFrameRate;
         }
     }
+    
+    private void Start()
+    {
+        if (Application.isPlaying && NoWaterMode)
+        {
+            ApplyNoWaterMode();
+        }
+    }
+    
+    /// <summary>
+    /// Applies No Water Mode - can be called at runtime from UI.
+    /// </summary>
+    public void ApplyNoWaterMode()
+    {
+        // Disable/Enable assigned water surface object
+        if (waterSurfaceObject != null)
+        {
+            waterSurfaceObject.SetActive(!NoWaterMode);
+        }
+        
+        // Disable/Enable pool post-processing volume
+        if (poolPostProcessingVolume != null)
+        {
+            poolPostProcessingVolume.SetActive(!NoWaterMode);
+        }
+        
+        if (NoWaterMode)
+        {
+            Debug.Log("[SimulationSettings] No Water Mode enabled");
+        }
+    }
 
     public void LoadSettings()
     {
         PublishROS = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "false"));
         DisplaySimObjects = bool.Parse(PlayerPrefs.GetString("DisplaySimToggle", "false"));
+        NoWaterMode = bool.Parse(PlayerPrefs.GetString("NoWaterModeToggle", "false"));
         HydrophonesNumberOption = PlayerPrefs.GetInt("HydrophonesNumberOption", 0);
 
         PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "false"));
@@ -221,6 +262,7 @@ public class SimulationSettings : MonoBehaviour
     {
         PlayerPrefs.SetString("PublishROSToggle", PublishROS.ToString());
         PlayerPrefs.SetString("DisplaySimToggle", DisplaySimObjects.ToString());
+        PlayerPrefs.SetString("NoWaterModeToggle", NoWaterMode.ToString());
         PlayerPrefs.SetInt("HydrophonesNumberOption", HydrophonesNumberOption);
 
         PlayerPrefs.SetString("PublishDVLToggle", PublishDVL.ToString());

@@ -4,19 +4,19 @@ namespace Utils
 {
     /// <summary>
     /// Handles random number generation for sensor noise simulation.
+    /// Uses Unity's optimized random for main thread performance.
     /// </summary>
     public static class Stochastic
     {
-        private static readonly System.Random rng = new System.Random();
-
         /// <summary>
         /// Generates a standard normal distribution number (Mean = 0, StdDev = 1)
         /// using the Box-Muller transform.
         /// </summary>
         public static float GenerateGaussian()
         {
-            float u1 = 1.0f - (float)rng.NextDouble();
-            float u2 = 1.0f - (float)rng.NextDouble();
+            // 1.0f - Random.value ensures u1 is never 0, preventing Log(0) = -Infinity
+            float u1 = 1.0f - Random.value;
+            float u2 = Random.value;
             return Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
         }
 
@@ -37,7 +37,7 @@ namespace Utils
         /// </summary>
         public static float GenerateUniform()
         {
-            return (float)rng.NextDouble();
+            return Random.value;
         }
     }
 

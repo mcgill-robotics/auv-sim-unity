@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
-using UnityEngine.UI;
 using TMPro;
 
 public class FreeCameraController : MonoBehaviour
@@ -90,7 +89,7 @@ public class FreeCameraController : MonoBehaviour
             initialMousePosition = GetWorldPointUnderMouse();
             isPanning = true;
         }
-        else if (Input.GetMouseButtonUp(1) && Input.GetMouseButtonUp(2))
+        else if (Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
         {
             isPanning = false;
         }
@@ -119,9 +118,25 @@ public class FreeCameraController : MonoBehaviour
             );
             
             var pickedElement = hudDocument.rootVisualElement.panel.Pick(panelPosition);
+            
+            // Check if picked element is a meaningful UI element (not root or transparent container)
             if (pickedElement != null && pickedElement != hudDocument.rootVisualElement)
             {
-                return true; // Mouse is over a UI element
+                // Walk up the tree to find if we're over an actual visible UI element
+                var element = pickedElement;
+                while (element != null && element != hudDocument.rootVisualElement)
+                {
+                    // Check if this element has visible background/border or is interactive
+                    if (element.resolvedStyle.backgroundColor.a > 0.01f ||
+                        element.resolvedStyle.borderTopWidth > 0 ||
+                        element is Button || element is Toggle || element is TextField ||
+                        element is ScrollView || element is DropdownField ||
+                        element.name.StartsWith("Drawer") || element.name.StartsWith("TopBar"))
+                    {
+                        return true;
+                    }
+                    element = element.parent;
+                }
             }
         }
         

@@ -50,6 +50,9 @@ public class ZED2iSimSender : MonoBehaviour
     
     [Space(10)]
     [Header("Debug")]
+    [Tooltip("Send orientation to ZED SDK. Disable to send Identity (helps debug tracking issues)")]
+    public bool sendOrientation = true;
+    
     [Tooltip("Enable debug logging of orientation and acceleration values")]
     public bool debugLogging = false;
     
@@ -62,10 +65,10 @@ public class ZED2iSimSender : MonoBehaviour
     private int targetHeight = 600;
 
     // --- Internals ---
-    // Physics State calculation without Rigidbody
-    private Vector3 lastPosition;
+    // Physics State (latched in FixedUpdate, read in CaptureAndSend)
     private Vector3 lastLinearVelocity;
     private Vector3 currentProperAccelLocal;
+    private Vector3 currentAngularVelocityLocal;
     
     private Quaternion initialRotationInv;
     private RenderTexture leftRT, rightRT, flipRT;
@@ -109,6 +112,12 @@ public class ZED2iSimSender : MonoBehaviour
         float ax, float ay, float az);
 
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
+    private static extern int ingest_imu(int id, long timestamp_ns,
+        float vx, float vy, float vz,   // Angular Velocity (deg/s)
+        float ax, float ay, float az,   // Linear Acceleration (m/s²)
+        float qw, float qx, float qy, float qz); // Orientation
+
+    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
     private static extern void close_streamer(int id);
 
     void Start()
@@ -131,10 +140,9 @@ public class ZED2iSimSender : MonoBehaviour
             targetFPS = SimulationSettings.Instance.FrontCamRate;
             Debug.Log("[ZED Sim] Using settings: " + targetWidth + "x" + targetHeight + " @" + targetFPS + " FPS");
         }
-        rb.sleepThreshold = 0.0f;
+        if (rb != null) rb.sleepThreshold = 0.0f;
 
         // Init physics state
-        lastPosition = transform.position;
         lastLinearVelocity = Vector3.zero;
         
         // Zero out start rotation so ZED starts at Identity
@@ -148,48 +156,66 @@ public class ZED2iSimSender : MonoBehaviour
         StartCoroutine(InitializeNativeStreamer());
     }
 
-    // --- MANUAL PHYSICS CALCULATION ---
+    // --- PHYSICS CALCULATION (50Hz) ---
+    // Calculates and sends high-frequency IMU data for stable positional tracking
     void FixedUpdate()
     {
-        if (rb.IsSleeping())
-        {
-            rb.WakeUp();
-        }
+        if (rb == null || !isStreaming) return;
+        
+        if (rb.IsSleeping()) rb.WakeUp();
+        
         float dt = Time.fixedDeltaTime;
         if (dt <= 0) return;
 
-        /*
-        Vector3 currentPos = transform.position;
-
-        // 1. Calculate Velocity (v = dx / dt)
-        Vector3 currentVelocity = (currentPos - lastPosition) / dt;
-
-        // 2. Calculate Kinematic Acceleration (a = dv / dt)
-        Vector3 worldAccel = (currentVelocity - lastVelocity) / dt;
-
-        // 3. Calculate Proper Acceleration (What IMU feels)
-        // a_proper = a_kinematic - gravity
-        // Stationary: 0 - (-9.81) = +9.81 (Upwards)
-        Vector3 properAccelWorld = worldAccel - Physics.gravity;
-
-        // 4. Convert to Local Frame (Camera Space)
-        currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
-
-        // Update state for next frame
-        lastPosition = currentPos;
-        lastVelocity = currentVelocity;
-        */
-
-        if (rb == null) return;
-
+        // Calculate Proper Acceleration (what the IMU feels)
         Vector3 currentVelocity = rb.linearVelocity;
-        if (Time.fixedDeltaTime > 0)
-        {
-            Vector3 worldAccel = (currentVelocity - lastLinearVelocity) / Time.fixedDeltaTime;
-            Vector3 properAccelWorld = worldAccel - Physics.gravity;
-            currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
-        }
+        Vector3 worldAccel = (currentVelocity - lastLinearVelocity) / dt;
+        Vector3 properAccelWorld = worldAccel - Physics.gravity; // +9.81 UP when static
+        
+        // Transform to Local Sensor Frame
+        currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
+        
+        // Angular Velocity: World rad/s -> Local deg/s
+        Vector3 angVelLocal = transform.InverseTransformDirection(rb.angularVelocity);
+        currentAngularVelocityLocal = angVelLocal * Mathf.Rad2Deg;
+        
         lastLinearVelocity = currentVelocity;
+        
+        // --- SEND HIGH-FREQUENCY IMU DATA (50Hz) ---
+        SendIMUData();
+    }
+    
+    private void SendIMUData()
+    {
+        // Get timestamp
+        long timestamp_ns = (long)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1_000_000);
+        
+        // Orientation (Unity LHS -> ZED RHS)
+        float qx, qy, qz, qw;
+        if (sendOrientation)
+        {
+            Quaternion deltaRot = initialRotationInv * transform.rotation;
+            qx = invertRotX ? -deltaRot.x : deltaRot.x;
+            qy = invertRotY ? -deltaRot.y : deltaRot.y;
+            qz = invertRotZ ? -deltaRot.z : deltaRot.z;
+            qw = deltaRot.w;
+        }
+        else
+        {
+            qx = 0; qy = 0; qz = 0; qw = 1;
+        }
+        
+        // Acceleration (m/s²)
+        float ax = invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x;
+        float ay = invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y;
+        float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
+        
+        // Angular Velocity (deg/s) - match rotation axis inversions
+        float vx = invertRotX ? -currentAngularVelocityLocal.x : currentAngularVelocityLocal.x;
+        float vy = invertRotY ? -currentAngularVelocityLocal.y : currentAngularVelocityLocal.y;
+        float vz = invertRotZ ? -currentAngularVelocityLocal.z : currentAngularVelocityLocal.z;
+        
+        ingest_imu(streamerID, timestamp_ns, vx, vy, vz, ax, ay, az, qw, qx, qy, qz);
     }
 
     IEnumerator CaptureAndSend()
@@ -223,20 +249,25 @@ public class ZED2iSimSender : MonoBehaviour
             RenderTexture.active = null;
 
             // --- 2. Orientation ---
-            // Calculate Delta Rotation from startup
-            Quaternion deltaRot = initialRotationInv * transform.rotation;
+            float qx, qy, qz, qw;
+            if (sendOrientation)
+            {
+                // Calculate Delta Rotation from startup
+                Quaternion deltaRot = initialRotationInv * transform.rotation;
 
-            // Unity (LHS) -> ZED (RHS)
-            // We negate X, Y, Z components to map Left-Handed Y-Up to Right-Handed Y-Down
-            float qx = invertRotX ? -deltaRot.x : deltaRot.x;
-            float qy = invertRotY ? -deltaRot.y : deltaRot.y; 
-            float qz = invertRotZ ? -deltaRot.z : deltaRot.z;
-            float qw = deltaRot.w;
+                // Unity (LHS) -> ZED (RHS)
+                qx = invertRotX ? -deltaRot.x : deltaRot.x;
+                qy = invertRotY ? -deltaRot.y : deltaRot.y; 
+                qz = invertRotZ ? -deltaRot.z : deltaRot.z;
+                qw = deltaRot.w;
+            }
+            else
+            {
+                // Send Identity for debugging tracking issues
+                qx = 0; qy = 0; qz = 0; qw = 1;
+            }
 
-            // --- 3. Acceleration ---
-            // We calculated Proper Accel in Unity Frame (+9.81 Y when static).
-            // ZED Bridge needs to receive +9.81 so it can flip it internally to -9.81.
-            // So we do NOT invert Y here (invertAccelY = false).
+            // --- 3. Acceleration (latched from FixedUpdate) ---
             float ax = invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x;
             float ay = invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y;
             float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
@@ -315,6 +346,14 @@ public class ZED2iSimSender : MonoBehaviour
     void OnDestroy() 
     { 
         if (isStreaming) close_streamer(streamerID);
-        if (flipRT != null) flipRT.Release();
+        
+        // Release RenderTextures
+        if (leftRT != null) { leftRT.Release(); Destroy(leftRT); }
+        if (rightRT != null) { rightRT.Release(); Destroy(rightRT); }
+        if (flipRT != null) { flipRT.Release(); Destroy(flipRT); }
+        
+        // Destroy Texture2D buffers
+        if (texBufferLeft != null) Destroy(texBufferLeft);
+        if (texBufferRight != null) Destroy(texBufferRight);
     }
 }
