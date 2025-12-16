@@ -26,6 +26,9 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Depth sensor data topic")]
     public string DepthTopic = "/sensors/depth";
     
+    [Tooltip("Pressure sensor data topic (FluidPressure)")]
+    public string PressureTopic = "/sensors/pressure";
+    
     [Tooltip("Hydrophone bearing data topic")]
     public string HydrophonesTopic = "/sensors/hydrophones/data";
     
@@ -79,6 +82,7 @@ public class ROSSettings : MonoBehaviour
     public string FrontCamFrameId = "zed_left_camera_optical_frame";
     public string DownCamFrameId = "down_camera_optical_frame";
     public string DepthCamFrameId = "zed_left_camera_optical_frame";
+    public string PressureFrameId = "pressure_link";
 
     private void Awake()
     {
