@@ -40,6 +40,9 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Publish hydrophone bearing data")]
     public bool PublishHydrophones = false;
     
+    [Tooltip("Publish pressure sensor data")]
+    public bool PublishPressure = false;
+    
     [Tooltip("Publish front camera images")]
     public bool PublishFrontCam = false;
     
@@ -48,6 +51,34 @@ public class SimulationSettings : MonoBehaviour
     
     [Tooltip("Stream ZED stereo camera via ZED SDK (disables front camera ROS publishing)")]
     public bool StreamZEDCamera = false;
+    
+    [Space(10)]
+    [Header("Sensor Visualization")]
+    [Tooltip("Show DVL beam visualization")]
+    public bool VisualizeDVL = true;
+    
+    [Tooltip("Show IMU acceleration/angular velocity arrows")]
+    public bool VisualizeIMU = true;
+    
+    [Tooltip("Show Pressure sensor depth line")]
+    public bool VisualizePressure = true;
+    
+    [Space(10)]
+    [Header("UI Drawer States")]
+    [Tooltip("Config drawer open state")]
+    public bool DrawerConfigOpen = true;
+    
+    [Tooltip("Controls drawer open state")]
+    public bool DrawerControlsOpen = true;
+    
+    [Tooltip("Telemetry drawer open state")]
+    public bool DrawerTelemetryOpen = true;
+    
+    [Tooltip("Sensors drawer open state")]
+    public bool DrawerSensorsOpen = true;
+    
+    [Tooltip("Camera drawer open state")]
+    public bool DrawerCameraOpen = true;
 
     [Space(10)]
     [Header("Pinger Bearing Visualization")]

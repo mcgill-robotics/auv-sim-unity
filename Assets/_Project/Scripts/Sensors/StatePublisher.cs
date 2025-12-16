@@ -78,7 +78,12 @@ public class StatePublisher : ROSPublisher
             // Reuse existing arrays
             for (int i = 0; i < numberOfPingers; i++)
             {
-                (times[i], frequencies[i]) = pingerTimeDifference.CalculateTimeDifference(i);
+                // Note: CalculateTimeDifference returns a reused array reference.
+                // We MUST Clone it because 'times[i]' needs to store distinct data for this specific pinger,
+                // and the next call to CalculateTimeDifference will overwrite the same buffer.
+                var (t, f) = pingerTimeDifference.CalculateTimeDifference(i);
+                times[i] = (uint[])t.Clone(); 
+                frequencies[i] = f;
             }
             stateMsg.frequencies = frequencies;
             stateMsg.hydrophone_one_freqs = times[0];

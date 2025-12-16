@@ -78,16 +78,21 @@ Shader "Hidden/DepthHeatmap"
                 float3 viewPos = float3(viewRay * linearZ, linearZ);
                 float trueDistance = length(viewPos);
 
-                // Logarithmic scaling for better contrast (like ZED2i)
-                float logMin = log(max(_MinDist, 0.01));
-                float logMax = log(_MaxDist);
-                float logDist = log(max(trueDistance, 0.01));
+                // Asymptotic scaling: 0 at Min, ~0.9 at Max, approaches 1.0 at Infinity
+                // This ensures "infinite range" where it gets closer and closer to deep blue
+                float range = max(_MaxDist - _MinDist, 0.001);
+                float distFromMin = max(trueDistance - _MinDist, 0.0);
                 
-                float t = saturate((logDist - logMin) / (logMax - logMin));
+                // Calculate scale k such that at _MaxDist, final t (after pow3) is 0.9 (Blue)
+                // 0.9 = (1 - exp(-k * range))^3  ->  0.9^(1/3) = 1 - exp(-k * range)
+                // exp(-k * range) = 1 - 0.9^(1/3) = 1 - 0.965 = 0.035
+                // k = -ln(0.035) / range ≈ 3.35 / range
+                float k = 3.35 / range;
+                
+                float t = 1.0 - exp(-k * distFromMin);
                 
                 // Push colors toward warm end (red/yellow/green)
-                // Values < 1.0 shift toward warm, > 1.0 shift toward cool
-                t = pow(t, 3);
+                t = pow(t, 2);
 
                 // Get ZED-style color
                 float3 color = GetZEDStyleColor(t);

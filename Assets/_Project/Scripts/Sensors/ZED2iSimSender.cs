@@ -185,10 +185,12 @@ public class ZED2iSimSender : MonoBehaviour
         SendIMUData();
     }
     
+    private static readonly DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
     private void SendIMUData()
     {
-        // Get timestamp
-        long timestamp_ns = (long)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1_000_000);
+        // Get timestamp (no allocation)
+        long timestamp_ns = (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
         
         // Orientation (Unity LHS -> ZED RHS)
         float qx, qy, qz, qw;
@@ -272,8 +274,8 @@ public class ZED2iSimSender : MonoBehaviour
             float ay = invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y;
             float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
 
-            // Use System Time for smoother network sync
-            long timestamp_ns = (long)((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds * 1_000_000);
+            // Use System Time for smoother network sync (cached epoch)
+            long timestamp_ns = (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
 
             // Get reference to raw data without creating a new byte[]
             NativeArray<byte> rawLeft = texBufferLeft.GetRawTextureData<byte>();
@@ -284,7 +286,9 @@ public class ZED2iSimSender : MonoBehaviour
             // Debug logging
             if (debugLogging && (frameCount % debugLogInterval == 0))
             {
-                Debug.Log($"[ZED Debug] Frame {frameCount}: Quat({qw:F3}, {qx:F3}, {qy:F3}, {qz:F3}) | Accel({ax:F2}, {ay:F2}, {az:F2}) m/s²");
+                // Format string less spammy than interpolation in loop
+                Debug.LogFormat("[ZED Debug] Frame {0}: Quat({1:F3}, {2:F3}, {3:F3}, {4:F3}) | Accel({5:F2}, {6:F2}, {7:F2}) m/s²", 
+                    frameCount, qw, qx, qy, qz, ax, ay, az);
             }
             frameCount++;
         }
