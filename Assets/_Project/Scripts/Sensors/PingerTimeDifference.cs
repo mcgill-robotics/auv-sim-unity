@@ -62,14 +62,25 @@ public class PingerTimeDifference : MonoBehaviour
             }
         }
 
-        scaledTimes = new uint[pingerToHydrophonesTime.Length];
-        for (int i = 0; i < pingerToHydrophonesTime.Length; i++)
+        // Ensure scaledTimes is large enough (max 4 hydrophones)
+        if (scaledTimes.Length != pingerToHydrophonesTime.Length)
+        {
+            scaledTimes = new uint[pingerToHydrophonesTime.Length];
+        }
+
+        int hydrophonesOption = SimulationSettings.Instance != null ? SimulationSettings.Instance.HydrophonesNumberOption : 0;
+        int count = hydrophonesOption + 3; // 0->3, 1->4
+
+        // Populate reused array
+        for (int i = 0; i < count && i < pingerToHydrophonesTime.Length; i++)
         {
             double hydrophoneTime = currentTime + (pingerToHydrophonesTime[i] - minDeltaTime);
             scaledTimes[i] = (uint)((hydrophoneTime * scaledTimeUnit) % doubleUintMaxValue);
         }
         
-        int hydrophonesOption = SimulationSettings.Instance != null ? SimulationSettings.Instance.HydrophonesNumberOption : 0;
-        return (scaledTimes[..(hydrophonesOption + 3)], frequencies[pingerIndex]);
+        // Return the reused array directly. The consumer should respect the known count (3 or 4)
+        // Note: This still allocates a tuple, but avoids the array allocation and slicing copy.
+        // Ideally consumer would accept a buffer, but this is a significant improvement.
+        return (scaledTimes, frequencies[pingerIndex]);
     }
 }

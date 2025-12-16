@@ -40,6 +40,11 @@ public class SimulatorHUD : MonoBehaviour
     // Sensor Publishers for data display
     private DVLPublisher dvlPublisher;
     private IMUPublisher imuPublisher;
+    private PressurePublisher pressurePublisher;
+    
+    // UI Update Throttling (Performance Optimization)
+    private float lastUIUpdateTime;
+    private const float UI_UPDATE_INTERVAL = 0.1f; // 10Hz is plenty for reading numbers
 
     // UI Elements - Settings
     private Toggle togglePublishROS;
@@ -50,6 +55,7 @@ public class SimulatorHUD : MonoBehaviour
     private Toggle toggleDVL;
     private Toggle toggleIMU;
     private Toggle toggleDepth;
+    private Toggle togglePressure;
     private Toggle toggleHydro;
     private Toggle toggleFrontCam;
     private Toggle toggleDownCam;
@@ -71,10 +77,16 @@ public class SimulatorHUD : MonoBehaviour
     
     // UI Elements - Sensor Data
     private Label textDVLVx, textDVLVy, textDVLVz, textDVLAlt, textDVLLock;
+    private Toggle toggleDVLViz;
+
     private Label textIMUAx, textIMUAy, textIMUAz;
     private Label textIMUWx, textIMUWy, textIMUWz;
-    private Toggle toggleDVLViz;
     private Toggle toggleIMUViz;
+    
+    // Pressure Sensor
+    private Label textPressureDepth;
+    private Label textPressureValue;
+    private Toggle togglePressureViz;
 
     // UI Elements - Competition
     private Label textTimer;
@@ -210,6 +222,7 @@ public class SimulatorHUD : MonoBehaviour
         toggleDVL = root.Q<Toggle>("Toggle-DVL");
         toggleIMU = root.Q<Toggle>("Toggle-IMU");
         toggleDepth = root.Q<Toggle>("Toggle-Depth");
+        togglePressure = root.Q<Toggle>("Toggle-Pressure");
         toggleHydro = root.Q<Toggle>("Toggle-Hydro");
         toggleFrontCam = root.Q<Toggle>("Toggle-FrontCam");
         toggleDownCam = root.Q<Toggle>("Toggle-DownCam");
@@ -259,6 +272,8 @@ public class SimulatorHUD : MonoBehaviour
                     dvlPublisher.enableVisualization = evt.newValue;
                     dvlPublisher.SetVisualizationActive(evt.newValue);
                 }
+                // Save to SimulationSettings for persistence
+                SimulationSettings.Instance.VisualizeDVL = evt.newValue;
             });
         }
         
@@ -270,6 +285,25 @@ public class SimulatorHUD : MonoBehaviour
                     imuPublisher.enableVisualization = evt.newValue;
                     imuPublisher.SetVisualizationActive(evt.newValue);
                 }
+                // Save to SimulationSettings for persistence
+                SimulationSettings.Instance.VisualizeIMU = evt.newValue;
+            });
+        }
+        
+        // Pressure Sensor Labels & Toggle
+        textPressureDepth = root.Q<Label>("Text-PressureDepth");
+        textPressureValue = root.Q<Label>("Text-PressureValue");
+        togglePressureViz = root.Q<Toggle>("Toggle-PressureViz");
+        
+        if (togglePressureViz != null)
+        {
+            togglePressureViz.RegisterValueChangedCallback(evt => {
+                if (pressurePublisher != null)
+                {
+                    pressurePublisher.SetVisualizationActive(evt.newValue);
+                }
+                // Save to SimulationSettings for persistence
+                SimulationSettings.Instance.VisualizePressure = evt.newValue;
             });
         }
 
@@ -329,11 +363,18 @@ public class SimulatorHUD : MonoBehaviour
     private void InitializeDrawers()
     {
         // Register click handlers on drawer tabs
-        RegisterDrawerTab("ConfigDrawer-Tab", configDrawer);
-        RegisterDrawerTab("ControlsDrawer-Tab", controlsDrawer);
-        RegisterDrawerTab("TelemetryDrawer-Tab", telemetryDrawer);
-        RegisterDrawerTab("SensorsDrawer-Tab", sensorsDrawer);
-        RegisterDrawerTab("CameraDrawer-Tab", cameraDrawer);
+        RegisterDrawerTab("ConfigDrawer-Tab", configDrawer, "Config");
+        RegisterDrawerTab("ControlsDrawer-Tab", controlsDrawer, "Controls");
+        RegisterDrawerTab("TelemetryDrawer-Tab", telemetryDrawer, "Telemetry");
+        RegisterDrawerTab("SensorsDrawer-Tab", sensorsDrawer, "Sensors");
+        RegisterDrawerTab("CameraDrawer-Tab", cameraDrawer, "Camera");
+        
+        // Load saved drawer states from SimulationSettings
+        ApplyDrawerState(configDrawer, SimulationSettings.Instance.DrawerConfigOpen);
+        ApplyDrawerState(controlsDrawer, SimulationSettings.Instance.DrawerControlsOpen);
+        ApplyDrawerState(telemetryDrawer, SimulationSettings.Instance.DrawerTelemetryOpen);
+        ApplyDrawerState(sensorsDrawer, SimulationSettings.Instance.DrawerSensorsOpen);
+        ApplyDrawerState(cameraDrawer, SimulationSettings.Instance.DrawerCameraOpen);
         
         // Log panel toggle
         if (logToggle != null && logPanel != null)
@@ -345,7 +386,23 @@ public class SimulatorHUD : MonoBehaviour
         }
     }
     
-    private void RegisterDrawerTab(string tabName, VisualElement drawer)
+    private void ApplyDrawerState(VisualElement drawer, bool isOpen)
+    {
+        if (drawer == null) return;
+        
+        if (isOpen)
+        {
+            drawer.RemoveFromClassList(DRAWER_COLLAPSED_CLASS);
+            drawer.AddToClassList(DRAWER_OPEN_CLASS);
+        }
+        else
+        {
+            drawer.RemoveFromClassList(DRAWER_OPEN_CLASS);
+            drawer.AddToClassList(DRAWER_COLLAPSED_CLASS);
+        }
+    }
+    
+    private void RegisterDrawerTab(string tabName, VisualElement drawer, string drawerName)
     {
         if (drawer == null) return;
         
@@ -355,17 +412,18 @@ public class SimulatorHUD : MonoBehaviour
         if (tab != null)
         {
             tab.RegisterCallback<PointerDownEvent>(evt => {
-                ToggleDrawer(drawer);
+                ToggleDrawer(drawer, drawerName);
                 evt.StopPropagation();
             });
         }
     }
     
-    private void ToggleDrawer(VisualElement drawer)
+    private void ToggleDrawer(VisualElement drawer, string drawerName)
     {
         if (drawer == null) return;
         
         bool isOpen = drawer.ClassListContains(DRAWER_OPEN_CLASS);
+        bool newState = !isOpen;
         
         if (isOpen)
         {
@@ -378,6 +436,23 @@ public class SimulatorHUD : MonoBehaviour
             // Open drawer
             drawer.RemoveFromClassList(DRAWER_COLLAPSED_CLASS);
             drawer.AddToClassList(DRAWER_OPEN_CLASS);
+        }
+        
+        // Save state to SimulationSettings for persistence
+        SaveDrawerState(drawerName, newState);
+    }
+    
+    private void SaveDrawerState(string drawerName, bool isOpen)
+    {
+        if (SimulationSettings.Instance == null) return;
+        
+        switch (drawerName)
+        {
+            case "Config": SimulationSettings.Instance.DrawerConfigOpen = isOpen; break;
+            case "Controls": SimulationSettings.Instance.DrawerControlsOpen = isOpen; break;
+            case "Telemetry": SimulationSettings.Instance.DrawerTelemetryOpen = isOpen; break;
+            case "Sensors": SimulationSettings.Instance.DrawerSensorsOpen = isOpen; break;
+            case "Camera": SimulationSettings.Instance.DrawerCameraOpen = isOpen; break;
         }
     }
     
@@ -463,6 +538,7 @@ public class SimulatorHUD : MonoBehaviour
         toggleDVL.value = SimulationSettings.Instance.PublishDVL;
         toggleIMU.value = SimulationSettings.Instance.PublishIMU;
         toggleDepth.value = SimulationSettings.Instance.PublishDepth;
+        togglePressure.value = SimulationSettings.Instance.PublishPressure;
         toggleHydro.value = SimulationSettings.Instance.PublishHydrophones;
         toggleFrontCam.value = SimulationSettings.Instance.PublishFrontCam;
         toggleDownCam.value = SimulationSettings.Instance.PublishDownCam;
@@ -488,6 +564,7 @@ public class SimulatorHUD : MonoBehaviour
         SimulationSettings.Instance.PublishDVL = toggleDVL.value;
         SimulationSettings.Instance.PublishIMU = toggleIMU.value;
         SimulationSettings.Instance.PublishDepth = toggleDepth.value;
+        SimulationSettings.Instance.PublishPressure = togglePressure.value;
         SimulationSettings.Instance.PublishHydrophones = toggleHydro.value;
         SimulationSettings.Instance.PublishFrontCam = toggleFrontCam.value;
         SimulationSettings.Instance.PublishDownCam = toggleDownCam.value;
@@ -584,12 +661,33 @@ public class SimulatorHUD : MonoBehaviour
         if (depthPublisher == null) depthPublisher = FindFirstObjectByType<CameraDepthPublisher>();
         if (dvlPublisher == null) dvlPublisher = FindFirstObjectByType<DVLPublisher>();
         if (imuPublisher == null) imuPublisher = FindFirstObjectByType<IMUPublisher>();
+        if (pressurePublisher == null) pressurePublisher = FindFirstObjectByType<PressurePublisher>();
         
-        // Initialize sensor viz toggle values from publishers
-        if (toggleDVLViz != null && dvlPublisher != null)
-            toggleDVLViz.SetValueWithoutNotify(dvlPublisher.enableVisualization);
-        if (toggleIMUViz != null && imuPublisher != null)
-            toggleIMUViz.SetValueWithoutNotify(imuPublisher.enableVisualization);
+        // Load visualization settings from SimulationSettings (persisted across sessions)
+        // and apply them to both the UI toggles and the publishers
+        if (dvlPublisher != null)
+        {
+            dvlPublisher.enableVisualization = SimulationSettings.Instance.VisualizeDVL;
+            dvlPublisher.SetVisualizationActive(SimulationSettings.Instance.VisualizeDVL);
+            if (toggleDVLViz != null)
+                toggleDVLViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizeDVL);
+        }
+        
+        if (imuPublisher != null)
+        {
+            imuPublisher.enableVisualization = SimulationSettings.Instance.VisualizeIMU;
+            imuPublisher.SetVisualizationActive(SimulationSettings.Instance.VisualizeIMU);
+            if (toggleIMUViz != null)
+                toggleIMUViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizeIMU);
+        }
+        
+        if (pressurePublisher != null)
+        {
+            pressurePublisher.enableVisualization = SimulationSettings.Instance.VisualizePressure;
+            pressurePublisher.SetVisualizationActive(SimulationSettings.Instance.VisualizePressure);
+            if (togglePressureViz != null)
+                togglePressureViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizePressure);
+        }
     }
 
     private void InitializeCameraDropdown()
@@ -773,12 +871,9 @@ public class SimulatorHUD : MonoBehaviour
     {
         if (uiDocument == null) return;
         
-        // 1. Check Focus State
+        // --- Keep Input Logic Running Every Frame (Responsive) ---
         var focusedElement = uiDocument.rootVisualElement.focusController.focusedElement;
         
-        // Check if the focused element is a text input field (or part of one)
-        // TextInputBaseField is the base class for TextField, IntegerField, etc.
-        // Note: The focused element might be the internal text input, so we check types.
         IsInputFocused = focusedElement is TextInputBaseField<string> || 
                          focusedElement is TextInputBaseField<int> ||
                          focusedElement is TextField ||
@@ -786,15 +881,19 @@ public class SimulatorHUD : MonoBehaviour
                          focusedElement is FloatField ||
                          focusedElement is DoubleField;
 
-        // 2. Handle Escape to Blur
         if (IsInputFocused && Input.GetKeyDown(KeyCode.Escape))
         {
             focusedElement?.Blur();
             IsInputFocused = false;
         }
         
-        // 3. Update Sensor Data Display
-        UpdateSensorDataDisplay();
+        // --- Throttle Data Display (Optimization) ---
+        // Only regenerate strings and trigger layout recalculations 10 times per second
+        if (Time.time - lastUIUpdateTime > UI_UPDATE_INTERVAL)
+        {
+            UpdateSensorDataDisplay();
+            lastUIUpdateTime = Time.time;
+        }
     }
     
     private void UpdateSensorDataDisplay()
@@ -832,6 +931,15 @@ public class SimulatorHUD : MonoBehaviour
             if (textIMUWx != null) textIMUWx.text = $"{angVel.x:+0.00;-0.00}";
             if (textIMUWy != null) textIMUWy.text = $"{angVel.y:+0.00;-0.00}";
             if (textIMUWz != null) textIMUWz.text = $"{angVel.z:+0.00;-0.00}";
+        }
+        
+        // Pressure Data
+        if (pressurePublisher != null)
+        {
+            if (textPressureDepth != null)
+                textPressureDepth.text = $"{pressurePublisher.LastDepth:0.00} m";
+            if (textPressureValue != null)
+                textPressureValue.text = $"{pressurePublisher.LastPressure / 1000.0:0.0} kPa";
         }
     }
 }

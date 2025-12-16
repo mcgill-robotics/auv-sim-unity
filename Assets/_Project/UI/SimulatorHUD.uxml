@@ -1,7 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/_Project/UI/SimulatorTheme.uss?fileID=7433441132597879392&amp;guid=d590fc99fd36436b19016e9833644c8f&amp;type=3#SimulatorTheme" />
     <ui:VisualElement name="Root" class="root-container">
-        <!-- Fullscreen camera background (hidden by default, sits behind all HUD elements) -->
         <ui:Image name="FullscreenCameraBackground" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;" />
         <ui:VisualElement name="TopBar" class="top-bar">
             <ui:VisualElement class="top-bar-section">
@@ -34,6 +33,7 @@
                 <ui:Toggle name="Toggle-DVL" label="Doppler Velocity" value="true" />
                 <ui:Toggle name="Toggle-IMU" label="IMU / AHRS" value="true" />
                 <ui:Toggle name="Toggle-Depth" label="Depth Sensor" value="true" />
+                <ui:Toggle name="Toggle-Pressure" label="Pressure Sensor" value="true" />
                 <ui:Toggle name="Toggle-Hydro" label="Hydrophones" value="true" />
                 <ui:Label text="OPTICS" class="data-label text-accent margin-top-small" />
                 <ui:Toggle name="Toggle-FrontCam" label="Front Feed" value="true" />
@@ -63,7 +63,7 @@
                 <ui:Label text="⌨" class="drawer-tab-icon" />
                 <ui:Label text="C&#10;T&#10;R&#10;L&#10;S" class="drawer-tab-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="ControlsDrawer-Content" class="drawer-content drawer-content-left" style="width: 288px; height: 313px;">
+            <ui:VisualElement name="ControlsDrawer-Content" class="drawer-content drawer-content-left" style="width: 239px; height: 284px;">
                 <ui:Label text="MANUAL OVERRIDE" class="header" style="font-size: 14px; margin-bottom: 10px;" />
                 <ui:VisualElement class="keybind-row">
                     <ui:Label text="Surge (Fwd/Back)" />
@@ -95,55 +95,46 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="TelemetryDrawer" class="drawer-container drawer-container-right drawer-open" style="right: 0; top: 10px;">
+        <ui:VisualElement name="TelemetryDrawer" class="drawer-container drawer-container-right drawer-open" style="right: 0; top: 60px;">
             <ui:VisualElement name="TelemetryDrawer-Tab" class="drawer-tab drawer-tab-right" style="height: 180px;">
                 <ui:Label text="📊" class="drawer-tab-icon" />
                 <ui:Label text="T&#10;E&#10;L&#10;E&#10;M" class="drawer-tab-label drawer-tab-label-right" />
             </ui:VisualElement>
-            <ui:VisualElement name="TelemetryDrawer-Content" class="drawer-content drawer-content-right" style="width: 240px;">
+            <ui:VisualElement name="TelemetryDrawer-Content" class="drawer-content drawer-content-right" style="width: 290px; height: 184px;">
                 <ui:Label text="TELEMETRY" class="header" />
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="LONG (X)" class="data-label" />
-                    <ui:Label name="Text-PosX" text="0.00 m" class="data-value" />
+                    <ui:Label text="POSITION" class="data-label" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Label name="Text-PosX" text="0.00" class="data-value" style="width: 50px; font-size: 11px;" />
+                        <ui:Label name="Text-PosY" text="0.00" class="data-value" style="width: 50px; font-size: 11px;" />
+                        <ui:Label name="Text-PosZ" text="0.00" class="data-value" style="width: 50px; font-size: 11px;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="LAT (Y)" class="data-label" />
-                    <ui:Label name="Text-PosY" text="0.00 m" class="data-value" />
+                    <ui:Label text="ROTATION" class="data-label" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Label name="Text-RotX" text="0.0°" class="data-value" style="width: 50px; font-size: 11px;" />
+                        <ui:Label name="Text-RotZ" text="0.0°" class="data-value" style="width: 50px; font-size: 11px;" />
+                        <ui:Label name="Text-RotY" text="0.0°" class="data-value" style="width: 50px; font-size: 11px;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement class="data-row">
-                    <ui:Label text="DEPTH (Z)" class="data-label" />
-                    <ui:Label name="Text-PosZ" text="0.00 m" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement style="height: 12px;" />
-                <ui:VisualElement class="data-row">
-                    <ui:Label text="ROLL" class="data-label" />
-                    <ui:Label name="Text-RotX" text="0.0°" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="data-row">
-                    <ui:Label text="PITCH" class="data-label" />
-                    <ui:Label name="Text-RotZ" text="0.0°" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="data-row">
-                    <ui:Label text="HEADING" class="data-label" />
-                    <ui:Label name="Text-RotY" text="0.0°" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement style="height: 12px; border-bottom-width: 1px; border-color: rgb(68, 68, 68); margin-bottom: 5px;" />
+                <ui:VisualElement style="height: 8px; border-bottom-width: 1px; border-color: rgb(68, 68, 68); margin-bottom: 5px;" />
                 <ui:Label name="Text-MissionStatus" text="STATUS: STANDBY" class="data-value" style="align-self: center;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="SensorsDrawer" class="drawer-container drawer-container-right drawer-open" style="right: 0; top: 400px;">
+        <ui:VisualElement name="SensorsDrawer" class="drawer-container drawer-container-right drawer-open" style="right: 0; top: 300px;">
             <ui:VisualElement name="SensorsDrawer-Tab" class="drawer-tab drawer-tab-right" style="height: 160px;">
                 <ui:Label text="📡" class="drawer-tab-icon" />
                 <ui:Label text="S&#10;E&#10;N&#10;S&#10;E" class="drawer-tab-label drawer-tab-label-right" />
             </ui:VisualElement>
-            <ui:VisualElement name="SensorsDrawer-Content" class="drawer-content drawer-content-right" style="width: 238px; padding: 10px; height: 284px;">
+            <ui:VisualElement name="SensorsDrawer-Content" class="drawer-content drawer-content-right" style="width: 305px; padding: 10px; height: 391px;">
                 <ui:Label text="SENSOR DATA" class="header" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
                     <ui:Label text="DVL" class="data-label text-accent" />
-                    <ui:Toggle name="Toggle-DVLViz" tooltip="Show DVL beam visualization" style="margin: 0;" />
+                    <ui:Toggle name="Toggle-DVLViz" label="👁" tooltip="Show DVL beam visualization" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="Velocity" style="font-size: 11px;" />
+                    <ui:Label text="Velocity" class="data-label" />
                     <ui:VisualElement style="flex-direction: row;">
                         <ui:Label name="Text-DVLVx" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
                         <ui:Label name="Text-DVLVy" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
@@ -151,20 +142,20 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="Altitude" style="font-size: 11px;" />
+                    <ui:Label text="Altitude" class="data-label" />
                     <ui:Label name="Text-DVLAlt" text="0.00 m" class="data-value" style="width: 70px; font-size: 11px;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="Lock" style="font-size: 11px;" />
+                    <ui:Label text="Lock" class="data-label" />
                     <ui:Label name="Text-DVLLock" text="4/4 LOCK" class="data-value status-ok" style="width: 70px; font-size: 11px;" />
                 </ui:VisualElement>
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
                     <ui:Label text="IMU" class="data-label text-accent" />
-                    <ui:Toggle name="Toggle-IMUViz" tooltip="Show IMU visualization" style="margin: 0;" />
+                    <ui:Toggle name="Toggle-IMUViz" label="👁" tooltip="Show IMU visualization" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="Accel" style="font-size: 11px;" />
+                    <ui:Label text="Accel" class="data-label" />
                     <ui:VisualElement style="flex-direction: row;">
                         <ui:Label name="Text-IMUAx" text="+0.0" class="data-value" style="width: 40px; font-size: 11px;" />
                         <ui:Label name="Text-IMUAy" text="+0.0" class="data-value" style="width: 40px; font-size: 11px;" />
@@ -172,12 +163,25 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="AngVel" style="font-size: 11px;" />
+                    <ui:Label text="AngVel" class="data-label" />
                     <ui:VisualElement style="flex-direction: row;">
                         <ui:Label name="Text-IMUWx" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
                         <ui:Label name="Text-IMUWy" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
                         <ui:Label name="Text-IMUWz" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
                     </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement style="height: 6px;" />
+                <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
+                    <ui:Label text="PRESSURE" class="data-label text-accent" />
+                    <ui:Toggle name="Toggle-PressureViz" label="👁" tooltip="Show pressure depth line" style="margin: 0;" />
+                </ui:VisualElement>
+                <ui:VisualElement class="data-row">
+                    <ui:Label text="Depth" class="data-label" />
+                    <ui:Label name="Text-PressureDepth" text="0.00 m" class="data-value" style="font-size: 11px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="data-row">
+                    <ui:Label text="Pressure" class="data-label" />
+                    <ui:Label name="Text-PressureValue" text="101.3 kPa" class="data-value" style="font-size: 11px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
