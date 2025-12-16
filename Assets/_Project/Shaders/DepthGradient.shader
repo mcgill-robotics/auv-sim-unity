@@ -87,7 +87,7 @@ Shader "Hidden/DepthHeatmap"
                 
                 // Push colors toward warm end (red/yellow/green)
                 // Values < 1.0 shift toward warm, > 1.0 shift toward cool
-                t = pow(t, 2);
+                t = pow(t, 3);
 
                 // Get ZED-style color
                 float3 color = GetZEDStyleColor(t);

@@ -161,15 +161,15 @@ public class Thrusters : MonoBehaviour
             
             float targetForce = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
             
-            // Clamp to max thruster output
-            targetForce = Mathf.Clamp(targetForce, -maxThrusterForce, maxThrusterForce);
-            
-            // Apply Ramp-up (Inertia)
+            // Apply Ramp-up (Motor Inertia) - command signal ramps toward target
             currentThrusterLevels[i] = Mathf.MoveTowards(currentThrusterLevels[i], targetForce, rampRate * Time.fixedDeltaTime);
             float finalForce = currentThrusterLevels[i];
             
-            // Apply Efficiency Variance
+            // Apply Efficiency Variance (per-thruster manufacturing variance)
             finalForce *= thrusterEfficiencyScalars[i];
+            
+            // Clamp AFTER efficiency - physical thruster saturation (motor torque/RPM limit)
+            finalForce = Mathf.Clamp(finalForce, -maxThrusterForce, maxThrusterForce);
 
             Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
             Vector3 thrusterForceVector = worldForceDirection * (finalForce * massScalarRealToSim);

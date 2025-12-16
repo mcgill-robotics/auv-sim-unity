@@ -148,8 +148,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 13256600}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.41550183, y: -0.22909813, z: 0.10897687, w: 0.8734967}
+  m_LocalPosition: {x: 13.311756, y: 20.364216, z: -26.77079}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1920,6 +1920,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1813887350}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &762281599 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1258587467130263829, guid: 23a56bd1c20c876628004a14ea1b8261,
+    type: 3}
+  m_PrefabInstance: {fileID: 7025177105496563573}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &785343302
 GameObject:
   m_ObjectHideFlags: 19
@@ -2214,6 +2220,12 @@ Transform:
 --- !u!4 &848459954 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3309249668409498677, guid: 23a56bd1c20c876628004a14ea1b8261,
+    type: 3}
+  m_PrefabInstance: {fileID: 7025177105496563573}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &871712519 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6290846835601977544, guid: 23a56bd1c20c876628004a14ea1b8261,
     type: 3}
   m_PrefabInstance: {fileID: 7025177105496563573}
   m_PrefabAsset: {fileID: 0}
@@ -2963,6 +2975,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PublishROS: 0
   DisplaySimObjects: 0
+  NoWaterMode: 0
+  waterSurfaceObject: {fileID: 762281599}
+  poolPostProcessingVolume: {fileID: 871712519}
   HydrophonesNumberOption: 0
   PublishDVL: 0
   PublishIMU: 0
@@ -2970,7 +2985,7 @@ MonoBehaviour:
   PublishHydrophones: 0
   PublishFrontCam: 0
   PublishDownCam: 0
-  StreamZEDCamera: 1
+  StreamZEDCamera: 0
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
@@ -9378,7 +9393,7 @@ Transform:
   m_GameObject: {fileID: 8807818500742429687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0000141859055, y: 0.00000333786, z: -0.000007793307}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19095,7 +19110,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 77.9
   orthographic: 0
@@ -35080,6 +35095,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
       propertyPath: underWater
       value: 1
       objectReference: {fileID: 0}
@@ -35138,6 +35158,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1605656518}
+    - target: {fileID: 6290846835601977544, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8255952892118903901, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: m_Mesh
@@ -44690,7 +44715,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 77.9
   orthographic: 0
@@ -44981,12 +45006,13 @@ MonoBehaviour:
   targetFPS: 30
   leftCamera: {fileID: 7576036214537056526}
   rightCamera: {fileID: 892457791577318750}
-  invertRotY: 1
+  invertRotY: 0
   invertRotX: 1
   invertRotZ: 1
   invertAccelY: 0
   invertAccelX: 0
   invertAccelZ: 0
+  sendOrientation: 1
   debugLogging: 0
   debugLogInterval: 60
   rb: {fileID: 5423533928392263035}
@@ -45053,8 +45079,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1338581312503760882}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0.19799995, z: 0}
+  m_LocalRotation: {x: 0.615243, y: -0.043689158, z: 0.03418109, w: 0.7863834}
+  m_LocalPosition: {x: 0, y: -0.15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

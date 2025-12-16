@@ -20,6 +20,15 @@ public class ROSClock : ROSPublisher
         }
         return new RosMessageTypes.BuiltinInterfaces.TimeMsg();
     }
+    
+    /// <summary>
+    /// Returns the current ROS clock time in nanoseconds (high precision for ZED/async operations).
+    /// </summary>
+    public static long GetROSTimestampNanoseconds()
+    {
+        if (_instance == null) return 0;
+        return (long)(_instance.clockTimePassed * 1e9);
+    }
 
     protected override void Start()
     {
