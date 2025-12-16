@@ -93,15 +93,18 @@ public class CameraDepthPublisher : ROSPublisher
 
     private void CreateRenderTextures()
     {
-        // Linear depth RT (RFloat for metric depth values)
+        // Linear depth RT (RFloat for metric depth values) - no AA, point filtering for precision
         depthRT = new RenderTexture(publishWidth, publishHeight, 0, RenderTextureFormat.RFloat);
         depthRT.name = "DepthRT_Linear";
+        depthRT.filterMode = FilterMode.Point; // Exact values, no interpolation
         depthRT.Create();
         Debug.Log($"[CameraDepthPublisher] Created depthRT: {depthRT.name}");
         
-        // Visualization RT (ARGB32 for heatmap display)
+        // Visualization RT (ARGB32 for heatmap display) - with AA for smooth edges
         visualizationRT = new RenderTexture(publishWidth, publishHeight, 0, RenderTextureFormat.ARGB32);
         visualizationRT.name = "DepthRT_Heatmap";
+        visualizationRT.antiAliasing = 4;
+        visualizationRT.filterMode = FilterMode.Bilinear;
         visualizationRT.Create();
         Debug.Log($"[CameraDepthPublisher] Created visualizationRT: {visualizationRT.name}");
     }

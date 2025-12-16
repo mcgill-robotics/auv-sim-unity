@@ -20,11 +20,14 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
     *   DVL: 4-beam Janus configuration, acoustic raycasting, grazing angle checks, and outlier simulation.
 *   Debug Visualization: Added 3D debug arrows (LineRenderers) for visualizing sensor data (DVL beams, Velocity, Acceleration) in the Scene view.
 *   Refactored Project Structure: Moved all custom scripts into `_Project/` for cleaner organization.
+*   **Performance Optimization:** Replaced blocking `ReadPixels` with `AsyncGPUReadback` for all cameras, significantly reducing CPU spikes during simulation.
+*   **ZED X Synchronization:** Fixed timestamp drift between IMU and Camera streams using `ROSClock` nanoseconds. Implemented physics latching to ensure IMU data matches the rendered frame exactly.
+*   **UI Overhaul:** Redesigned HUD with collapsible **Drawers**, a persistent **Top Bar**, and a scrollable **Log Panel**.
 
 **Known Issues:**
-*   **ZED IMU:** Rotational data sent to the ZED Bridge currently causes tracking instability.
+<!-- *   **ZED IMU:** Rotational data sent to the ZED Bridge currently causes tracking instability. -->
 *   **ROS Synchronization:** Ensure the ROS TCP Endpoint matches the IP/Port configurations in the Unity Editor.
-*   **Performance:** There is a lot of potential optimization to be done.
+*   **Performance:** There is still some optimization to be done.
 
 ## Architecture
 
@@ -244,7 +247,7 @@ The simulator communicates over the following default topics (configurable in `R
 *   [ ] **Frame IDs:** Ensure `frame_id` fields in ROS messages match the TF tree expected by the ROS stack.
 
 **Priority 2: Critical Fixes**
-*   [ ] **ZED Bridge IMU:** Fix the IMU data transformation in `ZED2iSimSender`. Currently, sending rotational data breaks the ZED SDK's positional tracking loop.
+*   [X] **ZED Bridge IMU:** Fix the IMU data transformation in `ZED2iSimSender`. Currently, sending rotational data breaks the ZED SDK's positional tracking loop.
 
 **Priority 3: Usability & Workflow**
 *   [ ] **Modular Camera Modes:** Implement presets in `SimulationSettings` to quickly toggle specific configurations:
@@ -262,7 +265,7 @@ The simulator communicates over the following default topics (configurable in `R
 **Priority 6: Documentation**
 *   [ ] **Architecture:** Document the new UI Toolkit structure (`.uxml`, `.uss`, and bindings) and the Core Manager pattern.
 *   [ ] **Sensor Models:** Document the math behind the DVL acoustics simulation and IMU noise models.
-*   [ ] **Setup Guide:** specific instructions for configuring the Unity 6 environment.
+*   [X] **Setup Guide:** specific instructions for configuring the Unity 6 environment.
 
 ## Directory Structure
 *   **Assets/_Project:** Contains all custom simulator code and assets.

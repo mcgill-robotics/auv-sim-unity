@@ -45,6 +45,8 @@ public class SimulatorHUD : MonoBehaviour
     private Toggle togglePublishROS;
     private Toggle toggleSimObjects;
     private Toggle toggleStreamZED;
+    private Toggle toggleNoWater;
+    private Toggle toggleFreeCamera;
     private Toggle toggleDVL;
     private Toggle toggleIMU;
     private Toggle toggleDepth;
@@ -187,6 +189,24 @@ public class SimulatorHUD : MonoBehaviour
         togglePublishROS = root.Q<Toggle>("Toggle-PublishROS");
         toggleSimObjects = root.Q<Toggle>("Toggle-SimObjects");
         toggleStreamZED = root.Q<Toggle>("Toggle-StreamZED");
+        toggleNoWater = root.Q<Toggle>("Toggle-NoWater");
+        toggleNoWater.RegisterValueChangedCallback(evt => {
+            if (SimulationSettings.Instance != null)
+            {
+                SimulationSettings.Instance.NoWaterMode = evt.newValue;
+                SimulationSettings.Instance.ApplyNoWaterMode();
+            }
+        });
+        toggleFreeCamera = root.Q<Toggle>("Toggle-FreeCamera");
+        toggleFreeCamera.RegisterValueChangedCallback(evt => {
+            if (CameraManager.Instance != null)
+            {
+                if (evt.newValue)
+                    CameraManager.Instance.ActivateFreeCam();
+                else
+                    CameraManager.Instance.ActivateFollowCam();
+            }
+        });
         toggleDVL = root.Q<Toggle>("Toggle-DVL");
         toggleIMU = root.Q<Toggle>("Toggle-IMU");
         toggleDepth = root.Q<Toggle>("Toggle-Depth");
@@ -439,6 +459,7 @@ public class SimulatorHUD : MonoBehaviour
         togglePublishROS.value = SimulationSettings.Instance.PublishROS;
         toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
         toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
+        toggleNoWater.value = SimulationSettings.Instance.NoWaterMode;
         toggleDVL.value = SimulationSettings.Instance.PublishDVL;
         toggleIMU.value = SimulationSettings.Instance.PublishIMU;
         toggleDepth.value = SimulationSettings.Instance.PublishDepth;
@@ -463,6 +484,7 @@ public class SimulatorHUD : MonoBehaviour
         SimulationSettings.Instance.PublishROS = togglePublishROS.value;
         SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
         SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
+        SimulationSettings.Instance.NoWaterMode = toggleNoWater.value;
         SimulationSettings.Instance.PublishDVL = toggleDVL.value;
         SimulationSettings.Instance.PublishIMU = toggleIMU.value;
         SimulationSettings.Instance.PublishDepth = toggleDepth.value;
@@ -644,8 +666,6 @@ public class SimulatorHUD : MonoBehaviour
             fullscreenCameraBackground.image = selectedTexture;
         }
     }
-
-    // Removed GetOrCreateTargetTexture as we now use publisher textures directly
 
     private void OnSaveImage()
     {

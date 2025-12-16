@@ -21,9 +21,7 @@ public class CameraPublisher : ROSPublisher
     private int resolutionHeight = 480;
 
     private ImageMsg message;
-    private Texture2D texture2D;
     private RenderTexture renderTexture;
-    private Rect rect;
 
     // Camera Info
     private CameraInfoMsg cameraInfoMsg;
@@ -121,8 +119,6 @@ public class CameraPublisher : ROSPublisher
             cam.targetTexture = renderTexture;
         }
 
-        texture2D = new Texture2D(resolutionWidth, resolutionHeight, TextureFormat.RGB24, false);
-        rect = new Rect(0, 0, resolutionWidth, resolutionHeight);
         message = new ImageMsg();
         string currentFrameId = cameraType == CameraType.Front ? ROSSettings.Instance.FrontCamFrameId : ROSSettings.Instance.DownCamFrameId;
         message.header = new HeaderMsg { frame_id = currentFrameId };
@@ -132,6 +128,8 @@ public class CameraPublisher : ROSPublisher
         message.step = (uint)(resolutionWidth * 3);
     }
 
+    private bool isReading = false;  // Prevent queueing too many async requests
+    
     protected override void FixedUpdate()
     {
         // Check if we should publish to ROS
@@ -142,7 +140,7 @@ public class CameraPublisher : ROSPublisher
             if (cameraType == CameraType.Down && SimulationSettings.Instance.PublishDownCam) shouldPublish = true;
         }
 
-        if (!shouldPublish) return;
+        if (!shouldPublish || isReading) return;
         
         // Rate limiting
         timeSinceLastPublish += Time.fixedDeltaTime;
@@ -151,32 +149,43 @@ public class CameraPublisher : ROSPublisher
             timeSinceLastPublish = 0f;
 
             // Safety Check
-            if (cam == null || texture2D == null || renderTexture == null || !renderTexture.IsCreated()) return;
+            if (cam == null || renderTexture == null || !renderTexture.IsCreated()) return;
             
-            // Read from RenderTexture (CameraRenderManager handles the actual rendering)
-            RenderTexture currentRT = RenderTexture.active;
-            RenderTexture.active = renderTexture;
-            texture2D.ReadPixels(rect, 0, 0);
-            texture2D.Apply();
-            RenderTexture.active = currentRT;
+            // Capture timestamp NOW (when frame was rendered), not when readback completes
+            var stamp = ROSClock.GetROSTimestamp();
             
-            // Publish to ROS
-            PublishMessage();
+            isReading = true;
+            
+            // Async GPU Readback - doesn't stall CPU waiting for GPU
+            UnityEngine.Rendering.AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGB24, 
+                req => OnReadbackComplete(req, stamp));
         }
+    }
+    
+    private void OnReadbackComplete(UnityEngine.Rendering.AsyncGPUReadbackRequest req, RosMessageTypes.BuiltinInterfaces.TimeMsg stamp)
+    {
+        isReading = false;
+        
+        if (req.hasError)
+        {
+            Debug.LogWarning($"[CameraPublisher] AsyncGPUReadback failed for {cameraType}");
+            return;
+        }
+        
+        // Get raw data and publish
+        var rawData = req.GetData<byte>();
+        message.data = rawData.ToArray();
+        message.header.stamp = stamp;
+        ros.Publish(Topic, message);
+
+        // Publish Camera Info with synced timestamp
+        cameraInfoMsg.header.stamp = stamp;
+        ros.Publish(cameraInfoTopic, cameraInfoMsg);
     }
 
     public override void PublishMessage()
     {
-        // Note: Rendering is now done in FixedUpdate loop
-        
-        // Publish Image
-        message.data = texture2D.GetRawTextureData();
-        message.header.stamp = ROSClock.GetROSTimestamp();
-        ros.Publish(Topic, message);
-
-        // Publish Camera Info
-        cameraInfoMsg.header.stamp = message.header.stamp; // Sync timestamps
-        ros.Publish(cameraInfoTopic, cameraInfoMsg);
+        // No-op: Publishing is now handled asynchronously in OnReadbackComplete
     }
     
     // Helper for flipping texture (used by Depth Publisher)
@@ -191,10 +200,6 @@ public class CameraPublisher : ROSPublisher
         {
             renderTexture.Release();
             Destroy(renderTexture);
-        }
-        if (texture2D != null)
-        {
-            Destroy(texture2D);
         }
     }
 }
