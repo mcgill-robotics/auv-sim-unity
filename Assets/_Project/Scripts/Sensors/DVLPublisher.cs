@@ -150,80 +150,27 @@ public class DVLPublisher : ROSPublisher
         visualizationRoot.transform.localPosition = Vector3.zero;
         visualizationRoot.transform.localRotation = Quaternion.identity;
         
-        // Create materials
-        beamValidMat = CreateMaterial(Color.green);
-        beamInvalidMat = CreateMaterial(Color.red);
-        velocityMat = CreateMaterial(new Color(1f, 0.8f, 0.2f)); // Yellow/Gold
+        // Create materials using shared utility
+        beamValidMat = VisualizationUtils.CreateMaterial(Color.green);
+        beamInvalidMat = VisualizationUtils.CreateMaterial(Color.red);
+        velocityMat = VisualizationUtils.CreateMaterial(new Color(1f, 0.8f, 0.2f)); // Yellow/Gold
         
         // Create beam arrows and cache their renderers
         beamArrows = new GameObject[4];
         beamArrowRenderers = new Renderer[4][];
         for (int i = 0; i < 4; i++)
         {
-            beamArrows[i] = CreateArrow($"Beam_{i}", beamValidMat, 0.02f);
+            beamArrows[i] = VisualizationUtils.CreateArrow($"Beam_{i}", beamValidMat, 0.02f);
             beamArrows[i].transform.SetParent(visualizationRoot.transform);
             beamArrowRenderers[i] = beamArrows[i].GetComponentsInChildren<Renderer>();
         }
         
         // Create velocity arrow
-        velocityArrow = CreateArrow("VelocityArrow", velocityMat, 0.04f);
+        velocityArrow = VisualizationUtils.CreateArrow("VelocityArrow", velocityMat, 0.04f);
         velocityArrow.transform.SetParent(visualizationRoot.transform);
         velocityArrow.SetActive(false);
     }
-    
-    private Material CreateMaterial(Color color)
-    {
-        // specific shader lookup for HDRP
-        Shader shader = Shader.Find("HDRP/Lit");
-        if (shader == null) shader = Shader.Find("Universal Render Pipeline/Lit");
-        if (shader == null) shader = Shader.Find("Standard");
-        
-        Material mat = new Material(shader);
-        
-        // Set both _Color (Standard) and _BaseColor (HDRP/URP) to be safe
-        if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
-        if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
-        
-        // Emission settings
-        mat.EnableKeyword("_EMISSION");
-        if (mat.HasProperty("_EmissiveColor")) mat.SetColor("_EmissiveColor", color * 0.5f);
-        if (mat.HasProperty("_EmissionColor")) mat.SetColor("_EmissionColor", color * 0.5f);
-        
-        return mat;
-    }
-    
-    private GameObject CreateArrow(string name, Material mat, float thickness)
-    {
-        GameObject arrowRoot = new GameObject(name);
-        
-        // Shaft (Cylinder) - pivot at base, extends in +Y
-        GameObject shaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        shaft.name = "Shaft";
-        shaft.transform.SetParent(arrowRoot.transform);
-        shaft.transform.localPosition = new Vector3(0, 0.5f, 0);
-        shaft.transform.localScale = new Vector3(thickness, 0.5f, thickness);
-        Object.Destroy(shaft.GetComponent<Collider>());
-        
-        Renderer shaftRen = shaft.GetComponent<Renderer>();
-        shaftRen.material = mat;
-        shaftRen.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        shaftRen.receiveShadows = false;
-        
-        // Head (Cube as arrow tip)
-        GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        head.name = "Head";
-        head.transform.SetParent(arrowRoot.transform);
-        head.transform.localPosition = new Vector3(0, 1.0f, 0);
-        head.transform.localScale = new Vector3(thickness * 2f, thickness * 2f, thickness * 2f);
-        Object.Destroy(head.GetComponent<Collider>());
-        
-        Renderer headRen = head.GetComponent<Renderer>();
-        headRen.material = mat;
-        headRen.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        headRen.receiveShadows = false;
-        
-        return arrowRoot;
-    }
+
 
     protected override void FixedUpdate()
     {
@@ -494,6 +441,8 @@ public class DVLPublisher : ROSPublisher
     /// </summary>
     public void SetVisualizationActive(bool active)
     {
+        enableVisualization = active;
+
         if (visualizationRoot != null)
         {
             visualizationRoot.SetActive(active);
@@ -506,5 +455,9 @@ public class DVLPublisher : ROSPublisher
         {
             Destroy(visualizationRoot);
         }
+        // Cleanup runtime-created materials to prevent memory leaks
+        if (beamValidMat != null) Destroy(beamValidMat);
+        if (beamInvalidMat != null) Destroy(beamInvalidMat);
+        if (velocityMat != null) Destroy(velocityMat);
     }
 }
