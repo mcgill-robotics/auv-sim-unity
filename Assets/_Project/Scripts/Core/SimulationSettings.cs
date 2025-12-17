@@ -217,6 +217,7 @@ public class SimulationSettings : MonoBehaviour
         PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "false"));
         PublishIMU = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "false"));
         PublishDepth = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "false"));
+        PublishPressure = bool.Parse(PlayerPrefs.GetString("PublishPressureToggle", "false"));
         PublishHydrophones = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "false"));
         PublishFrontCam = bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "false"));
         PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
@@ -299,6 +300,7 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("PublishDVLToggle", PublishDVL.ToString());
         PlayerPrefs.SetString("PublishIMUToggle", PublishIMU.ToString());
         PlayerPrefs.SetString("PublishDepthToggle", PublishDepth.ToString());
+        PlayerPrefs.SetString("PublishPressureToggle", PublishPressure.ToString());
         PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophones.ToString());
         PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCam.ToString());
         PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCam.ToString());

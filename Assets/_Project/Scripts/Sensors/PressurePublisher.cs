@@ -46,6 +46,8 @@ public class PressurePublisher : ROSPublisher
     private FluidPressureMsg pressureMsg;
     private LineRenderer depthLine;
     private GameObject visualizationRoot;
+    private Material lineMaterial;  // Store reference for cleanup
+    private Texture2D lineTexture;  // Store reference for cleanup
     
     // Public property for UI/other scripts
     public double LastPressure { get; private set; }
@@ -96,7 +98,9 @@ public class PressurePublisher : ROSPublisher
         depthLine.receiveShadows = false;
         
         // Enable texture tiling along the line length
+        // Tile mode + textureScale controls dots per world unit
         depthLine.textureMode = LineTextureMode.Tile;
+        depthLine.textureScale = new Vector2(5f, 1f); // 5 dots per world unit
         
         visualizationRoot.SetActive(enableVisualization);
     }
@@ -104,25 +108,25 @@ public class PressurePublisher : ROSPublisher
     private Material CreateDottedLineMaterial()
     {
         // Create a simple dotted texture (16 pixels: 8 on, 8 off)
-        Texture2D dottedTexture = new Texture2D(16, 1, TextureFormat.RGBA32, false);
-        dottedTexture.filterMode = FilterMode.Point;
-        dottedTexture.wrapMode = TextureWrapMode.Repeat;
+        lineTexture = new Texture2D(16, 1, TextureFormat.RGBA32, false);
+        lineTexture.filterMode = FilterMode.Point;
+        lineTexture.wrapMode = TextureWrapMode.Repeat;
         
         // Create dot pattern: filled, then empty
         for (int i = 0; i < 16; i++)
         {
             // First 8 pixels = visible (white), last 8 = transparent
             Color pixelColor = i < 8 ? Color.white : Color.clear;
-            dottedTexture.SetPixel(i, 0, pixelColor);
+            lineTexture.SetPixel(i, 0, pixelColor);
         }
-        dottedTexture.Apply();
+        lineTexture.Apply();
         
         // Create material
-        Material mat = new Material(Shader.Find("Sprites/Default"));
-        mat.mainTexture = dottedTexture;
-        mat.mainTextureScale = new Vector2(10f, 1f); // 10 dots per unit length
+        lineMaterial = new Material(Shader.Find("Sprites/Default"));
+        lineMaterial.mainTexture = lineTexture;
+        lineMaterial.mainTextureScale = new Vector2(30f, 1f); // 5 dots per unit length
         
-        return mat;
+        return lineMaterial;
     }
 
     protected override void FixedUpdate()
@@ -236,5 +240,8 @@ public class PressurePublisher : ROSPublisher
         {
             Destroy(visualizationRoot);
         }
+        // Cleanup runtime-created material and texture to prevent memory leaks
+        if (lineMaterial != null) Destroy(lineMaterial);
+        if (lineTexture != null) Destroy(lineTexture);
     }
 }

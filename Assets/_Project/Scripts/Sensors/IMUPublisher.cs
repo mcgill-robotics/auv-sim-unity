@@ -144,16 +144,16 @@ public class IMUPublisher : ROSPublisher
         visualizationRoot.transform.localPosition = Vector3.zero;
         visualizationRoot.transform.localRotation = Quaternion.identity;
         
-        // Create materials
-        accelMat = CreateMaterial(new Color(1f, 0.2f, 0.8f)); // Magenta
+        // Create materials using shared utility
+        accelMat = VisualizationUtils.CreateMaterial(new Color(1f, 0.2f, 0.8f)); // Magenta
         
         angVelMats = new Material[3];
-        angVelMats[0] = CreateMaterial(Color.red);   // X
-        angVelMats[1] = CreateMaterial(Color.green); // Y
-        angVelMats[2] = CreateMaterial(Color.blue);  // Z
+        angVelMats[0] = VisualizationUtils.CreateMaterial(Color.red);   // X
+        angVelMats[1] = VisualizationUtils.CreateMaterial(Color.green); // Y
+        angVelMats[2] = VisualizationUtils.CreateMaterial(Color.blue);  // Z
         
         // Create acceleration arrow
-        accelArrow = CreateArrow("AccelArrow", accelMat, 0.03f);
+        accelArrow = VisualizationUtils.CreateArrow("AccelArrow", accelMat, 0.03f);
         accelArrow.transform.SetParent(visualizationRoot.transform);
         accelArrow.SetActive(false);
         
@@ -163,65 +163,12 @@ public class IMUPublisher : ROSPublisher
         
         for (int i = 0; i < 3; i++)
         {
-            angVelArrows[i] = CreateArrow(names[i], angVelMats[i], 0.02f);
+            angVelArrows[i] = VisualizationUtils.CreateArrow(names[i], angVelMats[i], 0.02f);
             angVelArrows[i].transform.SetParent(visualizationRoot.transform);
             angVelArrows[i].SetActive(false);
         }
     }
-    
-    private Material CreateMaterial(Color color)
-    {
-        // specific shader lookup for HDRP
-        Shader shader = Shader.Find("HDRP/Lit");
-        if (shader == null) shader = Shader.Find("Universal Render Pipeline/Lit");
-        if (shader == null) shader = Shader.Find("Standard");
-        
-        Material mat = new Material(shader);
-        
-        // Set both _Color (Standard) and _BaseColor (HDRP/URP) to be safe
-        if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
-        if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
-        
-        // Emission settings
-        mat.EnableKeyword("_EMISSION");
-        if (mat.HasProperty("_EmissiveColor")) mat.SetColor("_EmissiveColor", color * 0.5f);
-        if (mat.HasProperty("_EmissionColor")) mat.SetColor("_EmissionColor", color * 0.5f);
-        
-        return mat;
-    }
-    
-    private GameObject CreateArrow(string name, Material mat, float thickness)
-    {
-        GameObject arrowRoot = new GameObject(name);
-        
-        // Shaft (Cylinder)
-        GameObject shaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        shaft.name = "Shaft";
-        shaft.transform.SetParent(arrowRoot.transform);
-        shaft.transform.localPosition = new Vector3(0, 0.5f, 0);
-        shaft.transform.localScale = new Vector3(thickness, 0.5f, thickness);
-        Object.Destroy(shaft.GetComponent<Collider>());
-        
-        Renderer shaftRen = shaft.GetComponent<Renderer>();
-        shaftRen.material = mat;
-        shaftRen.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        shaftRen.receiveShadows = false;
-        
-        // Head (Cube)
-        GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        head.name = "Head";
-        head.transform.SetParent(arrowRoot.transform);
-        head.transform.localPosition = new Vector3(0, 1.0f, 0);
-        head.transform.localScale = new Vector3(thickness * 2f, thickness * 2f, thickness * 2f);
-        Object.Destroy(head.GetComponent<Collider>());
-        
-        Renderer headRen = head.GetComponent<Renderer>();
-        headRen.material = mat;
-        headRen.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        headRen.receiveShadows = false;
-        
-        return arrowRoot;
-    }
+
 
     protected override void FixedUpdate()
     {
@@ -433,6 +380,8 @@ public class IMUPublisher : ROSPublisher
     /// </summary>
     public void SetVisualizationActive(bool active)
     {
+        enableVisualization = active;
+
         if (visualizationRoot != null)
         {
             visualizationRoot.SetActive(active);
@@ -442,5 +391,14 @@ public class IMUPublisher : ROSPublisher
     private void OnDestroy()
     {
         if (visualizationRoot != null) Destroy(visualizationRoot);
+        // Cleanup runtime-created materials to prevent memory leaks
+        if (accelMat != null) Destroy(accelMat);
+        if (angVelMats != null)
+        {
+            foreach (var mat in angVelMats)
+            {
+                if (mat != null) Destroy(mat);
+            }
+        }
     }
 }

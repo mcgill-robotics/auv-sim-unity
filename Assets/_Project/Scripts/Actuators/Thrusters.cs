@@ -107,45 +107,24 @@ public class Thrusters : MonoBehaviour
     private void InitializeArrows()
     {
         arrowInstances = new GameObject[thrusters.Length];
-        GameObject prefabToUse = CreateDefaultArrowPrefab();
+        
+        // Create material and template arrow using shared utility
+        Material arrowMat = Utils.VisualizationUtils.CreateMaterial(Color.red);
+        GameObject templateArrow = Utils.VisualizationUtils.CreateArrow("DefaultArrow", arrowMat, 0.1f);
 
         for (int i = 0; i < thrusters.Length; i++)
         {
-            arrowInstances[i] = Instantiate(prefabToUse, thrusters[i].position, Quaternion.identity);
+            arrowInstances[i] = Instantiate(templateArrow, thrusters[i].position, Quaternion.identity);
             arrowInstances[i].transform.parent = thrusters[i]; // Parent to thruster so it moves with AUV
             arrowInstances[i].SetActive(false);
         }
 
-        // If we created a runtime prefab, destroy the template
-        Destroy(prefabToUse);
+        // Destroy the template and material (instances keep their own copies)
+        Destroy(templateArrow);
+        Destroy(arrowMat);
     }
 
-    private GameObject CreateDefaultArrowPrefab()
-    {
-        GameObject arrowRoot = new GameObject("DefaultArrow");
-        
-        // Shaft (Cylinder)
-        GameObject shaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        shaft.transform.parent = arrowRoot.transform;
-        shaft.transform.localPosition = new Vector3(0, 0.5f, 0); // Pivot at base
-        shaft.transform.localScale = new Vector3(0.1f, 0.5f, 0.1f); // Height is 2*scaleY = 1.0
-        DestroyImmediate(shaft.GetComponent<Collider>()); // Remove immediately before instantiation
 
-        // Head (Cube as simple pointer)
-        GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        head.transform.parent = arrowRoot.transform;
-        head.transform.localPosition = new Vector3(0, 1.0f, 0);
-        head.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-        DestroyImmediate(head.GetComponent<Collider>()); // Remove immediately before instantiation
-
-        // Material color
-        Renderer shaftRen = shaft.GetComponent<Renderer>();
-        Renderer headRen = head.GetComponent<Renderer>();
-        shaftRen.material.color = Color.red;
-        headRen.material.color = Color.red;
-
-        return arrowRoot;
-    }
 
     private void Update()
     {
