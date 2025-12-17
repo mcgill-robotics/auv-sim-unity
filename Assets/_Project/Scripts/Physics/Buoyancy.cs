@@ -20,7 +20,14 @@ public class Buoyancy : MonoBehaviour
     public Vector3 centerOfMass;
 
     private Rigidbody auvRb;
+    
+    /// <summary>
+    /// Threshold depth (in meters) for partial submersion calculation.
+    /// When AUV is within this distance of Y=0, buoyancy is scaled linearly.
+    /// Uses AUV length / 4 as a rough approximation of the vehicle's "waterline height".
+    /// </summary>
     private float auvLengthOver4;
+    
     private Vector3 buoyancyForceVector;
     private Vector3 buoyancyForceVectorScaled;
 
@@ -29,10 +36,14 @@ public class Buoyancy : MonoBehaviour
     {
         auvRb = GetComponent<Rigidbody>();
         auvRb.centerOfMass = centerOfMass;
+        
+        // Use 1/4 of AUV length as the "waterline zone" depth threshold
         auvLengthOver4 = auvRb.transform.localScale.x / 4;
+        
         buoyancyForceVector = Vector3.up * buoyancyForce;
         buoyancyForceVectorScaled = buoyancyForceVector / auvLengthOver4;
     }
+
 
     private void FixedUpdate()
     {

@@ -187,12 +187,7 @@ public class CameraPublisher : ROSPublisher
     {
         // No-op: Publishing is now handled asynchronously in OnReadbackComplete
     }
-    
-    // Helper for flipping texture (used by Depth Publisher)
-    public static byte[] FlipTextureVertically(Texture2D original, int step)
-    {
-        return original.GetRawTextureData(); 
-    }
+
 
     protected virtual void OnDestroy()
     {

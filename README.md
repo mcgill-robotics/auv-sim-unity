@@ -20,12 +20,13 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
     *   DVL: 4-beam Janus configuration, acoustic raycasting, grazing angle checks, and outlier simulation.
 *   Debug Visualization: Added 3D debug arrows (LineRenderers) for visualizing sensor data (DVL beams, Velocity, Acceleration) in the Scene view.
 *   Refactored Project Structure: Moved all custom scripts into `_Project/` for cleaner organization.
-*   **Performance Optimization:** Replaced blocking `ReadPixels` with `AsyncGPUReadback` for all cameras, significantly reducing CPU spikes during simulation.
-*   **ZED X Synchronization:** Fixed timestamp drift between IMU and Camera streams using `ROSClock` nanoseconds. Implemented physics latching to ensure IMU data matches the rendered frame exactly.
-*   **UI Overhaul:** Redesigned HUD with collapsible **Drawers**, a persistent **Top Bar**, and a scrollable **Log Panel**.
+*   Performance Optimization: Replaced blocking `ReadPixels` with `AsyncGPUReadback` for all cameras, significantly reducing CPU spikes during simulation.
+*   ZED X Synchronization: Fixed timestamp drift between IMU and Camera streams using `ROSClock` nanoseconds. Implemented physics latching to ensure IMU data matches the rendered frame exactly.
+*   UI Overhaul: Redesigned HUD with collapsible **Drawers**, a persistent **Top Bar**, and a scrollable **Log Panel**.
+*   Refactored `SimulatorHUD` into 4 focused controllers: `SettingsController`, `TelemetryController`, `CameraFeedController`, `SensorDataController`.
+*   Added Pressure sensor depth line visualization with configurable dotted pattern.
 
 **Known Issues:**
-<!-- *   **ZED IMU:** Rotational data sent to the ZED Bridge currently causes tracking instability. -->
 *   **ROS Synchronization:** Ensure the ROS TCP Endpoint matches the IP/Port configurations in the Unity Editor.
 *   **Performance:** There is still some optimization to be done.
 
@@ -155,10 +156,12 @@ All sensors inherit from the abstract `ROSPublisher` class. This base class hand
 *   **Dropper:** Handles the mechanism for releasing markers during competition tasks.
 
 ### 4. User Interface (`Scripts/UI`)
-The simulator uses **UI Toolkit** (UXML/USS) for the Heads-Up Display (`SimulatorHUD`).
-*   **Settings Panel:** Live configuration of sensor publishing, resolution, and graphics quality.
-*   **Telemetry:** Real-time visualization of AUV pose, velocity, and mission status.
-*   **Visual Feed:** Debug views for camera streams and depth maps.
+The simulator uses **UI Toolkit** (UXML/USS) for the Heads-Up Display.
+*   **SimulatorHUD:** Main coordinator for drawers, logging, and Update loop.
+*   **SettingsController:** Manages Config drawer - sensor toggles, save button, ROS connection state.
+*   **TelemetryController:** Subscribes to ROS state topics for position/rotation display.
+*   **CameraFeedController:** Camera feed dropdown, fullscreen toggle, and snapshot saving.
+*   **SensorDataController:** DVL/IMU/Pressure data display with visualization toggles.
 
 ## Installation & Setup
 
@@ -269,11 +272,12 @@ The simulator communicates over the following default topics (configurable in `R
 
 ## Directory Structure
 *   **Assets/_Project:** Contains all custom simulator code and assets.
-    *   **Scripts/Core:** Managers and Singletons.
-    *   **Scripts/Sensors:** ROS publishing logic and ZED interface.
+    *   **Scripts/Core:** Managers and Singletons (`SimulationSettings`, `ROSSettings`, `ROSClock`, `InputManager`).
+    *   **Scripts/Sensors:** ROS publishing logic and ZED interface (`DVLPublisher`, `IMUPublisher`, `CameraPublisher`, `ZED2iSimSender`).
     *   **Scripts/Actuators:** Thrusters and physical manipulators.
     *   **Scripts/Physics:** Hydrodynamics and buoyancy.
-    *   **Scripts/UI:** UI Toolkit scripts and view logic.
+    *   **Scripts/UI:** UI Toolkit controllers (`SimulatorHUD`, `SettingsController`, `TelemetryController`, etc.).
+    *   **Scripts/Utils:** Shared utilities (`VisualizationUtils` for debug arrow creation).
     *   **Scripts/CompetitionSettings:** Task-specific logic and scoring.
     *   **UI:** `.uxml` layouts and `.uss` stylesheets.
 *   **Assets/3rdParty:** External assets (SkySeries, TextMesh Pro).
