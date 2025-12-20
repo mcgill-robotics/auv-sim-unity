@@ -8,6 +8,47 @@ namespace Utils
     /// </summary>
     public static class VisualizationUtils
     {
+        public const int INDICATOR_LAYER = 22; // Suggested layer for Sim_Indicators
+
+        /// <summary>
+        /// Moves a GameObject and all its children to the X-Ray indicator layer.
+        /// </summary>
+        public static void SetXRayLayer(GameObject obj)
+        {
+            obj.layer = INDICATOR_LAYER;
+            foreach (Transform child in obj.transform)
+            {
+                SetXRayLayer(child.gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Sets the _BaseColor and _Color properties on a Renderer using a MaterialPropertyBlock.
+        /// This is the best way to handle per-object colors when using material overrides (like X-Ray pass).
+        /// </summary>
+        public static void SetColorProperty(Renderer ren, Color color)
+        {
+            MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+            ren.GetPropertyBlock(mpb);
+            mpb.SetColor("_BaseColor", color);
+            mpb.SetColor("_Color", color); // Fallback for standard shaders
+            ren.SetPropertyBlock(mpb);
+        }
+
+        /// <summary>
+        /// Creates an X-Ray ghost material based on the Hidden/XRayGhost shader.
+        /// </summary>
+        public static Material CreateXRayMaterial(Color color, float opacity = 0.5f)
+        {
+            Shader shader = Shader.Find("Hidden/XRayGhost");
+            if (shader == null) return CreateMaterial(color); // Fallback to standard
+
+            Material mat = new Material(shader);
+            mat.SetColor("_BaseColor", color);
+            mat.SetFloat("_Opacity", opacity);
+            return mat;
+        }
+
         /// <summary>
         /// Creates a material with the specified color. Supports HDRP, URP, and Standard pipeline.
         /// Remember to Destroy() the material in OnDestroy() to prevent memory leaks.
@@ -34,6 +75,39 @@ namespace Utils
         }
         
         /// <summary>
+        /// Creates a simple 3D dot (sphere) that uses the X-Ray ghost material.
+        /// The dot is automatically moved to the INDICATOR_LAYER.
+        /// </summary>
+        /// <param name="name">Name for the dot GameObject</param>
+        /// <param name="parent">Parent transform</param>
+        /// <param name="color">Color for the dot</param>
+        /// <param name="size">Scale of the sphere</param>
+        /// <returns>Dot GameObject</returns>
+        public static GameObject CreateSensorDot(string name, Transform parent, Color color, float size = 0.05f)
+        {
+            GameObject dot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            dot.name = name;
+            dot.transform.SetParent(parent);
+            dot.transform.localPosition = Vector3.zero;
+            dot.transform.localRotation = Quaternion.identity;
+            dot.transform.localScale = new Vector3(size, size, size);
+            
+            Object.DestroyImmediate(dot.GetComponent<Collider>());
+            
+            Material mat = CreateMaterial(color); // Use standard material for solid presence
+            Renderer ren = dot.GetComponent<Renderer>();
+            ren.material = mat;
+            ren.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            ren.receiveShadows = false;
+            
+            SetColorProperty(ren, color); // Apply to MPB for X-Ray color override
+            
+            SetXRayLayer(dot);
+            
+            return dot;
+        }
+
+        /// <summary>
         /// Creates a simple 3D arrow (cylinder shaft + cube head) pointing in +Y direction.
         /// The arrow's pivot is at its base, making it easy to position and scale.
         /// Remember to Destroy() the returned GameObject in OnDestroy().
@@ -59,6 +133,12 @@ namespace Utils
             shaftRen.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             shaftRen.receiveShadows = false;
             
+            // Extract color from material and apply to MPB for X-Ray override
+            Color col = Color.white;
+            if (mat.HasProperty("_BaseColor")) col = mat.GetColor("_BaseColor");
+            else if (mat.HasProperty("_Color")) col = mat.GetColor("_Color");
+            SetColorProperty(shaftRen, col);
+            
             // Head (Cube as arrow tip)
             GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
             head.name = "Head";
@@ -71,6 +151,7 @@ namespace Utils
             headRen.material = mat;
             headRen.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             headRen.receiveShadows = false;
+            SetColorProperty(headRen, col);
             
             return arrowRoot;
         }

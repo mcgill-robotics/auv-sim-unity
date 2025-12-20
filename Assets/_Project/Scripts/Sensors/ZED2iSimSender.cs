@@ -30,7 +30,7 @@ public class ZED2iSimSender : MonoBehaviour
     [Space(10)]
     [Header("Coordinate System Mapping")]
     [Tooltip("Invert rotation Y axis to convert Unity LHS to ZED RHS")]
-    public bool invertRotY = true;
+    public bool invertRotY = false;
     
     [Tooltip("Invert rotation X axis")]
     public bool invertRotX = true;
