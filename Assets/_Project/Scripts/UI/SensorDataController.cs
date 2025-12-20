@@ -10,16 +10,19 @@ public class SensorDataController
     // DVL Labels
     private Label textDVLVx, textDVLVy, textDVLVz;
     private Label textDVLAlt, textDVLLock;
+    private Label labelDVL;
     private Toggle toggleDVLViz;
     
     // IMU Labels
     private Label textIMUAx, textIMUAy, textIMUAz;
     private Label textIMUWx, textIMUWy, textIMUWz;
+    private Label labelIMU;
     private Toggle toggleIMUViz;
     
     // Pressure Labels
     private Label textPressureDepth;
     private Label textPressureValue;
+    private Label labelPressure;
     private Toggle togglePressureViz;
     
     // Publisher References
@@ -56,6 +59,10 @@ public class SensorDataController
         textPressureDepth = root.Q<Label>("Text-PressureDepth");
         textPressureValue = root.Q<Label>("Text-PressureValue");
         togglePressureViz = root.Q<Toggle>("Toggle-PressureViz");
+        
+        labelDVL = root.Q<Label>("Label-DVL");
+        labelIMU = root.Q<Label>("Label-IMU");
+        labelPressure = root.Q<Label>("Label-Pressure");
     }
     
     private void RegisterCallbacks()
@@ -68,6 +75,7 @@ public class SensorDataController
                     dvlPublisher.SetVisualizationActive(evt.newValue);
                 }
                 SimulationSettings.Instance.VisualizeDVL = evt.newValue;
+                SimulationSettings.Instance.SaveSettings();
             });
         }
         
@@ -79,6 +87,7 @@ public class SensorDataController
                     imuPublisher.SetVisualizationActive(evt.newValue);
                 }
                 SimulationSettings.Instance.VisualizeIMU = evt.newValue;
+                SimulationSettings.Instance.SaveSettings();
             });
         }
         
@@ -90,6 +99,7 @@ public class SensorDataController
                     pressurePublisher.SetVisualizationActive(evt.newValue);
                 }
                 SimulationSettings.Instance.VisualizePressure = evt.newValue;
+                SimulationSettings.Instance.SaveSettings();
             });
         }
     }
@@ -124,6 +134,24 @@ public class SensorDataController
             if (togglePressureViz != null)
                 togglePressureViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizePressure);
         }
+
+        // Apply colors to UI labels
+        UpdateLabelColors();
+    }
+
+    /// <summary>
+    /// Syncs the HUD sensor names with the publishers' visualization colors.
+    /// </summary>
+    private void UpdateLabelColors()
+    {
+        if (dvlPublisher != null && labelDVL != null)
+            labelDVL.style.color = new StyleColor(dvlPublisher.visualizationColor);
+            
+        if (imuPublisher != null && labelIMU != null)
+            labelIMU.style.color = new StyleColor(imuPublisher.visualizationColor);
+            
+        if (pressurePublisher != null && labelPressure != null)
+            labelPressure.style.color = new StyleColor(pressurePublisher.visualizationColor);
     }
     
     /// <summary>

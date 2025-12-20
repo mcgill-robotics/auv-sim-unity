@@ -154,7 +154,7 @@ public class CameraFeedController
         }
     }
     
-    private void OnSaveImage()
+    public void OnSaveImage()
     {
         if (cameraFeedImage == null || cameraFeedImage.image == null)
         {
@@ -207,5 +207,19 @@ public class CameraFeedController
         File.WriteAllBytes(fullPath, bytes);
 
         logCallback?.Invoke($"Snapshot saved to: {fullPath}");
+    }
+
+    /// <summary>
+    /// Cycles to the next available camera feed.
+    /// </summary>
+    public void CycleCamera()
+    {
+        if (dropdownCamTopic == null || dropdownCamTopic.choices == null || dropdownCamTopic.choices.Count <= 1) return;
+
+        int nextIndex = (dropdownCamTopic.index + 1) % dropdownCamTopic.choices.Count;
+        dropdownCamTopic.index = nextIndex;
+        
+        // This triggers the value changed callback which calls UpdateCameraFeed
+        logCallback?.Invoke($"Switched to camera: {dropdownCamTopic.value}");
     }
 }

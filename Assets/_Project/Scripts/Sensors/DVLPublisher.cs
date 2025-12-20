@@ -71,9 +71,11 @@ public class DVLPublisher : ROSPublisher
     public float maxGrazingAngle = 60f;
     
     [Space(10)]
-    [Header("Visualization")]
     [Tooltip("Enable LineRenderer visualization of beams and velocity")]
     public bool enableVisualization = true;
+
+    [Tooltip("Color for velocity arrow and location dot")]
+    public Color visualizationColor = new Color(1f, 0.8f, 0.2f); // Golden
     
     [Tooltip("Scale factor for velocity arrow visualization")]
     [Range(0.1f, 5f)]
@@ -107,6 +109,8 @@ public class DVLPublisher : ROSPublisher
     private Material beamValidMat;
     private Material beamInvalidMat;
     private Material velocityMat;
+    private Material dotMat;
+    private GameObject locationDot;
 
     protected override void Start()
     {
@@ -162,13 +166,19 @@ public class DVLPublisher : ROSPublisher
         {
             beamArrows[i] = VisualizationUtils.CreateArrow($"Beam_{i}", beamValidMat, 0.02f);
             beamArrows[i].transform.SetParent(visualizationRoot.transform);
+            VisualizationUtils.SetXRayLayer(beamArrows[i]);
             beamArrowRenderers[i] = beamArrows[i].GetComponentsInChildren<Renderer>();
         }
         
         // Create velocity arrow
         velocityArrow = VisualizationUtils.CreateArrow("VelocityArrow", velocityMat, 0.04f);
         velocityArrow.transform.SetParent(visualizationRoot.transform);
+        VisualizationUtils.SetXRayLayer(velocityArrow);
         velocityArrow.SetActive(false);
+        
+        // Create sensor location dot (always visible X-Ray marker)
+        locationDot = VisualizationUtils.CreateSensorDot("DVL_Location", visualizationRoot.transform, visualizationColor, 0.05f);
+        dotMat = locationDot.GetComponent<Renderer>().material;
     }
 
 
@@ -375,7 +385,13 @@ public class DVLPublisher : ROSPublisher
                 if (beamArrowRenderers != null && beamArrowRenderers[i] != null)
                 {
                     Material mat = BeamValid[i] ? beamValidMat : beamInvalidMat;
-                    foreach (var r in beamArrowRenderers[i]) r.material = mat;
+                    Color col = BeamValid[i] ? Color.green : Color.red;
+                    
+                    foreach (var r in beamArrowRenderers[i])
+                    {
+                        r.material = mat;
+                        VisualizationUtils.SetColorProperty(r, col);
+                    }
                 }
             }
         }
@@ -459,5 +475,6 @@ public class DVLPublisher : ROSPublisher
         if (beamValidMat != null) Destroy(beamValidMat);
         if (beamInvalidMat != null) Destroy(beamInvalidMat);
         if (velocityMat != null) Destroy(velocityMat);
+        if (dotMat != null) Destroy(dotMat);
     }
 }

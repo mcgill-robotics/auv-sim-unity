@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Unity.Robotics.ROSTCPConnector;
+using System.Collections.Generic;
 
 /// <summary>
 /// Main HUD coordinator. Manages drawer system, logging, competition UI, and delegates
@@ -51,6 +52,8 @@ public class SimulatorHUD : MonoBehaviour
     private Label logToggle;
     private ScrollView logScrollView;
     private VisualElement logPanel;
+    private List<string> logLines = new List<string>();
+    private const int MAX_LOG_LINES = 50;
 
     // UI Elements - Drawers
     private VisualElement configDrawer;
@@ -275,6 +278,8 @@ public class SimulatorHUD : MonoBehaviour
             case "Sensors": SimulationSettings.Instance.DrawerSensorsOpen = isOpen; break;
             case "Camera": SimulationSettings.Instance.DrawerCameraOpen = isOpen; break;
         }
+        
+        SimulationSettings.Instance.SaveSettings();
     }
     
     private void ToggleLogPanel()
@@ -348,7 +353,14 @@ public class SimulatorHUD : MonoBehaviour
         
         if (textLog != null)
         {
-            textLog.text += $"\n> {message}";
+            // Maintain a rolling list of log lines for performance
+            logLines.Add($"> {message}");
+            if (logLines.Count > MAX_LOG_LINES)
+            {
+                logLines.RemoveAt(0);
+            }
+
+            textLog.text = string.Join("\n", logLines);
             
             // Auto-scroll to bottom
             if (logScrollView != null)
@@ -379,6 +391,19 @@ public class SimulatorHUD : MonoBehaviour
         {
             focusedElement?.Blur();
             IsInputFocused = false;
+        }
+
+        // Camera shortcuts (only if not typing)
+        if (!IsInputFocused && InputManager.Instance != null)
+        {
+            if (Input.GetKeyDown(InputManager.Instance.GetKey("cameraSnapshotKeybind", KeyCode.P)))
+            {
+                cameraFeedController?.OnSaveImage();
+            }
+            if (Input.GetKeyDown(InputManager.Instance.GetKey("cameraCycleKeybind", KeyCode.V)))
+            {
+                cameraFeedController?.CycleCamera();
+            }
         }
         
         // Throttled sensor data updates (10Hz)

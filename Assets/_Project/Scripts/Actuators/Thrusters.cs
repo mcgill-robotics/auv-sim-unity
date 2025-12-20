@@ -43,6 +43,9 @@ public class Thrusters : MonoBehaviour
     [Range(0.001f, 0.1f)]
     public float forceVisualScale = 0.02f;
 
+    [Tooltip("Color for thruster force arrows")]
+    public Color visualizationColor = Color.red;
+
     [Space(10)]
     [Header("Thruster Limits")]
     [Tooltip("Maximum force (N) a single thruster can output. T200 ≈ 50N, T500 ≈ 150N")]
@@ -58,6 +61,7 @@ public class Thrusters : MonoBehaviour
     public float efficiencyVariance = 0.05f;
     
     private GameObject[] arrowInstances;
+    private Material arrowMat;
 
     private ROSConnection roscon;
     private bool isFrozen = false;
@@ -109,19 +113,19 @@ public class Thrusters : MonoBehaviour
         arrowInstances = new GameObject[thrusters.Length];
         
         // Create material and template arrow using shared utility
-        Material arrowMat = Utils.VisualizationUtils.CreateMaterial(Color.red);
+        arrowMat = Utils.VisualizationUtils.CreateMaterial(visualizationColor);
         GameObject templateArrow = Utils.VisualizationUtils.CreateArrow("DefaultArrow", arrowMat, 0.1f);
 
         for (int i = 0; i < thrusters.Length; i++)
         {
             arrowInstances[i] = Instantiate(templateArrow, thrusters[i].position, Quaternion.identity);
             arrowInstances[i].transform.parent = thrusters[i]; // Parent to thruster so it moves with AUV
+            Utils.VisualizationUtils.SetXRayLayer(arrowInstances[i]);
             arrowInstances[i].SetActive(false);
         }
 
-        // Destroy the template and material (instances keep their own copies)
+        // Destroy the template (instances keep their own copies of the GO but share the material)
         Destroy(templateArrow);
-        Destroy(arrowMat);
     }
 
 
@@ -205,7 +209,21 @@ public class Thrusters : MonoBehaviour
         if (Input.GetKeyDown(InputManager.Instance.GetKey("freezeKeybind", KeyCode.Space)))
         {
             isFrozen = !isFrozen;
+            if (isFrozen)
+            {
+                // Kill all momentum for a clean stop BEFORE setting kinematic
+                // Unity throws an error if we set velocity on a kinematic body
+                auvRb.linearVelocity = Vector3.zero;
+                auvRb.angularVelocity = Vector3.zero;
+                Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
+                SimulatorHUD.Instance?.Log("<color=orange>AUV FROZEN</color> - Momentum cleared.");
+            }
+            else
+            {
+                SimulatorHUD.Instance?.Log("<color=green>AUV UNFROZEN</color> - Physics active.");
+            }
             auvRb.isKinematic = isFrozen;
+
         }
     }
 
@@ -327,5 +345,33 @@ public class Thrusters : MonoBehaviour
             float randomOffset = UnityEngine.Random.Range(-efficiencyVariance, efficiencyVariance);
             thrusterEfficiencyScalars[i] = 1.0f + randomOffset;
         }
+    }
+
+    private void OnValidate()
+    {
+        if (!Application.isPlaying || arrowMat == null) return;
+        
+        // Update material color
+        if (arrowMat.HasProperty("_BaseColor")) arrowMat.SetColor("_BaseColor", visualizationColor);
+        if (arrowMat.HasProperty("_Color")) arrowMat.SetColor("_Color", visualizationColor);
+        
+        // Update MPB on all instances for X-Ray
+        if (arrowInstances != null)
+        {
+            foreach (var arrow in arrowInstances)
+            {
+                if (arrow == null) continue;
+                var renders = arrow.GetComponentsInChildren<Renderer>(true);
+                foreach (var r in renders)
+                {
+                    Utils.VisualizationUtils.SetColorProperty(r, visualizationColor);
+                }
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (arrowMat != null) Destroy(arrowMat);
     }
 }

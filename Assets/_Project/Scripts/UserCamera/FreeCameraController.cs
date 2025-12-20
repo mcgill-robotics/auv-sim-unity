@@ -52,15 +52,7 @@ public class FreeCameraController : MonoBehaviour
     private void Update()
     {
         // Don't control camera if interacting with UI
-        if (IsMouseOverUI()) return;
-
-        // Don't control if mouse is outside game window
-        if (!IsMouseOverGameWindow())
-        {
-            isPanning = false;
-            isDragging = false;
-            return;
-        }
+        if (Utils.UIUtils.IsMouseOverUI()) return;
 
         HandleInput();
 
@@ -104,48 +96,6 @@ public class FreeCameraController : MonoBehaviour
             Vector3 moveDir = cam.transform.forward * scrollInput * scrollSpeed * distanceToWorld / 5f;
             cam.transform.position += moveDir;
         }
-    }
-
-    private bool IsMouseOverUI()
-    {
-        // UI Toolkit detection
-        var hudDocument = SimulatorHUD.Instance?.uiDocument;
-        if (hudDocument != null && hudDocument.rootVisualElement != null)
-        {
-            var panelPosition = RuntimePanelUtils.ScreenToPanel(
-                hudDocument.rootVisualElement.panel,
-                new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y)
-            );
-            
-            var pickedElement = hudDocument.rootVisualElement.panel.Pick(panelPosition);
-            
-            // Check if picked element is a meaningful UI element (not root or transparent container)
-            if (pickedElement != null && pickedElement != hudDocument.rootVisualElement)
-            {
-                // Walk up the tree to find if we're over an actual visible UI element
-                var element = pickedElement;
-                while (element != null && element != hudDocument.rootVisualElement)
-                {
-                    // Check if this element has visible background/border or is interactive
-                    if (element.resolvedStyle.backgroundColor.a > 0.01f ||
-                        element.resolvedStyle.borderTopWidth > 0 ||
-                        element is Button || element is Toggle || element is TextField ||
-                        element is ScrollView || element is DropdownField ||
-                        element.name.StartsWith("Drawer") || element.name.StartsWith("TopBar"))
-                    {
-                        return true;
-                    }
-                    element = element.parent;
-                }
-            }
-        }
-        
-        return false;
-    }
-
-    private bool IsMouseOverGameWindow()
-    {
-        return !(0 > Input.mousePosition.x || 0 > Input.mousePosition.y || Screen.width < Input.mousePosition.x || Screen.height < Input.mousePosition.y);
     }
 
     private void UpdateDragging()
