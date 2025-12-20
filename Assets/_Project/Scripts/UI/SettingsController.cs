@@ -12,7 +12,8 @@ public class SettingsController
     private Toggle togglePublishROS;
     private Toggle toggleSimObjects;
     private Toggle toggleStreamZED;
-    private Toggle toggleNoWater;
+    private Toggle toggleWater;
+    private Toggle toggleShadows;
     private Toggle toggleFreeCamera;
     private Toggle toggleDVL;
     private Toggle toggleIMU;
@@ -52,7 +53,8 @@ public class SettingsController
         togglePublishROS = root.Q<Toggle>("Toggle-PublishROS");
         toggleSimObjects = root.Q<Toggle>("Toggle-SimObjects");
         toggleStreamZED = root.Q<Toggle>("Toggle-StreamZED");
-        toggleNoWater = root.Q<Toggle>("Toggle-NoWater");
+        toggleWater = root.Q<Toggle>("Toggle-Water");
+        toggleShadows = root.Q<Toggle>("Toggle-Shadows");
         toggleFreeCamera = root.Q<Toggle>("Toggle-FreeCamera");
         toggleDVL = root.Q<Toggle>("Toggle-DVL");
         toggleIMU = root.Q<Toggle>("Toggle-IMU");
@@ -78,14 +80,26 @@ public class SettingsController
     
     private void RegisterCallbacks(VisualElement root)
     {
-        // No Water toggle - immediate effect
-        if (toggleNoWater != null)
+        // Water toggle - immediate effect (Inverted: Enable Water = true means NoWaterMode = false)
+        if (toggleWater != null)
         {
-            toggleNoWater.RegisterValueChangedCallback(evt => {
+            toggleWater.RegisterValueChangedCallback(evt => {
                 if (SimulationSettings.Instance != null)
                 {
-                    SimulationSettings.Instance.NoWaterMode = evt.newValue;
+                    SimulationSettings.Instance.NoWaterMode = !evt.newValue;
                     SimulationSettings.Instance.ApplyNoWaterMode();
+                }
+            });
+        }
+
+        // Shadows toggle - immediate effect
+        if (toggleShadows != null)
+        {
+            toggleShadows.RegisterValueChangedCallback(evt => {
+                if (SimulationSettings.Instance != null)
+                {
+                    SimulationSettings.Instance.EnableShadows = evt.newValue;
+                    SimulationSettings.Instance.ApplyShadows();
                 }
             });
         }
@@ -178,7 +192,8 @@ public class SettingsController
         if (togglePublishROS != null) togglePublishROS.value = SimulationSettings.Instance.PublishROS;
         if (toggleSimObjects != null) toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
         if (toggleStreamZED != null) toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
-        if (toggleNoWater != null) toggleNoWater.value = SimulationSettings.Instance.NoWaterMode;
+        if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
+        if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;
         if (toggleDVL != null) toggleDVL.value = SimulationSettings.Instance.PublishDVL;
         if (toggleIMU != null) toggleIMU.value = SimulationSettings.Instance.PublishIMU;
         if (toggleDepth != null) toggleDepth.value = SimulationSettings.Instance.PublishDepth;
@@ -205,7 +220,8 @@ public class SettingsController
         if (togglePublishROS != null) SimulationSettings.Instance.PublishROS = togglePublishROS.value;
         if (toggleSimObjects != null) SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
         if (toggleStreamZED != null) SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
-        if (toggleNoWater != null) SimulationSettings.Instance.NoWaterMode = toggleNoWater.value;
+        if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
+        if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
         if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;
         if (toggleIMU != null) SimulationSettings.Instance.PublishIMU = toggleIMU.value;
         if (toggleDepth != null) SimulationSettings.Instance.PublishDepth = toggleDepth.value;

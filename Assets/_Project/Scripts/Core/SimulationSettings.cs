@@ -15,6 +15,12 @@ public class SimulationSettings : MonoBehaviour
     
     [Tooltip("Disable water volume and rendering for performance (when vision isn't needed)")]
     public bool NoWaterMode = false;
+
+    [Tooltip("Enable or disable shadows for better performance")]
+    public bool EnableShadows = true;
+
+    [Tooltip("The main directional light (Sun) to control shadows for")]
+    public Light sunLight;
     
     [Tooltip("Water surface GameObject to disable in No Water Mode")]
     public GameObject waterSurfaceObject;
@@ -207,11 +213,23 @@ public class SimulationSettings : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Applies shadow settings - called at runtime.
+    /// </summary>
+    public void ApplyShadows()
+    {
+        if (sunLight != null)
+        {
+            sunLight.shadows = EnableShadows ? LightShadows.Soft : LightShadows.None;
+        }
+    }
+
     public void LoadSettings()
     {
         PublishROS = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "false"));
         DisplaySimObjects = bool.Parse(PlayerPrefs.GetString("DisplaySimToggle", "false"));
         NoWaterMode = bool.Parse(PlayerPrefs.GetString("NoWaterModeToggle", "false"));
+        EnableShadows = bool.Parse(PlayerPrefs.GetString("EnableShadowsToggle", "true"));
         HydrophonesNumberOption = PlayerPrefs.GetInt("HydrophonesNumberOption", 0);
 
         PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "false"));
@@ -222,6 +240,16 @@ public class SimulationSettings : MonoBehaviour
         PublishFrontCam = bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "false"));
         PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
         StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
+
+        VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
+        VisualizeIMU = bool.Parse(PlayerPrefs.GetString("VisualizeIMUToggle", "true"));
+        VisualizePressure = bool.Parse(PlayerPrefs.GetString("VisualizePressureToggle", "true"));
+
+        DrawerConfigOpen = bool.Parse(PlayerPrefs.GetString("DrawerConfigOpen", "true"));
+        DrawerControlsOpen = bool.Parse(PlayerPrefs.GetString("DrawerControlsOpen", "true"));
+        DrawerTelemetryOpen = bool.Parse(PlayerPrefs.GetString("DrawerTelemetryOpen", "true"));
+        DrawerSensorsOpen = bool.Parse(PlayerPrefs.GetString("DrawerSensorsOpen", "true"));
+        DrawerCameraOpen = bool.Parse(PlayerPrefs.GetString("DrawerCameraOpen", "true"));
 
         FrontCamRate = int.Parse(PlayerPrefs.GetString("frontCamRate", "10"));
         DownCamRate = int.Parse(PlayerPrefs.GetString("downCamRate", "10"));
@@ -241,6 +269,7 @@ public class SimulationSettings : MonoBehaviour
         SnapshotSavePath = ValidateAndGetSavePath(SnapshotSavePath);
         
         QualitySettings.SetQualityLevel(QualityLevel);
+        ApplyShadows();
     }
 
     public string ValidateAndGetSavePath(string path)
@@ -295,6 +324,7 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("PublishROSToggle", PublishROS.ToString());
         PlayerPrefs.SetString("DisplaySimToggle", DisplaySimObjects.ToString());
         PlayerPrefs.SetString("NoWaterModeToggle", NoWaterMode.ToString());
+        PlayerPrefs.SetString("EnableShadowsToggle", EnableShadows.ToString());
         PlayerPrefs.SetInt("HydrophonesNumberOption", HydrophonesNumberOption);
 
         PlayerPrefs.SetString("PublishDVLToggle", PublishDVL.ToString());
@@ -305,6 +335,16 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCam.ToString());
         PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCam.ToString());
         PlayerPrefs.SetString("StreamZEDCameraToggle", StreamZEDCamera.ToString());
+
+        PlayerPrefs.SetString("VisualizeDVLToggle", VisualizeDVL.ToString());
+        PlayerPrefs.SetString("VisualizeIMUToggle", VisualizeIMU.ToString());
+        PlayerPrefs.SetString("VisualizePressureToggle", VisualizePressure.ToString());
+
+        PlayerPrefs.SetString("DrawerConfigOpen", DrawerConfigOpen.ToString());
+        PlayerPrefs.SetString("DrawerControlsOpen", DrawerControlsOpen.ToString());
+        PlayerPrefs.SetString("DrawerTelemetryOpen", DrawerTelemetryOpen.ToString());
+        PlayerPrefs.SetString("DrawerSensorsOpen", DrawerSensorsOpen.ToString());
+        PlayerPrefs.SetString("DrawerCameraOpen", DrawerCameraOpen.ToString());
 
         PlayerPrefs.SetString("frontCamRate", FrontCamRate.ToString());
         PlayerPrefs.SetString("downCamRate", DownCamRate.ToString());
@@ -330,6 +370,7 @@ public class SimulationSettings : MonoBehaviour
         if (isLoaded)
         {
             SaveSettings();
+            ApplyShadows();
         }
     }
 #endif

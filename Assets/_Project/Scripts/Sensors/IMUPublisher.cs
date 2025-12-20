@@ -79,6 +79,9 @@ public class IMUPublisher : ROSPublisher
     [Range(0.1f, 2f)]
     public float angVelArrowScale = 0.5f;
 
+    [Tooltip("Color for acceleration arrow and location dot")]
+    public Color visualizationColor = new Color(1f, 0.2f, 0.8f); // Magenta
+
     // Public properties for UI/other scripts
     public Vector3 LastAcceleration { get; private set; }
     public Vector3 LastAngularVelocity { get; private set; }
@@ -95,9 +98,11 @@ public class IMUPublisher : ROSPublisher
     // Visualization (3D mesh arrows)
     private GameObject accelArrow;
     private GameObject[] angVelArrows; // RGB for XYZ
+    private GameObject locationDot;
     private GameObject visualizationRoot;
     private Material accelMat;
     private Material[] angVelMats;
+    private Material dotMat;
 
     protected override void Start()
     {
@@ -145,7 +150,7 @@ public class IMUPublisher : ROSPublisher
         visualizationRoot.transform.localRotation = Quaternion.identity;
         
         // Create materials using shared utility
-        accelMat = VisualizationUtils.CreateMaterial(new Color(1f, 0.2f, 0.8f)); // Magenta
+        accelMat = VisualizationUtils.CreateMaterial(visualizationColor);
         
         angVelMats = new Material[3];
         angVelMats[0] = VisualizationUtils.CreateMaterial(Color.red);   // X
@@ -155,6 +160,7 @@ public class IMUPublisher : ROSPublisher
         // Create acceleration arrow
         accelArrow = VisualizationUtils.CreateArrow("AccelArrow", accelMat, 0.03f);
         accelArrow.transform.SetParent(visualizationRoot.transform);
+        VisualizationUtils.SetXRayLayer(accelArrow);
         accelArrow.SetActive(false);
         
         // Create angular velocity arrows (RGB for XYZ)
@@ -165,8 +171,13 @@ public class IMUPublisher : ROSPublisher
         {
             angVelArrows[i] = VisualizationUtils.CreateArrow(names[i], angVelMats[i], 0.02f);
             angVelArrows[i].transform.SetParent(visualizationRoot.transform);
+            VisualizationUtils.SetXRayLayer(angVelArrows[i]);
             angVelArrows[i].SetActive(false);
         }
+        
+        // Create sensor location dot (always visible X-Ray marker)
+        locationDot = VisualizationUtils.CreateSensorDot("IMU_Location", visualizationRoot.transform, visualizationColor, 0.05f);
+        dotMat = locationDot.GetComponent<Renderer>().material;
     }
 
 
@@ -400,5 +411,6 @@ public class IMUPublisher : ROSPublisher
                 if (mat != null) Destroy(mat);
             }
         }
+        if (dotMat != null) Destroy(dotMat);
     }
 }

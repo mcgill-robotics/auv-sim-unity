@@ -39,8 +39,8 @@ public class PressurePublisher : ROSPublisher
     [Tooltip("Show depth line from sensor to water surface")]
     public bool enableVisualization = true;
     
-    [Tooltip("Color of the depth visualization line")]
-    public Color lineColor = new Color(0.2f, 0.6f, 1f, 0.8f); // Light blue
+    [Tooltip("Color of the depth visualization line and location dot")]
+    public Color visualizationColor = new Color(0.2f, 0.6f, 1f, 0.8f); // Light blue
 
     // Internals
     private FluidPressureMsg pressureMsg;
@@ -48,6 +48,8 @@ public class PressurePublisher : ROSPublisher
     private GameObject visualizationRoot;
     private Material lineMaterial;  // Store reference for cleanup
     private Texture2D lineTexture;  // Store reference for cleanup
+    private Material dotMat;
+    private GameObject locationDot;
     
     // Public property for UI/other scripts
     public double LastPressure { get; private set; }
@@ -83,6 +85,7 @@ public class PressurePublisher : ROSPublisher
         // Create depth line
         GameObject lineObj = new GameObject("DepthLine");
         lineObj.transform.SetParent(visualizationRoot.transform);
+        VisualizationUtils.SetXRayLayer(lineObj);
         depthLine = lineObj.AddComponent<LineRenderer>();
         
         // Configure line appearance
@@ -92,8 +95,8 @@ public class PressurePublisher : ROSPublisher
         
         // Create dotted line material
         depthLine.material = CreateDottedLineMaterial();
-        depthLine.startColor = lineColor;
-        depthLine.endColor = lineColor;
+        depthLine.startColor = visualizationColor;
+        depthLine.endColor = visualizationColor;
         depthLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         depthLine.receiveShadows = false;
         
@@ -101,6 +104,10 @@ public class PressurePublisher : ROSPublisher
         // Tile mode + textureScale controls dots per world unit
         depthLine.textureMode = LineTextureMode.Tile;
         depthLine.textureScale = new Vector2(5f, 1f); // 5 dots per world unit
+        
+        // Create sensor location dot (always visible X-Ray marker)
+        locationDot = VisualizationUtils.CreateSensorDot("Pressure_Location", visualizationRoot.transform, visualizationColor, 0.05f);
+        dotMat = locationDot.GetComponent<Renderer>().material;
         
         visualizationRoot.SetActive(enableVisualization);
     }
@@ -229,8 +236,8 @@ public class PressurePublisher : ROSPublisher
         // Update line color
         if (depthLine != null)
         {
-            depthLine.startColor = lineColor;
-            depthLine.endColor = new Color(lineColor.r, lineColor.g, lineColor.b, 0.2f);
+            depthLine.startColor = visualizationColor;
+            depthLine.endColor = new Color(visualizationColor.r, visualizationColor.g, visualizationColor.b, 0.2f);
         }
     }
     
@@ -243,5 +250,6 @@ public class PressurePublisher : ROSPublisher
         // Cleanup runtime-created material and texture to prevent memory leaks
         if (lineMaterial != null) Destroy(lineMaterial);
         if (lineTexture != null) Destroy(lineTexture);
+        if (dotMat != null) Destroy(dotMat);
     }
 }

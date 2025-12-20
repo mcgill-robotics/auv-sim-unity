@@ -21,42 +21,51 @@
                 <ui:Label text="⚙" class="drawer-tab-icon" />
                 <ui:Label text="C&#10;O&#10;N&#10;F&#10;I&#10;G" class="drawer-tab-label" />
             </ui:VisualElement>
-            <ui:ScrollView name="ConfigDrawer-Content" class="drawer-content drawer-content-left" style="width: 399px; height: 583px;">
-                <ui:Label text="SYSTEM CONFIG" class="header" />
-                <ui:Label text="CORE SYSTEMS" class="data-label text-accent margin-top-small" />
-                <ui:Toggle name="Toggle-PublishROS" label="ROS Bridge" value="true" />
-                <ui:Toggle name="Toggle-SimObjects" label="Debug Viz" value="true" />
-                <ui:Toggle name="Toggle-StreamZED" label="ZED X Stream" value="false" />
-                <ui:Toggle name="Toggle-NoWater" label="No Water Mode" value="false" />
-                <ui:Toggle name="Toggle-FreeCamera" label="Free Camera" value="false" />
-                <ui:Label text="SENSORS" class="data-label text-accent margin-top-small" />
-                <ui:Toggle name="Toggle-DVL" label="Doppler Velocity" value="true" />
-                <ui:Toggle name="Toggle-IMU" label="IMU / AHRS" value="true" />
-                <ui:Toggle name="Toggle-Depth" label="Depth Sensor" value="true" />
-                <ui:Toggle name="Toggle-Pressure" label="Pressure Sensor" value="true" />
-                <ui:Toggle name="Toggle-Hydro" label="Hydrophones" value="true" />
-                <ui:Label text="OPTICS" class="data-label text-accent margin-top-small" />
-                <ui:Toggle name="Toggle-FrontCam" label="Front Feed" value="true" />
-                <ui:Toggle name="Toggle-DownCam" label="Down Feed" value="true" />
-                <ui:VisualElement class="margin-top-small">
-                    <ui:IntegerField name="Input-FrontRate" label="Front Hz" value="10" />
-                    <ui:IntegerField name="Input-DownRate" label="Down Hz" value="10" />
-                </ui:VisualElement>
-                <ui:Label text="RESOLUTION" class="data-label text-accent margin-top-small" />
-                <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
-                    <ui:IntegerField name="Input-FrontW" label="Front Res" value="960" style="flex-grow: 1; margin-right: 2px;" />
-                    <ui:Label text="x" style="align-self: center; color: rgb(180, 180, 180); margin-top: 5px;" />
-                    <ui:IntegerField name="Input-FrontH" value="600" style="flex-grow: 1; margin-left: 2px;" />
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-top: 5px;">
-                    <ui:IntegerField name="Input-DownW" label="Down Res" value="640" style="flex-grow: 1; margin-right: 2px;" />
-                    <ui:Label text="x" style="align-self: center; color: rgb(180, 180, 180); margin-top: 5px;" />
-                    <ui:IntegerField name="Input-DownH" value="480" style="flex-grow: 1; margin-left: 2px;" />
-                </ui:VisualElement>
-                <ui:DropdownField name="Dropdown-Quality" label="GFX Quality" choices="Ultra,High,Medium,Low" index="3" class="margin-top-small" />
-                <ui:DropdownField name="Dropdown-ScreenRes" label="Screen Res" choices="Native,1920x1080,1600x900,1280x720,960x540" index="0" class="margin-top-small" />
-                <ui:Button name="Btn-Save" text="SAVE &amp; RESTART" class="mcgill-button" style="margin-top: 15px;" />
-            </ui:ScrollView>
+            <ui:VisualElement name="ConfigDrawer-Content-Wrapper" class="drawer-content drawer-content-left" style="width: 399px; height: 583px; padding: 0;">
+                <ui:ScrollView name="ConfigDrawer-Content" style="flex-grow: 1; padding: 15px;">
+                    <ui:Label text="SYSTEM CONFIG" class="header" />
+                    
+                    <ui:Label text="GRAPHICS" class="data-label text-accent margin-top-small" />
+                    <ui:Toggle name="Toggle-Water" label="Enable Water" value="true" />
+                    <ui:Toggle name="Toggle-Shadows" label="Enable Shadows" value="true" />
+                    <ui:DropdownField name="Dropdown-Quality" label="GFX Quality" choices="Ultra,High,Medium,Low" index="3" />
+                    <ui:DropdownField name="Dropdown-ScreenRes" label="Screen Res" choices="Native,1920x1080,1600x900,1280x720,960x540" index="0" />
+
+                    <ui:Label text="CORE SYSTEMS" class="data-label text-accent margin-top-small" />
+                    <ui:Toggle name="Toggle-PublishROS" label="ROS Bridge" value="true" />
+                    <ui:Toggle name="Toggle-SimObjects" label="Debug Viz" value="true" />
+                    <ui:Toggle name="Toggle-StreamZED" label="ZED X Stream" value="false" />
+                    <ui:Toggle name="Toggle-FreeCamera" label="Free Camera" value="false" />
+                    
+                    
+                    <ui:Label text="SENSORS" class="data-label text-accent margin-top-small" />
+                    <ui:Toggle name="Toggle-DVL" label="Doppler Velocity" value="true" />
+                    <ui:Toggle name="Toggle-IMU" label="IMU / AHRS" value="true" />
+                    <ui:Toggle name="Toggle-Depth" label="Depth Sensor" value="true" />
+                    <ui:Toggle name="Toggle-Pressure" label="Pressure Sensor" value="true" />
+                    <ui:Toggle name="Toggle-Hydro" label="Hydrophones" value="true" />
+                    <ui:Label text="OPTICS" class="data-label text-accent margin-top-small" />
+                    <ui:Toggle name="Toggle-FrontCam" label="Front Feed" value="true" />
+                    <ui:Toggle name="Toggle-DownCam" label="Down Feed" value="true" />
+                    <ui:VisualElement class="margin-top-small">
+                        <ui:IntegerField name="Input-FrontRate" label="Front Hz" value="10" />
+                        <ui:IntegerField name="Input-DownRate" label="Down Hz" value="10" />
+                    </ui:VisualElement>
+                    <ui:Label text="RESOLUTION" class="data-label text-accent margin-top-small" />
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                        <ui:IntegerField name="Input-FrontW" label="Front Res" value="960" style="flex-grow: 1; margin-right: 2px;" />
+                        <ui:Label text="x" style="align-self: center; color: rgb(180, 180, 180); margin-top: 5px;" />
+                        <ui:IntegerField name="Input-FrontH" value="600" style="flex-grow: 1; margin-left: 2px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-top: 5px;">
+                        <ui:IntegerField name="Input-DownW" label="Down Res" value="640" style="flex-grow: 1; margin-right: 2px;" />
+                        <ui:Label text="x" style="align-self: center; color: rgb(180, 180, 180); margin-top: 5px;" />
+                        <ui:IntegerField name="Input-DownH" value="480" style="flex-grow: 1; margin-left: 2px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="height: 10px;" />
+                </ui:ScrollView>
+                <ui:Button name="Btn-Save" text="SAVE &amp; RESTART" class="mcgill-button" style="margin: 10px; margin-top: 0; align-self: flex-end; width: 140px;" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="ControlsDrawer" class="drawer-container drawer-open" style="left: 0; bottom: auto; top: 760px;">
             <ui:VisualElement name="ControlsDrawer-Tab" class="drawer-tab drawer-tab-left" style="height: 160px;">
@@ -90,8 +99,25 @@
                     <ui:Label text="[O] / [U]" class="data-value" />
                 </ui:VisualElement>
                 <ui:VisualElement class="keybind-row" style="margin-top: 8px; border-top-width: 1px; border-color: rgb(68, 68, 68); padding-top: 8px;">
-                    <ui:Label text="EMERGENCY STOP" class="status-bad" />
+                    <ui:Label text="FREEZE / UNFREEZE" class="status-bad" />
                     <ui:Label text="[SPACE]" class="data-value" />
+                </ui:VisualElement>
+                <ui:Label text="CAMERA OVERRIDE" class="data-label text-accent margin-top-small" style="font-size: 11px; margin-bottom: 5px;" />
+                <ui:VisualElement class="keybind-row">
+                    <ui:Label text="Orbit / Zoom" />
+                    <ui:Label text="[R-Click] / [Scroll]" class="data-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="keybind-row">
+                    <ui:Label text="Snapshot" />
+                    <ui:Label text="[P]" class="data-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="keybind-row">
+                    <ui:Label text="Cycle Feed" />
+                    <ui:Label text="[V]" class="data-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="keybind-row">
+                    <ui:Label text="Switch Cam" />
+                    <ui:Label text="[C]" class="data-value" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
@@ -130,7 +156,7 @@
             <ui:VisualElement name="SensorsDrawer-Content" class="drawer-content drawer-content-right" style="width: 305px; padding: 10px; height: 391px;">
                 <ui:Label text="SENSOR DATA" class="header" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:Label text="DVL" class="data-label text-accent" />
+                    <ui:Label name="Label-DVL" text="DVL" class="data-label text-accent" />
                     <ui:Toggle name="Toggle-DVLViz" label="👁" tooltip="Show DVL beam visualization" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
@@ -151,7 +177,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:Label text="IMU" class="data-label text-accent" />
+                    <ui:Label name="Label-IMU" text="IMU" class="data-label text-accent" />
                     <ui:Toggle name="Toggle-IMUViz" label="👁" tooltip="Show IMU visualization" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
@@ -172,7 +198,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:Label text="PRESSURE" class="data-label text-accent" />
+                    <ui:Label name="Label-Pressure" text="PRESSURE" class="data-label text-accent" />
                     <ui:Toggle name="Toggle-PressureViz" label="👁" tooltip="Show pressure depth line" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
@@ -193,7 +219,6 @@
             <ui:VisualElement name="CameraDrawer-Content" class="drawer-content drawer-content-right" style="width: 422px; height: 370px;">
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 5px;">
                     <ui:Label text="VISUAL FEED" class="header" style="margin-bottom: 0; border-bottom-width: 0;" />
-                    <ui:Label text="● LIVE" class="text-accent" style="-unity-font-style: bold;" />
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; margin-bottom: 5px;">
                     <ui:DropdownField name="Dropdown-CamTopic" style="flex-grow: 1; margin-right: 5px;" />
