@@ -8,7 +8,7 @@ using UnityEngine;
 /// which creates a righting torque when offset from the center of mass.
 /// </summary>
 public class Buoyancy : MonoBehaviour
-{
+{   
     [Header("Buoyancy Configuration")]
     [Tooltip("Total upward buoyancy force in Newtons (should slightly exceed weight for positive buoyancy)")]
     public float buoyancyForce;
