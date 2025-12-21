@@ -1223,11 +1223,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f5bb79c2344568448c1243c643319e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 7607941106488901699}
-  followDistance: 4
-  height: 1
-  pitchAngle: 15
-  rigidity: 10
 --- !u!20 &430683503
 Camera:
   m_ObjectHideFlags: 0
@@ -2175,7 +2170,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -3143,23 +3138,23 @@ MonoBehaviour:
   PublishROS: 0
   DisplaySimObjects: 0
   NoWaterMode: 0
-  EnableShadows: 1
+  EnableShadows: 0
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
   HydrophonesNumberOption: 0
   PublishDVL: 0
-  PublishIMU: 0
+  PublishIMU: 1
   PublishDepth: 0
   PublishHydrophones: 0
   PublishPressure: 0
   PublishFrontCam: 0
   PublishDownCam: 0
   StreamZEDCamera: 1
-  VisualizeDVL: 0
+  VisualizeDVL: 1
   VisualizeIMU: 0
-  VisualizePressure: 1
-  DrawerConfigOpen: 1
+  VisualizePressure: 0
+  DrawerConfigOpen: 0
   DrawerControlsOpen: 1
   DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
@@ -3178,7 +3173,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 300
-  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/willz2205/Desktop/mcgill_robotics/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25059,7 +25054,7 @@ MonoBehaviour:
   enableForceVisualization: 1
   forceVisualScale: 0.1
   visualizationColor: {r: 1, g: 0, b: 0, a: 1}
-  maxThrusterForce: 50
+  maxThrusterForce: 124.8
   rampRate: 100
   efficiencyVariance: 0
 --- !u!198 &4312039581372834481
@@ -34806,7 +34801,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7607941106488901699}
   serializedVersion: 4
-  m_Mass: 3
+  m_Mass: 26
   m_Drag: 3
   m_AngularDrag: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -44939,6 +44934,7 @@ GameObject:
   - component: {fileID: 4309865187830058028}
   - component: {fileID: 9179425145227507842}
   - component: {fileID: 9179425145227507843}
+  - component: {fileID: 9179425145227507844}
   m_Layer: 7
   m_Name: Diana
   m_TagString: Untagged
@@ -45834,7 +45830,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72654cd3b1e01e845881bc182dcc2474, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buoyancyForce: 32
+  buoyancyForce: 264
   centerOfBuoyancy: {x: 0, y: 0, z: 0}
   centerOfMass: {x: 0, y: -0.005, z: 0}
 --- !u!82 &9179425145227507842
@@ -45942,6 +45938,22 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7607941106488901699}
   m_Enabled: 1
+--- !u!114 &9179425145227507844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607941106488901699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de9c3645ff6d59730be2a886468aa18a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dragAreaMode: 0
+  waterDensity: 1000
+  dragCoefficient: 1.1
+  constantArea: 0.25
 --- !u!33 &9188264537612161936
 MeshFilter:
   m_ObjectHideFlags: 0
