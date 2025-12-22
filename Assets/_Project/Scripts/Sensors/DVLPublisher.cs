@@ -8,8 +8,11 @@ public class DVLPublisher : ROSPublisher
     public override string Topic => ROSSettings.Instance.DVLTopic;
 
     [Header("Physical Setup")]
-    [Tooltip("AUV Rigidbody - used to calculate point velocity at sensor location")]
-    public Rigidbody auvRb;
+    [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
+    [SerializeField] private Rigidbody auvRbOverride;
+    
+    /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
+    private Rigidbody AuvRb => auvRbOverride != null ? auvRbOverride : SimulationSettings.Instance?.AUVRigidbody;
     
     [Tooltip("Layer for Pool Floor/Walls/Objects. MUST Exclude Water surface.")]
     public LayerMask acousticLayerMask;
@@ -184,7 +187,7 @@ public class DVLPublisher : ROSPublisher
 
     protected override void FixedUpdate()
     {
-        if (auvRb == null) return;
+        if (AuvRb == null) return;
 
         // Update bias every physics step (always needed for accurate simulation)
         velocityBias.Step();
@@ -295,7 +298,7 @@ public class DVLPublisher : ROSPublisher
         
         // 2. Get Ground Truth Velocity at sensor point
         // CRITICAL: Use transform (sensor frame), NOT auvRb.transform (robot frame)
-        Vector3 pointVelWorld = auvRb.GetPointVelocity(transform.position);
+        Vector3 pointVelWorld = AuvRb.GetPointVelocity(transform.position);
         Vector3 localVel = transform.InverseTransformDirection(pointVelWorld);
         
         // 3. Populate Message

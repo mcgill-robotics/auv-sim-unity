@@ -6,6 +6,19 @@ public class SimulationSettings : MonoBehaviour
 {
     public static SimulationSettings Instance { get; private set; }
 
+    [Header("AUV References")]
+    [Tooltip("The AUV's Rigidbody - used by physics and sensor scripts")]
+    public Rigidbody AUVRigidbody;
+    
+    [Tooltip("The AUV's root Transform")]
+    public Transform AUVTransform;
+    
+    [Tooltip("Front camera (ZED left or mono front camera)")]
+    public Camera FrontCamera;
+    
+    [Tooltip("Down-facing camera")]
+    public Camera DownCamera;
+
     [Header("Global Toggles")]
     [Tooltip("Enable ROS TCP connection and publishing")]
     public bool PublishROS = false;

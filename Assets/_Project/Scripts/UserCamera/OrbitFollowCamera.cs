@@ -8,8 +8,11 @@ using UnityEngine.UIElements;
 public class OrbitFollowCamera : MonoBehaviour
 {
     [Header("Target Settings")]
-    [Tooltip("The object this camera should follow")]
-    public Transform target;
+    [Tooltip("The object this camera should follow - leave empty to use SimulationSettings.AUVTransform")]
+    [SerializeField] private Transform targetOverride;
+    
+    /// <summary>Returns the target Transform from override or SimulationSettings.</summary>
+    private Transform Target => targetOverride != null ? targetOverride : SimulationSettings.Instance?.AUVTransform;
     
     [Header("Distance Settings")]
     [Tooltip("Default distance from the target")]
@@ -56,7 +59,7 @@ public class OrbitFollowCamera : MonoBehaviour
 
     private void OnEnable()
     {
-        if (target == null) return;
+        if (Target == null) return;
         
         if (!initialized || resetOnEnable)
         {
@@ -68,7 +71,7 @@ public class OrbitFollowCamera : MonoBehaviour
         {
             // Calculate current relative offset so the camera doesn't jump
             // Relative Rotation = Inv(Target) * Current
-            Quaternion relativeRot = Quaternion.Inverse(target.rotation) * transform.rotation;
+            Quaternion relativeRot = Quaternion.Inverse(Target.rotation) * transform.rotation;
             Vector3 angles = relativeRot.eulerAngles;
             
             // Normalize angles to -180, 180 range for clamping logic
@@ -78,12 +81,12 @@ public class OrbitFollowCamera : MonoBehaviour
         
         currentRotation = transform.rotation;
         currentPosition = transform.position;
-        currentDistance = Vector3.Distance(transform.position, target.position);
+        currentDistance = Vector3.Distance(transform.position, Target.position);
     }
 
     private void Start()
     {
-        if (target == null)
+        if (Target == null)
         {
             Debug.LogWarning("[OrbitFollowCamera] No target assigned!");
         }
@@ -91,7 +94,7 @@ public class OrbitFollowCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (target == null) return;
+        if (Target == null) return;
 
         // 1. Handle Input (if not over UI)
         if (!Utils.UIUtils.IsMouseOverUI())
@@ -119,10 +122,10 @@ public class OrbitFollowCamera : MonoBehaviour
         // 3. Calculate Target State (Relative to target rotation)
         // We multiply target.rotation by our orbital delta
         Quaternion orbitalRotation = Quaternion.Euler(y, x, 0);
-        Quaternion targetRotation = target.rotation * orbitalRotation;
+        Quaternion targetRotation = Target.rotation * orbitalRotation;
         
         // Position is base target pos + (relative rotation offset)
-        Vector3 targetPosition = target.position + targetRotation * new Vector3(0.0f, 0.0f, -distance);
+        Vector3 targetPosition = Target.position + targetRotation * new Vector3(0.0f, 0.0f, -distance);
 
         // 4. Smooth State Transitions
         float dt = Time.deltaTime;
@@ -130,7 +133,7 @@ public class OrbitFollowCamera : MonoBehaviour
         currentDistance = Mathf.Lerp(currentDistance, distance, dt * movementSmoothing);
         
         // Re-calculate smoothed position
-        currentPosition = target.position + currentRotation * new Vector3(0.0f, 0.0f, -currentDistance);
+        currentPosition = Target.position + currentRotation * new Vector3(0.0f, 0.0f, -currentDistance);
 
         // 5. Apply to transform
         transform.rotation = currentRotation;

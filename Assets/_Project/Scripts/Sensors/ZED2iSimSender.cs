@@ -77,7 +77,12 @@ public class ZED2iSimSender : MonoBehaviour
     private int streamerID = 0;
     private int frameCount = 0;
     private WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
-    public Rigidbody rb;
+    
+    [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
+    [SerializeField] private Rigidbody rbOverride;
+    
+    /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
+    private Rigidbody Rb => rbOverride != null ? rbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
     #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         const string DLL_NAME = "sl_zed64";
@@ -140,7 +145,7 @@ public class ZED2iSimSender : MonoBehaviour
             targetFPS = SimulationSettings.Instance.FrontCamRate;
             Debug.Log("[ZED Sim] Using settings: " + targetWidth + "x" + targetHeight + " @" + targetFPS + " FPS");
         }
-        if (rb != null) rb.sleepThreshold = 0.0f;
+        if (Rb != null) Rb.sleepThreshold = 0.0f;
 
         // Init physics state
         lastLinearVelocity = Vector3.zero;
@@ -160,15 +165,15 @@ public class ZED2iSimSender : MonoBehaviour
     // Calculates and sends high-frequency IMU data for stable positional tracking
     void FixedUpdate()
     {
-        if (rb == null || !isStreaming) return;
+        if (Rb == null || !isStreaming) return;
         
-        if (rb.IsSleeping()) rb.WakeUp();
+        if (Rb.IsSleeping()) Rb.WakeUp();
         
         float dt = Time.fixedDeltaTime;
         if (dt <= 0) return;
 
         // Calculate Proper Acceleration (what the IMU feels)
-        Vector3 currentVelocity = rb.linearVelocity;
+        Vector3 currentVelocity = Rb.linearVelocity;
         Vector3 worldAccel = (currentVelocity - lastLinearVelocity) / dt;
         Vector3 properAccelWorld = worldAccel - Physics.gravity; // +9.81 UP when static
         
@@ -176,7 +181,7 @@ public class ZED2iSimSender : MonoBehaviour
         currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
         
         // Angular Velocity: World rad/s -> Local deg/s
-        Vector3 angVelLocal = transform.InverseTransformDirection(rb.angularVelocity);
+        Vector3 angVelLocal = transform.InverseTransformDirection(Rb.angularVelocity);
         currentAngularVelocityLocal = angVelLocal * Mathf.Rad2Deg;
         
         lastLinearVelocity = currentVelocity;
