@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Auv;
+using Utils;
 
 public class Thrusters : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class Thrusters : MonoBehaviour
     
     [Tooltip("Scale factor for arrow length (magnitude visualization)")]
     [Range(0.001f, 0.1f)]
-    public float forceVisualScale = 0.02f;
+    public float forceVisualScale = 0.01f;
 
     [Tooltip("Color for thruster force arrows")]
     public Color visualizationColor = Color.red;
@@ -113,14 +114,21 @@ public class Thrusters : MonoBehaviour
         arrowInstances = new GameObject[thrusters.Length];
         
         // Create material and template arrow using shared utility
-        arrowMat = Utils.VisualizationUtils.CreateMaterial(visualizationColor);
-        GameObject templateArrow = Utils.VisualizationUtils.CreateArrow("DefaultArrow", arrowMat, 0.1f);
+        arrowMat =VisualizationUtils.CreateMaterial(visualizationColor);
+        GameObject templateArrow =VisualizationUtils.CreateArrow("DefaultArrow", arrowMat, 0.03f);
 
         for (int i = 0; i < thrusters.Length; i++)
         {
             arrowInstances[i] = Instantiate(templateArrow, thrusters[i].position, Quaternion.identity);
             arrowInstances[i].transform.parent = thrusters[i]; // Parent to thruster so it moves with AUV
-            Utils.VisualizationUtils.SetXRayLayer(arrowInstances[i]);
+           VisualizationUtils.SetXRayLayer(arrowInstances[i]);
+            
+            // Apply color to each instance's renderers (MaterialPropertyBlock is NOT copied by Instantiate)
+            foreach (var ren in arrowInstances[i].GetComponentsInChildren<Renderer>())
+            {
+               VisualizationUtils.SetColorProperty(ren, visualizationColor);
+            }
+            
             arrowInstances[i].SetActive(false);
         }
 
@@ -364,7 +372,7 @@ public class Thrusters : MonoBehaviour
                 var renders = arrow.GetComponentsInChildren<Renderer>(true);
                 foreach (var r in renders)
                 {
-                    Utils.VisualizationUtils.SetColorProperty(r, visualizationColor);
+                   VisualizationUtils.SetColorProperty(r, visualizationColor);
                 }
             }
         }

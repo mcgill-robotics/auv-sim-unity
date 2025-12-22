@@ -31,6 +31,20 @@ public class Buoyancy : MonoBehaviour
     private Vector3 buoyancyForceVector;
     private Vector3 buoyancyForceVectorScaled;
 
+    /// <summary>
+    /// Called when a value changes in the Inspector. Updates the Rigidbody's center of mass immediately.
+    /// </summary>
+    private void OnValidate()
+    {
+        // Get or cache the rigidbody reference
+        if (auvRb == null)
+            auvRb = GetComponent<Rigidbody>();
+        
+        if (auvRb != null)
+        {
+            auvRb.centerOfMass = centerOfMass;
+        }
+    }
     
     private void Start()
     {
