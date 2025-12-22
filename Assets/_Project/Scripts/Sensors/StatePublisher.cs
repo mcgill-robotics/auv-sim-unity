@@ -8,11 +8,17 @@ public class StatePublisher : ROSPublisher
     public override string Topic => ROSSettings.Instance.StateTopic;
 
     [Header("Physical Setup")]
-    [Tooltip("AUV root GameObject for transform data")]
-    public GameObject auv;
+    [Tooltip("AUV root Transform - leave empty to use SimulationSettings.AUVTransform")]
+    [SerializeField] private Transform auvOverride;
     
-    [Tooltip("AUV Rigidbody for velocity and acceleration data")]
-    public Rigidbody auvRb;
+    [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
+    [SerializeField] private Rigidbody auvRbOverride;
+    
+    /// <summary>Returns the AUV Transform from override or SimulationSettings.</summary>
+    private Transform AuvTransform => auvOverride != null ? auvOverride : SimulationSettings.Instance?.AUVTransform;
+    
+    /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
+    private Rigidbody AuvRb => auvRbOverride != null ? auvRbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
     [Space(10)]
     [Header("Hydrophone System")]
@@ -39,7 +45,7 @@ public class StatePublisher : ROSPublisher
         }
         
         stateMsg = new UnityStateMsg();
-        lastVelocity = auvRb.linearVelocity;
+        lastVelocity = AuvRb.linearVelocity;
         
         // Initialize reusable arrays
         frequencies = new int[numberOfPingers];
@@ -53,16 +59,16 @@ public class StatePublisher : ROSPublisher
 
     public override void PublishMessage()
     {
-        Vector3 currentVelocity = auvRb.linearVelocity;
+        Vector3 currentVelocity = AuvRb.linearVelocity;
         Vector3 acceleration = (currentVelocity - lastVelocity) / Time.fixedDeltaTime;
         lastVelocity = currentVelocity;
 
-        stateMsg.position = auv.transform.position.To<RUF>();
+        stateMsg.position = AuvTransform.position.To<RUF>();
         stateMsg.position.y *= -1; // Convert to depth
 
-        Quaternion rotation = auv.transform.rotation * rotationOffset;
+        Quaternion rotation = AuvTransform.rotation * rotationOffset;
         stateMsg.orientation = rotation.To<NED>();
-        stateMsg.angular_velocity = auvRb.angularVelocity.To<RUF>();
+        stateMsg.angular_velocity = AuvRb.angularVelocity.To<RUF>();
         stateMsg.velocity = currentVelocity.To<RUF>();
         stateMsg.linear_acceleration = acceleration.To<RUF>();
 
