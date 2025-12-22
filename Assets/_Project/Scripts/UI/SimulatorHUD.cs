@@ -22,14 +22,17 @@ public class SimulatorHUD : MonoBehaviour
 
     [Space(10)]
     [Header("Camera Sources for HUD Display")]
-    [Tooltip("Front-left camera for stereo display")]
-    public Camera frontLeftCamera;
+    [Tooltip("Front-left camera - leave empty to use SimulationSettings.FrontCamera")]
+    [SerializeField] private Camera frontLeftCameraOverride;
     
-    [Tooltip("Front-right camera for stereo display")]
-    public Camera frontRightCamera;
+    [Tooltip("Downward-facing camera - leave empty to use SimulationSettings.DownCamera")]
+    [SerializeField] private Camera downCameraOverride;
     
-    [Tooltip("Downward-facing camera")]
-    public Camera downCamera;
+    /// <summary>Returns the front camera from override or SimulationSettings.</summary>
+    private Camera FrontLeftCamera => frontLeftCameraOverride != null ? frontLeftCameraOverride : SimulationSettings.Instance?.FrontCamera;
+    
+    /// <summary>Returns the down camera from override or SimulationSettings.</summary>
+    private Camera DownCamera => downCameraOverride != null ? downCameraOverride : SimulationSettings.Instance?.DownCamera;
     
     // Controllers (initialized in OnEnable)
     private SettingsController settingsController;
@@ -175,11 +178,39 @@ public class SimulatorHUD : MonoBehaviour
         // Initialize drawers
         InitializeDrawers();
         
-        // Click-to-blur handler
+        // Click-to-blur: Clear focus when clicking anywhere outside text inputs
+        // This handles both clicking on the root background AND clicking on the 3D game view
         root.RegisterCallback<PointerDownEvent>(evt => {
-            if (evt.target == root)
+            var focused = root.focusController.focusedElement;
+            if (focused == null) return;
+            
+            // If clicking on something that isn't the focused element or its children, blur
+            bool clickedOnFocused = focused == evt.target;
+            if (!clickedOnFocused && focused is VisualElement focusedVE && evt.target is VisualElement clickedVE)
             {
-                root.focusController.focusedElement?.Blur();
+                clickedOnFocused = focusedVE.Contains(clickedVE);
+            }
+            
+            if (!clickedOnFocused)
+            {
+                focused.Blur();
+            }
+        });
+        
+        // Focus guard: If a text field gains focus while mouse is NOT over UI, immediately blur it.
+        // This prevents accidental focus from Tab navigation or Unity EventSystem quirks.
+        root.RegisterCallback<FocusInEvent>(evt => {
+            if (evt.target is Focusable focusable && 
+                (evt.target is TextField || 
+                 evt.target is IntegerField || 
+                 evt.target is FloatField ||
+                 evt.target is DoubleField))
+            {
+                // If mouse is not over UI, this focus was unintentional
+                if (!Utils.UIUtils.IsMouseOverUI())
+                {
+                    focusable.Blur();
+                }
             }
         });
     }
@@ -311,7 +342,7 @@ public class SimulatorHUD : MonoBehaviour
         settingsController = new SettingsController(root, ros, Log);
         telemetryController = new TelemetryController(root, ros);
         sensorDataController = new SensorDataController(root);
-        cameraFeedController = new CameraFeedController(root, frontLeftCamera, downCamera, Log);
+        cameraFeedController = new CameraFeedController(root, FrontLeftCamera, DownCamera, Log);
         
         // Load settings to UI
         settingsController.LoadSettingsToUI();

@@ -10,8 +10,11 @@ public class IMUPublisher : ROSPublisher
     public override string Topic => ROSSettings.Instance.IMUTopic;
 
     [Header("Physical Setup")]
-    [Tooltip("AUV Rigidbody - used to calculate point velocity and acceleration at sensor location")]
-    public Rigidbody auvRb;
+    [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
+    [SerializeField] private Rigidbody auvRbOverride;
+    
+    /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
+    private Rigidbody AuvRb => auvRbOverride != null ? auvRbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
     [Space(10)]
     [Header("Accelerometer Noise")]
@@ -109,9 +112,9 @@ public class IMUPublisher : ROSPublisher
         base.Start();
         InitializeMessage();
         
-        if (auvRb != null)
+        if (AuvRb != null)
         {
-            lastPointVelocity = auvRb.GetPointVelocity(transform.position);
+            lastPointVelocity = AuvRb.GetPointVelocity(transform.position);
         }
         
         // Initialize Gauss-Markov bias models with pre-calculated coefficients
@@ -183,7 +186,7 @@ public class IMUPublisher : ROSPublisher
 
     protected override void FixedUpdate()
     {
-        if (auvRb == null) return;
+        if (AuvRb == null) return;
         
         // Bias models must update every physics step for accurate simulation
         gyroBias.Step();
@@ -222,7 +225,7 @@ public class IMUPublisher : ROSPublisher
         float dt = Time.fixedDeltaTime;
 
         // 1. Angular Velocity (Gyroscope)
-        Vector3 currentAngularVelWorld = auvRb.angularVelocity;
+        Vector3 currentAngularVelWorld = AuvRb.angularVelocity;
         Vector3 sensorAngularVel = transform.InverseTransformDirection(currentAngularVelWorld);
         
         // Apply noise: White noise + Gauss-Markov bias
@@ -233,7 +236,7 @@ public class IMUPublisher : ROSPublisher
         LastAngularVelocity = noisyAngVel;
 
         // 2. Linear Acceleration (Accelerometer)
-        Vector3 currentPointVelocity = auvRb.GetPointVelocity(transform.position);
+        Vector3 currentPointVelocity = AuvRb.GetPointVelocity(transform.position);
         Vector3 worldAccel = (currentPointVelocity - lastPointVelocity) / dt;
         
         // Proper Acceleration = Kinematic - Gravity (what sensor actually feels)
