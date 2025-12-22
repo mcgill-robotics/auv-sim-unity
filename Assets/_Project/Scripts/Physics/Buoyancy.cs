@@ -8,7 +8,7 @@ using UnityEngine;
 /// which creates a righting torque when offset from the center of mass.
 /// </summary>
 public class Buoyancy : MonoBehaviour
-{
+{   
     [Header("Buoyancy Configuration")]
     [Tooltip("Total upward buoyancy force in Newtons (should slightly exceed weight for positive buoyancy)")]
     public float buoyancyForce;
@@ -31,6 +31,20 @@ public class Buoyancy : MonoBehaviour
     private Vector3 buoyancyForceVector;
     private Vector3 buoyancyForceVectorScaled;
 
+    /// <summary>
+    /// Called when a value changes in the Inspector. Updates the Rigidbody's center of mass immediately.
+    /// </summary>
+    private void OnValidate()
+    {
+        // Get or cache the rigidbody reference
+        if (auvRb == null)
+            auvRb = GetComponent<Rigidbody>();
+        
+        if (auvRb != null)
+        {
+            auvRb.centerOfMass = centerOfMass;
+        }
+    }
     
     private void Start()
     {
