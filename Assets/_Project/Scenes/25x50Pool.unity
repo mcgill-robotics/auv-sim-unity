@@ -1152,6 +1152,10 @@ MonoBehaviour:
   excludeLayers:
     serializedVersion: 2
     m_Bits: 128
+  showOutlineOnLaunch: 1
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineWidth: 0.02
+  outlineShader: {fileID: 0}
   manageColliders: 1
   nextTorpedoIndex: 0
   targetRotation: 0
@@ -2173,7 +2177,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.01670003, y: 0.07520008, z: 0.06290007}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6362377508993018389}
@@ -3678,7 +3682,7 @@ Transform:
   m_GameObject: {fileID: 1335381705}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.027076729, y: -2.753806, z: -6.731403}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3987,18 +3991,17 @@ MonoBehaviour:
   PublishIMU: 0
   PublishDepth: 0
   PublishHydrophones: 0
-  PublishPressure: 0
   PublishFrontCam: 0
   PublishDownCam: 0
-  StreamZEDCamera: 1
+  StreamZEDCamera: 0
   VisualizeDVL: 0
   VisualizeIMU: 0
-  VisualizePressure: 0
+  VisualizeDepth: 0
   DrawerConfigOpen: 1
   DrawerControlsOpen: 1
   DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
-  DrawerCameraOpen: 0
+  DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
@@ -5555,14 +5558,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2041719978}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0da12ca8dbc9fbd5af21a19e22af2ae, type: 3}
+  m_Script: {fileID: 11500000, guid: a3de366220f27c89aa761498edf1f473, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _publishRate: 10
-  atmosphericPressure: 101325
-  waterDensity: 1000
-  gravity: 9.81
-  noiseStdDev: 100
+  useUnityYAsDepth: 1
+  noiseStdDev: 0.01
   bias: 0
   enableVisualization: 1
   visualizationColor: {r: 1, g: 1, b: 1, a: 1}
@@ -5816,7 +5817,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.016699791, y: 0.07520008, z: 0.059900284}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7689657270306945842}
@@ -33524,7 +33525,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2743497507793947152, guid: fda167fdb878a35cc9f3aaf67e4da5e0, type: 3}
 --- !u!4 &8847969391884221260
