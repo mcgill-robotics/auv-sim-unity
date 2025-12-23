@@ -156,13 +156,15 @@ public class SensorDataController
     
     /// <summary>
     /// Update sensor value displays. Call this periodically (e.g., 10Hz) from Update().
+    /// Displays values in sensor frame (exactly what is sent to ROS).
     /// </summary>
     public void UpdateSensorDataDisplay()
     {
-        // DVL Data
+        // DVL Data - Using RosVelocity (FRD frame: X=Forward, Y=Right, Z=Down)
         if (dvlPublisher != null)
         {
-            var vel = dvlPublisher.LastVelocity;
+            var vel = dvlPublisher.RosVelocity;
+            
             if (textDVLVx != null) textDVLVx.text = $"{vel.x:+0.00;-0.00}";
             if (textDVLVy != null) textDVLVy.text = $"{vel.y:+0.00;-0.00}";
             if (textDVLVz != null) textDVLVz.text = $"{vel.z:+0.00;-0.00}";
@@ -179,11 +181,11 @@ public class SensorDataController
             }
         }
         
-        // IMU Data
+        // IMU Data - Using ROS accessors (FLU frame: X=Forward, Y=Left, Z=Up)
         if (imuPublisher != null)
         {
-            var accel = imuPublisher.LastAcceleration;
-            var angVel = imuPublisher.LastAngularVelocity;
+            var accel = imuPublisher.RosAcceleration;
+            var angVel = imuPublisher.RosAngularVelocity;
             
             if (textIMUAx != null) textIMUAx.text = $"{accel.x:+0.0;-0.0}";
             if (textIMUAy != null) textIMUAy.text = $"{accel.y:+0.0;-0.0}";
@@ -194,7 +196,7 @@ public class SensorDataController
             if (textIMUWz != null) textIMUWz.text = $"{angVel.z:+0.00;-0.00}";
         }
         
-        // Pressure Data
+        // Pressure Data (scalar, no frame conversion needed)
         if (pressurePublisher != null)
         {
             if (textPressureDepth != null)
