@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Unity.Robotics.ROSTCPConnector;
 using System.Collections.Generic;
-
 /// <summary>
 /// Main HUD coordinator. Manages drawer system, logging, competition UI, and delegates
 /// specific functionality to specialized controllers.
@@ -90,65 +89,51 @@ public class SimulatorHUD : MonoBehaviour
         
         root.focusable = false;
         
-        // Block ALL keyboard events from affecting UI unless we're typing in a text field.
-        // This prevents WASD/arrow keys from scrolling UI elements while allowing normal text input.
-        EventCallback<KeyDownEvent> blockKeyboardEvents = evt => {
-            bool isTyping = root.focusController.focusedElement is TextInputBaseField<string> || 
-                            root.focusController.focusedElement is TextField ||
-                            root.focusController.focusedElement is IntegerField ||
-                            root.focusController.focusedElement is FloatField ||
-                            root.focusController.focusedElement is DoubleField;
-            if (!isTyping)
-            {
-                evt.PreventDefault();
-                evt.StopImmediatePropagation();
-            }
+        // Helper to check if currently typing in a text field
+        Func<bool> isTyping = () => {
+            var focused = root.focusController.focusedElement;
+            return focused is TextInputBaseField<string> || 
+                   focused is TextField ||
+                   focused is IntegerField ||
+                   focused is FloatField ||
+                   focused is DoubleField;
         };
         
-        EventCallback<KeyUpEvent> blockKeyUpEvents = evt => {
-            bool isTyping = root.focusController.focusedElement is TextInputBaseField<string> || 
-                            root.focusController.focusedElement is TextField ||
-                            root.focusController.focusedElement is IntegerField ||
-                            root.focusController.focusedElement is FloatField ||
-                            root.focusController.focusedElement is DoubleField;
-            if (!isTyping)
-            {
-                evt.PreventDefault();
-                evt.StopImmediatePropagation();
-            }
-        };
+        // Block ALL keyboard events unless typing in a text field
+        root.RegisterCallback<KeyDownEvent>(evt => {
+            if (!isTyping()) { evt.PreventDefault(); evt.StopImmediatePropagation(); }
+        }, TrickleDown.TrickleDown);
         
-        EventCallback<NavigationMoveEvent> blockNavigationEvents = evt => {
-            bool isTyping = root.focusController.focusedElement is TextInputBaseField<string> || 
-                            root.focusController.focusedElement is TextField ||
-                            root.focusController.focusedElement is IntegerField ||
-                            root.focusController.focusedElement is FloatField ||
-                            root.focusController.focusedElement is DoubleField;
-            if (!isTyping)
-            {
-                evt.PreventDefault();
-                evt.StopImmediatePropagation();
-            }
-        };
+        root.RegisterCallback<KeyUpEvent>(evt => {
+            if (!isTyping()) { evt.PreventDefault(); evt.StopImmediatePropagation(); }
+        }, TrickleDown.TrickleDown);
         
-        // Also block NavigationSubmitEvent (triggered by Space/Enter on buttons)
-        EventCallback<NavigationSubmitEvent> blockNavigationSubmit = evt => {
-            bool isTyping = root.focusController.focusedElement is TextInputBaseField<string> || 
-                            root.focusController.focusedElement is TextField ||
-                            root.focusController.focusedElement is IntegerField ||
-                            root.focusController.focusedElement is FloatField ||
-                            root.focusController.focusedElement is DoubleField;
-            if (!isTyping)
-            {
-                evt.PreventDefault();
-                evt.StopImmediatePropagation();
-            }
-        };
+        // Block ALL navigation events unconditionally (arrow keys, tab, etc.)
+        root.RegisterCallback<NavigationMoveEvent>(evt => {
+            evt.PreventDefault(); evt.StopImmediatePropagation();
+        }, TrickleDown.TrickleDown);
         
-        root.RegisterCallback<KeyDownEvent>(blockKeyboardEvents, TrickleDown.TrickleDown);
-        root.RegisterCallback<KeyUpEvent>(blockKeyUpEvents, TrickleDown.TrickleDown);
-        root.RegisterCallback<NavigationMoveEvent>(blockNavigationEvents, TrickleDown.TrickleDown);
-        root.RegisterCallback<NavigationSubmitEvent>(blockNavigationSubmit, TrickleDown.TrickleDown);
+        // Block submit events (Space/Enter pressing buttons)
+        root.RegisterCallback<NavigationSubmitEvent>(evt => {
+            evt.PreventDefault(); evt.StopImmediatePropagation();
+        }, TrickleDown.TrickleDown);
+        
+        // Block cancel events (Escape triggering UI)
+        root.RegisterCallback<NavigationCancelEvent>(evt => {
+            evt.PreventDefault(); evt.StopImmediatePropagation();
+        }, TrickleDown.TrickleDown);
+        
+        // Auto-blur when clicking on non-input areas (releases focus back to game)
+        root.RegisterCallback<PointerDownEvent>(evt => {
+            var focused = root.focusController.focusedElement;
+            if (focused != null && !(evt.target is TextInputBaseField<string>) && 
+                !(evt.target is TextField) && !(evt.target is IntegerField) && 
+                !(evt.target is FloatField) && !(evt.target is DoubleField))
+            {
+                focused.Blur();
+                IsInputFocused = false;
+            }
+        });
 
         // Query drawer elements
         configDrawer = root.Q<VisualElement>("ConfigDrawer");
@@ -197,16 +182,12 @@ public class SimulatorHUD : MonoBehaviour
             }
         });
         
-        // Focus guard: If a text field gains focus while mouse is NOT over UI, immediately blur it.
-        // This prevents accidental focus from Tab navigation or Unity EventSystem quirks.
+        // Focus guard: If ANY element gains focus while mouse is NOT over UI, immediately blur it.
+        // This prevents accidental focus from Tab navigation, keyboard shortcuts, or Unity quirks.
         root.RegisterCallback<FocusInEvent>(evt => {
-            if (evt.target is Focusable focusable && 
-                (evt.target is TextField || 
-                 evt.target is IntegerField || 
-                 evt.target is FloatField ||
-                 evt.target is DoubleField))
+            if (evt.target is Focusable focusable)
             {
-                // If mouse is not over UI, this focus was unintentional
+                // If mouse is not over UI, this focus was unintentional - blur immediately
                 if (!Utils.UIUtils.IsMouseOverUI())
                 {
                     focusable.Blur();
@@ -412,16 +393,37 @@ public class SimulatorHUD : MonoBehaviour
         // Input focus detection
         var focusedElement = uiDocument.rootVisualElement.focusController.focusedElement;
         
+        // Check if we're in a text input field (typing mode)
         IsInputFocused = focusedElement is TextInputBaseField<string> || 
                          focusedElement is TextField ||
                          focusedElement is IntegerField ||
                          focusedElement is FloatField ||
                          focusedElement is DoubleField;
 
+        // Escape always releases focus
         if (IsInputFocused && Input.GetKeyDown(KeyCode.Escape))
         {
             focusedElement?.Blur();
             IsInputFocused = false;
+        }
+        
+        // AGGRESSIVE: If ANY element has focus (not just text fields) and a game control key is pressed,
+        // blur it immediately. This prevents buttons/sliders/dropdowns from capturing keyboard input.
+        if (!IsInputFocused && focusedElement != null)
+        {
+            // Check if any common game control keys are being pressed
+            bool gameKeyPressed = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || 
+                                  Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) ||
+                                  Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.E) ||
+                                  Input.GetKey(KeyCode.I) || Input.GetKey(KeyCode.J) ||
+                                  Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L) ||
+                                  Input.GetKey(KeyCode.U) || Input.GetKey(KeyCode.O) ||
+                                  Input.GetKey(KeyCode.Space);
+            
+            if (gameKeyPressed)
+            {
+                focusedElement.Blur();
+            }
         }
 
         // Camera shortcuts (only if not typing)

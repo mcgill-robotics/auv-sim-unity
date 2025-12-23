@@ -88,13 +88,16 @@ public class DVLPublisher : ROSPublisher
     [Range(0.005f, 0.05f)]
     public float beamLineWidth = 0.01f;
 
-    // Public properties for UI/other scripts
+    // Public properties for UI/other scripts (Unity frame)
     public Vector3 LastVelocity { get; private set; }
     public float LastAltitude { get; private set; }
     public bool IsValid { get; private set; }
     public int ValidBeamCount { get; private set; }
     public Vector3[] BeamHitPoints { get; private set; } = new Vector3[4];
     public bool[] BeamValid { get; private set; } = new bool[4];
+    
+    // ROS-frame accessor (FRD convention) - read directly from message
+    public Vector3 RosVelocity => msg != null ? new Vector3((float)msg.vx, (float)msg.vy, (float)msg.vz) : Vector3.zero;
 
     // Internals
     private VelocityReportMsg msg;
@@ -325,12 +328,12 @@ public class DVLPublisher : ROSPublisher
             
             LastVelocity = noisyVel;
             
-            // Convert to ROS frame (Unity FLU to ROS convention)
+            // Convert to DVL sensor frame (Waterlinked A50)
             // Unity: X=Right, Y=Up, Z=Forward
-            // DVL sensor frame: X=Forward, Y=Left, Z=Up (FLU)
-            msg.vx = noisyVel.z;   // Unity Z (Forward) -> ROS X
-            msg.vy = -noisyVel.x;  // Unity -X (Left) -> ROS Y  
-            msg.vz = noisyVel.y;   // Unity Y (Up) -> ROS Z
+            // DVL sensor frame: X=Forward, Y=Right, Z=Down (FRD)
+            msg.vx = noisyVel.z;   // Unity Z (Forward) -> DVL X (Forward)
+            msg.vy = noisyVel.x;   // Unity X (Right) -> DVL Y (Right)
+            msg.vz = -noisyVel.y;  // Unity -Y (Down) -> DVL Z (Down)
             
             msg.altitude = LastAltitude;
             msg.valid = true;

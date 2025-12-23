@@ -11,6 +11,14 @@ namespace Utils
         /// </summary>
         public static bool IsMouseOverUI()
         {
+            // Block interactions when mouse is outside the game window
+            Vector3 mousePos = Input.mousePosition;
+            if (mousePos.x < 0 || mousePos.x > Screen.width || 
+                mousePos.y < 0 || mousePos.y > Screen.height)
+            {
+                return true;
+            }
+            
             // UI Toolkit detection
             var hudDocument = SimulatorHUD.Instance?.uiDocument;
             if (hudDocument != null && hudDocument.rootVisualElement != null)
