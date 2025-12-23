@@ -5,10 +5,9 @@ using System.Linq;
 
 public class PingerTimeDifference : MonoBehaviour
 {
-    public Transform hydrophoneO;
-    public Transform hydrophoneX;
-    public Transform hydrophoneY;
-    public Transform hydrophoneZ;   // for fourth hydrophone
+    public Transform hydrophone1;
+    public Transform hydrophone2;
+    public Transform hydrophone3;
     public Transform pinger1;
     public Transform pinger2;
     public Transform pinger3;
@@ -32,10 +31,9 @@ public class PingerTimeDifference : MonoBehaviour
     {
         doubleUintMaxValue = (double)uintMaxValue;
 
-        hydrophoneList.Add(hydrophoneO);
-        hydrophoneList.Add(hydrophoneX);
-        hydrophoneList.Add(hydrophoneY);
-        hydrophoneList.Add(hydrophoneZ);
+        hydrophoneList.Add(hydrophone1);
+        hydrophoneList.Add(hydrophone2);
+        hydrophoneList.Add(hydrophone3);
         pingersList.Add(pinger1);
         pingersList.Add(pinger2);
         pingersList.Add(pinger3);
