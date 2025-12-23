@@ -85,12 +85,18 @@ public class IMUPublisher : ROSPublisher
     [Tooltip("Color for acceleration arrow and location dot")]
     public Color visualizationColor = new Color(1f, 0.2f, 0.8f); // Magenta
 
-    // Public properties for UI/other scripts
+    // Public properties for UI/other scripts (Unity frame)
     public Vector3 LastAcceleration { get; private set; }
     public Vector3 LastAngularVelocity { get; private set; }
     public Quaternion LastOrientation { get; private set; }
     public Vector3 CurrentGyroBias => gyroBias?.CurrentBias ?? Vector3.zero;
     public Vector3 CurrentAccelBias => accelBias?.CurrentBias ?? Vector3.zero;
+    
+    // ROS-frame accessors (FLU convention) - read directly from message
+    public Vector3 RosAcceleration => imuMsg != null ? 
+        new Vector3((float)imuMsg.linear_acceleration.x, (float)imuMsg.linear_acceleration.y, (float)imuMsg.linear_acceleration.z) : Vector3.zero;
+    public Vector3 RosAngularVelocity => imuMsg != null ? 
+        new Vector3((float)imuMsg.angular_velocity.x, (float)imuMsg.angular_velocity.y, (float)imuMsg.angular_velocity.z) : Vector3.zero;
 
     // Internals
     private ImuMsg imuMsg;
@@ -281,7 +287,19 @@ public class IMUPublisher : ROSPublisher
 
         // 4. Populate message (ready for publishing)
         imuMsg.linear_acceleration = noisyAccel.To<FLU>();
-        imuMsg.angular_velocity = noisyAngVel.To<FLU>();
+        
+        // Angular velocity is a PSEUDOVECTOR (axial vector, defined by cross product)
+        // Standard To<FLU> is (z, -x, y) for position vectors.
+        // For angular velocity, hand-rule flip affects axes differently:
+        //   - X axis (Forward): same physical axis, hand-rule flipped → negate
+        //   - Y axis (Left → Right): axis direction + hand-rule both flip → cancels out, NO negate
+        //   - Z axis (Up): same physical axis, hand-rule flipped → negate
+        imuMsg.angular_velocity = new Vector3Msg
+        {
+            x = -noisyAngVel.z,  // FLU X = -Unity Z (roll)
+            y = noisyAngVel.x,   // FLU Y = +Unity X (pitch) - two flips cancel
+            z = -noisyAngVel.y   // FLU Z = -Unity Y (yaw)
+        };
     }
 
     private void SetCovarianceMatrices()
@@ -339,28 +357,40 @@ public class IMUPublisher : ROSPublisher
             }
         }
         
-        // Angular velocity arrows
+        // Angular velocity arrows - displayed in FLU frame (matching ROS output)
+        // FLU: X=Forward, Y=Left, Z=Up (right-hand rule applies)
+        // ROS FLU conventions:
+        //   ωx (Roll): positive = CCW looking forward (robot rolls right)
+        //   ωy (Pitch): positive = CCW looking left (nose pitches down)  
+        //   ωz (Yaw): positive = CCW from above (robot turns left)
         if (angVelArrows != null)
         {
-            Vector3[] localAxes = { Vector3.right, Vector3.up, Vector3.forward };
-            float[] angVelComponents = { LastAngularVelocity.x, LastAngularVelocity.y, LastAngularVelocity.z };
+            // Use RosAngularVelocity which is already in FLU frame (from imuMsg)
+            Vector3 angVelFLU = RosAngularVelocity;
+            
+            // FLU axes in Unity world space
+            Vector3[] fluAxesWorld = {
+                transform.TransformDirection(Vector3.forward),  // FLU X = Forward
+                transform.TransformDirection(Vector3.left),     // FLU Y = Left
+                transform.TransformDirection(Vector3.up)        // FLU Z = Up
+            };
+            float[] fluComponents = { angVelFLU.x, angVelFLU.y, angVelFLU.z };
             
             for (int i = 0; i < 3; i++)
             {
                 if (angVelArrows[i] != null)
                 {
-                    float mag = angVelComponents[i];
+                    float mag = fluComponents[i];
                     
                     if (Mathf.Abs(mag) > 0.01f)
                     {
-                        Vector3 axisWorld = transform.TransformDirection(localAxes[i]);
                         float length = Mathf.Abs(mag) * angVelArrowScale;
                         
                         angVelArrows[i].SetActive(true);
                         angVelArrows[i].transform.position = transform.position;
                         
-                        // Point in axis direction (positive or negative based on sign)
-                        Vector3 dir = axisWorld * Mathf.Sign(mag);
+                        // Right-hand rule: positive rotation = arrow points along axis
+                        Vector3 dir = fluAxesWorld[i] * Mathf.Sign(mag);
                         angVelArrows[i].transform.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(90, 0, 0);
                         angVelArrows[i].transform.localScale = new Vector3(1, length, 1);
                     }
