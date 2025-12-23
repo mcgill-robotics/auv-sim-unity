@@ -19,16 +19,15 @@ public class SensorDataController
     private Label labelIMU;
     private Toggle toggleIMUViz;
     
-    // Pressure Labels
-    private Label textPressureDepth;
-    private Label textPressureValue;
-    private Label labelPressure;
-    private Toggle togglePressureViz;
+    // Depth Labels
+    private Label textDepthValue;
+    private Label labelDepth;
+    private Toggle toggleDepthViz;
     
     // Publisher References
     private DVLPublisher dvlPublisher;
     private IMUPublisher imuPublisher;
-    private PressurePublisher pressurePublisher;
+    private DepthPublisher depthPublisher;
     
     public SensorDataController(VisualElement root)
     {
@@ -55,14 +54,13 @@ public class SensorDataController
         textIMUWz = root.Q<Label>("Text-IMUWz");
         toggleIMUViz = root.Q<Toggle>("Toggle-IMUViz");
         
-        // Pressure
-        textPressureDepth = root.Q<Label>("Text-PressureDepth");
-        textPressureValue = root.Q<Label>("Text-PressureValue");
-        togglePressureViz = root.Q<Toggle>("Toggle-PressureViz");
+        // Depth
+        textDepthValue = root.Q<Label>("Text-DepthValue");
+        toggleDepthViz = root.Q<Toggle>("Toggle-DepthViz");
         
         labelDVL = root.Q<Label>("Label-DVL");
         labelIMU = root.Q<Label>("Label-IMU");
-        labelPressure = root.Q<Label>("Label-Pressure");
+        labelDepth = root.Q<Label>("Label-Depth");
     }
     
     private void RegisterCallbacks()
@@ -91,14 +89,14 @@ public class SensorDataController
             });
         }
         
-        if (togglePressureViz != null)
+        if (toggleDepthViz != null)
         {
-            togglePressureViz.RegisterValueChangedCallback(evt => {
-                if (pressurePublisher != null)
+            toggleDepthViz.RegisterValueChangedCallback(evt => {
+                if (depthPublisher != null)
                 {
-                    pressurePublisher.SetVisualizationActive(evt.newValue);
+                    depthPublisher.SetVisualizationActive(evt.newValue);
                 }
-                SimulationSettings.Instance.VisualizePressure = evt.newValue;
+                SimulationSettings.Instance.VisualizeDepth = evt.newValue;
                 SimulationSettings.Instance.SaveSettings();
             });
         }
@@ -111,7 +109,7 @@ public class SensorDataController
     {
         dvlPublisher = Object.FindFirstObjectByType<DVLPublisher>();
         imuPublisher = Object.FindFirstObjectByType<IMUPublisher>();
-        pressurePublisher = Object.FindFirstObjectByType<PressurePublisher>();
+        depthPublisher = Object.FindFirstObjectByType<DepthPublisher>();
         
         // Apply saved visualization settings
         if (dvlPublisher != null)
@@ -128,11 +126,11 @@ public class SensorDataController
                 toggleIMUViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizeIMU);
         }
         
-        if (pressurePublisher != null)
+        if (depthPublisher != null)
         {
-            pressurePublisher.SetVisualizationActive(SimulationSettings.Instance.VisualizePressure);
-            if (togglePressureViz != null)
-                togglePressureViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizePressure);
+            depthPublisher.SetVisualizationActive(SimulationSettings.Instance.VisualizeDepth);
+            if (toggleDepthViz != null)
+                toggleDepthViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizeDepth);
         }
 
         // Apply colors to UI labels
@@ -150,8 +148,8 @@ public class SensorDataController
         if (imuPublisher != null && labelIMU != null)
             labelIMU.style.color = new StyleColor(imuPublisher.visualizationColor);
             
-        if (pressurePublisher != null && labelPressure != null)
-            labelPressure.style.color = new StyleColor(pressurePublisher.visualizationColor);
+        if (depthPublisher != null && labelDepth != null)
+            labelDepth.style.color = new StyleColor(depthPublisher.visualizationColor);
     }
     
     /// <summary>
@@ -196,13 +194,11 @@ public class SensorDataController
             if (textIMUWz != null) textIMUWz.text = $"{angVel.z:+0.00;-0.00}";
         }
         
-        // Pressure Data (scalar, no frame conversion needed)
-        if (pressurePublisher != null)
+        // Depth Data
+        if (depthPublisher != null)
         {
-            if (textPressureDepth != null)
-                textPressureDepth.text = $"{pressurePublisher.LastDepth:0.00} m";
-            if (textPressureValue != null)
-                textPressureValue.text = $"{pressurePublisher.LastPressure / 1000.0:0.0} kPa";
+            if (textDepthValue != null)
+                textDepthValue.text = $"{depthPublisher.LastDepth:0.00} m";
         }
     }
     
