@@ -72,52 +72,83 @@
                 <ui:Label text="⌨" class="drawer-tab-icon" />
                 <ui:Label text="C&#10;T&#10;R&#10;L&#10;S" class="drawer-tab-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="ControlsDrawer-Content" class="drawer-content drawer-content-left" style="width: 239px; height: 284px;">
-                <ui:Label text="MANUAL OVERRIDE" class="header" style="font-size: 14px; margin-bottom: 10px;" />
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Surge (Fwd/Back)" />
-                    <ui:Label text="[W] / [S]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Sway (Left/Right)" />
-                    <ui:Label text="[A] / [D]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Heave (Up/Down)" />
-                    <ui:Label text="[E] / [Q]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Yaw (Turn)" />
-                    <ui:Label text="[J] / [L]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Pitch" />
-                    <ui:Label text="[I] / [K]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Roll" />
-                    <ui:Label text="[O] / [U]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row" style="margin-top: 8px; border-top-width: 1px; border-color: rgb(68, 68, 68); padding-top: 8px;">
-                    <ui:Label text="FREEZE / UNFREEZE" class="status-bad" />
-                    <ui:Label text="[SPACE]" class="data-value" />
-                </ui:VisualElement>
-                <ui:Label text="CAMERA OVERRIDE" class="data-label text-accent margin-top-small" style="font-size: 11px; margin-bottom: 5px;" />
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Orbit / Zoom" />
-                    <ui:Label text="[R-Click] / [Scroll]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Snapshot" />
-                    <ui:Label text="[P]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Cycle Feed" />
-                    <ui:Label text="[V]" class="data-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="keybind-row">
-                    <ui:Label text="Switch Cam" />
-                    <ui:Label text="[C]" class="data-value" />
+            <ui:VisualElement name="ControlsDrawer-Content" class="drawer-content drawer-content-left" style="width: 500px; height: 260px;">
+                <ui:Label text="SIMULATOR CONTROLS" class="header" style="font-size: 14px; margin-bottom: 10px;" />
+                <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                    <!-- Column 1: Movement -->
+                    <ui:VisualElement style="width: 230px;">
+                        <ui:Label text="MOVEMENT" class="data-label text-accent" style="font-size: 11px; margin-bottom: 5px;" />
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Surge (Fwd/Back)" />
+                            <ui:Label text="[W] / [S]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Sway (Left/Right)" />
+                            <ui:Label text="[A] / [D]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Heave (Up/Down)" />
+                            <ui:Label text="[E] / [Q]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Yaw (Turn)" />
+                            <ui:Label text="[J] / [L]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Pitch" />
+                            <ui:Label text="[I] / [K]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Roll" />
+                            <ui:Label text="[O] / [U]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row" style="margin-top: 8px; border-top-width: 1px; border-color: rgb(68, 68, 68); padding-top: 8px;">
+                            <ui:Label text="FREEZE / UNFREEZE" class="status-bad" />
+                            <ui:Label text="[SPACE]" class="data-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+
+                    <!-- Divider -->
+                    <ui:VisualElement style="width: 1px; background-color: rgb(68, 68, 68); margin: 0 10px;" />
+
+                    <!-- Column 2: Actuators & Camera -->
+                    <ui:VisualElement style="width: 230px;">
+                        <ui:Label text="ACTUATORS" class="data-label text-accent" style="font-size: 11px; margin-bottom: 5px;" />
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Launch Torpedo" />
+                            <ui:Label text="[T]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Reset Launcher" />
+                            <ui:Label text="[Y]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Rotate Launcher" />
+                            <ui:Label text="[ ← ] / [ → ]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row" style="margin-bottom: 8px;">
+                            <ui:Label text="Drop (Dropper)" />
+                            <ui:Label text="[G]" class="data-value" />
+                        </ui:VisualElement>
+
+                        <ui:Label text="CAMERA &amp; TOOLS" class="data-label text-accent" style="font-size: 11px; margin-bottom: 5px;" />
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Orbit / Zoom" />
+                            <ui:Label text="[R-Click] / [Scroll]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Snapshot" />
+                            <ui:Label text="[P]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Cycle Feed" />
+                            <ui:Label text="[V]" class="data-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="keybind-row">
+                            <ui:Label text="Switch Camera" />
+                            <ui:Label text="[C]" class="data-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

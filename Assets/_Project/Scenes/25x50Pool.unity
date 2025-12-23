@@ -130,7 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 10935510}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right Chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -457,7 +457,7 @@ GameObject:
   m_Component:
   - component: {fileID: 74523310}
   - component: {fileID: 74523311}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left Thrusters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -553,7 +553,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 100362016}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -573,12 +573,12 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2083545327}
+  - {fileID: 634586413}
   - {fileID: 6188464031529021589}
   - {fileID: 7063326007192270073}
   - {fileID: 830137549}
-  - {fileID: 6362377508993018389}
   - {fileID: 10935510}
-  - {fileID: 7689657270306945842}
   - {fileID: 8254860207206042926}
   - {fileID: 2153609703163188894}
   - {fileID: 5735536480775782616}
@@ -600,7 +600,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 130216582}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Grabber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -633,7 +633,7 @@ GameObject:
   m_Component:
   - component: {fileID: 198530565}
   - component: {fileID: 198530566}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right Thrusters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -951,7 +951,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 238501981}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Legs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1103,7 +1103,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 345055707}
-  m_Layer: 0
+  - component: {fileID: 345055708}
+  m_Layer: 7
   m_Name: Torpedo Launcher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1126,6 +1127,34 @@ Transform:
   - {fileID: 100362016}
   m_Father: {fileID: 431467988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &345055708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345055706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1901ccfb1d6418c4a9b34bac85b39f13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotatingBase: {fileID: 345055707}
+  torpedos:
+  - {fileID: 634586412}
+  - {fileID: 2083545326}
+  maxRotationAngle: 80
+  rotationSpeed: 30
+  launchForce: 5
+  torpedoMass: 1
+  torpedoDrag: 0.5
+  torpedoAngularDrag: 0.5
+  excludeLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  manageColliders: 1
+  nextTorpedoIndex: 0
+  targetRotation: 0
 --- !u!4 &357318295 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
@@ -1633,7 +1662,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 431467988}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Actuators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1667,7 +1696,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 440438759}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: VIsual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1700,7 +1729,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 465794308}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sensors
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1805,7 +1834,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 494990812}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T8 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2054,7 +2083,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 577177578}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Closed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2096,7 +2125,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 595315753}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T4 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2118,6 +2147,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 947108272}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &634586412
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 634586413}
+  m_Layer: 7
+  m_Name: Left Torpedo Parent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &634586413
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634586412}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.01670003, y: 0.07520008, z: 0.06290007}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6362377508993018389}
+  m_Father: {fileID: 100362016}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &688476569
 GameObject:
   m_ObjectHideFlags: 0
@@ -2127,7 +2188,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 688476570}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T6 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2159,7 +2220,7 @@ GameObject:
   m_Component:
   - component: {fileID: 722216575}
   - component: {fileID: 722216576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Movella MTi-600 (IMU)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2232,7 +2293,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 767788489}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 'Small Kill Switch '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2553,7 +2614,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 830137549}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left Chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2588,7 +2649,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 830320719}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T2 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2795,7 +2856,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 933812022}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T7 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2826,7 +2887,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 947108272}
-  m_Layer: 0
+  - component: {fileID: 947108273}
+  m_Layer: 7
   m_Name: Thrusters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2857,6 +2919,48 @@ Transform:
   - {fileID: 494990812}
   m_Father: {fileID: 431467988}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &947108273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947108271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17f2cd4078169b44d8f5677d78a6b821, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sinkForce: 50
+  floatForce: 50
+  moveForce: 50
+  rotationForce: 10
+  thrusters:
+  - {fileID: 1991429751}
+  - {fileID: 830320719}
+  - {fileID: 1377547790}
+  - {fileID: 595315753}
+  - {fileID: 969918696}
+  - {fileID: 688476570}
+  - {fileID: 933812022}
+  - {fileID: 494990812}
+  thrusterParticles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  AUVRealForceMultiplier: 3
+  enableForceVisualization: 1
+  forceVisualScale: 0.01
+  visualizationColor: {r: 1, g: 0, b: 0, a: 1}
+  maxThrusterForce: 50
+  rampRate: 100
+  efficiencyVariance: 0
+  auvRbOverride: {fileID: 0}
 --- !u!1 &969918695
 GameObject:
   m_ObjectHideFlags: 0
@@ -2866,7 +2970,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 969918696}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T5 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2897,7 +3001,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1030855250}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: VIsual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2930,7 +3034,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1037403592}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3140,7 +3244,7 @@ GameObject:
   - component: {fileID: 1135839434}
   - component: {fileID: 1135839436}
   - component: {fileID: 1135839435}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Right_Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3361,7 +3465,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1147001838}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3406,8 +3510,7 @@ GameObject:
   - component: {fileID: 1196380217}
   - component: {fileID: 1196380220}
   - component: {fileID: 1196380221}
-  - component: {fileID: 1196380219}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Douglas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3459,47 +3562,6 @@ Transform:
   - {fileID: 1037403592}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1196380219
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196380216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17f2cd4078169b44d8f5677d78a6b821, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sinkForce: 50
-  floatForce: 50
-  moveForce: 50
-  rotationForce: 10
-  thrusters:
-  - {fileID: 1991429751}
-  - {fileID: 830320719}
-  - {fileID: 1377547790}
-  - {fileID: 595315753}
-  - {fileID: 969918696}
-  - {fileID: 688476570}
-  - {fileID: 933812022}
-  - {fileID: 494990812}
-  thrusterParticles:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  AUVRealForceMultiplier: 3
-  enableForceVisualization: 1
-  forceVisualScale: 0.01
-  visualizationColor: {r: 1, g: 0, b: 0, a: 1}
-  maxThrusterForce: 50
-  rampRate: 100
-  efficiencyVariance: 0
 --- !u!114 &1196380220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3606,7 +3668,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: 7b51334a971553f2fa0125444129dee4, type: 2}
+  sharedProfile: {fileID: 11400000, guid: d27696ddbe9ee4a10be6e59bc55a31c6, type: 2}
 --- !u!4 &1335381708
 Transform:
   m_ObjectHideFlags: 0
@@ -3634,7 +3696,7 @@ GameObject:
   - component: {fileID: 1370920609}
   - component: {fileID: 1370920608}
   - component: {fileID: 1370920607}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ZED2i (Stereo Camera)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3727,7 +3789,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1377547790}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T3 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3928,15 +3990,15 @@ MonoBehaviour:
   PublishPressure: 0
   PublishFrontCam: 0
   PublishDownCam: 0
-  StreamZEDCamera: 0
+  StreamZEDCamera: 1
   VisualizeDVL: 0
-  VisualizeIMU: 1
+  VisualizeIMU: 0
   VisualizePressure: 0
   DrawerConfigOpen: 1
   DrawerControlsOpen: 1
   DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
-  DrawerCameraOpen: 1
+  DrawerCameraOpen: 0
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
@@ -4070,6 +4132,9 @@ MonoBehaviour:
   ThrustersTopic: /auv/thrusters
   ThrusterForcesTopic: /auv/thruster_forces
   DropperTopic: /auv/dropper
+  TorpedoLaunchTopic: /auv/torpedo/launch
+  TorpedoResetTopic: /auv/torpedo/reset
+  TorpedoRotationTopic: /auv/torpedo/rotate
   DVLTopic: /sensors/dvl/data
   IMUTopic: /sensors/imu/data
   DepthTopic: /sensors/depth
@@ -4149,7 +4214,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1481776558}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4215,7 +4280,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1554602066}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hydrophones
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4250,7 +4315,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1565515643}
   - component: {fileID: 1565515644}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DVL-A50
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4497,7 +4562,7 @@ GameObject:
   - component: {fileID: 1621375947}
   - component: {fileID: 1621375949}
   - component: {fileID: 1621375948}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Left_Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4721,7 +4786,7 @@ GameObject:
   - component: {fileID: 1671108404}
   - component: {fileID: 1671108403}
   - component: {fileID: 1671108402}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Down Cam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5427,7 +5492,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1991429751}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T1 Transform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5459,7 +5524,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2041719979}
   - component: {fileID: 2041719980}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pressure Sensor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5725,6 +5790,38 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 881192469}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2083545326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2083545327}
+  m_Layer: 7
+  m_Name: Right Torpedo Parent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2083545327
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083545326}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.016699791, y: 0.07520008, z: 0.059900284}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7689657270306945842}
+  m_Father: {fileID: 100362016}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2102525241
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5902,7 +5999,7 @@ GameObject:
   - component: {fileID: 7198833242310866121}
   - component: {fileID: 6019333177879811115}
   - component: {fileID: 2245413131866408111}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5918,7 +6015,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3132406201666366320}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5936,7 +6033,7 @@ GameObject:
   - component: {fileID: 5550140208641215314}
   - component: {fileID: 8328152538411195077}
   - component: {fileID: 6454550184963225593}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6057,7 +6154,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8629767595977119601}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6183,7 +6280,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4244244706505243509}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6246,7 +6343,7 @@ GameObject:
   - component: {fileID: 2823793512599789452}
   - component: {fileID: 7143697508871218024}
   - component: {fileID: 4428860678299305636}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID268
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6354,7 +6451,7 @@ GameObject:
   - component: {fileID: 7420635151773996761}
   - component: {fileID: 8280540296108517261}
   - component: {fileID: 1410037790848669054}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6532,7 +6629,7 @@ GameObject:
   - component: {fileID: 8358309504114383546}
   - component: {fileID: 7297883080743736198}
   - component: {fileID: 8876472551097208647}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6593,7 +6690,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6022821783232171241}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6611,7 +6708,7 @@ GameObject:
   - component: {fileID: 5104207659952494426}
   - component: {fileID: 8142348395433010749}
   - component: {fileID: 3344537994141622776}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6643,7 +6740,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5114639938886786764}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6659,7 +6756,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4399809293374270462}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Full thrusters (flat) <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6675,7 +6772,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3700537212607382075}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  20'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6709,7 +6806,7 @@ GameObject:
   - component: {fileID: 7028970495431212801}
   - component: {fileID: 7649270088102046628}
   - component: {fileID: 7649270088102046629}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Chassis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6893,7 +6990,7 @@ GameObject:
   - component: {fileID: 3027361407150200637}
   - component: {fileID: 8509938956540417450}
   - component: {fileID: 8571792345336012141}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6987,7 +7084,7 @@ GameObject:
   - component: {fileID: 580045598591668992}
   - component: {fileID: 8889606125008791303}
   - component: {fileID: 8449032319466892860}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7041,7 +7138,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3607492219039379003}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  17'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7179,7 +7276,7 @@ GameObject:
   - component: {fileID: 4178840578963401168}
   - component: {fileID: 3076037383313335903}
   - component: {fileID: 2934908164325008576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Grabber closed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7233,7 +7330,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4409820672042873322}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7251,7 +7348,7 @@ GameObject:
   - component: {fileID: 4754382520885636944}
   - component: {fileID: 749738595191552230}
   - component: {fileID: 147036021913140181}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7309,7 +7406,7 @@ GameObject:
   - component: {fileID: 3680070583646982359}
   - component: {fileID: 3589754560437612306}
   - component: {fileID: 7031543448678077273}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7453,7 +7550,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8385958601633330763}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7522,7 +7619,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7923807481724934012}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7578,7 +7675,7 @@ GameObject:
   - component: {fileID: 7977770304192052788}
   - component: {fileID: 5809832862947232178}
   - component: {fileID: 6021951716630985419}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7641,7 +7738,7 @@ GameObject:
   - component: {fileID: 7429825836763548588}
   - component: {fileID: 5008741209317238641}
   - component: {fileID: 6117279282475324969}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: pxc_1714936_00_FP-1-27-16-MV-1-75_3D^P100_MTi600_MTi-600
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7682,7 +7779,7 @@ GameObject:
   - component: {fileID: 8415350708532437862}
   - component: {fileID: 2527197178914520541}
   - component: {fileID: 8116078265306855821}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7785,7 +7882,7 @@ GameObject:
   - component: {fileID: 2153609703163188894}
   - component: {fileID: 7377480004753533262}
   - component: {fileID: 3653444084994407660}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SER-20XX Servo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7801,7 +7898,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4966086568050446833}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7817,7 +7914,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1602551170479900805}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7856,7 +7953,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8901387841422438332}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7872,7 +7969,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7344706982003538164}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7890,7 +7987,7 @@ GameObject:
   - component: {fileID: 5440281278282505596}
   - component: {fileID: 1476764129994481637}
   - component: {fileID: 7774222088765376027}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7906,7 +8003,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8904908039348687863}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  19'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7993,7 +8090,7 @@ GameObject:
   - component: {fileID: 4241630044439410682}
   - component: {fileID: 8988616663932796114}
   - component: {fileID: 5225225935864747932}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Base chamber R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8117,7 +8214,7 @@ GameObject:
   - component: {fileID: 2478093782813883872}
   - component: {fileID: 1780795216025969392}
   - component: {fileID: 6387610777269476193}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8133,7 +8230,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7248762797749329471}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8157,7 +8254,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3591780065656294324}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Full thrusters (angle) <3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8274,7 +8371,7 @@ GameObject:
   - component: {fileID: 630907491374651390}
   - component: {fileID: 1247961776670318828}
   - component: {fileID: 5766857052334201938}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8465,7 +8562,7 @@ GameObject:
   - component: {fileID: 6670058453217009743}
   - component: {fileID: 7272862810808227148}
   - component: {fileID: 7966963504630039084}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8526,7 +8623,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9104751533455213236}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8589,7 +8686,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8976229354988279999}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  20'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8848,7 +8945,7 @@ GameObject:
   - component: {fileID: 3086179606952567127}
   - component: {fileID: 865480801799021413}
   - component: {fileID: 1434430983147079780}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8889,7 +8986,8 @@ GameObject:
   - component: {fileID: 6362377508993018389}
   - component: {fileID: 5718624556657040847}
   - component: {fileID: 7165802304902637262}
-  m_Layer: 0
+  - component: {fileID: 7165802304902637263}
+  m_Layer: 7
   m_Name: Left Torpedo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9101,7 +9199,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 62308547025805989}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  14'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9180,7 +9278,7 @@ GameObject:
   - component: {fileID: 6343318778731783185}
   - component: {fileID: 5704927265400188398}
   - component: {fileID: 7529144360043889163}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9306,7 +9404,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3296964572801287676}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9377,7 +9475,7 @@ GameObject:
   - component: {fileID: 6536284830891755730}
   - component: {fileID: 1766555098009296726}
   - component: {fileID: 2236577014424478042}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9432,7 +9530,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5055265073380881705}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MTi-600 Housing Assembly <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9448,7 +9546,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2662045102990476130}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9466,7 +9564,7 @@ GameObject:
   - component: {fileID: 7035123922510255980}
   - component: {fileID: 8392948299605398402}
   - component: {fileID: 8294887539221708638}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9543,7 +9641,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 765189520434456868}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9606,7 +9704,7 @@ GameObject:
   - component: {fileID: 7092875830931167849}
   - component: {fileID: 1515853805164524149}
   - component: {fileID: 4986797758181108677}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9622,7 +9720,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3181884717593299576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9646,7 +9744,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 847213752400120802}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9717,7 +9815,7 @@ GameObject:
   - component: {fileID: 8496914883104797197}
   - component: {fileID: 5210533073562472533}
   - component: {fileID: 1604552934045104340}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID250
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9795,7 +9893,7 @@ GameObject:
   - component: {fileID: 2558247991351040640}
   - component: {fileID: 1497067575990924511}
   - component: {fileID: 5283833799707435932}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9811,7 +9909,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3715739170259477469}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9911,7 +10009,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4404830447253668395}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10065,7 +10163,7 @@ GameObject:
   - component: {fileID: 1808615839936777386}
   - component: {fileID: 7326278960196145249}
   - component: {fileID: 2367407964370924109}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10081,7 +10179,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5014657937941118076}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10146,7 +10244,7 @@ GameObject:
   - component: {fileID: 8552295368310704112}
   - component: {fileID: 5705309888336957211}
   - component: {fileID: 4472906355839713110}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10164,7 +10262,7 @@ GameObject:
   - component: {fileID: 6220965306961370066}
   - component: {fileID: 1916097959672469348}
   - component: {fileID: 2754344996111004582}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10190,7 +10288,7 @@ GameObject:
   - component: {fileID: 481225741997778303}
   - component: {fileID: 3476573165663075861}
   - component: {fileID: 5027357290523092631}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10216,7 +10314,7 @@ GameObject:
   - component: {fileID: 489922584691467099}
   - component: {fileID: 2040353691209099488}
   - component: {fileID: 2497218831489728883}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10240,7 +10338,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2413980140383051087}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10256,7 +10354,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3303631199150297565}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10272,7 +10370,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3101324268422700970}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10290,7 +10388,7 @@ GameObject:
   - component: {fileID: 8254860207206042926}
   - component: {fileID: 931982454840718803}
   - component: {fileID: 1584475316340088512}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Foam_part
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10406,7 +10504,7 @@ GameObject:
   - component: {fileID: 1649672907354171386}
   - component: {fileID: 907909658979664579}
   - component: {fileID: 5366054359517207169}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 1550285220
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10543,7 +10641,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7889288264996145785}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  18'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10659,7 +10757,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2564314728004662666}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  19'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10675,7 +10773,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2241872572655341396}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10815,7 +10913,7 @@ GameObject:
   - component: {fileID: 299528737670339477}
   - component: {fileID: 5726896962302995108}
   - component: {fileID: 6135236641490302719}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10831,7 +10929,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8634226209518699177}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Full thrusters (angle) <4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11015,7 +11113,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2977566753622358286}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11031,7 +11129,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1050923919160431407}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11049,7 +11147,7 @@ GameObject:
   - component: {fileID: 8108638977418439819}
   - component: {fileID: 544675860472331186}
   - component: {fileID: 896901116865922671}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Secondary Grabber Mount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11112,7 +11210,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1161701682802701531}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11136,7 +11234,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6156724096251532640}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11213,7 +11311,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8709833701317104528}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11229,7 +11327,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2852409041897247887}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11245,7 +11343,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1705692249862592836}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11277,7 +11375,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4003082353384485168}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11293,7 +11391,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6591357577023956302}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11342,7 +11440,7 @@ GameObject:
   - component: {fileID: 4495979221028612307}
   - component: {fileID: 2858414313275512861}
   - component: {fileID: 7671395954092520508}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11373,7 +11471,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4223648727413688275}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11389,7 +11487,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5817856799972224105}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11498,7 +11596,7 @@ GameObject:
   - component: {fileID: 4443828955237461440}
   - component: {fileID: 8598338810943237660}
   - component: {fileID: 6218533351757106400}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11569,7 +11667,7 @@ GameObject:
   - component: {fileID: 5788700139257089951}
   - component: {fileID: 3228018458012617571}
   - component: {fileID: 1375960752873421038}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11587,7 +11685,7 @@ GameObject:
   - component: {fileID: 2107802719754918289}
   - component: {fileID: 6999401891303260909}
   - component: {fileID: 6546461330388707556}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cap chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11605,7 +11703,7 @@ GameObject:
   - component: {fileID: 473706512408273966}
   - component: {fileID: 4204176594428696889}
   - component: {fileID: 704174365963128298}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11759,7 +11857,7 @@ GameObject:
   - component: {fileID: 8533742007566378037}
   - component: {fileID: 2685244457579893682}
   - component: {fileID: 1079886796816478962}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11792,7 +11890,7 @@ GameObject:
   - component: {fileID: 2413270100460115212}
   - component: {fileID: 804388114946776560}
   - component: {fileID: 568138765935615322}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11840,7 +11938,7 @@ GameObject:
   - component: {fileID: 8963198535507126239}
   - component: {fileID: 8411005452369520735}
   - component: {fileID: 283319256742243604}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11864,7 +11962,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2993389866963102867}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11882,7 +11980,7 @@ GameObject:
   - component: {fileID: 9126050115802058457}
   - component: {fileID: 1574218863401193980}
   - component: {fileID: 6069114318326026196}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11898,7 +11996,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5170045044906533509}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11916,7 +12014,7 @@ GameObject:
   - component: {fileID: 7509086196732541578}
   - component: {fileID: 3593377571574325889}
   - component: {fileID: 6494136031166417737}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11979,7 +12077,7 @@ GameObject:
   - component: {fileID: 3279233719855966506}
   - component: {fileID: 2821419313445454710}
   - component: {fileID: 1646715737378043132}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12073,7 +12171,7 @@ GameObject:
   - component: {fileID: 5339181157075022113}
   - component: {fileID: 2650568146331272237}
   - component: {fileID: 6027358168501165920}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID286
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12121,7 +12219,7 @@ GameObject:
   - component: {fileID: 6506379068052484802}
   - component: {fileID: 4736685287965210345}
   - component: {fileID: 3970582025307635878}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Insert in chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12137,7 +12235,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5809548567154679096}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12202,7 +12300,7 @@ GameObject:
   - component: {fileID: 2639680715427932177}
   - component: {fileID: 3788836970981475682}
   - component: {fileID: 7647663638530519375}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID50
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12226,7 +12324,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 96815478021208006}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12242,7 +12340,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4618184886963678837}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12302,7 +12400,7 @@ GameObject:
   - component: {fileID: 163355488072145426}
   - component: {fileID: 4518157391257739155}
   - component: {fileID: 4018958054630502549}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Short rail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12320,7 +12418,7 @@ GameObject:
   - component: {fileID: 4007660689076654708}
   - component: {fileID: 649943577970311746}
   - component: {fileID: 2230515465631353198}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12402,7 +12500,7 @@ GameObject:
   - component: {fileID: 985321101111579107}
   - component: {fileID: 5037183325348263296}
   - component: {fileID: 2725127367524944669}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 3014T957_Steel Eyebolt with Shoulder - for Lifting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12435,7 +12533,7 @@ GameObject:
   - component: {fileID: 3462720727220633014}
   - component: {fileID: 3323718340250549222}
   - component: {fileID: 7471144140410582442}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Silo chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12453,7 +12551,7 @@ GameObject:
   - component: {fileID: 9131333493783609567}
   - component: {fileID: 1406425993821018614}
   - component: {fileID: 2066075756405456545}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID256
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12487,7 +12585,7 @@ GameObject:
   - component: {fileID: 1011812883233268212}
   - component: {fileID: 1179149320418647318}
   - component: {fileID: 8952291465541567309}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12769,7 +12867,7 @@ GameObject:
   - component: {fileID: 2853666375967574665}
   - component: {fileID: 2570940494213440871}
   - component: {fileID: 644892181457984979}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12787,7 +12885,7 @@ GameObject:
   - component: {fileID: 5439413664713286838}
   - component: {fileID: 4944259509136091358}
   - component: {fileID: 4705265570132702559}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12805,7 +12903,7 @@ GameObject:
   - component: {fileID: 7511763885994363442}
   - component: {fileID: 3652161989794925504}
   - component: {fileID: 6460056966967657285}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12836,7 +12934,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6746283261776513269}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12854,7 +12952,7 @@ GameObject:
   - component: {fileID: 6410561678010740315}
   - component: {fileID: 5366044191698133010}
   - component: {fileID: 3691321892391905825}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12941,7 +13039,7 @@ GameObject:
   - component: {fileID: 6909730767451818491}
   - component: {fileID: 8015142938164136262}
   - component: {fileID: 2089406341491780460}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12972,7 +13070,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8160592825501901153}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  24'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13206,7 +13304,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7626129080934100486}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13232,7 +13330,7 @@ GameObject:
   - component: {fileID: 4086398360031500226}
   - component: {fileID: 7390631343926891337}
   - component: {fileID: 8880011071558296590}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13279,7 +13377,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8414562669382504905}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13305,7 +13403,7 @@ GameObject:
   - component: {fileID: 7496233810607114953}
   - component: {fileID: 5215097439314251516}
   - component: {fileID: 4443951817012212715}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13339,7 +13437,7 @@ GameObject:
   - component: {fileID: 4455092265077754090}
   - component: {fileID: 6843678383956043976}
   - component: {fileID: 4978759521347811404}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13486,7 +13584,7 @@ GameObject:
   - component: {fileID: 6469126119002692005}
   - component: {fileID: 9200463041307582392}
   - component: {fileID: 4961076395737516275}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13513,7 +13611,7 @@ GameObject:
   - component: {fileID: 4140528290485973152}
   - component: {fileID: 269978623471554740}
   - component: {fileID: 9220478561657704890}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13811,7 +13909,7 @@ GameObject:
   - component: {fileID: 3076591428230661961}
   - component: {fileID: 2428340055296621437}
   - component: {fileID: 2374344433537787241}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13921,7 +14019,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 540148644184512578}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13952,7 +14050,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6143488867660295696}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14200,7 +14298,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8008779822262736931}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14216,7 +14314,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2564149469807387398}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  21'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14234,7 +14332,7 @@ GameObject:
   - component: {fileID: 9187486389565987010}
   - component: {fileID: 5061432222729192668}
   - component: {fileID: 4438186573294137582}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14313,7 +14411,7 @@ GameObject:
   - component: {fileID: 3117888316534535991}
   - component: {fileID: 5154702058051955083}
   - component: {fileID: 3130798005991018020}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14504,7 +14602,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1856673123756391112}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  30'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14613,7 +14711,7 @@ GameObject:
   - component: {fileID: 5388038767767687955}
   - component: {fileID: 7195375937437575141}
   - component: {fileID: 1694706136279468022}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14729,7 +14827,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2301536275421249659}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  22'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14774,7 +14872,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9200409942576941736}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14790,7 +14888,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2698820621188852245}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14808,7 +14906,7 @@ GameObject:
   - component: {fileID: 4835546346519800775}
   - component: {fileID: 7112931378620395276}
   - component: {fileID: 6907250429559896654}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14855,7 +14953,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5688163164406931424}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14918,7 +15016,7 @@ GameObject:
   - component: {fileID: 1951077811508005595}
   - component: {fileID: 8697602894447097209}
   - component: {fileID: 3726988353479037471}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14934,7 +15032,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4467642606260466531}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14976,7 +15074,7 @@ GameObject:
   - component: {fileID: 5052153318369463718}
   - component: {fileID: 8720705352072896571}
   - component: {fileID: 4913660682828745657}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15077,7 +15175,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7689664168631426550}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15109,7 +15207,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3078879611242164990}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15156,7 +15254,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1665151008682371960}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  18'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15197,7 +15295,7 @@ GameObject:
   - component: {fileID: 920507751042290261}
   - component: {fileID: 5569556059239823172}
   - component: {fileID: 5737332487883086010}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15215,7 +15313,7 @@ GameObject:
   - component: {fileID: 7233621616213630919}
   - component: {fileID: 7870721357327278365}
   - component: {fileID: 3614611241366072492}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15233,7 +15331,7 @@ GameObject:
   - component: {fileID: 9084322113687644764}
   - component: {fileID: 4560280911213939355}
   - component: {fileID: 5984566542712218681}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15251,7 +15349,7 @@ GameObject:
   - component: {fileID: 1948345374321838025}
   - component: {fileID: 5806485773625232668}
   - component: {fileID: 112177474002911394}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15331,7 +15429,7 @@ GameObject:
   - component: {fileID: 1003485385766647239}
   - component: {fileID: 108388093949267512}
   - component: {fileID: 5607945955365403056}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15347,7 +15445,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6516580661796311718}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15379,7 +15477,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5932625167581273030}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15397,7 +15495,7 @@ GameObject:
   - component: {fileID: 94330133891369071}
   - component: {fileID: 5334423676159745081}
   - component: {fileID: 3495259294921040795}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15460,7 +15558,7 @@ GameObject:
   - component: {fileID: 1456642747905817053}
   - component: {fileID: 5011166687168162557}
   - component: {fileID: 2819212991906654924}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15491,7 +15589,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7018548317542619418}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15570,7 +15668,7 @@ GameObject:
   - component: {fileID: 5183178193010805020}
   - component: {fileID: 2660999389805985689}
   - component: {fileID: 5067922081834788992}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15813,7 +15911,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1165792643924092465}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15829,7 +15927,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4684730464005684993}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Full thrusters (angle) <4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15961,7 +16059,7 @@ GameObject:
   - component: {fileID: 5763721035039746277}
   - component: {fileID: 2391546447270604109}
   - component: {fileID: 1339687072240192155}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15979,7 +16077,7 @@ GameObject:
   - component: {fileID: 8975475354144537085}
   - component: {fileID: 7288196115804417230}
   - component: {fileID: 9222318529249751980}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15997,7 +16095,7 @@ GameObject:
   - component: {fileID: 6179001340881384405}
   - component: {fileID: 6128309233296733735}
   - component: {fileID: 3361997211630395119}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16013,7 +16111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7077228364721841717}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16151,7 +16249,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6538976453492979804}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16191,7 +16289,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1177489343707216768}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16217,7 +16315,7 @@ GameObject:
   - component: {fileID: 3416966717182767267}
   - component: {fileID: 2801238412461312034}
   - component: {fileID: 1151889765022391972}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16339,7 +16437,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2160010781119057574}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  17'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16410,7 +16508,7 @@ GameObject:
   - component: {fileID: 4612647291470814049}
   - component: {fileID: 1106662393022385540}
   - component: {fileID: 9073023816734355965}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID315
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16426,7 +16524,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2869999826114023235}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16521,7 +16619,7 @@ GameObject:
   - component: {fileID: 4640732888474975458}
   - component: {fileID: 6936255258475830294}
   - component: {fileID: 4240163092755304877}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16569,7 +16667,7 @@ GameObject:
   - component: {fileID: 816476938267219093}
   - component: {fileID: 3314123000705109456}
   - component: {fileID: 36370842139146566}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16585,7 +16683,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2235697915832865119}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16870,7 +16968,7 @@ GameObject:
   - component: {fileID: 5295206333188871699}
   - component: {fileID: 5902652874155258765}
   - component: {fileID: 165608698464430266}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID262
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16931,7 +17029,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 424286893774835313}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  27'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16949,7 +17047,7 @@ GameObject:
   - component: {fileID: 3841780900735917950}
   - component: {fileID: 2672729712526838074}
   - component: {fileID: 5807276362078440992}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17060,7 +17158,7 @@ GameObject:
   - component: {fileID: 2019374991090274130}
   - component: {fileID: 1189999421718544241}
   - component: {fileID: 1952723587332147135}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17192,7 +17290,7 @@ GameObject:
   - component: {fileID: 5149981031164457624}
   - component: {fileID: 6730683482243794334}
   - component: {fileID: 7915794804140683068}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17292,7 +17390,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1078990316664402716}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17310,7 +17408,7 @@ GameObject:
   - component: {fileID: 5125454504345954283}
   - component: {fileID: 3557061383987497836}
   - component: {fileID: 2508342093793534349}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17328,7 +17426,7 @@ GameObject:
   - component: {fileID: 996921006902084452}
   - component: {fileID: 4821785981463745520}
   - component: {fileID: 2355291841782690252}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17504,7 +17602,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5475183697619214006}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17520,7 +17618,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1631424467132487781}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17717,7 +17815,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 56941747941473380}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17735,7 +17833,7 @@ GameObject:
   - component: {fileID: 5464581042113662697}
   - component: {fileID: 7059891214305906369}
   - component: {fileID: 1023240978619474294}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17798,7 +17896,7 @@ GameObject:
   - component: {fileID: 2704579842971903927}
   - component: {fileID: 5959342297531893335}
   - component: {fileID: 1432105136967938832}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17816,7 +17914,7 @@ GameObject:
   - component: {fileID: 6310730510974887416}
   - component: {fileID: 5947260972488472723}
   - component: {fileID: 6658841036384544955}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17879,7 +17977,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6468780939634089975}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17895,7 +17993,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8703936913369884289}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17929,7 +18027,7 @@ GameObject:
   - component: {fileID: 3365570942783204010}
   - component: {fileID: 2538232584774267083}
   - component: {fileID: 858609768269713600}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17983,7 +18081,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 744010807698247262}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18017,7 +18115,7 @@ GameObject:
   - component: {fileID: 5426896228911883527}
   - component: {fileID: 4039233131200984551}
   - component: {fileID: 4630505574531061182}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18065,7 +18163,7 @@ GameObject:
   - component: {fileID: 5752013276512952324}
   - component: {fileID: 7048679767251501540}
   - component: {fileID: 3550014073291877828}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18091,7 +18189,7 @@ GameObject:
   - component: {fileID: 7063326007192270073}
   - component: {fileID: 8850128932290876929}
   - component: {fileID: 4408718849593738443}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bracket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18109,7 +18207,7 @@ GameObject:
   - component: {fileID: 1936335983384747830}
   - component: {fileID: 1183774238937452239}
   - component: {fileID: 1901720713329413918}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18127,7 +18225,7 @@ GameObject:
   - component: {fileID: 8124333483500574097}
   - component: {fileID: 6227341642105726615}
   - component: {fileID: 2799401712747590028}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18145,7 +18243,7 @@ GameObject:
   - component: {fileID: 7054257139823504272}
   - component: {fileID: 3850620517085922514}
   - component: {fileID: 5636455532843695892}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18161,7 +18259,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3265715533627153037}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18234,7 +18332,7 @@ GameObject:
   - component: {fileID: 7063421364275337958}
   - component: {fileID: 1370260190743965127}
   - component: {fileID: 1821701930589919856}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18310,7 +18408,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5648364944802915091}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18328,7 +18426,7 @@ GameObject:
   - component: {fileID: 7195235291309304309}
   - component: {fileID: 6480918822023800650}
   - component: {fileID: 4855279973877294015}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID226
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18377,7 +18475,7 @@ GameObject:
   - component: {fileID: 4648094355503529195}
   - component: {fileID: 7013741068645543502}
   - component: {fileID: 3717854968032121028}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18395,7 +18493,7 @@ GameObject:
   - component: {fileID: 2252413458550420917}
   - component: {fileID: 7792900724339118263}
   - component: {fileID: 438492037408988287}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18458,7 +18556,7 @@ GameObject:
   - component: {fileID: 941371654114536978}
   - component: {fileID: 3635612440600733789}
   - component: {fileID: 853288371329528818}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18474,7 +18572,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5258865903707383119}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18490,7 +18588,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1486406384263362086}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18506,7 +18604,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6841587437748653423}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18522,7 +18620,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1892538418329291671}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18624,7 +18722,7 @@ GameObject:
   - component: {fileID: 5600586488682544217}
   - component: {fileID: 2974137900720654282}
   - component: {fileID: 3113633007691156487}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18655,7 +18753,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7022160833845829490}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18671,7 +18769,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2213995849268663560}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18734,7 +18832,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6529513415127450065}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  25'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18855,7 +18953,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4485067613362139267}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18871,7 +18969,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4511236869714183805}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Full thrusters (flat) <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18919,7 +19017,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8741406189873186416}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19011,7 +19109,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4685708897939864304}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19089,7 +19187,7 @@ GameObject:
   - component: {fileID: 1119511897194031245}
   - component: {fileID: 3684907701576033311}
   - component: {fileID: 1171180858851701082}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19113,7 +19211,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 379330471216997096}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19155,7 +19253,7 @@ GameObject:
   - component: {fileID: 8387360095820324322}
   - component: {fileID: 2495251646811223497}
   - component: {fileID: 461314078867647050}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19249,7 +19347,7 @@ GameObject:
   - component: {fileID: 7331523348263159186}
   - component: {fileID: 7051004927883473521}
   - component: {fileID: 8819994511962443927}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19265,7 +19363,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 227803860182780004}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19306,7 +19404,7 @@ GameObject:
   - component: {fileID: 1261370280297185347}
   - component: {fileID: 5695080205585042331}
   - component: {fileID: 8601604093797801066}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19337,7 +19435,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3518309710578557671}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  24'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19400,7 +19498,7 @@ GameObject:
   - component: {fileID: 280109426773193918}
   - component: {fileID: 1475933385250356078}
   - component: {fileID: 4927281198025658147}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19416,7 +19514,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2732591473845937814}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19456,7 +19554,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5924498765127848612}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19472,7 +19570,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 930134072952819281}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19672,7 +19770,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6253580811357205920}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19743,7 +19841,7 @@ GameObject:
   - component: {fileID: 2003211013915428236}
   - component: {fileID: 5700952886354617075}
   - component: {fileID: 3217382528387597616}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Insert in chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19834,7 +19932,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2584933265760207147}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19881,7 +19979,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2771210126677183856}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20104,7 +20202,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7038023961797086533}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20120,7 +20218,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7733657173043630630}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20161,7 +20259,8 @@ GameObject:
   - component: {fileID: 7689657270306945842}
   - component: {fileID: 5040319204434433605}
   - component: {fileID: 8844985455223092721}
-  m_Layer: 0
+  - component: {fileID: 8844985455223092722}
+  m_Layer: 7
   m_Name: Right Torpedo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20254,7 +20353,7 @@ GameObject:
   - component: {fileID: 4274579213474139919}
   - component: {fileID: 1327200941617071855}
   - component: {fileID: 1087521124149002343}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20272,7 +20371,7 @@ GameObject:
   - component: {fileID: 7119345860997928654}
   - component: {fileID: 2514856636281255940}
   - component: {fileID: 9034395264069478794}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Short rail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20364,7 +20463,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3909167080354225297}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20433,7 +20532,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6564933480901985773}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20494,7 +20593,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2139475782294047020}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20528,7 +20627,7 @@ GameObject:
   - component: {fileID: 3178468676482267494}
   - component: {fileID: 7066358511296423249}
   - component: {fileID: 1241399685107368247}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hydrophones opening
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20544,7 +20643,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2087014158970681007}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20562,7 +20661,7 @@ GameObject:
   - component: {fileID: 5735536480775782616}
   - component: {fileID: 2359655381583595376}
   - component: {fileID: 7047331097757234543}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Inner_window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20613,7 +20712,7 @@ GameObject:
   - component: {fileID: 6212959425767884959}
   - component: {fileID: 5583499411020747350}
   - component: {fileID: 7596933996056969533}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20742,7 +20841,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3468977770907648529}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Full thrusters (angle) <3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20789,7 +20888,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1266407913714045848}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20805,7 +20904,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3771146723492345857}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  29'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20876,7 +20975,7 @@ GameObject:
   - component: {fileID: 3902694686704998577}
   - component: {fileID: 2320578149679436421}
   - component: {fileID: 4087771881674410983}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20902,7 +21001,7 @@ GameObject:
   - component: {fileID: 9202381582438805261}
   - component: {fileID: 1337318803133862535}
   - component: {fileID: 8982812689224298446}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20948,7 +21047,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1048254132507228840}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  26'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21009,7 +21108,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2312879224014590426}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Connector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21027,7 +21126,7 @@ GameObject:
   - component: {fileID: 7125741821075304098}
   - component: {fileID: 1016951816458713105}
   - component: {fileID: 1706111571277303160}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21045,7 +21144,7 @@ GameObject:
   - component: {fileID: 7048194823578199623}
   - component: {fileID: 3011454401991472717}
   - component: {fileID: 1606597656067569484}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T-slot Nut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21063,7 +21162,7 @@ GameObject:
   - component: {fileID: 4691554474792969647}
   - component: {fileID: 1840612910267529651}
   - component: {fileID: 7369175472028923246}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21079,7 +21178,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1681103245586313762}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21160,7 +21259,7 @@ GameObject:
   - component: {fileID: 3378220210239410637}
   - component: {fileID: 4662243918171300751}
   - component: {fileID: 2651218885733764200}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21178,7 +21277,7 @@ GameObject:
   - component: {fileID: 5756118915052388359}
   - component: {fileID: 7390021029517043233}
   - component: {fileID: 7241630082395190750}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21241,7 +21340,7 @@ GameObject:
   - component: {fileID: 9146540880164251380}
   - component: {fileID: 5751296146680462862}
   - component: {fileID: 4171299867410635222}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Window insert
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21257,7 +21356,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7022687646556554077}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21397,7 +21496,7 @@ GameObject:
   - component: {fileID: 7308426942527026101}
   - component: {fileID: 6971480485215194325}
   - component: {fileID: 6386900680155077961}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21413,7 +21512,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 143487507702706363}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21590,7 +21689,7 @@ GameObject:
   - component: {fileID: 248843485246382964}
   - component: {fileID: 6279179419306423377}
   - component: {fileID: 2246006845917749625}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21608,7 +21707,7 @@ GameObject:
   - component: {fileID: 5917659132415513719}
   - component: {fileID: 6969771733115779604}
   - component: {fileID: 4119358172823417417}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21703,7 +21802,7 @@ GameObject:
   - component: {fileID: 7847408524935202769}
   - component: {fileID: 1404329948388865290}
   - component: {fileID: 2483695945578007228}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21766,7 +21865,7 @@ GameObject:
   - component: {fileID: 1604592604481270470}
   - component: {fileID: 3917541907745993487}
   - component: {fileID: 4608958477545267658}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21874,7 +21973,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1190482951923793446}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  20'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21892,7 +21991,7 @@ GameObject:
   - component: {fileID: 3008016838592267591}
   - component: {fileID: 2617152556788780872}
   - component: {fileID: 7122127580924787056}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22010,7 +22109,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1707879895511881740}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22043,7 +22142,7 @@ GameObject:
   - component: {fileID: 8755819175020628820}
   - component: {fileID: 1423672373438982415}
   - component: {fileID: 1383019895910601610}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID244
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22115,7 +22214,7 @@ GameObject:
   - component: {fileID: 432021327353342544}
   - component: {fileID: 3371946180926408027}
   - component: {fileID: 8771884514342725829}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22133,7 +22232,7 @@ GameObject:
   - component: {fileID: 90336035368389886}
   - component: {fileID: 2946329800327834804}
   - component: {fileID: 6683303915194398720}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 3014T957_Steel Eyebolt with Shoulder - for Lifting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22264,7 +22363,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6255755091706875468}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22282,7 +22381,7 @@ GameObject:
   - component: {fileID: 5037596516909531217}
   - component: {fileID: 6736852385828279705}
   - component: {fileID: 8873634455271317848}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22298,7 +22397,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2954968288064921261}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22316,7 +22415,7 @@ GameObject:
   - component: {fileID: 4781230230576013170}
   - component: {fileID: 5276950178928693972}
   - component: {fileID: 3568287359511966763}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID274
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22395,7 +22494,7 @@ GameObject:
   - component: {fileID: 6318856501973697375}
   - component: {fileID: 5578887826256642898}
   - component: {fileID: 7639392486390927635}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22413,7 +22512,7 @@ GameObject:
   - component: {fileID: 5598720025541353122}
   - component: {fileID: 4948977280598393190}
   - component: {fileID: 6805407885963294156}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22431,7 +22530,7 @@ GameObject:
   - component: {fileID: 1194458433023272807}
   - component: {fileID: 6346657461818021459}
   - component: {fileID: 3606564083456320862}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22447,7 +22546,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7612508938898271815}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22503,7 +22602,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1758247028308938504}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22685,7 +22784,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4339938226539330868}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22703,7 +22802,7 @@ GameObject:
   - component: {fileID: 3760547923861896401}
   - component: {fileID: 2475303134827589148}
   - component: {fileID: 7609306823638954761}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: C bracket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22735,7 +22834,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3697621099206564405}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22774,7 +22873,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7464556943509647028}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22790,7 +22889,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5414556500303170193}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22862,7 +22961,7 @@ GameObject:
   - component: {fileID: 2508952791812312664}
   - component: {fileID: 312710435625151989}
   - component: {fileID: 1325897380473622680}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22941,7 +23040,7 @@ GameObject:
   - component: {fileID: 7341297434374286988}
   - component: {fileID: 3588642295461792379}
   - component: {fileID: 8245368101378380041}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: VIsual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22987,7 +23086,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7482770374893448153}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  21'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23197,7 +23296,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8889561568199970664}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23260,7 +23359,7 @@ GameObject:
   - component: {fileID: 7283604631763043775}
   - component: {fileID: 8121873064193958936}
   - component: {fileID: 139133274622450595}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid3>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23354,7 +23453,7 @@ GameObject:
   - component: {fileID: 2765448286690807607}
   - component: {fileID: 2467074109733130902}
   - component: {fileID: 9087040905911238225}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23370,7 +23469,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6534853081123172158}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23448,7 +23547,7 @@ GameObject:
   - component: {fileID: 5429648763261757050}
   - component: {fileID: 7064500761627118919}
   - component: {fileID: 2454639047137148832}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID280
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23464,7 +23563,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2676438932317028500}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23482,7 +23581,7 @@ GameObject:
   - component: {fileID: 1048676702918468269}
   - component: {fileID: 8525107354953806710}
   - component: {fileID: 1091234969968666219}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23516,7 +23615,7 @@ GameObject:
   - component: {fileID: 6711439465097043017}
   - component: {fileID: 4984616037024815532}
   - component: {fileID: 4534610306930108618}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23534,7 +23633,7 @@ GameObject:
   - component: {fileID: 7977700580311798691}
   - component: {fileID: 3897878027208237458}
   - component: {fileID: 4887026662095980420}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 190509 V5_mti_600_bottom_case
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23550,7 +23649,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3761052217915159035}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23610,7 +23709,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8016705596765228537}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23644,7 +23743,7 @@ GameObject:
   - component: {fileID: 38749204548830208}
   - component: {fileID: 6219172870445044038}
   - component: {fileID: 8949624909810191921}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23776,7 +23875,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8638480658451977174}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23920,7 +24019,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2162588900241201994}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24019,7 +24118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1956065874478114746}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24037,7 +24136,7 @@ GameObject:
   - component: {fileID: 1418079809189739936}
   - component: {fileID: 8641478229415151500}
   - component: {fileID: 3264453412539280495}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24231,7 +24330,7 @@ GameObject:
   - component: {fileID: 2389075696350602572}
   - component: {fileID: 4660968114263142502}
   - component: {fileID: 8392814907332718253}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24249,7 +24348,7 @@ GameObject:
   - component: {fileID: 5130320579866879282}
   - component: {fileID: 4805226796400619064}
   - component: {fileID: 6362201579301377349}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24267,7 +24366,7 @@ GameObject:
   - component: {fileID: 6136251613306632637}
   - component: {fileID: 5247936790814098811}
   - component: {fileID: 6509294182274451894}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24307,7 +24406,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8456169590283564941}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24387,7 +24486,7 @@ GameObject:
   - component: {fileID: 3490836484949427865}
   - component: {fileID: 8894270700517488662}
   - component: {fileID: 8537692052656381974}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24405,7 +24504,7 @@ GameObject:
   - component: {fileID: 7335684009782046408}
   - component: {fileID: 3168358856662559900}
   - component: {fileID: 7176362097431293047}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Grabber open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24535,7 +24634,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2884661618768642251}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24667,7 +24766,7 @@ GameObject:
   - component: {fileID: 2515371445605924136}
   - component: {fileID: 1845487296121244297}
   - component: {fileID: 994077058106478657}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24701,7 +24800,7 @@ GameObject:
   - component: {fileID: 1740124653046645502}
   - component: {fileID: 3027055834549766432}
   - component: {fileID: 1659777305444418643}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24719,7 +24818,7 @@ GameObject:
   - component: {fileID: 1883185437463692314}
   - component: {fileID: 5523057316658514951}
   - component: {fileID: 2544596777622508012}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24735,7 +24834,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4078575028040223535}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24769,7 +24868,7 @@ GameObject:
   - component: {fileID: 8813260564300402754}
   - component: {fileID: 3903347239489733700}
   - component: {fileID: 5835893167711045774}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24968,7 +25067,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4786744597591804608}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25115,7 +25214,7 @@ GameObject:
   - component: {fileID: 5633288695677646589}
   - component: {fileID: 855520984068425454}
   - component: {fileID: 7849598898031450889}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25160,7 +25259,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8151062650308267304}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  30'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25193,7 +25292,7 @@ GameObject:
   - component: {fileID: 3297906128421092035}
   - component: {fileID: 7727908014896613011}
   - component: {fileID: 3678754572222202057}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25211,7 +25310,7 @@ GameObject:
   - component: {fileID: 8772046915725122979}
   - component: {fileID: 8769287373344120893}
   - component: {fileID: 2793673168281180651}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Open CASCADE STEP translator 6.8 3.1.1.1^Open CASCADE STEP translator 6.8
     3.1.1_Board_MTi600_MTi-600
   m_TagString: Untagged
@@ -25243,7 +25342,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2932109298653285962}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25261,7 +25360,7 @@ GameObject:
   - component: {fileID: 2377807464746335937}
   - component: {fileID: 4165001460594749152}
   - component: {fileID: 3153875546529177673}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25368,7 +25467,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8077465333295647039}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  28'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25384,7 +25483,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5255476654624148929}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25432,7 +25531,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2160808738260489132}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25466,7 +25565,7 @@ GameObject:
   - component: {fileID: 3645643658347609886}
   - component: {fileID: 1519714173904294289}
   - component: {fileID: 8246650888620884333}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25482,7 +25581,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5918709167672413125}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25614,7 +25713,7 @@ GameObject:
   - component: {fileID: 7692668253782847907}
   - component: {fileID: 4136995644820381938}
   - component: {fileID: 6619826948583778906}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25698,12 +25797,12 @@ Transform:
   m_GameObject: {fileID: 1116152522400885026}
   serializedVersion: 2
   m_LocalRotation: {x: 3.140185e-16, y: 0.7071068, z: 4.0061413e-16, w: -0.7071068}
-  m_LocalPosition: {x: -0.01670003, y: 0.07520008, z: 0.06290007}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8023087545352033115}
-  m_Father: {fileID: 100362016}
+  m_Father: {fileID: 634586413}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6372402925481459196
 MeshFilter:
@@ -25722,7 +25821,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2870214013242841539}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25828,7 +25927,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7008447562756010084}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25846,7 +25945,7 @@ GameObject:
   - component: {fileID: 2603777285247481125}
   - component: {fileID: 9058882296485217594}
   - component: {fileID: 2325751616103294789}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25877,7 +25976,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5831195082556597888}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  28'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25893,7 +25992,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2445849994409347030}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25911,7 +26010,7 @@ GameObject:
   - component: {fileID: 3677456349815374128}
   - component: {fileID: 621017751113666357}
   - component: {fileID: 4808022057692756707}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25929,7 +26028,7 @@ GameObject:
   - component: {fileID: 4769374732541427468}
   - component: {fileID: 4346534331678033551}
   - component: {fileID: 8588419685899235088}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25945,7 +26044,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4950970670271330864}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  23'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26142,7 +26241,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2591761301148748185}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26168,7 +26267,7 @@ GameObject:
   - component: {fileID: 2342915766426269961}
   - component: {fileID: 5752667043108436404}
   - component: {fileID: 4377981577951318695}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26231,7 +26330,7 @@ GameObject:
   - component: {fileID: 4830277139319360130}
   - component: {fileID: 1625226972865041391}
   - component: {fileID: 4200836720936273221}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26370,7 +26469,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8847969391884221260}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26419,7 +26518,7 @@ GameObject:
   - component: {fileID: 3793862404188874471}
   - component: {fileID: 8643638660110002311}
   - component: {fileID: 2666611669514796690}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26480,7 +26579,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5724983867814737543}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  27'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26496,7 +26595,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2670317548513535891}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26530,7 +26629,7 @@ GameObject:
   - component: {fileID: 517736263753072854}
   - component: {fileID: 5527851121453023125}
   - component: {fileID: 363044692013243312}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26546,7 +26645,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4567442792632491652}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  31'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26596,7 +26695,7 @@ GameObject:
   - component: {fileID: 8788646207991308311}
   - component: {fileID: 7628666012340032205}
   - component: {fileID: 2979839747182531031}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: C bracket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26659,7 +26758,7 @@ GameObject:
   - component: {fileID: 2923828457325112422}
   - component: {fileID: 6303908468835614323}
   - component: {fileID: 1155492101148573265}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26701,7 +26800,7 @@ GameObject:
   - component: {fileID: 8404604844046779429}
   - component: {fileID: 414168423767869680}
   - component: {fileID: 3536983798933028487}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26770,7 +26869,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2259214711327203458}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26803,7 +26902,7 @@ GameObject:
   - component: {fileID: 6456247372405359723}
   - component: {fileID: 2837420655655017557}
   - component: {fileID: 8597552433137534876}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T-slot Nut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26819,7 +26918,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5610816975610544113}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26882,7 +26981,7 @@ GameObject:
   - component: {fileID: 4279436089434804468}
   - component: {fileID: 1215931200980734349}
   - component: {fileID: 7200425575412632253}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Secondary Grabber Mount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26900,7 +26999,7 @@ GameObject:
   - component: {fileID: 3613913250233436634}
   - component: {fileID: 3177538088559289690}
   - component: {fileID: 4063394099084873944}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26933,7 +27032,7 @@ GameObject:
   - component: {fileID: 5062304936013152684}
   - component: {fileID: 7506841524622963288}
   - component: {fileID: 7133116766687707397}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sticker2^MTi-600 Housing Assembly
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27086,7 +27185,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5164402087032077661}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27102,7 +27201,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2455824709145146761}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27118,7 +27217,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1860418469612272064}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27158,7 +27257,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1625569964108207378}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  16'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27182,7 +27281,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2158019509665054730}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27258,7 +27357,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8837617544732822521}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27276,7 +27375,7 @@ GameObject:
   - component: {fileID: 3698975811586719820}
   - component: {fileID: 5807902277415501009}
   - component: {fileID: 8453961627202768553}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27317,7 +27416,7 @@ GameObject:
   - component: {fileID: 3422215205455661454}
   - component: {fileID: 6644249244723209257}
   - component: {fileID: 4937063343218655480}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27335,7 +27434,7 @@ GameObject:
   - component: {fileID: 157643354938267544}
   - component: {fileID: 6851200425108236943}
   - component: {fileID: 8578592376035325490}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27354,7 +27453,7 @@ GameObject:
   - component: {fileID: 8124425252560920147}
   - component: {fileID: 943997261217643304}
   - component: {fileID: 8124425252560920148}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27370,7 +27469,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7869629849229726250}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27404,7 +27503,7 @@ GameObject:
   - component: {fileID: 4692010220903581903}
   - component: {fileID: 8359670268182323113}
   - component: {fileID: 610564770311520420}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27422,7 +27521,7 @@ GameObject:
   - component: {fileID: 5503883026451004066}
   - component: {fileID: 8068846837024804988}
   - component: {fileID: 3180695750167970995}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27501,7 +27600,7 @@ GameObject:
   - component: {fileID: 5616366080449312705}
   - component: {fileID: 8854555468058024292}
   - component: {fileID: 3599756553534593432}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27535,7 +27634,7 @@ GameObject:
   - component: {fileID: 1103872281882094168}
   - component: {fileID: 6655710082889009633}
   - component: {fileID: 7231580313817250228}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid10>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28026,7 +28125,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1383476676193833129}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  26'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28075,7 +28174,7 @@ GameObject:
   - component: {fileID: 3798694987245670367}
   - component: {fileID: 63394914150168545}
   - component: {fileID: 6082650050750944535}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28093,7 +28192,7 @@ GameObject:
   - component: {fileID: 2126286883249446738}
   - component: {fileID: 557376230101977232}
   - component: {fileID: 6012040615658125651}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28255,7 +28354,7 @@ GameObject:
   - component: {fileID: 1931685627042207937}
   - component: {fileID: 5449283622147030333}
   - component: {fileID: 1680994374044322755}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28307,6 +28406,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &7165802304902637263
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116152522400885026}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2743497507793947152, guid: fda167fdb878a35cc9f3aaf67e4da5e0, type: 3}
 --- !u!1 &7173317305286122312
 GameObject:
   m_ObjectHideFlags: 0
@@ -28316,7 +28437,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 82447382789910090}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28460,7 +28581,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3819308443499436109}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28478,7 +28599,7 @@ GameObject:
   - component: {fileID: 3848043364245096886}
   - component: {fileID: 2987615507140726228}
   - component: {fileID: 8378963329902986755}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28599,7 +28720,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7664596320943951639}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28649,7 +28770,7 @@ GameObject:
   - component: {fileID: 7261637506650318156}
   - component: {fileID: 2149396813634142079}
   - component: {fileID: 3169315673741203624}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28803,7 +28924,7 @@ GameObject:
   - component: {fileID: 6933869235858685138}
   - component: {fileID: 3391030239840973924}
   - component: {fileID: 5299027396596211047}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T-slot Nut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28859,7 +28980,7 @@ GameObject:
   - component: {fileID: 6541558316994492878}
   - component: {fileID: 4484022390981993922}
   - component: {fileID: 3389197237354528053}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28990,7 +29111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2168116934691168273}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29006,7 +29127,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8158744222545689473}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29082,7 +29203,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6053997279010522667}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29169,7 +29290,7 @@ GameObject:
   - component: {fileID: 1128710431454425869}
   - component: {fileID: 8318526654860466040}
   - component: {fileID: 1088610401997887025}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cap chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29185,7 +29306,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7251638300496747337}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29216,7 +29337,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4655108671198371684}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  23'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29247,7 +29368,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4047609731169126661}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29559,7 +29680,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3654910348777299434}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  15'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29665,7 +29786,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6039070374005359003}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29726,7 +29847,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4084085084528943081}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29873,7 +29994,7 @@ GameObject:
   - component: {fileID: 9201917548773847038}
   - component: {fileID: 7042813350030223930}
   - component: {fileID: 2375029862191898895}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid4>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29891,7 +30012,7 @@ GameObject:
   - component: {fileID: 3588759309429693269}
   - component: {fileID: 5465219931016092814}
   - component: {fileID: 1077267358298115345}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29926,7 +30047,7 @@ GameObject:
   - component: {fileID: 7655138677322832894}
   - component: {fileID: 6324873560938624653}
   - component: {fileID: 7655138677322832895}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29942,7 +30063,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2099592941162783791}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  25'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30138,7 +30259,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8218932596318778905}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  16'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30244,12 +30365,12 @@ Transform:
   m_GameObject: {fileID: 4564513302517293511}
   serializedVersion: 2
   m_LocalRotation: {x: 2.4360485e-16, y: 0.7071068, z: -1.5700924e-16, w: -0.7071068}
-  m_LocalPosition: {x: 0.016699791, y: 0.07520008, z: 0.059900284}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4612647291470814049}
-  m_Father: {fileID: 100362016}
+  m_Father: {fileID: 2083545327}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &7689664168631426550
 Transform:
@@ -30293,7 +30414,7 @@ GameObject:
   - component: {fileID: 4562675866152615465}
   - component: {fileID: 7125347054651800683}
   - component: {fileID: 8712821581048549869}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30309,7 +30430,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3618377632349495289}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30335,7 +30456,7 @@ GameObject:
   - component: {fileID: 7360341010255116444}
   - component: {fileID: 4625375615614782979}
   - component: {fileID: 7458451746382258895}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30369,7 +30490,7 @@ GameObject:
   - component: {fileID: 1466312899796945548}
   - component: {fileID: 8889111745326357224}
   - component: {fileID: 3574904733560612868}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30387,7 +30508,7 @@ GameObject:
   - component: {fileID: 5466537106392374984}
   - component: {fileID: 3524550600022225627}
   - component: {fileID: 7487270573294195388}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30458,7 +30579,7 @@ GameObject:
   - component: {fileID: 351808933361891163}
   - component: {fileID: 6372402925481459196}
   - component: {fileID: 3143537494610613402}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30474,7 +30595,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8619285846600143188}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30506,7 +30627,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8382926603076785997}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30584,7 +30705,7 @@ GameObject:
   - component: {fileID: 3703749774596949225}
   - component: {fileID: 5907908772756168340}
   - component: {fileID: 2453528428413525645}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rail (Side)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30648,7 +30769,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2129890213497650292}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30666,7 +30787,7 @@ GameObject:
   - component: {fileID: 368143753176050597}
   - component: {fileID: 4169730682703150731}
   - component: {fileID: 5030166706895325704}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30760,7 +30881,7 @@ GameObject:
   - component: {fileID: 8504658263282617837}
   - component: {fileID: 2545864816388441474}
   - component: {fileID: 6743083508107137984}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200 PROPELLER CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30794,7 +30915,7 @@ GameObject:
   - component: {fileID: 1902001435956228288}
   - component: {fileID: 3607531158296071178}
   - component: {fileID: 8182500017976774399}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: C bracket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30810,7 +30931,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7602757219637377116}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  22'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30873,7 +30994,7 @@ GameObject:
   - component: {fileID: 652719767029461689}
   - component: {fileID: 3403845057036893648}
   - component: {fileID: 6987151187894007555}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30891,7 +31012,7 @@ GameObject:
   - component: {fileID: 1222744640293192359}
   - component: {fileID: 8428520584029729545}
   - component: {fileID: 1134373971817231076}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30937,7 +31058,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8388606279454509766}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  29'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30955,7 +31076,7 @@ GameObject:
   - component: {fileID: 8023087545352033115}
   - component: {fileID: 8804314316970433253}
   - component: {fileID: 4572912292182477477}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID315
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31018,7 +31139,7 @@ GameObject:
   - component: {fileID: 6342222960596255059}
   - component: {fileID: 6274715976787051691}
   - component: {fileID: 555497493547326223}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31052,7 +31173,7 @@ GameObject:
   - component: {fileID: 2178495375037308534}
   - component: {fileID: 8476199053729675511}
   - component: {fileID: 5292078843425785229}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31109,7 +31230,7 @@ GameObject:
   - component: {fileID: 2114004144550462428}
   - component: {fileID: 3201196543098781273}
   - component: {fileID: 7280168678324324798}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31125,7 +31246,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7820463044234944158}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31141,7 +31262,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 140398562306995713}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31183,7 +31304,7 @@ GameObject:
   - component: {fileID: 3945062799045793105}
   - component: {fileID: 5224217365322776}
   - component: {fileID: 6119256091507838115}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31199,7 +31320,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 985582231170158267}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  15'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31232,7 +31353,7 @@ GameObject:
   - component: {fileID: 2016697667441782169}
   - component: {fileID: 5131077360260499242}
   - component: {fileID: 9032346885593505193}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31355,7 +31476,7 @@ GameObject:
   - component: {fileID: 6757011675568289819}
   - component: {fileID: 8621731946857687645}
   - component: {fileID: 3217092756939136066}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Base chamber L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31387,7 +31508,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3762008378272233309}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31436,7 +31557,7 @@ GameObject:
   - component: {fileID: 4200007106830604102}
   - component: {fileID: 311191050173406128}
   - component: {fileID: 1703295433659890961}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pointy finger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31528,7 +31649,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8213005906774526520}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  16'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31562,7 +31683,7 @@ GameObject:
   - component: {fileID: 5692948811420362828}
   - component: {fileID: 143712994497571952}
   - component: {fileID: 5174079094456880869}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31578,7 +31699,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5034118630608262322}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  14'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31594,7 +31715,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4127786207146806784}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31715,7 +31836,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7506429998425006636}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  31'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31733,7 +31854,7 @@ GameObject:
   - component: {fileID: 623400057955661768}
   - component: {fileID: 1375342364893544759}
   - component: {fileID: 5747338795924000165}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid6>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31751,7 +31872,7 @@ GameObject:
   - component: {fileID: 4579197782481778736}
   - component: {fileID: 4488174892333318464}
   - component: {fileID: 125724310423483222}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rail (Side)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31865,7 +31986,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5320755787335279418}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ' '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31883,7 +32004,7 @@ GameObject:
   - component: {fileID: 4050535746379665076}
   - component: {fileID: 3077850744002939964}
   - component: {fileID: 1918793891504274116}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid13>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31899,7 +32020,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7906080373776433561}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31915,7 +32036,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3337807220961021758}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31954,7 +32075,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6632540714177245694}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32194,7 +32315,7 @@ GameObject:
   - component: {fileID: 7017327705576026150}
   - component: {fileID: 9017787351169162784}
   - component: {fileID: 8975099864711048109}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid7>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32318,7 +32439,7 @@ GameObject:
   - component: {fileID: 1132979424935484295}
   - component: {fileID: 481055732626665528}
   - component: {fileID: 6127925479869610147}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid9>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32345,7 +32466,7 @@ GameObject:
   - component: {fileID: 2607830966314640250}
   - component: {fileID: 5705728927384015330}
   - component: {fileID: 8480172130071856333}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32443,7 +32564,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1437516905569958209}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32519,7 +32640,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8315859363540074610}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Thurster <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32582,7 +32703,7 @@ GameObject:
   - component: {fileID: 1942380475142531838}
   - component: {fileID: 4437948770595002283}
   - component: {fileID: 7989306098043575204}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID238
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32892,7 +33013,7 @@ GameObject:
   - component: {fileID: 3259637419302295053}
   - component: {fileID: 4267703757563332887}
   - component: {fileID: 7260609468871176626}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32908,7 +33029,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1183993608743216461}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  12'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33080,7 +33201,7 @@ GameObject:
   - component: {fileID: 4105532115669173119}
   - component: {fileID: 2267808605231261868}
   - component: {fileID: 8892132936175657881}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Part 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33111,7 +33232,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6308406105115849581}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  10'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33129,7 +33250,7 @@ GameObject:
   - component: {fileID: 8639129513705295351}
   - component: {fileID: 3225047408687471808}
   - component: {fileID: 7378914847797910255}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rail (Back)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33230,7 +33351,7 @@ GameObject:
   - component: {fileID: 2460664508400772997}
   - component: {fileID: 6009008767655953696}
   - component: {fileID: 7348144366785781517}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33316,7 +33437,7 @@ GameObject:
   - component: {fileID: 3379745197038767426}
   - component: {fileID: 633599402363922094}
   - component: {fileID: 35368523325753340}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33384,6 +33505,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &8844985455223092722
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4564513302517293511}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2743497507793947152, guid: fda167fdb878a35cc9f3aaf67e4da5e0, type: 3}
 --- !u!4 &8847969391884221260
 Transform:
   m_ObjectHideFlags: 0
@@ -33419,7 +33562,7 @@ GameObject:
   - component: {fileID: 1477921754510288716}
   - component: {fileID: 4225995449868459187}
   - component: {fileID: 6454350578235869462}
-  m_Layer: 31
+  m_Layer: 7
   m_Name: ID232
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33445,7 +33588,7 @@ GameObject:
   - component: {fileID: 2522825127707568539}
   - component: {fileID: 5888994410971731070}
   - component: {fileID: 5614812138080129703}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Back Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33461,7 +33604,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2845164358790992412}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33744,7 +33887,7 @@ GameObject:
   - component: {fileID: 7603300908558052220}
   - component: {fileID: 7063694359878506478}
   - component: {fileID: 7559524541479107690}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33762,7 +33905,7 @@ GameObject:
   - component: {fileID: 9201016884699426213}
   - component: {fileID: 5308071414491922663}
   - component: {fileID: 9094096897705793207}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid2>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33825,7 +33968,7 @@ GameObject:
   - component: {fileID: 7538698787710347284}
   - component: {fileID: 5724537553186901650}
   - component: {fileID: 7567395992939767414}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: C bracket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33886,7 +34029,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4892244905612923812}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33919,7 +34062,7 @@ GameObject:
   - component: {fileID: 7298994284893746950}
   - component: {fileID: 6989164944349511698}
   - component: {fileID: 8987540247236841748}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid12>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34013,7 +34156,7 @@ GameObject:
   - component: {fileID: 6188464031529021589}
   - component: {fileID: 7602646639508984527}
   - component: {fileID: 8743935520251900209}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bracket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34031,7 +34174,7 @@ GameObject:
   - component: {fileID: 8197739713285221928}
   - component: {fileID: 3021772050321665086}
   - component: {fileID: 4474256862862618597}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: T-slot Nut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34147,7 +34290,7 @@ GameObject:
   - component: {fileID: 4074392832238576423}
   - component: {fileID: 2574912905359811538}
   - component: {fileID: 5005435945572396192}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34165,7 +34308,7 @@ GameObject:
   - component: {fileID: 2822003410264703610}
   - component: {fileID: 7871490526248218013}
   - component: {fileID: 1585702995820134790}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Silo chamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34189,7 +34332,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5480058929092431131}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MTi-600 <1>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34297,7 +34440,7 @@ GameObject:
   - component: {fileID: 7903323983951992679}
   - component: {fileID: 1764884127636997169}
   - component: {fileID: 7581678210687439292}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid11>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34534,7 +34677,7 @@ GameObject:
   - component: {fileID: 560708001806475776}
   - component: {fileID: 888539681118251275}
   - component: {fileID: 173967154018526610}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid5>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34550,7 +34693,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6606228715698231610}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34566,7 +34709,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3397846515350741077}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: '  13'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34584,7 +34727,7 @@ GameObject:
   - component: {fileID: 1902893400878089037}
   - component: {fileID: 2963314519744548195}
   - component: {fileID: 996533119993983330}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sticker1^MTi-600 Housing Assembly
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34617,7 +34760,7 @@ GameObject:
   - component: {fileID: 5456069957946661709}
   - component: {fileID: 1270438835626292097}
   - component: {fileID: 4303224226394053833}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: <T200-ASM-CW-THRUSTER-R1>-<T200-THRUSTER-R1-CW-1-solid8>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
