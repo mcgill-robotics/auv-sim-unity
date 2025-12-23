@@ -59,9 +59,6 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Publish hydrophone bearing data")]
     public bool PublishHydrophones = false;
     
-    [Tooltip("Publish pressure sensor data")]
-    public bool PublishPressure = false;
-    
     [Tooltip("Publish front camera images")]
     public bool PublishFrontCam = false;
     
@@ -79,8 +76,8 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Show IMU acceleration/angular velocity arrows")]
     public bool VisualizeIMU = true;
     
-    [Tooltip("Show Pressure sensor depth line")]
-    public bool VisualizePressure = true;
+    [Tooltip("Show Depth sensor line")]
+    public bool VisualizeDepth = true;
     
     [Space(10)]
     [Header("UI Drawer States")]
@@ -248,7 +245,6 @@ public class SimulationSettings : MonoBehaviour
         PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "false"));
         PublishIMU = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "false"));
         PublishDepth = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "false"));
-        PublishPressure = bool.Parse(PlayerPrefs.GetString("PublishPressureToggle", "false"));
         PublishHydrophones = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "false"));
         PublishFrontCam = bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "false"));
         PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
@@ -256,7 +252,7 @@ public class SimulationSettings : MonoBehaviour
 
         VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
         VisualizeIMU = bool.Parse(PlayerPrefs.GetString("VisualizeIMUToggle", "true"));
-        VisualizePressure = bool.Parse(PlayerPrefs.GetString("VisualizePressureToggle", "true"));
+        VisualizeDepth = bool.Parse(PlayerPrefs.GetString("VisualizeDepthToggle", "true"));
 
         DrawerConfigOpen = bool.Parse(PlayerPrefs.GetString("DrawerConfigOpen", "true"));
         DrawerControlsOpen = bool.Parse(PlayerPrefs.GetString("DrawerControlsOpen", "true"));
@@ -343,7 +339,6 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("PublishDVLToggle", PublishDVL.ToString());
         PlayerPrefs.SetString("PublishIMUToggle", PublishIMU.ToString());
         PlayerPrefs.SetString("PublishDepthToggle", PublishDepth.ToString());
-        PlayerPrefs.SetString("PublishPressureToggle", PublishPressure.ToString());
         PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophones.ToString());
         PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCam.ToString());
         PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCam.ToString());
@@ -351,7 +346,7 @@ public class SimulationSettings : MonoBehaviour
 
         PlayerPrefs.SetString("VisualizeDVLToggle", VisualizeDVL.ToString());
         PlayerPrefs.SetString("VisualizeIMUToggle", VisualizeIMU.ToString());
-        PlayerPrefs.SetString("VisualizePressureToggle", VisualizePressure.ToString());
+        PlayerPrefs.SetString("VisualizeDepthToggle", VisualizeDepth.ToString());
 
         PlayerPrefs.SetString("DrawerConfigOpen", DrawerConfigOpen.ToString());
         PlayerPrefs.SetString("DrawerControlsOpen", DrawerControlsOpen.ToString());

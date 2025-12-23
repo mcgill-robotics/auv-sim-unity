@@ -18,7 +18,6 @@ public class SettingsController
     private Toggle toggleDVL;
     private Toggle toggleIMU;
     private Toggle toggleDepth;
-    private Toggle togglePressure;
     private Toggle toggleHydro;
     private Toggle toggleFrontCam;
     private Toggle toggleDownCam;
@@ -59,7 +58,6 @@ public class SettingsController
         toggleDVL = root.Q<Toggle>("Toggle-DVL");
         toggleIMU = root.Q<Toggle>("Toggle-IMU");
         toggleDepth = root.Q<Toggle>("Toggle-Depth");
-        togglePressure = root.Q<Toggle>("Toggle-Pressure");
         toggleHydro = root.Q<Toggle>("Toggle-Hydro");
         toggleFrontCam = root.Q<Toggle>("Toggle-FrontCam");
         toggleDownCam = root.Q<Toggle>("Toggle-DownCam");
@@ -147,13 +145,6 @@ public class SettingsController
             });
         }
         
-        if (togglePressure != null)
-        {
-            togglePressure.RegisterValueChangedCallback(evt => {
-                SimulationSettings.Instance.PublishPressure = evt.newValue;
-            });
-        }
-        
         if (toggleHydro != null)
         {
             toggleHydro.RegisterValueChangedCallback(evt => {
@@ -197,7 +188,6 @@ public class SettingsController
         if (toggleDVL != null) toggleDVL.value = SimulationSettings.Instance.PublishDVL;
         if (toggleIMU != null) toggleIMU.value = SimulationSettings.Instance.PublishIMU;
         if (toggleDepth != null) toggleDepth.value = SimulationSettings.Instance.PublishDepth;
-        if (togglePressure != null) togglePressure.value = SimulationSettings.Instance.PublishPressure;
         if (toggleHydro != null) toggleHydro.value = SimulationSettings.Instance.PublishHydrophones;
         if (toggleFrontCam != null) toggleFrontCam.value = SimulationSettings.Instance.PublishFrontCam;
         if (toggleDownCam != null) toggleDownCam.value = SimulationSettings.Instance.PublishDownCam;
@@ -225,7 +215,6 @@ public class SettingsController
         if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;
         if (toggleIMU != null) SimulationSettings.Instance.PublishIMU = toggleIMU.value;
         if (toggleDepth != null) SimulationSettings.Instance.PublishDepth = toggleDepth.value;
-        if (togglePressure != null) SimulationSettings.Instance.PublishPressure = togglePressure.value;
         if (toggleHydro != null) SimulationSettings.Instance.PublishHydrophones = toggleHydro.value;
         if (toggleFrontCam != null) SimulationSettings.Instance.PublishFrontCam = toggleFrontCam.value;
         if (toggleDownCam != null) SimulationSettings.Instance.PublishDownCam = toggleDownCam.value;

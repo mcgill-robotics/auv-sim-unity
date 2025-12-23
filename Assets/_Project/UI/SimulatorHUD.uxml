@@ -229,16 +229,12 @@
                 </ui:VisualElement>
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:Label name="Label-Pressure" text="PRESSURE" class="data-label text-accent" />
-                    <ui:Toggle name="Toggle-PressureViz" label="👁" tooltip="Show pressure depth line" style="margin: 0;" />
+                    <ui:Label name="Label-Depth" text="DEPTH" class="data-label text-accent" />
+                    <ui:Toggle name="Toggle-DepthViz" label="👁" tooltip="Show depth line visualization" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="Depth" class="data-label" />
-                    <ui:Label name="Text-PressureDepth" text="0.00 m" class="data-value" style="font-size: 11px;"/>
-                </ui:VisualElement>
-                <ui:VisualElement class="data-row">
-                    <ui:Label text="Pressure" class="data-label" />
-                    <ui:Label name="Text-PressureValue" text="101.3 kPa" class="data-value" style="font-size: 11px;"/>
+                    <ui:Label text="Value" class="data-label" />
+                    <ui:Label name="Text-DepthValue" text="0.00 m" class="data-value" style="font-size: 11px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
