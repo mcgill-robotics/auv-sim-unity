@@ -61,12 +61,17 @@ public class Thrusters : MonoBehaviour
     [Range(0f, 0.1f)]
     public float efficiencyVariance = 0.05f;
     
+    [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
+    [SerializeField] private Rigidbody auvRbOverride;
+    
+    /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
+    private Rigidbody AuvRb => auvRbOverride != null ? auvRbOverride : SimulationSettings.Instance?.AUVRigidbody;
+
     private GameObject[] arrowInstances;
     private Material arrowMat;
 
     private ROSConnection roscon;
     private bool isFrozen = false;
-    private Rigidbody auvRb;
     private double[] rosThrusterForces = new double[8];
     private double[] inputThrusterForces = new double[8];
     private float[] thrusterEfficiencyScalars = new float[8];
@@ -87,7 +92,6 @@ public class Thrusters : MonoBehaviour
     private void Start()
     {
         roscon = ROSConnection.GetOrCreateInstance();
-        auvRb = GetComponent<Rigidbody>();
         roscon.Subscribe<ThrusterForcesMsg>(ROSSettings.Instance.ThrusterForcesTopic, SetThrusterForces);
         
         massScalarRealToSim = 1f / AUVRealForceMultiplier;
@@ -165,7 +169,7 @@ public class Thrusters : MonoBehaviour
             Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
             Vector3 thrusterForceVector = worldForceDirection * (finalForce * massScalarRealToSim);
             
-            auvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
+            AuvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
             
             bool shouldPlay = Math.Abs(finalForce) > 0.01f && cachedQualityLevel < 2;
 
@@ -221,8 +225,8 @@ public class Thrusters : MonoBehaviour
             {
                 // Kill all momentum for a clean stop BEFORE setting kinematic
                 // Unity throws an error if we set velocity on a kinematic body
-                auvRb.linearVelocity = Vector3.zero;
-                auvRb.angularVelocity = Vector3.zero;
+                AuvRb.linearVelocity = Vector3.zero;
+                AuvRb.angularVelocity = Vector3.zero;
                 Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
                 SimulatorHUD.Instance?.Log("<color=orange>AUV FROZEN</color> - Momentum cleared.");
             }
@@ -230,7 +234,7 @@ public class Thrusters : MonoBehaviour
             {
                 SimulatorHUD.Instance?.Log("<color=green>AUV UNFROZEN</color> - Physics active.");
             }
-            auvRb.isKinematic = isFrozen;
+            AuvRb.isKinematic = isFrozen;
 
         }
     }
