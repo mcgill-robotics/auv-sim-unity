@@ -16,6 +16,9 @@ public class SensorDataController
     // IMU Labels
     private Label textIMUAx, textIMUAy, textIMUAz;
     private Label textIMUWx, textIMUWy, textIMUWz;
+    private Label textIMURoll;
+    private Label textIMUPitch;
+    private Label textIMUYaw;
     private Label labelIMU;
     private Toggle toggleIMUViz;
     
@@ -52,6 +55,9 @@ public class SensorDataController
         textIMUWx = root.Q<Label>("Text-IMUWx");
         textIMUWy = root.Q<Label>("Text-IMUWy");
         textIMUWz = root.Q<Label>("Text-IMUWz");
+        textIMURoll = root.Q<Label>("Text-IMURoll");
+        textIMUPitch = root.Q<Label>("Text-IMUPitch");
+        textIMUYaw = root.Q<Label>("Text-IMUYaw");
         toggleIMUViz = root.Q<Toggle>("Toggle-IMUViz");
         
         // Depth
@@ -192,6 +198,10 @@ public class SensorDataController
             if (textIMUWx != null) textIMUWx.text = $"{angVel.x:+0.00;-0.00}";
             if (textIMUWy != null) textIMUWy.text = $"{angVel.y:+0.00;-0.00}";
             if (textIMUWz != null) textIMUWz.text = $"{angVel.z:+0.00;-0.00}";
+            
+            if (textIMURoll != null) textIMURoll.text = imuPublisher.publishOrientation ? $"{WrapAngle(imuPublisher.RosOrientation.eulerAngles.x):F1}°" : "---";
+            if (textIMUPitch != null) textIMUPitch.text = imuPublisher.publishOrientation ? $"{WrapAngle(imuPublisher.RosOrientation.eulerAngles.y):F1}°" : "---";
+            if (textIMUYaw != null) textIMUYaw.text = imuPublisher.publishOrientation ? $"{WrapAngle(imuPublisher.RosOrientation.eulerAngles.z):F1}°" : "---";
         }
         
         // Depth Data
@@ -208,5 +218,13 @@ public class SensorDataController
     public CameraDepthPublisher GetDepthPublisher()
     {
         return Object.FindFirstObjectByType<CameraDepthPublisher>();
+    }
+
+    private float WrapAngle(float angle)
+    {
+        angle %= 360f;
+        if (angle > 180f) angle -= 360f;
+        if (angle < -180f) angle += 360f;
+        return angle;
     }
 }

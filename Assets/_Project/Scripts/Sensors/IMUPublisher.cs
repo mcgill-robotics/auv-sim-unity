@@ -97,6 +97,8 @@ public class IMUPublisher : ROSPublisher
         new Vector3((float)imuMsg.linear_acceleration.x, (float)imuMsg.linear_acceleration.y, (float)imuMsg.linear_acceleration.z) : Vector3.zero;
     public Vector3 RosAngularVelocity => imuMsg != null ? 
         new Vector3((float)imuMsg.angular_velocity.x, (float)imuMsg.angular_velocity.y, (float)imuMsg.angular_velocity.z) : Vector3.zero;
+    public Quaternion RosOrientation => imuMsg != null ? 
+        new Quaternion((float)imuMsg.orientation.x, (float)imuMsg.orientation.y, (float)imuMsg.orientation.z, (float)imuMsg.orientation.w) : Quaternion.identity;
 
     // Internals
     private ImuMsg imuMsg;
