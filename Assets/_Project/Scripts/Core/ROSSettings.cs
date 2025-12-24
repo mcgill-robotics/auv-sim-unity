@@ -27,13 +27,13 @@ public class ROSSettings : MonoBehaviour
     [Space(10)]
     [Header("Sensor Topics")]
     [Tooltip("DVL velocity and altitude data topic")]
-    public string DVLTopic = "/sensors/dvl/data";
+    public string DVLTopic = "/dvl/velocity";
     
     [Tooltip("IMU orientation, gyro, and accelerometer data topic")]
-    public string IMUTopic = "/sensors/imu/data";
+    public string IMUTopic = "/imu/data";
     
     [Tooltip("Depth sensor data topic")]
-    public string DepthTopic = "/sensors/depth";
+    public string DepthTopic = "/raw/depth";
     
     [Tooltip("Pressure sensor data topic (FluidPressure)")]
     public string PressureTopic = "/sensors/pressure";

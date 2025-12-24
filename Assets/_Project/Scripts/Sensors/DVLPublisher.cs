@@ -1,6 +1,6 @@
 using UnityEngine;
-using RosMessageTypes.Auv;
-using Unity.Robotics.ROSTCPConnector.ROSGeometry;
+using RosMessageTypes.MarineAcoustic;
+using RosMessageTypes.Std;
 using Utils;
 
 public class DVLPublisher : ROSPublisher
@@ -97,10 +97,10 @@ public class DVLPublisher : ROSPublisher
     public bool[] BeamValid { get; private set; } = new bool[4];
     
     // ROS-frame accessor (FRD convention) - read directly from message
-    public Vector3 RosVelocity => msg != null ? new Vector3((float)msg.vx, (float)msg.vy, (float)msg.vz) : Vector3.zero;
+    public Vector3 RosVelocity => dvlMsg != null ? new Vector3((float)dvlMsg.velocity.x, (float)dvlMsg.velocity.y, (float)dvlMsg.velocity.z) : Vector3.zero;
 
     // Internals
-    private VelocityReportMsg msg;
+    private DvlMsg dvlMsg;
     private float nextPublishTime = 0;
     private GaussMarkovVector velocityBias;
     
@@ -125,8 +125,7 @@ public class DVLPublisher : ROSPublisher
         // DVL uses its own adaptive timing based on altitude, not base class rate limiting
         useBaseRateLimiting = false;
         
-        msg = new VelocityReportMsg();
-        msg.covariance = new double[9];
+        dvlMsg = new DvlMsg();
         
         // Initialize beam directions: Janus X-configuration
         // Azimuth angles: 45°, 135°, 225°, 315° (rotated around Y)
@@ -140,6 +139,13 @@ public class DVLPublisher : ROSPublisher
             Quaternion tilt = Quaternion.Euler(beamTiltAngle, 0f, 0f);
             Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
             beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
+            
+            // Populate ROS beam unit vectors (Unity RUF -> ROS FRD)
+            // Unity X -> ROS Y
+            // Unity -Y -> ROS Z
+            // Unity Z -> ROS X
+            Vector3 v = beamDirectionsLocal[i];
+            dvlMsg.beam_unit_vec[i] = new RosMessageTypes.Geometry.Vector3Msg(v.z, v.x, -v.y);
         }
         
         // Initialize Gauss-Markov bias model with pre-calculated coefficients
@@ -207,10 +213,13 @@ public class DVLPublisher : ROSPublisher
             }
             
             // Calculate next update time
-            float rate = 26f;
+            float rate = 2.0f; // Default "Search" rate when lock is lost
+            
             if (simulateAdaptiveRate && IsValid)
             {
-                rate = Mathf.Lerp(26f, 4f, LastAltitude / 50.0f);
+                // Linearly interpolate between 15Hz (shallow) and 4Hz (deep) 
+                // A50: ~15Hz at <0.6m, ~4Hz at max range
+                rate = Mathf.Lerp(15.0f, 4.0f, LastAltitude / maxAltitude);
             }
             nextPublishTime = Time.time + (1.0f / rate);
         }
@@ -224,15 +233,66 @@ public class DVLPublisher : ROSPublisher
 
     protected override void RegisterPublisher()
     {
-        ros.RegisterPublisher<VelocityReportMsg>(Topic);
+        ros.RegisterPublisher<DvlMsg>(Topic);
     }
 
     public override void PublishMessage()
     {
-        // Timestamp and publish the pre-calculated message
-        var rosTime = ROSClock.GetROSTimestamp();
-        msg.time = rosTime.sec + rosTime.nanosec * 1e-9;
-        ros.Publish(Topic, msg);
+        // Update timestamp for publication
+        dvlMsg.header.stamp = ROSClock.GetROSTimestamp();
+        ros.Publish(Topic, dvlMsg);
+    }
+
+    /// <summary>
+    /// Population of the DvlMsg fields. 
+    /// Moved here so RosVelocity accessor works for HUD even when not publishing.
+    /// </summary>
+    private void UpdateDvlMessageData()
+    {
+        // 1. Config
+        dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId; // "dvl_link"
+        dvlMsg.velocity_mode = DvlMsg.DVL_MODE_BOTTOM;
+        dvlMsg.dvl_type = DvlMsg.DVL_TYPE_PISTON;
+        
+        // 2. Validity Flags
+        dvlMsg.beam_velocities_valid = IsValid;
+        dvlMsg.beam_ranges_valid = true; 
+        dvlMsg.num_good_beams = (byte)ValidBeamCount;
+        dvlMsg.altitude = IsValid ? LastAltitude : -1.0;
+
+        if (IsValid)
+        {
+            // 3. Velocity (Sensor Frame: FRD)
+            // Unity Z (Fwd) -> DVL X (Fwd), Unity X (Right) -> DVL Y (Right), Unity -Y (Down) -> DVL Z (Down)
+            dvlMsg.velocity.x = LastVelocity.z; 
+            dvlMsg.velocity.y = LastVelocity.x; 
+            dvlMsg.velocity.z = -LastVelocity.y;
+
+            // 4. Covariance (3x3 Diagonal)
+            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
+            dvlMsg.velocity_covar[0] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var X
+            dvlMsg.velocity_covar[4] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var Y
+            dvlMsg.velocity_covar[8] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var Z
+        }
+        else
+        {
+            // Loss of Lock: Zero velocity, Infinite covariance
+            dvlMsg.velocity.x = 0;
+            dvlMsg.velocity.y = 0;
+            dvlMsg.velocity.z = 0;
+            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
+            
+            dvlMsg.velocity_covar[0] = 10000;
+            dvlMsg.velocity_covar[4] = 10000;
+            dvlMsg.velocity_covar[8] = 10000;
+        }
+
+        // 5. Beam Data
+        for (int i = 0; i < 4; i++)
+        {
+            dvlMsg.range[i] = BeamValid[i] ? Vector3.Distance(transform.position, BeamHitPoints[i]) : 0;
+            dvlMsg.beam_quality[i] = BeamValid[i] ? 100f : 0f;
+        }
     }
     
     /// <summary>
@@ -304,7 +364,7 @@ public class DVLPublisher : ROSPublisher
         Vector3 pointVelWorld = AuvRb.GetPointVelocity(transform.position);
         Vector3 localVel = transform.InverseTransformDirection(pointVelWorld);
         
-        // 3. Populate Message
+        // 3. Populate Message Summary for internal state
         if (IsValid)
         {
             LastAltitude = avgAltitude / validBeams;
@@ -327,39 +387,16 @@ public class DVLPublisher : ROSPublisher
             }
             
             LastVelocity = noisyVel;
-            
-            // Convert to DVL sensor frame (Waterlinked A50)
-            // Unity: X=Right, Y=Up, Z=Forward
-            // DVL sensor frame: X=Forward, Y=Right, Z=Down (FRD)
-            msg.vx = noisyVel.z;   // Unity Z (Forward) -> DVL X (Forward)
-            msg.vy = noisyVel.x;   // Unity X (Right) -> DVL Y (Right)
-            msg.vz = -noisyVel.y;  // Unity -Y (Down) -> DVL Z (Down)
-            
-            msg.altitude = LastAltitude;
-            msg.valid = true;
-            msg.status = true;
-            
-            // Update covariance for valid lock
-            msg.covariance[0] = sigmaVelocityHorizontal * sigmaVelocityHorizontal;
-            msg.covariance[4] = sigmaVelocityHorizontal * sigmaVelocityHorizontal;
-            msg.covariance[8] = sigmaVelocityVertical * sigmaVelocityVertical;
         }
         else
         {
             // Loss of Lock
             LastVelocity = Vector3.zero;
             LastAltitude = -1f;
-            
-            msg.vx = 0; msg.vy = 0; msg.vz = 0;
-            msg.altitude = -1.0;
-            msg.valid = false;
-            msg.status = false;
-            
-            // Blow up covariance to signal untrusted data
-            msg.covariance[0] = 10000;
-            msg.covariance[4] = 10000;
-            msg.covariance[8] = 10000;
         }
+
+        // Always update message data for HUD/Visualization
+        UpdateDvlMessageData();
     }
 
     private void UpdateVisualization()
@@ -448,6 +485,12 @@ public class DVLPublisher : ROSPublisher
                 Quaternion tilt = Quaternion.Euler(beamTiltAngle, 0f, 0f);
                 Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
                 beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
+                
+                // Update ROS beam unit vectors
+                Vector3 v = beamDirectionsLocal[i];
+                dvlMsg.beam_unit_vec[i].x = v.z;
+                dvlMsg.beam_unit_vec[i].y = v.x;
+                dvlMsg.beam_unit_vec[i].z = -v.y;
             }
         }
         
