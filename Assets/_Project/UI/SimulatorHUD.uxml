@@ -227,13 +227,21 @@
                         <ui:Label name="Text-IMUWz" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement class="data-row">
+                    <ui:Label text="Orient" class="data-label" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Label name="Text-IMURoll" text="0.0°" class="data-value" title="Roll" style="width: 45px; font-size: 11px;" />
+                        <ui:Label name="Text-IMUPitch" text="0.0°" class="data-value" title="Pitch" style="width: 45px; font-size: 11px;" />
+                        <ui:Label name="Text-IMUYaw" text="0.0°" class="data-value" title="Yaw" style="width: 45px; font-size: 11px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
                     <ui:Label name="Label-Depth" text="DEPTH" class="data-label text-accent" />
                     <ui:Toggle name="Toggle-DepthViz" label="👁" tooltip="Show depth line visualization" style="margin: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
-                    <ui:Label text="Value" class="data-label" />
+                    <ui:Label text="Depth" class="data-label" />
                     <ui:Label name="Text-DepthValue" text="0.00 m" class="data-value" style="font-size: 11px;"/>
                 </ui:VisualElement>
             </ui:VisualElement>
