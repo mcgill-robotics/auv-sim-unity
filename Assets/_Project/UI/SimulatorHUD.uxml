@@ -42,11 +42,11 @@
                     <ui:Toggle name="Toggle-DVL" label="Doppler Velocity" value="true" />
                     <ui:Toggle name="Toggle-IMU" label="IMU / AHRS" value="true" />
                     <ui:Toggle name="Toggle-Depth" label="Depth Sensor" value="true" />
-                    <ui:Toggle name="Toggle-Pressure" label="Pressure Sensor" value="true" />
                     <ui:Toggle name="Toggle-Hydro" label="Hydrophones" value="true" />
                     <ui:Label text="OPTICS" class="data-label text-accent margin-top-small" />
                     <ui:Toggle name="Toggle-FrontCam" label="Front Feed" value="true" />
                     <ui:Toggle name="Toggle-DownCam" label="Down Feed" value="true" />
+                    <ui:Toggle name="Toggle-DepthCamera" label="Depth Camera" value="true" />
                     <ui:VisualElement class="margin-top-small">
                         <ui:IntegerField name="Input-FrontRate" label="Front Hz" value="10" />
                         <ui:IntegerField name="Input-DownRate" label="Down Hz" value="10" />

@@ -9,23 +9,6 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
 **Version:** Unity 6 (6000.0.62f1)
 **Architecture:** Component-based ROS Bridge with UI Toolkit
 
-**Recent Changes:**
-*   Migrated project to Unity 6.
-*   Replaced legacy GUI with Unity UI Toolkit for improved performance and modularity.
-*   Implemented native ZED X camera streaming via `ZED2iSimSender` to interface directly with the ZED SDK Bridge.
-*   Refactored sensor architecture into a modular `ROSPublisher` inheritance system.
-*   Centralized configuration via singleton Managers.
-*   Stochastic Sensor Simulation: Implemented realistic noise models for sensors.
-    *   IMU: Gauss-Markov bias instability and white noise models.
-    *   DVL: 4-beam Janus configuration, acoustic raycasting, grazing angle checks, and outlier simulation.
-*   Debug Visualization: Added 3D debug arrows (LineRenderers) for visualizing sensor data (DVL beams, Velocity, Acceleration) in the Scene view.
-*   Refactored Project Structure: Moved all custom scripts into `_Project/` for cleaner organization.
-*   Performance Optimization: Replaced blocking `ReadPixels` with `AsyncGPUReadback` for all cameras, significantly reducing CPU spikes during simulation.
-*   ZED X Synchronization: Fixed timestamp drift between IMU and Camera streams using `ROSClock` nanoseconds. Implemented physics latching to ensure IMU data matches the rendered frame exactly.
-*   UI Overhaul: Redesigned HUD with collapsible **Drawers**, a persistent **Top Bar**, and a scrollable **Log Panel**.
-*   Refactored `SimulatorHUD` into 4 focused controllers: `SettingsController`, `TelemetryController`, `CameraFeedController`, `SensorDataController`.
-*   Added Pressure sensor depth line visualization with configurable dotted pattern.
-
 **Known Issues:**
 *   **ROS Synchronization:** Ensure the ROS TCP Endpoint matches the IP/Port configurations in the Unity Editor.
 *   **Performance:** There is still some optimization to be done.
@@ -138,18 +121,12 @@ All sensors inherit from the abstract `ROSPublisher` class. This base class hand
 *   Global on/off toggles via `SimulationSettings`.
 *   Standardized `FixedUpdate` loops for physics consistency.
 
-**Implemented Sensors:**
-*   **DVL:** Publishes `VelocityReportMsg`.
-    *   Simulates A50 4-beam Janus geometry (22.5° tilt).
-    *   Models acoustic lock loss due to pitch/roll (grazing angles) and minimum altitude.
-    *   Includes Gauss-Markov bias drift and random outliers.
-*   **IMU:** Publishes `ImuMsg`.
-    *   Simulates "Proper Acceleration" (Gravity subtraction).
-    *   Includes Lever Arm effects (centripetal force) based on mounting position.
-    *   Models Bias Instability (Random Walk) for Gyro and Accel.
-    *   Supports "Raw Mode" (no orientation) or "AHRS Mode" (noisy orientation) for EKF testing.
-*   **Cameras:** `CameraPublisher` and `CameraDepthPublisher` utilize RenderTextures and Compute Shaders to efficiently output RGB and 32-bit float Depth images.
-*   **ZED X:** Uses `ZED2iSimSender` and native plugins (`libsl_zed.so` / `sl_zed64.dll`) to emulate the ZED hardware stream directly.
+***Implemented Sensors:**
+*   **DVL:** Publishes `TwistWithCovarianceStamped` with covariance matrix.
+*   **IMU:** Publishes `sensor_msgs/Imu`. Includes orientation covariance configuration for EKF compatibility.
+*   **Depth:** Publishes `std_msgs/Float64`. Represents metric depth for direct consumption by control nodes.
+*   **Cameras:** Publishes `sensor_msgs/Image` and `CameraInfo`.
+*   **ZED X:** Native bridge support via `ZED2iSimSender` for hardware-in-the-loop testing with the ZED SDK.
 
 ### 3. Actuation (`Scripts/Actuators`)
 *   **Thrusters:** Subscribes to `ThrusterForcesMsg`. Converts Newton force commands into Unity Rigidbody forces applied at specific mount points relative to the Center of Mass.
@@ -195,12 +172,41 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
 5.  Navigate to the top menu `Robotics -> ROS Settings` and ensure the IP address matches your ROS machine (or `127.0.0.1` if running locally).
 
 ### ROS Setup
-_**TODO**_
+
+1.  **Launch ROS TCP Endpoint**
+    ```bash
+    # Source your workspace
+    source ros2_ws/install/setup.bash
+
+    # Launch endpoint
+    ros2 launch ros_tcp_endpoint endpoint.py
+
+    ```
+
+2.  **Verify Connection**
+    - In Unity: Press Play. The ROS Settings menu should show a green "Connected" status.
+    - In Terminal: You should see logs indicating registration of publishers (e.g., RegisterPublisher(/sensors/dvl/data, ...)).
+
+3.  **Visualize Data**
+    To verify data is flowing correctly:
+    Check Sensor Data:
+    ```bash
+    ros2 topic list
+    ros2 topic echo /sensors/dvl/data --once
+    ros2 topic echo /sensors/imu/data --once
+    ros2 topic echo /sensors/depth --once
+    ```
+
+    View Camera Feeds:
+    To view the RGB or Depth streams, use rqt_image_view (requires X11 forwarding enabled in Docker):
+    ```bash
+    ros2 run rqt_image_view rqt_image_view
+    ```
 
 ## Workflows
 
 ### Running a Simulation
-1.  Open the scene `Assets/Scenes/Refactoring-Pool.unity` (or the relevant competition scene).
+1.  Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
 2.  Press **Play**.
 3.  The **Simulator HUD** will appear. Use the left panel to toggle specific sensors or adjust camera framerates.
 4.  Click **Apply Configuration** to save changes.
@@ -216,6 +222,8 @@ When the simulator is running, you can manually override ROS commands using the 
 *   **Roll:** U / O
 *   **Emergency Stop:** Spacebar (Toggles Kinematic freeze)
 *   **Drop Marker:** G
+*   **Rotate Torpedo Launcher:** Left and Right Arrow Keys
+*   **Shoot Torpedo/Reset:** T / Y
 *   **Toggle Camera Mode:** C
 
 ### Competition Logic

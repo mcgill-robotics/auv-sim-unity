@@ -21,6 +21,7 @@ public class SettingsController
     private Toggle toggleHydro;
     private Toggle toggleFrontCam;
     private Toggle toggleDownCam;
+    private Toggle toggleDepthCamera;
     
     // UI Elements - Camera Parameters
     private IntegerField inputFrontRate;
@@ -61,6 +62,7 @@ public class SettingsController
         toggleHydro = root.Q<Toggle>("Toggle-Hydro");
         toggleFrontCam = root.Q<Toggle>("Toggle-FrontCam");
         toggleDownCam = root.Q<Toggle>("Toggle-DownCam");
+        toggleDepthCamera = root.Q<Toggle>("Toggle-DepthCamera");
         
         // Camera parameters
         inputFrontRate = root.Q<IntegerField>("Input-FrontRate");
@@ -166,6 +168,13 @@ public class SettingsController
             });
         }
         
+        if (toggleDepthCamera != null)
+        {
+            toggleDepthCamera.RegisterValueChangedCallback(evt => {
+                SimulationSettings.Instance.PublishDepthCamera = evt.newValue;
+            });
+        }
+        
         // Save button
         if (btnSave != null)
         {
@@ -191,6 +200,7 @@ public class SettingsController
         if (toggleHydro != null) toggleHydro.value = SimulationSettings.Instance.PublishHydrophones;
         if (toggleFrontCam != null) toggleFrontCam.value = SimulationSettings.Instance.PublishFrontCam;
         if (toggleDownCam != null) toggleDownCam.value = SimulationSettings.Instance.PublishDownCam;
+        if (toggleDepthCamera != null) toggleDepthCamera.value = SimulationSettings.Instance.PublishDepthCamera;
 
         if (inputFrontRate != null) inputFrontRate.value = SimulationSettings.Instance.FrontCamRate;
         if (inputDownRate != null) inputDownRate.value = SimulationSettings.Instance.DownCamRate;
@@ -218,6 +228,7 @@ public class SettingsController
         if (toggleHydro != null) SimulationSettings.Instance.PublishHydrophones = toggleHydro.value;
         if (toggleFrontCam != null) SimulationSettings.Instance.PublishFrontCam = toggleFrontCam.value;
         if (toggleDownCam != null) SimulationSettings.Instance.PublishDownCam = toggleDownCam.value;
+        if (toggleDepthCamera != null) SimulationSettings.Instance.PublishDepthCamera = toggleDepthCamera.value;
 
         if (inputFrontRate != null) SimulationSettings.Instance.FrontCamRate = inputFrontRate.value;
         if (inputDownRate != null) SimulationSettings.Instance.DownCamRate = inputDownRate.value;
