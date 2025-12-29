@@ -19,7 +19,7 @@ public class IMUPublisher : ROSPublisher
     [Space(10)]
     [Header("Accelerometer Noise")]
     [Tooltip("White noise std dev (m/s²) added to acceleration measurements")]
-    [Range(0.001f, 1.0f)]
+    [Range(0.0f, 1.0f)]
     public float accelNoise = 0.1f;
     
     [Space(5)]
@@ -29,13 +29,13 @@ public class IMUPublisher : ROSPublisher
     public float accelBiasCorrelationTime = 300f;
     
     [Tooltip("Steady-state accelerometer bias std dev (m/s²)")]
-    [Range(0.001f, 0.1f)]
+    [Range(0.0f, 0.1f)]
     public float accelBiasSigma = 0.02f;
     
     [Space(10)]
     [Header("Gyroscope Noise")]
     [Tooltip("White noise std dev (rad/s) added to angular velocity measurements")]
-    [Range(0.001f, 1.0f)]
+    [Range(0.0f, 1.0f)]
     public float gyroNoise = 0.05f;
     
     [Space(5)]
@@ -45,7 +45,7 @@ public class IMUPublisher : ROSPublisher
     public float gyroBiasCorrelationTime = 100f;
     
     [Tooltip("Steady-state gyroscope bias std dev (rad/s)")]
-    [Range(0.0001f, 0.05f)]
+    [Range(0.0f, 0.05f)]
     public float gyroBiasSigma = 0.01f;
 
     [Space(10)]
@@ -58,15 +58,15 @@ public class IMUPublisher : ROSPublisher
     
     [Space(5)]
     [Tooltip("Roll orientation noise (degrees) - typically small")]
-    [Range(0.01f, 2f)]
+    [Range(0.0f, 2f)]
     public float orientationNoiseRoll = 0.5f;
     
     [Tooltip("Pitch orientation noise (degrees) - typically small")]
-    [Range(0.01f, 2f)]
+    [Range(0.0f, 2f)]
     public float orientationNoisePitch = 0.5f;
     
     [Tooltip("Yaw/Heading orientation noise (degrees) - typically larger due to magnetometer drift")]
-    [Range(0.1f, 10f)]
+    [Range(0.0f, 10f)]
     public float orientationNoiseYaw = 2.0f;
 
     [Space(10)]

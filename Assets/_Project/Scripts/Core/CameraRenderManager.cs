@@ -99,7 +99,7 @@ public class CameraRenderManager : MonoBehaviour
         if (s == null) return false;
         
         // ROS publishing (front camera or depth - both use front camera)
-        bool rosNeeded = s.PublishROS && (s.PublishFrontCam || s.PublishDepth);
+        bool rosNeeded = s.PublishROS && (s.PublishFrontCam || s.PublishDepthCamera);
         
         // ZED streaming needs the camera rendered
         bool zedNeeded = s.StreamZEDCamera;
