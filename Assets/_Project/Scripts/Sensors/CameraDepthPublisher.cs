@@ -47,6 +47,9 @@ public class CameraDepthPublisher : ROSPublisher
     private CameraInfoMsg cameraInfoMsg;
     private string cameraInfoTopic;
     
+    // Cached buffer for zero-allocation publishing
+    private byte[] cachedDepthData;
+    
     // For UI display
     public RenderTexture VisualizationTexture => visualizationRT;
     
@@ -267,7 +270,7 @@ public class CameraDepthPublisher : ROSPublisher
         if (sourceCamera == null || depthRT == null) return;
         
         // Check if we should publish to ROS
-        bool shouldPublish = SimulationSettings.Instance.PublishDepth && SimulationSettings.Instance.PublishROS;
+        bool shouldPublish = SimulationSettings.Instance.PublishDepthCamera && SimulationSettings.Instance.PublishROS;
         
         if (!shouldPublish) return;
         
@@ -312,14 +315,52 @@ public class CameraDepthPublisher : ROSPublisher
             return;
         }
         
-        // Copy data to texture
-        var data = request.GetData<float>();
-        if (data.Length > 0 && depthTexture2D != null)
+        // Get raw data as NativeArray<byte> (no allocation)
+        var data = request.GetData<byte>();
+        if (data.Length == 0) return;
+        
+        // Allocate buffer ONLY if null or size changed (typically once at startup)
+        if (cachedDepthData == null || cachedDepthData.Length != data.Length)
         {
-            depthTexture2D.SetPixelData(data, 0);
-            depthTexture2D.Apply();
-            PublishMessage();
+            cachedDepthData = new byte[data.Length];
         }
+        
+        // Fast copy from NativeArray to managed array (no allocation)
+        // Note: Vertical flip is handled in LinearDepthResampler.shader for zero CPU cost
+        data.CopyTo(cachedDepthData);
+        
+        // Update Texture2D only if needed for visualization/debugging
+        if (depthTexture2D != null)
+        {
+            depthTexture2D.LoadRawTextureData(cachedDepthData);
+            depthTexture2D.Apply();
+        }
+        
+        // Publish with cached data
+        PublishOptimized();
+    }
+    
+    /// <summary>
+    /// Optimized publish path that avoids GetRawTextureData() allocation.
+    /// </summary>
+    private void PublishOptimized()
+    {
+        if (cachedDepthData == null) return;
+        
+        // Handle 16UC1 conversion (still allocates, but this encoding is rarely used)
+        if (encoding == "16UC1")
+        {
+            PublishMessage(); // Fallback to original method for 16UC1
+            return;
+        }
+        
+        // 32FC1: Zero-allocation path - directly use cached buffer
+        depthMsg.data = cachedDepthData;
+        depthMsg.header.stamp = ROSClock.GetROSTimestamp();
+        ros.Publish(Topic, depthMsg);
+        
+        cameraInfoMsg.header.stamp = depthMsg.header.stamp;
+        ros.Publish(cameraInfoTopic, cameraInfoMsg);
     }
 
     public override void PublishMessage()

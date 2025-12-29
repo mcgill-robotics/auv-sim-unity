@@ -22,6 +22,12 @@ public class CameraPublisher : ROSPublisher
 
     private ImageMsg message;
     private RenderTexture renderTexture;
+    
+    // JPEG encoding
+    private Texture2D encodingTexture;
+    private byte[] cachedRawBuffer;
+    private CompressedImageMsg compressedMessage;
+    private string compressedTopic;
 
     // Camera Info
     private CameraInfoMsg cameraInfoMsg;
@@ -51,6 +57,10 @@ public class CameraPublisher : ROSPublisher
     protected override void RegisterPublisher()
     {
         ros.RegisterPublisher<ImageMsg>(Topic);
+        
+        // Register compressed image topic (ROS convention: topic/compressed)
+        compressedTopic = Topic + "/compressed";
+        ros.RegisterPublisher<CompressedImageMsg>(compressedTopic);
         
         // Register Camera Info Topic
         cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
@@ -126,6 +136,14 @@ public class CameraPublisher : ROSPublisher
         message.width = (uint)resolutionWidth;
         message.height = (uint)resolutionHeight;
         message.step = (uint)(resolutionWidth * 3);
+        
+        // Initialize compressed message
+        compressedMessage = new CompressedImageMsg();
+        compressedMessage.header = new HeaderMsg { frame_id = currentFrameId };
+        compressedMessage.format = "jpeg";
+        
+        // Create encoding texture for JPEG compression
+        encodingTexture = new Texture2D(resolutionWidth, resolutionHeight, TextureFormat.RGB24, false);
     }
 
     private bool isReading = false;  // Prevent queueing too many async requests
@@ -172,11 +190,44 @@ public class CameraPublisher : ROSPublisher
             return;
         }
         
-        // Get raw data and publish
+        // Get raw data as NativeArray (no allocation)
         var rawData = req.GetData<byte>();
-        message.data = rawData.ToArray();
-        message.header.stamp = stamp;
-        ros.Publish(Topic, message);
+        
+        // Check if JPEG compression is enabled
+        bool useJPEG = SimulationSettings.Instance != null && SimulationSettings.Instance.UseJPEGCompression;
+        
+        if (useJPEG)
+        {
+            // JPEG encoding path - publish to /compressed topic using CompressedImageMsg
+            if (cachedRawBuffer == null || cachedRawBuffer.Length != rawData.Length)
+            {
+                cachedRawBuffer = new byte[rawData.Length];
+            }
+            rawData.CopyTo(cachedRawBuffer);
+            
+            // Load into texture and encode
+            if (encodingTexture != null)
+            {
+                encodingTexture.LoadRawTextureData(cachedRawBuffer);
+                encodingTexture.Apply();
+                
+                int quality = SimulationSettings.Instance.JPEGQuality;
+                compressedMessage.data = encodingTexture.EncodeToJPG(quality);
+                compressedMessage.header.stamp = stamp;
+                ros.Publish(compressedTopic, compressedMessage);
+            }
+        }
+        else
+        {
+            // Raw RGB8 path - publish to main topic using ImageMsg
+            if (message.data == null || message.data.Length != rawData.Length)
+            {
+                message.data = new byte[rawData.Length];
+            }
+            rawData.CopyTo(message.data);
+            message.header.stamp = stamp;
+            ros.Publish(Topic, message);
+        }
 
         // Publish Camera Info with synced timestamp
         cameraInfoMsg.header.stamp = stamp;
@@ -195,6 +246,11 @@ public class CameraPublisher : ROSPublisher
         {
             renderTexture.Release();
             Destroy(renderTexture);
+        }
+        
+        if (encodingTexture != null)
+        {
+            Destroy(encodingTexture);
         }
     }
 }

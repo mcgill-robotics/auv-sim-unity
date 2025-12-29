@@ -65,6 +65,9 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Publish down camera images")]
     public bool PublishDownCam = false;
     
+    [Tooltip("Publish depth camera images (depth map from front camera)")]
+    public bool PublishDepthCamera = false;
+    
     [Tooltip("Stream ZED stereo camera via ZED SDK (disables front camera ROS publishing)")]
     public bool StreamZEDCamera = false;
     
@@ -141,6 +144,14 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Down camera resolution height")]
     [Range(240, 1080)]
     public int DownCamHeight = 480;
+    
+    [Space(5)]
+    [Tooltip("Use JPEG compression for camera images (reduces bandwidth ~10x)")]
+    public bool UseJPEGCompression = true;
+    
+    [Tooltip("JPEG compression quality (1-100, higher = better quality but larger size)")]
+    [Range(1, 100)]
+    public int JPEGQuality = 75;
 
     [Space(10)]
     [Header("Other Settings")]
@@ -248,6 +259,7 @@ public class SimulationSettings : MonoBehaviour
         PublishHydrophones = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "false"));
         PublishFrontCam = bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "false"));
         PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
+        PublishDepthCamera = bool.Parse(PlayerPrefs.GetString("PublishDepthCameraToggle", "false"));
         StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
 
         VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
@@ -267,6 +279,8 @@ public class SimulationSettings : MonoBehaviour
         FrontCamFOV = float.Parse(PlayerPrefs.GetString("frontCamFOV", "77.9"));
         DownCamWidth = int.Parse(PlayerPrefs.GetString("downCamWidth", "640"));
         DownCamHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
+        UseJPEGCompression = bool.Parse(PlayerPrefs.GetString("UseJPEGCompression", "true"));
+        JPEGQuality = int.Parse(PlayerPrefs.GetString("JPEGQuality", "75"));
 
         PoseRate = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
         QualityLevel = int.Parse(PlayerPrefs.GetString("qualityLevel", "3"));
@@ -342,6 +356,7 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophones.ToString());
         PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCam.ToString());
         PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCam.ToString());
+        PlayerPrefs.SetString("PublishDepthCameraToggle", PublishDepthCamera.ToString());
         PlayerPrefs.SetString("StreamZEDCameraToggle", StreamZEDCamera.ToString());
 
         PlayerPrefs.SetString("VisualizeDVLToggle", VisualizeDVL.ToString());
@@ -361,6 +376,8 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("frontCamFOV", FrontCamFOV.ToString());
         PlayerPrefs.SetString("downCamWidth", DownCamWidth.ToString());
         PlayerPrefs.SetString("downCamHeight", DownCamHeight.ToString());
+        PlayerPrefs.SetString("UseJPEGCompression", UseJPEGCompression.ToString());
+        PlayerPrefs.SetString("JPEGQuality", JPEGQuality.ToString());
 
         PlayerPrefs.SetString("poseRate", PoseRate.ToString());
         PlayerPrefs.SetString("qualityLevel", QualityLevel.ToString());

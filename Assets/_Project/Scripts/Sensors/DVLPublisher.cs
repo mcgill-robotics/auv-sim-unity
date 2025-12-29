@@ -1,5 +1,6 @@
 using UnityEngine;
-using RosMessageTypes.MarineAcoustic;
+// using RosMessageTypes.MarineAcoustic; // Commented out - using standard geometry_msgs instead
+using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
 using Utils;
 
@@ -37,11 +38,11 @@ public class DVLPublisher : ROSPublisher
     
     [Space(5)]
     [Tooltip("Horizontal velocity noise std dev (m/s). A50 has 22.5° beams - horizontal error is ~2.6x higher than vertical")]
-    [Range(0.001f, 0.1f)]
+    [Range(0.0f, 0.1f)]
     public float sigmaVelocityHorizontal = 0.01f;
     
     [Tooltip("Vertical velocity noise std dev (m/s)")]
-    [Range(0.0001f, 0.05f)]
+    [Range(0.0f, 0.05f)]
     public float sigmaVelocityVertical = 0.004f;
     
     [Space(10)]
@@ -51,7 +52,7 @@ public class DVLPublisher : ROSPublisher
     public float biasCorrelationTime = 100f;
     
     [Tooltip("Steady-state bias standard deviation (m/s)")]
-    [Range(0.001f, 0.05f)]
+    [Range(0.0f, 0.05f)]
     public float biasSigma = 0.005f;
     
     [Space(10)]
@@ -61,7 +62,7 @@ public class DVLPublisher : ROSPublisher
     public float outlierProbability = 0.01f;
     
     [Tooltip("Magnitude of outlier spike (m/s)")]
-    [Range(0.1f, 2f)]
+    [Range(0f, 2f)]
     public float outlierMagnitude = 0.5f;
     
     [Space(10)]
@@ -97,10 +98,14 @@ public class DVLPublisher : ROSPublisher
     public bool[] BeamValid { get; private set; } = new bool[4];
     
     // ROS-frame accessor (FRD convention) - read directly from message
-    public Vector3 RosVelocity => dvlMsg != null ? new Vector3((float)dvlMsg.velocity.x, (float)dvlMsg.velocity.y, (float)dvlMsg.velocity.z) : Vector3.zero;
+    public Vector3 RosVelocity => twistMsg != null ? new Vector3(
+        (float)twistMsg.twist.twist.linear.x, 
+        (float)twistMsg.twist.twist.linear.y, 
+        (float)twistMsg.twist.twist.linear.z) : Vector3.zero;
 
     // Internals
-    private DvlMsg dvlMsg;
+    // private DvlMsg dvlMsg; // Commented out - using TwistWithCovarianceStamped instead
+    private TwistWithCovarianceStampedMsg twistMsg;
     private float nextPublishTime = 0;
     private GaussMarkovVector velocityBias;
     
@@ -125,7 +130,9 @@ public class DVLPublisher : ROSPublisher
         // DVL uses its own adaptive timing based on altitude, not base class rate limiting
         useBaseRateLimiting = false;
         
-        dvlMsg = new DvlMsg();
+        // Initialize standard ROS message for velocity
+        twistMsg = new TwistWithCovarianceStampedMsg();
+        twistMsg.header = new HeaderMsg { frame_id = ROSSettings.Instance.DvlFrameId };
         
         // Initialize beam directions: Janus X-configuration
         // Azimuth angles: 45°, 135°, 225°, 315° (rotated around Y)
@@ -140,12 +147,8 @@ public class DVLPublisher : ROSPublisher
             Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
             beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
             
-            // Populate ROS beam unit vectors (Unity RUF -> ROS FRD)
-            // Unity X -> ROS Y
-            // Unity -Y -> ROS Z
-            // Unity Z -> ROS X
-            Vector3 v = beamDirectionsLocal[i];
-            dvlMsg.beam_unit_vec[i] = new RosMessageTypes.Geometry.Vector3Msg(v.z, v.x, -v.y);
+            // Beam directions are still useful for visualization
+            // Skip populating DvlMsg beam vectors since we're using TwistWithCovarianceStamped
         }
         
         // Initialize Gauss-Markov bias model with pre-calculated coefficients
@@ -233,66 +236,76 @@ public class DVLPublisher : ROSPublisher
 
     protected override void RegisterPublisher()
     {
-        ros.RegisterPublisher<DvlMsg>(Topic);
+        ros.RegisterPublisher<TwistWithCovarianceStampedMsg>(Topic);
     }
 
     public override void PublishMessage()
     {
         // Update timestamp for publication
-        dvlMsg.header.stamp = ROSClock.GetROSTimestamp();
-        ros.Publish(Topic, dvlMsg);
+        twistMsg.header.stamp = ROSClock.GetROSTimestamp();
+        ros.Publish(Topic, twistMsg);
     }
 
     /// <summary>
-    /// Population of the DvlMsg fields. 
+    /// Population of the TwistWithCovarianceStamped message fields. 
     /// Moved here so RosVelocity accessor works for HUD even when not publishing.
     /// </summary>
     private void UpdateDvlMessageData()
     {
-        // 1. Config
-        dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId; // "dvl_link"
-        dvlMsg.velocity_mode = DvlMsg.DVL_MODE_BOTTOM;
-        dvlMsg.dvl_type = DvlMsg.DVL_TYPE_PISTON;
-        
-        // 2. Validity Flags
-        dvlMsg.beam_velocities_valid = IsValid;
-        dvlMsg.beam_ranges_valid = true; 
-        dvlMsg.num_good_beams = (byte)ValidBeamCount;
-        dvlMsg.altitude = IsValid ? LastAltitude : -1.0;
+        // 1. Header
+        twistMsg.header.frame_id = ROSSettings.Instance.DvlFrameId; // "dvl_link"
 
         if (IsValid)
         {
-            // 3. Velocity (Sensor Frame: FRD)
+            // 2. Velocity (Sensor Frame: FRD)
             // Unity Z (Fwd) -> DVL X (Fwd), Unity X (Right) -> DVL Y (Right), Unity -Y (Down) -> DVL Z (Down)
-            dvlMsg.velocity.x = LastVelocity.z; 
-            dvlMsg.velocity.y = LastVelocity.x; 
-            dvlMsg.velocity.z = -LastVelocity.y;
+            twistMsg.twist.twist.linear.x = LastVelocity.z; 
+            twistMsg.twist.twist.linear.y = LastVelocity.x; 
+            twistMsg.twist.twist.linear.z = -LastVelocity.y;
+            
+            // Angular velocity is zero (DVL doesn't measure rotation)
+            twistMsg.twist.twist.angular.x = 0;
+            twistMsg.twist.twist.angular.y = 0;
+            twistMsg.twist.twist.angular.z = 0;
 
-            // 4. Covariance (3x3 Diagonal)
-            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
-            dvlMsg.velocity_covar[0] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var X
-            dvlMsg.velocity_covar[4] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var Y
-            dvlMsg.velocity_covar[8] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var Z
+            // 3. Covariance (6x6 matrix, row-major)
+            // Layout: [lin.x, lin.y, lin.z, ang.x, ang.y, ang.z]
+            // We only populate linear velocity covariance (upper-left 3x3 block)
+            for(int i=0; i<36; i++) twistMsg.twist.covariance[i] = 0;
+            
+            // Diagonal elements for linear velocity
+            twistMsg.twist.covariance[0] = Mathf.Pow(sigmaVelocityHorizontal, 2);  // Var lin.x (forward)
+            twistMsg.twist.covariance[7] = Mathf.Pow(sigmaVelocityHorizontal, 2);  // Var lin.y (right)
+            twistMsg.twist.covariance[14] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var lin.z (down)
+            
+            // Set angular covariance to very high (not measured)
+            twistMsg.twist.covariance[21] = 10000; // Var ang.x
+            twistMsg.twist.covariance[28] = 10000; // Var ang.y
+            twistMsg.twist.covariance[35] = 10000; // Var ang.z
         }
         else
         {
-            // Loss of Lock: Zero velocity, Infinite covariance
-            dvlMsg.velocity.x = 0;
-            dvlMsg.velocity.y = 0;
-            dvlMsg.velocity.z = 0;
-            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
+            // Loss of Lock: Zero velocity, Very high covariance
+            twistMsg.twist.twist.linear.x = 0;
+            twistMsg.twist.twist.linear.y = 0;
+            twistMsg.twist.twist.linear.z = 0;
+            twistMsg.twist.twist.angular.x = 0;
+            twistMsg.twist.twist.angular.y = 0;
+            twistMsg.twist.twist.angular.z = 0;
             
-            dvlMsg.velocity_covar[0] = 10000;
-            dvlMsg.velocity_covar[4] = 10000;
-            dvlMsg.velocity_covar[8] = 10000;
+            for(int i=0; i<36; i++) twistMsg.twist.covariance[i] = 0;
+            
+            // Very high covariance indicates invalid measurement
+            twistMsg.twist.covariance[0] = 10000;
+            twistMsg.twist.covariance[7] = 10000;
+            twistMsg.twist.covariance[14] = 10000;
+            twistMsg.twist.covariance[21] = 10000;
+            twistMsg.twist.covariance[28] = 10000;
+            twistMsg.twist.covariance[35] = 10000;
         }
-
-        // 5. Beam Data
-        for (int i = 0; i < 4; i++)
-        {
-            dvlMsg.range[i] = BeamValid[i] ? Vector3.Distance(transform.position, BeamHitPoints[i]) : 0;
-            dvlMsg.beam_quality[i] = BeamValid[i] ? 100f : 0f;
-        }
+        
+        // Note: Beam data (range, quality) is no longer published with TwistWithCovarianceStamped
+        // If needed, could be published on a separate topic
     }
     
     /// <summary>
@@ -488,9 +501,9 @@ public class DVLPublisher : ROSPublisher
                 
                 // Update ROS beam unit vectors
                 Vector3 v = beamDirectionsLocal[i];
-                dvlMsg.beam_unit_vec[i].x = v.z;
-                dvlMsg.beam_unit_vec[i].y = v.x;
-                dvlMsg.beam_unit_vec[i].z = -v.y;
+                // dvlMsg.beam_unit_vec[i].x = v.z;
+                // dvlMsg.beam_unit_vec[i].y = v.x;
+                // dvlMsg.beam_unit_vec[i].z = -v.y;
             }
         }
         
