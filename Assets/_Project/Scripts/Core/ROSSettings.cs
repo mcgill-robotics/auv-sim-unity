@@ -78,6 +78,20 @@ public class ROSSettings : MonoBehaviour
     public string StateThetaYTopic = "/auv/state/theta_y";
     public string StateThetaZTopic = "/auv/state/theta_z";
 
+    [Space(10)]
+    [Header("Ground Truth")]
+    [Tooltip("Ground truth velocity (linear + angular) in body frame")]
+    public string GroundTruthTwistTopic = "/auv/ground_truth/twist";
+    
+    [Tooltip("Ground truth acceleration (linear + angular) in body frame")]
+    public string GroundTruthAccelTopic = "/auv/ground_truth/accel";
+    
+    [Tooltip("Ground truth orientation quaternion")]
+    public string GroundTruthOrientationTopic = "/auv/ground_truth/orientation";
+    
+    [Tooltip("Ground truth depth (positive down)")]
+    public string GroundTruthDepthTopic = "/auv/ground_truth/depth";
+
     [Header("Competition")]
     public string PingerBearingTopic = "/sensors/hydrophones/pinger_bearing";
     public string VisionDetectionFrameTopic = "/vision/detection_frame";
