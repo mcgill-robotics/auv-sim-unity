@@ -185,10 +185,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 384c4d03a551c44448145f4093304119, type: 3}
   m_Name: ScreenSpaceReflection
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   quality:
-    m_OverrideState: 0
-    m_Value: 1
+    m_OverrideState: 1
+    m_Value: 2
   enabled:
     m_OverrideState: 1
     m_Value: 0
@@ -209,7 +209,7 @@ MonoBehaviour:
     m_Value: 1
   usedAlgorithm:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 1
   depthBufferThickness:
     m_OverrideState: 0
     m_Value: 0.01
@@ -218,7 +218,7 @@ MonoBehaviour:
     m_Value: 0.1
   accumulationFactor:
     m_OverrideState: 0
-    m_Value: 0.75
+    m_Value: 1
   biasFactor:
     m_OverrideState: 0
     m_Value: 0.5
@@ -241,8 +241,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   m_RayMaxIterations:
-    m_OverrideState: 0
-    m_Value: 32
+    m_OverrideState: 1
+    m_Value: 64
   rayMiss:
     m_OverrideState: 0
     m_Value: 3
@@ -369,8 +369,8 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0
   triangleSize:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 30
   ambientProbeDimmer:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0

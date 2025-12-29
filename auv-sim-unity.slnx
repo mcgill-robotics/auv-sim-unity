@@ -1,4 +1,9 @@
 ﻿<Solution>
+  <Project Path="Unity.Perception.Runtime.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Unity.Perception.Runtime.Tests.csproj" />
+  <Project Path="Unity.Perception.Editor.csproj" />
+  <Project Path="Unity.Perception.Performance.Tests.csproj" />
+  <Project Path="Unity.Perception.Editor.Tests.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>

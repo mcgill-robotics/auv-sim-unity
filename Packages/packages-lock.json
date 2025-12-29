@@ -117,16 +117,15 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.perception": {
-      "version": "1.0.0-preview.1",
+      "version": "file:com.unity.perception",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.burst": "1.7.3",
         "com.unity.collections": "1.2.4",
         "com.unity.nuget.newtonsoft-json": "3.0.2",
         "com.unity.render-pipelines.core": "12.1.7"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.unity.performance.profile-analyzer": {
       "version": "1.2.3",
@@ -136,7 +135,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.probuilder": {
-      "version": "6.0.7",
+      "version": "6.0.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
