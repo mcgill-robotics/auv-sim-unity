@@ -46,6 +46,37 @@ MonoBehaviour:
   m_SampleCount:
     m_OverrideState: 0
     m_Value: 8
+--- !u!114 &-7689872222015854065
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c604242b4dd4c8caa4d1944b94189e0, type: 3}
+  m_Name: HighQualityLineRenderingVolumeComponent
+  m_EditorClassIdentifier: 
+  active: 1
+  enable:
+    m_OverrideState: 1
+    m_Value: 1
+  compositionMode:
+    m_OverrideState: 0
+    m_Value: 0
+  clusterCount:
+    m_OverrideState: 0
+    m_Value: 24
+  sortingQuality:
+    m_OverrideState: 0
+    m_Value: 0
+  tileOpacityThreshold:
+    m_OverrideState: 0
+    m_Value: 1
+  writeDepthAlphaThreshold:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &-6343553022294933187
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -308,6 +339,7 @@ MonoBehaviour:
   - {fileID: -6343553022294933187}
   - {fileID: -1986656549030179517}
   - {fileID: -8150596611768991335}
+  - {fileID: -7689872222015854065}
 --- !u!114 &3211434947213623861
 MonoBehaviour:
   m_ObjectHideFlags: 3
