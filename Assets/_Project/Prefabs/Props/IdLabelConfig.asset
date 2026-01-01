@@ -34,5 +34,8 @@ MonoBehaviour:
   - label: bin
     id: 6
     hierarchyRelation: 0
+  - label: board
+    id: 7
+    hierarchyRelation: 0
   autoAssignIds: 1
   startingLabelId: 0

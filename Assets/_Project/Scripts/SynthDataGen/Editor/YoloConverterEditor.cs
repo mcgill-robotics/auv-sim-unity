@@ -12,7 +12,7 @@ using UnityEditor;
 public class YoloConverterWindow : EditorWindow
 {
     // Settings
-    private float _minVisibility = 0.6f;
+    private float _minVisibility = 0.25f;
     private Vector2 _resolution = new Vector2(960, 600);
     private string _customDatasetPath = "";
     
@@ -195,9 +195,13 @@ public class YoloConverterWindow : EditorWindow
             {
                 if (m["@type"]?.ToString().Contains("OcclusionMetric") == true)
                 {
-                    foreach (var val in m["values"])
+                    var values = m["values"];
+                    if (values != null)
                     {
-                        visibility[val["instanceId"].Value<int>()] = val["percentVisible"].Value<float>();
+                        foreach (var val in values)
+                        {
+                            visibility[val["instanceId"].Value<int>()] = val["percentVisible"].Value<float>();
+                        }
                     }
                 }
             }
@@ -230,28 +234,32 @@ public class YoloConverterWindow : EditorWindow
                 {
                     if (ann["@type"]?.ToString().Contains("BoundingBox2DAnnotation") == true)
                     {
-                        foreach (var val in ann["values"])
+                        var values = ann["values"];
+                        if (values != null)
                         {
-                            int instId = val["instanceId"].Value<int>();
-                            
-                            if (visibility.TryGetValue(instId, out float vis) && vis < _minVisibility)
-                                continue; 
-
-                            int labelId = val["labelId"].Value<int>();
-                            
-                            float x = val["origin"][0].Value<float>();
-                            float y = val["origin"][1].Value<float>();
-                            float w = val["dimension"][0].Value<float>();
-                            float h = val["dimension"][1].Value<float>();
-
-                            float centerX = (x + (w / 2.0f)) / _resolution.x;
-                            float centerY = (y + (h / 2.0f)) / _resolution.y;
-                            float normW = w / _resolution.x;
-                            float normH = h / _resolution.y;
-
-                            if (idMap.TryGetValue(labelId, out int yoloId))
+                            foreach (var val in values)
                             {
-                                txtContent += $"{yoloId} {centerX:F6} {centerY:F6} {normW:F6} {normH:F6}\n";
+                                int instId = val["instanceId"].Value<int>();
+                                
+                                if (visibility.TryGetValue(instId, out float vis) && vis < _minVisibility)
+                                    continue; 
+
+                                int labelId = val["labelId"].Value<int>();
+                                
+                                float x = val["origin"][0].Value<float>();
+                                float y = val["origin"][1].Value<float>();
+                                float w = val["dimension"][0].Value<float>();
+                                float h = val["dimension"][1].Value<float>();
+
+                                float centerX = (x + (w / 2.0f)) / _resolution.x;
+                                float centerY = (y + (h / 2.0f)) / _resolution.y;
+                                float normW = w / _resolution.x;
+                                float normH = h / _resolution.y;
+
+                                if (idMap.TryGetValue(labelId, out int yoloId))
+                                {
+                                    txtContent += $"{yoloId} {centerX:F6} {centerY:F6} {normW:F6} {normH:F6}\n";
+                                }
                             }
                         }
                     }

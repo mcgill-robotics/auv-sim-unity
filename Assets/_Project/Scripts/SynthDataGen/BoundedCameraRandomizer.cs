@@ -99,7 +99,7 @@ public class BoundedCameraRandomizer : Randomizer
 
     protected override void OnIterationStart()
     {
-        if (cameraTransform == null) return;
+        if (!enabled || cameraTransform == null) return;
 
         // 1. Pick target object first
         Vector3 targetPosition = GetRandomSpawnedObjectPosition();
@@ -245,7 +245,7 @@ public class BoundedCameraRandomizer : Randomizer
         
         if (activeObjects.Count == 0)
         {
-            Debug.LogWarning("[BoundedCameraRandomizer] No valid spawned objects found (all at cache position), using fallback target");
+            // Debug.LogWarning("[BoundedCameraRandomizer] No valid spawned objects found (all at cache position), using fallback target");
             return fallbackTarget;
         }
         

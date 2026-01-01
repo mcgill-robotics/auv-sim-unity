@@ -17,10 +17,6 @@ public class PrefabPlacementConfig
     
     [Tooltip("Y height for this prefab (e.g., -2.1 for floor objects, 0 for hanging objects)")]
     public float spawnHeight = -2.1f;
-    
-    [Tooltip("Probability weight for spawning this prefab (higher = more frequent)")]
-    [Range(0.1f, 10f)]
-    public float weight = 1f;
 }
 
 /// <summary>
@@ -47,6 +43,9 @@ public class PoolFloorPlacementRandomizer : Randomizer
     [Tooltip("Maximum number of objects to spawn per iteration (0 = unlimited by Poisson)")]
     public int maxObjectCount = 0;
     
+    [Tooltip("If false, no objects will be spawned, but the randomizer remains active to ensure cleanup.")]
+    public bool shouldSpawn = true;
+    
     #endregion
     
     #region Prefab Configuration
@@ -61,8 +60,6 @@ public class PoolFloorPlacementRandomizer : Randomizer
     
     private GameObject _container;
     private GameObjectOneWayCache _gameObjectCache;
-    private Dictionary<int, float> _prefabHeights;  // Maps prefab instance ID to height
-    private float _totalWeight;
     
     #endregion
     
@@ -87,97 +84,76 @@ public class PoolFloorPlacementRandomizer : Randomizer
             return;
         }
         
-        // Build prefab array and height lookup
+        // Build prefab array for cache
         var prefabArray = validConfigs.Select(c => c.prefab).ToArray();
-        _prefabHeights = new Dictionary<int, float>();
-        _totalWeight = 0f;
-        
-        foreach (var config in validConfigs)
-        {
-            _prefabHeights[config.prefab.GetInstanceID()] = config.spawnHeight;
-            _totalWeight += config.weight;
-        }
-        
         _gameObjectCache = new GameObjectOneWayCache(_container.transform, prefabArray, this);
     }
 
     protected override void OnIterationStart()
     {
-        if (_gameObjectCache == null || prefabConfigs == null || prefabConfigs.Count == 0)
+        if (!shouldSpawn || _gameObjectCache == null || prefabConfigs == null || prefabConfigs.Count == 0)
         {
             return;
         }
         
         // Generate Poisson Disk samples
         var seed = SamplerState.NextRandomState();
-        var samples = PoissonDiskSampling.GenerateSamples(
+        using (var nativeSamples = PoissonDiskSampling.GenerateSamples(
             placementArea.x, 
             placementArea.y, 
             separationDistance, 
             seed
-        );
-        
-        // Center offset so placement area is centered at origin
-        var centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
-        
-        int objectCount = 0;
-        foreach (var sample in samples)
+        ))
         {
-            // Check max count limit
-            if (maxObjectCount > 0 && objectCount >= maxObjectCount)
-                break;
+            // Shuffle prefabs to randomize which object type appears in the sequence
+            var prefabsToSpawn = prefabConfigs
+                .Where(c => c != null && c.prefab != null)
+                .ToList();
+
+            for (int i = prefabsToSpawn.Count - 1; i > 0; i--)
+            {
+                int k = UnityEngine.Random.Range(0, i + 1);
+                var temp = prefabsToSpawn[k];
+                prefabsToSpawn[k] = prefabsToSpawn[i];
+                prefabsToSpawn[i] = temp;
+            }
             
-            // Sample a weighted random prefab
-            var selectedConfig = SampleWeightedPrefab();
-            if (selectedConfig == null || selectedConfig.prefab == null)
-                continue;
+            // Center offset so placement area is centered at origin
+            var centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
             
-            var instance = _gameObjectCache.GetOrInstantiate(selectedConfig.prefab);
-            
-            // Place on XZ plane with per-prefab height
-            instance.transform.position = new Vector3(
-                sample.x - centerOffset.x,
-                selectedConfig.spawnHeight,
-                sample.y - centerOffset.z
-            );
-            
-            objectCount++;
+            // Place unique objects 1-to-1 until we run out of samples or prefabs
+            int spawnCount = Mathf.Min(nativeSamples.Length, prefabsToSpawn.Count);
+            if (maxObjectCount > 0) spawnCount = Mathf.Min(spawnCount, maxObjectCount);
+
+            for (int i = 0; i < spawnCount; i++)
+            {
+                var sample = nativeSamples[i];
+                var config = prefabsToSpawn[i];
+                
+                var instance = _gameObjectCache.GetOrInstantiate(config.prefab);
+                
+                // Place on XZ plane with per-prefab height
+                instance.transform.position = new Vector3(
+                    sample.x - centerOffset.x,
+                    config.spawnHeight,
+                    sample.y - centerOffset.z
+                );
+            }
         }
-        
-        samples.Dispose();
     }
 
     protected override void OnIterationEnd()
     {
+        // Always reset, even if disabled, to ensure objects from previous batch are cleaned up
         _gameObjectCache?.ResetAllObjects();
     }
     
-    #endregion
-    
-    #region Helper Methods
-    
     /// <summary>
-    /// Samples a prefab config based on weights.
+    /// Explicitly clear all spawned objects.
     /// </summary>
-    private PrefabPlacementConfig SampleWeightedPrefab()
+    public void ClearObjects()
     {
-        if (_totalWeight <= 0)
-            return prefabConfigs.FirstOrDefault(c => c?.prefab != null);
-        
-        float randomValue = UnityEngine.Random.Range(0f, _totalWeight);
-        float cumulative = 0f;
-        
-        foreach (var config in prefabConfigs)
-        {
-            if (config == null || config.prefab == null)
-                continue;
-                
-            cumulative += config.weight;
-            if (randomValue <= cumulative)
-                return config;
-        }
-        
-        return prefabConfigs.FirstOrDefault(c => c?.prefab != null);
+        _gameObjectCache?.ResetAllObjects();
     }
     
     #endregion
