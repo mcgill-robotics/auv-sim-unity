@@ -902,6 +902,8 @@ GameObject:
   - component: {fileID: 5555466671897405355}
   - component: {fileID: 646193968104972225}
   - component: {fileID: 1057141052619181166}
+  - component: {fileID: 1771015499230016667}
+  - component: {fileID: 4820862776996175763}
   m_Layer: 0
   m_Name: Quad
   m_TagString: Untagged
@@ -919,7 +921,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -1.35, y: -0.178, z: 0}
-  m_LocalScale: {x: 0.305, y: 0.305, z: 1}
+  m_LocalScale: {x: 0.2969114, y: 0.2969114, z: 0.97348}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4150487687301783545}
@@ -955,7 +957,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 70efb39bfaaf608aebd38f3439f9d075, type: 2}
+  - {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -999,6 +1001,40 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1771015499230016667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4241586609516240061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b33f0bc2b78db642a758f07826d0dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  labels:
+  - sawfish
+  useAutoLabeling: 0
+  autoLabelingSchemeType: 
+--- !u!114 &4820862776996175763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4241586609516240061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 1
+  maxDistance: 8
+  useAngleFilter: 1
+  maxViewAngle: 70
+  allowBackFace: 1
 --- !u!1 &4307085840721386522
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,6 +1047,8 @@ GameObject:
   - component: {fileID: 5986739609897553216}
   - component: {fileID: 4620799732237239688}
   - component: {fileID: 2308200021779470524}
+  - component: {fileID: 5973436675713353883}
+  - component: {fileID: 6386066412180814310}
   m_Layer: 0
   m_Name: Quad (1)
   m_TagString: Untagged
@@ -1028,7 +1066,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 1.35, y: -0.178, z: 0}
-  m_LocalScale: {x: 0.305, y: 0.305, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4150487687301783545}
@@ -1064,7 +1102,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
+  - {fileID: 2100000, guid: 70efb39bfaaf608aebd38f3439f9d075, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1108,6 +1146,40 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &5973436675713353883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4307085840721386522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b33f0bc2b78db642a758f07826d0dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  labels:
+  - shark
+  useAutoLabeling: 0
+  autoLabelingSchemeType: 
+--- !u!114 &6386066412180814310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4307085840721386522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 1
+  maxDistance: 8
+  useAngleFilter: 1
+  maxViewAngle: 70
+  allowBackFace: 1
 --- !u!1 &5143757022528637452
 GameObject:
   m_ObjectHideFlags: 0
@@ -1509,6 +1581,7 @@ GameObject:
   - component: {fileID: 4150487687301783545}
   - component: {fileID: 6120921401009914692}
   - component: {fileID: 3099827561287186068}
+  - component: {fileID: 2550855703370109037}
   m_Layer: 0
   m_Name: octagon
   m_TagString: Untagged
@@ -1575,6 +1648,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b85e54e30bb74162b2d6bca9b68f5482, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2550855703370109037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7140615294393502085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce341973f33d8cab84746681dc25adb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 646193968104972225}
+  - {fileID: 4620799732237239688}
+  configs:
+  - material: {fileID: 2100000, guid: 70efb39bfaaf608aebd38f3439f9d075, type: 2}
+    label: shark
+  - material: {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
+    label: sawfish
 --- !u!1 &7600262506088577414
 GameObject:
   m_ObjectHideFlags: 0

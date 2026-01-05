@@ -43,7 +43,7 @@ public class BatchRunner : MonoBehaviour
     private void Awake()
     {
         _scenario = GetComponent<FixedLengthScenario>();
-        if (!_scenario) _scenario = FindObjectOfType<FixedLengthScenario>();
+        if (!_scenario) _scenario = FindFirstObjectByType<FixedLengthScenario>();
 
         if (!_scenario)
         {

@@ -6,6 +6,9 @@ using Utils;
 /// Publishes depth sensor data to ROS based on sensor depth.
 /// Uses standard std_msgs/Float64 message.
 /// Measures depth at THIS GameObject's position (like a real sensor).
+/// 
+/// CONVENTION:
+/// Depth is published as a positive value increasing with depth (+ Down).
 /// </summary>
 public class DepthPublisher : ROSPublisher
 {

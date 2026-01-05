@@ -193,6 +193,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 509b4a980cf29784e98a3f4b5f4f64cc, type: 3}
+--- !u!114 &206961072 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6881566400908832541, guid: db73982fab23cbb7d8fcf37cfd9a0854,
+    type: 3}
+  m_PrefabInstance: {fileID: 6925684577414460007}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4ee7c3a3b205a14a94094d01ff91d6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &259236004
 Mesh:
   m_ObjectHideFlags: 0
@@ -531,6 +543,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 117772251433964429, guid: 748e9383638f6e24580c5dd29295e718,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 70efb39bfaaf608aebd38f3439f9d075, type: 2}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -549,22 +566,22 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.0000029653306
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
@@ -574,7 +591,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
@@ -591,6 +608,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7350696718535435371, guid: 748e9383638f6e24580c5dd29295e718,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -942,7 +964,7 @@ PrefabInstance:
     - target: {fileID: 11944008543641006, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 181999470436791272, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -962,7 +984,7 @@ PrefabInstance:
     - target: {fileID: 843766346388386003, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 971502776680211255, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -972,7 +994,7 @@ PrefabInstance:
     - target: {fileID: 971502776680211255, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 1047044928418413261, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -982,7 +1004,7 @@ PrefabInstance:
     - target: {fileID: 1047044928418413261, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 1270302382572272368, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -1012,7 +1034,7 @@ PrefabInstance:
     - target: {fileID: 2126305607582085362, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 3072772395680186925, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -1082,7 +1104,7 @@ PrefabInstance:
     - target: {fileID: 3953729244966891822, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 4179906744246432345, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -1097,7 +1119,7 @@ PrefabInstance:
     - target: {fileID: 4233951123883931485, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 4249054880939986828, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -1122,7 +1144,7 @@ PrefabInstance:
     - target: {fileID: 6004465994811715497, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 6431473544526436366, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -1147,7 +1169,7 @@ PrefabInstance:
     - target: {fileID: 7466101566090074426, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 240
+      value: 273
       objectReference: {fileID: 0}
     - target: {fileID: 7509861665271294260, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
@@ -2809,6 +2831,84 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1001 &1751630442
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 976002720483355549, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_Name
+      value: board
+      objectReference: {fileID: 0}
+    - target: {fileID: 976002720483355549, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.306562
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7.479618
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.0000029504295
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: 2958579989946816274, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4214278606299907990, guid: 6879801d142cb97b8af3ca47428c9cce,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8acd449d6875a738a959105cb517f9f3, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6879801d142cb97b8af3ca47428c9cce, type: 3}
 --- !u!43 &1797243394
 Mesh:
   m_ObjectHideFlags: 0
@@ -3192,7 +3292,7 @@ MonoBehaviour:
         asm: Unity.Perception.Runtime}
       data:
         m_Enabled: 1
-        collapsed: 1
+        collapsed: 0
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
         rotation:
           collapsed: 0
@@ -3216,7 +3316,7 @@ MonoBehaviour:
       type: {class: BoundedCameraRandomizer, ns: , asm: Assembly-CSharp}
       data:
         m_Enabled: 1
-        collapsed: 1
+        collapsed: 0
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
         cameraTransform: {fileID: 1963140906}
         poolMinBounds: {x: -11, y: -2, z: -22}
@@ -3257,8 +3357,8 @@ MonoBehaviour:
         asm: Unity.Perception.Runtime}
       data:
         range:
-          minimum: 0
-          maximum: 0
+          minimum: -30
+          maximum: 30
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
@@ -3277,8 +3377,8 @@ MonoBehaviour:
         asm: Unity.Perception.Runtime}
       data:
         range:
-          minimum: 0
-          maximum: 0
+          minimum: -30
+          maximum: 30
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
@@ -3334,10 +3434,12 @@ MonoBehaviour:
       type: {class: UnderwaterEnvironmentRandomizer, ns: , asm: Assembly-CSharp}
       data:
         m_Enabled: 1
-        collapsed: 1
+        collapsed: 0
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
         globalVolume: {fileID: 1111011693}
         waterSurface: {fileID: 1301816085}
+        planarReflectionProbe: {fileID: 206961072}
+        sunLight: {fileID: 2117332588}
         absorptionDistance:
           collapsed: 0
           value:
@@ -3377,7 +3479,19 @@ MonoBehaviour:
         filmGrainIntensity:
           collapsed: 0
           value:
-            rid: 2823715821560529061
+            rid: 7836056710045237352
+        reflectionMultiplier:
+          collapsed: 0
+          value:
+            rid: 7836056693691121873
+        sunAngle:
+          collapsed: 0
+          value:
+            rid: 7836056710045237388
+        sunIntensity:
+          collapsed: 0
+          value:
+            rid: 7836056710045237389
     - rid: 2823715821560529049
       type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
         asm: Unity.Perception.Runtime}
@@ -3494,13 +3608,43 @@ MonoBehaviour:
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
-    - rid: 2823715821560529061
+    - rid: 7836056693691121873
+      type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
+        asm: Unity.Perception.Runtime}
+      data:
+        range:
+          minimum: 0
+          maximum: 2
+        <minAllowed>k__BackingField: 0
+        <maxAllowed>k__BackingField: 0
+        <shouldCheckValidRange>k__BackingField: 0
+    - rid: 7836056710045237352
       type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
         asm: Unity.Perception.Runtime}
       data:
         range:
           minimum: 0
           maximum: 1
+        <minAllowed>k__BackingField: 0
+        <maxAllowed>k__BackingField: 0
+        <shouldCheckValidRange>k__BackingField: 0
+    - rid: 7836056710045237388
+      type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
+        asm: Unity.Perception.Runtime}
+      data:
+        range:
+          minimum: 20
+          maximum: 90
+        <minAllowed>k__BackingField: 0
+        <maxAllowed>k__BackingField: 0
+        <shouldCheckValidRange>k__BackingField: 0
+    - rid: 7836056710045237389
+      type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
+        asm: Unity.Perception.Runtime}
+      data:
+        range:
+          minimum: 8000
+          maximum: 16000
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
@@ -3547,13 +3691,13 @@ MonoBehaviour:
     saturationRange: {x: -40, y: -10}
     filmGrainMax: 1
     lookAtSpawnedObject: 1
-    cameraDistanceRange: {x: 2.5, y: 7}
-    pitchRange: {x: 0, y: 20}
+    cameraDistanceRange: {x: 1, y: 7}
+    pitchRange: {x: -20, y: 30}
     randomYawRange: {x: 0, y: 360}
-    rollRange: {x: -3, y: 3}
-    yawJitter: 15
+    rollRange: {x: -30, y: 30}
+    yawJitter: 30
   - batchName: Hard cases
-    iterations: 3000
+    iterations: 4000
     spawnObjects: 1
     absorptionDistanceRange: {x: 3, y: 10}
     waterScatterRedRange: {x: 0, y: 0.4}
@@ -3567,13 +3711,13 @@ MonoBehaviour:
     saturationRange: {x: -80, y: 0}
     filmGrainMax: 1
     lookAtSpawnedObject: 1
-    cameraDistanceRange: {x: 1.5, y: 12}
+    cameraDistanceRange: {x: 1, y: 12}
     pitchRange: {x: -10, y: 30}
     randomYawRange: {x: 0, y: 360}
-    rollRange: {x: -10, y: 10}
+    rollRange: {x: -15, y: 15}
     yawJitter: 45
   - batchName: Background
-    iterations: 1000
+    iterations: 2000
     spawnObjects: 0
     absorptionDistanceRange: {x: 4, y: 25}
     waterScatterRedRange: {x: 0, y: 0.4}
@@ -3588,9 +3732,9 @@ MonoBehaviour:
     filmGrainMax: 1
     lookAtSpawnedObject: 0
     cameraDistanceRange: {x: 2, y: 10}
-    pitchRange: {x: -10, y: 30}
+    pitchRange: {x: -20, y: 30}
     randomYawRange: {x: 0, y: 360}
-    rollRange: {x: -10, y: 10}
+    rollRange: {x: -15, y: 15}
     yawJitter: 45
   testModeEnabled: 0
   testBatchIndex: 0
@@ -3815,7 +3959,7 @@ Transform:
   m_GameObject: {fileID: 1963140903}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.688, z: -3.83}
+  m_LocalPosition: {x: 0, y: -0.688, z: -6.973}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4590,4 +4734,5 @@ SceneRoots:
   - {fileID: 584509325}
   - {fileID: 33666864}
   - {fileID: 858337496}
+  - {fileID: 1751630442}
   - {fileID: 1923574414}

@@ -113,41 +113,68 @@ graph TD
 *   **SimulationSettings:** A singleton that persists user preferences (resolution, sensor toggles, quality settings) across sessions.
 *   **ROSSettings:** Centralized registry for all ROS topic names and frame IDs.
 *   **ROSClock:** Synchronizes simulation time with ROS time, ensuring timestamp accuracy for sensor fusion.
+*   **CameraManager:** Orchestrates the activation/deactivation of camera publishers to optimize performance.
 *   **InputManager:** Manages manual control overrides and keybindings.
 
 ### 2. Sensor Abstraction (`Scripts/Sensors`)
-All sensors inherit from the abstract `ROSPublisher` class. This base class handles:
-*   Publishing frequency/rate throttling.
-*   Global on/off toggles via `SimulationSettings`.
-*   Standardized `FixedUpdate` loops for physics consistency.
-
+All sensors inherit from the abstract `ROSPublisher` class.
 ***Implemented Sensors:**
-*   **DVL:** Publishes `TwistWithCovarianceStamped` with covariance matrix.
-*   **IMU:** Publishes `sensor_msgs/Imu`. Includes orientation covariance configuration for EKF compatibility.
-*   **Depth:** Publishes `std_msgs/Float64`. Represents metric depth for direct consumption by control nodes.
-*   **Cameras:** Publishes `sensor_msgs/Image` and `CameraInfo`.
+*   **DVL:** Simulates 4-beam Janus acoustics with bias/noise. Publishes `TwistWithCovarianceStamped`.
+*   **IMU:** Publishes `sensor_msgs/Imu` (Accel, Gyro, Orientation). Supports EKF orientation covariance.
+*   **Depth:** Publishes `std_msgs/Float64` metric depth (positive-down).
+*   **Ground Truth:** Detailed state publishing (`Twist`, `Accel`, `Orientation`) at the AUV center of mass for validation.
+*   **Hydrophones:** Simulates pinger bearing and time-difference-of-arrival (TDOA).
+*   **Cameras:** Publishes `sensor_msgs/Image` and `CameraInfo` for front and downward views.
 *   **ZED X:** Native bridge support via `ZED2iSimSender` for hardware-in-the-loop testing with the ZED SDK.
 
 ### 3. Actuation (`Scripts/Actuators`)
-*   **Thrusters:** Subscribes to `ThrusterForcesMsg`. Converts Newton force commands into Unity Rigidbody forces applied at specific mount points relative to the Center of Mass.
+*   **Thrusters:** Subscribes to `ThrusterForces`. Converts Newton commands into Rigidbody forces applied at specific mount points relative to the CoM.
 *   **Dropper:** Handles the mechanism for releasing markers during competition tasks.
+*   **Torpedo Launcher:** Rotatable base with two-stage launch and reset logic.
 
 ### 4. User Interface (`Scripts/UI`)
 The simulator uses **UI Toolkit** (UXML/USS) for the Heads-Up Display.
 *   **SimulatorHUD:** Main coordinator for drawers, logging, and Update loop.
-*   **SettingsController:** Manages Config drawer - sensor toggles, save button, ROS connection state.
-*   **TelemetryController:** Subscribes to ROS state topics for position/rotation display.
-*   **CameraFeedController:** Camera feed dropdown, fullscreen toggle, and snapshot saving.
-*   **SensorDataController:** DVL/IMU/Pressure data display with visualization toggles.
+*   **Moduar Controllers:** Dedicated handlers for `Settings` (Config), `Telemetry` (AUV State), `Camera Feeds`, `Sensor Data`, and `Belief Visualization` (EKF/SLAM markers).
 
-## Installation & Setup
+## Project Structure
+
+```
+Assets/
+├── _Project/                    # All custom simulator code and assets
+│   ├── Scripts/
+│   │   ├── Core/                # Managers & Singletons (ROSSettings, Clock, Input)
+│   │   ├── Sensors/             # ROS Publishers & ZED Interface
+│   │   ├── Actuators/           # Thrusters, Dropper, Torpedo Launcher
+│   │   ├── Physics/             # Buoyancy & Hydrodynamics
+│   │   ├── UI/                  # HUD Controllers & Logic
+│   │   ├── Utils/               # Helpers (Visualization, Math)
+│   │   ├── CompetitionSettings/ # Task-specific logic & scoring
+│   │   ├── SynthDataGen/        # Synthetic data generation for ML
+│   │   ├── UserCamera/          # Freecam & Orbit controls
+│   │   ├── AudioSettings/       # Audio configuration
+│   │   └── PointsSettings/      # Scoring & points logic
+│   ├── UI/                      # UI Toolkit Assets (.uxml, .uss)
+│   ├── Scenes/                  # Unity Scenes (Pools, Tests)
+│   ├── Prefabs/                 # AUV parts, Props, Gates
+│   ├── Models/                  # 3D Models & imports
+│   ├── Materials/               # Custom materials
+│   ├── Textures/                # Texture assets
+│   ├── Shaders/                 # Custom shaders
+│   ├── Audio/                   # Sound effects
+│   └── Resources/               # Runtime-loaded assets
+├── RosMessages/                 # Generated C# ROS message classes
+├── 3rdParty/                    # External assets (SkySeries, TextMesh Pro)
+├── Plugins/                     # Native plugins (ZED SDK binaries)
+└── Settings/                    # Project render & quality settings
+```
 
 ### Prerequisites
 * **Unity Hub**
 * **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
 * **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
-### ⚠️ Important: ZED SDK & Plugin Setup
+### ⚠️ Important: ZED SDK & Plugin Setup (not tested on Windows, ignore if not using ZED SDK)
 The simulator relies on the ZED SDK. Due to GitHub file size limits, the required binary files (`.dll` and `.so`) are **NOT** included in the repository.
 
 **You must follow these steps or the project will have compile errors:**
@@ -175,12 +202,16 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
 
 1.  **Launch ROS TCP Endpoint**
     ```bash
-    # Source your workspace
-    source ros2_ws/install/setup.bash
+    # Build ROS workspace
+    source /opt/ros/humble/setup.bash
+    cd <AUV-2026>/ros2_ws
+    colcon build --symlink-install
+    
+    # Source the workspace
+    source install/setup.bash
 
     # Launch endpoint
     ros2 launch ros_tcp_endpoint endpoint.py
-
     ```
 
 2.  **Verify Connection**
@@ -226,29 +257,87 @@ When the simulator is running, you can manually override ROS commands using the 
 *   **Shoot Torpedo/Reset:** T / Y
 *   **Toggle Camera Mode:** C
 
-### Competition Logic
+### Competition Logic (TODO)
 The simulator includes a `CompetitionManager` that orchestrates specific tasks (e.g., Gate, Buoy, Bins).
 1.  In the HUD, select the desired task from the dropdown.
 2.  Click **Initiate Run**.
 3.  The simulator will reset the AUV and props to the starting configuration for that task.
-4.  Scoring is automated via collision triggers and alignment checks implementing the `ICompetitionTask` interface.
+
+### Unity Editor Tips
+
+**Set Aspect Ratio:**
+In the **Game** tab, click the dropdown showing "Free Aspect" and change it to **16:9** for a normal screen ratio.
+
+**Check FPS & Performance:**
+Click on **Stats** in the top-right corner of the **Game** tab to view the current framerate and rendering statistics.
+
+**Modify ROS Topic Names:**
+1.  In the **Hierarchy** panel, click on `Managers-Configurations`.
+2.  In the **Inspector** panel on the right, scroll down to find the `ROS Settings` component.
+3.  Edit the topic name fields directly.
+
+**Modify Simulation Settings:**
+1.  Click on `Managers-Configurations` in the **Hierarchy**.
+2.  In the **Inspector**, find the `Simulation Settings` component.
+3.  Toggle sensors, adjust camera resolutions, and configure other options.
+4.  **Note:** Some changes require you to **Stop** the simulation, modify the settings, and **Play** again. Alternatively, use the in-game HUD and click **Save & Restart**.
+
+**Modify Sensor Parameters:**
+Sensors are located under `Douglas > Sensors` in the **Hierarchy**. Each sensor has its own script attached:
+| GameObject | Script |
+| :--- | :--- |
+| `ZED2i (Stereo Camera)` | `CameraPublisher`, `CameraDepthPublisher`, `ZED2iSimSender` |
+| `Down Cam` | `CameraPublisher` |
+| `Movella MTI-600 (IMU)` | `IMUPublisher` |
+| `DVL-A50` | `DVLPublisher` |
+| `Pressure Sensor (Depth)` | `DepthPublisher` |
+| `Hydrophones` | `PingerBearingVisualizer`, `PingerTimeDifference` (TODO) |
+
+**Modify Actuator Parameters:**
+Actuators are located under `Douglas > Actuators` in the **Hierarchy**:
+| GameObject | Script |
+| :--- | :--- |
+| `Thrusters` | `Thrusters` |
+| `Grabber` | *(TODO: script not yet implemented)* |
+| `Torpedo Launcher` | `TorpedoLauncher` |
+
+**Modify AUV Physics:**
+Select the `Douglas` GameObject in the **Hierarchy** to access physics components:
+*   **Rigidbody:** Mass, drag, and angular drag.
+*   **Buoyancy:** Center of buoyancy offset and buoyancy force.
+*   **Drag:** Hydrodynamic drag coefficients.
+*   **GroundTruthPublisher:** Ground truth state publishing.
 
 ## ROS Interface
 
 The simulator communicates over the following default topics (configurable in `ROSSettings.cs`):
 
 **Publishers (Sim -> ROS):**
-*   `/auv/state`: Ground truth state (Position/Velocity).
-*   `/sensors/dvl/data`: Doppler Velocity Log data.
-*   `/sensors/imu/data`: IMU data (Accel/Gyro).
-*   `/sensors/depth`: Depth sensor reading.
-*   `/sensors/camera/front/image_raw`: Front camera RGB.
-*   `/sensors/camera/depth/image_raw`: Front camera Depth.
-*   `/down_cam/image_raw`: Downward facing camera.
+
+| Topic | Description | Frame / Convention | Message Type |
+| :--- | :--- | :--- | :--- |
+| `/auv/ground_truth/twist` | Ground truth linear/angular velocity | **Unity** (X-Right, Y-Up, Z-Fwd) + RH Rule | `TwistStamped` |
+| `/auv/ground_truth/accel` | Ground truth linear/angular acceleration | **Unity** (X-Right, Y-Up, Z-Fwd) + RH Rule | `AccelStamped` |
+| `/sensors/dvl/data` | Doppler Velocity Log (A50) | **FRD** (+X Fwd, +Y Right, +Z Down) | `TwistWithCovarianceStamped` (DvlMsg in the future) |
+| `/sensors/imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `Imu` |
+| `/sensors/depth/data` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
+| `/sensors/camera/front/image_raw` | Front RGB Camera (raw) | Optical Frame | `Image` |
+| `/sensors/camera/front/image_raw/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
+| `/sensors/camera/front/depth_raw` | Front Depth Map (always raw) | Optical Frame | `Image` |
+| `/sensors/camera/down/image_raw` | Downward RGB Camera (raw) | Optical Frame | `Image` |
+| `/sensors/camera/down/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
+
+> [!NOTE]
+> **JPEG Compression (enabled by default):** When enabled, only the `/compressed` topics are published for RGB cameras. The raw `image_raw` topics are not published. Disable JPEG compression in `SimulationSettings` to publish raw images instead. The depth map is always published as raw (no compression).
 
 **Subscribers (ROS -> Sim):**
-*   `/auv/thruster_forces`: Individual thruster commands (Newtons).
-*   `/auv/dropper`: Bool trigger for the dropper mechanism.
+
+| Topic | Description | Message Type |
+| :--- | :--- | :--- |
+| `/auv/thruster_forces` | Individual thruster force commands (8 thrusters) | `ThrusterForces` |
+| `/auv/dropper/trigger` | Trigger for the dropper mechanism | `Bool` |
+| `/auv/torpedo/launch` | Trigger for torpedo launch | `Bool` |
+| `/auv/torpedo/rotate` | Torpedo launcher rotation angle | `Float32` |
 
 ## Roadmap & TODO
 
@@ -278,15 +367,3 @@ The simulator communicates over the following default topics (configurable in `R
 *   [ ] **Sensor Models:** Document the math behind the DVL acoustics simulation and IMU noise models.
 *   [X] **Setup Guide:** specific instructions for configuring the Unity 6 environment.
 
-## Directory Structure
-*   **Assets/_Project:** Contains all custom simulator code and assets.
-    *   **Scripts/Core:** Managers and Singletons (`SimulationSettings`, `ROSSettings`, `ROSClock`, `InputManager`).
-    *   **Scripts/Sensors:** ROS publishing logic and ZED interface (`DVLPublisher`, `IMUPublisher`, `CameraPublisher`, `ZED2iSimSender`).
-    *   **Scripts/Actuators:** Thrusters and physical manipulators.
-    *   **Scripts/Physics:** Hydrodynamics and buoyancy.
-    *   **Scripts/UI:** UI Toolkit controllers (`SimulatorHUD`, `SettingsController`, `TelemetryController`, etc.).
-    *   **Scripts/Utils:** Shared utilities (`VisualizationUtils` for debug arrow creation).
-    *   **Scripts/CompetitionSettings:** Task-specific logic and scoring.
-    *   **UI:** `.uxml` layouts and `.uss` stylesheets.
-*   **Assets/3rdParty:** External assets (SkySeries, TextMesh Pro).
-*   **Assets/RosMessages:** Generated C# classes for ROS messages.

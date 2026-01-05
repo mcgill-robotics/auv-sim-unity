@@ -26,6 +26,12 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
     [Tooltip("The HDRP Water Surface component")]
     public WaterSurface waterSurface;
     
+    [Tooltip("The Planar Reflection Probe for water surface reflections")]
+    public PlanarReflectionProbe planarReflectionProbe;
+    
+    [Tooltip("The Directional Light representing the sun")]
+    public Light sunLight;
+    
     #endregion
     
     #region Water Parameters
@@ -78,6 +84,17 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
     [Tooltip("Simulates high ISO noise on the camera sensor (0 = clean, 1 = very noisy)")]
     public PerceptionFloatParameter filmGrainIntensity = new PerceptionFloatParameter { value = new UniformSampler(0.0f, 1.0f) };
     
+    [Header("Reflections")]
+    [Tooltip("Planar Reflection brightness multiplier (0 = no reflections, 2 = very bright)")]
+    public PerceptionFloatParameter reflectionMultiplier = new PerceptionFloatParameter { value = new UniformSampler(0f, 2f) };
+    
+    [Header("Sunlight")]
+    [Tooltip("Sun angle (X rotation in degrees). 20-90 = morning to noon")]
+    public PerceptionFloatParameter sunAngle = new PerceptionFloatParameter { value = new UniformSampler(20f, 90f) };
+    
+    [Tooltip("Sun intensity in Lux (0 = overcast, 16000 = bright sun)")]
+    public PerceptionFloatParameter sunIntensity = new PerceptionFloatParameter { value = new UniformSampler(0f, 16000f) };
+    
     #endregion
     
     #region Private Fields
@@ -126,6 +143,23 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
         if (_filmGrain != null)
         {
             _filmGrain.intensity.value = filmGrainIntensity.Sample();
+        }
+        
+        // 4. Randomize Planar Reflection Probe multiplier
+        if (planarReflectionProbe != null)
+        {
+            planarReflectionProbe.settingsRaw.lighting.multiplier = reflectionMultiplier.Sample();
+        }
+        
+        // 5. Randomize Sunlight angle and intensity
+        if (sunLight != null)
+        {
+            // Randomize X rotation (sun elevation) and Y rotation (sun direction)
+            float yaw = UnityEngine.Random.Range(0f, 360f);
+            sunLight.transform.eulerAngles = new Vector3(sunAngle.Sample(), yaw, 0f);
+            
+            // Randomize intensity in Lux
+            sunLight.intensity = sunIntensity.Sample();
         }
     }
     

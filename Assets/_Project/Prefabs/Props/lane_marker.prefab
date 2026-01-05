@@ -1236,6 +1236,7 @@ GameObject:
   - component: {fileID: 8849016581420365265}
   - component: {fileID: 5939229337016365794}
   - component: {fileID: 1241606200231072731}
+  - component: {fileID: 7971001167554287497}
   m_Layer: 0
   m_Name: lane_marker
   m_TagString: Untagged
@@ -1288,6 +1289,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b85e54e30bb74162b2d6bca9b68f5482, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7971001167554287497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6836674003132753358}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 0
+  maxDistance: 10
+  useAngleFilter: 0
+  maxViewAngle: 60
+  allowBackFace: 1
 --- !u!1 &7246666888139142798
 GameObject:
   m_ObjectHideFlags: 0
