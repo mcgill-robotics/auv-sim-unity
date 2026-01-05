@@ -321,12 +321,13 @@ public class ZED2iSimSender : MonoBehaviour
         p.port = (ushort)streamPort; p.fps = targetFPS; p.serial_number = serialNumber;
         p.codec_type = 0; p.alpha_channel_included = 0; p.input_format = 0; p.verbose = 0; 
         p.q3 = 1; // Identity extrinsics
-
+        p.transport_layer_mode = 0;
         if (init_streamer(streamerID, ref p) == 1) {
             Debug.Log($"[ZED Sim] Streamer {streamerID} Started.");
             isStreaming = true;
             StartCoroutine(CaptureAndSend()); // Start the loop
         } else {
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start.");
             close_streamer(streamerID);
         }
     }

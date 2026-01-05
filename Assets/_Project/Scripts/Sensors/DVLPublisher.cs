@@ -4,6 +4,14 @@ using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
 using Utils;
 
+/// <summary>
+/// Doppler Velocity Log (DVL) publisher.
+/// 
+/// COORDINATE FRAME: FRD
+/// +X: Forward
+/// +Y: Right
+/// +Z: Down
+/// </summary>
 public class DVLPublisher : ROSPublisher
 {
     public override string Topic => ROSSettings.Instance.DVLTopic;
@@ -258,7 +266,10 @@ public class DVLPublisher : ROSPublisher
         if (IsValid)
         {
             // 2. Velocity (Sensor Frame: FRD)
-            // Unity Z (Fwd) -> DVL X (Fwd), Unity X (Right) -> DVL Y (Right), Unity -Y (Down) -> DVL Z (Down)
+            // +X Forward, +Y Right, +Z Down
+            // Unity Z (Fwd) -> DVL X (Fwd)
+            // Unity X (Right) -> DVL Y (Right)
+            // Unity -Y (Down) -> DVL Z (Down)
             twistMsg.twist.twist.linear.x = LastVelocity.z; 
             twistMsg.twist.twist.linear.y = LastVelocity.x; 
             twistMsg.twist.twist.linear.z = -LastVelocity.y;

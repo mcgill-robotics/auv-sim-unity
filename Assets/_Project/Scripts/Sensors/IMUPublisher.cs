@@ -5,6 +5,17 @@ using RosMessageTypes.Geometry;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using Utils;
 
+/// <summary>
+/// Inertial Measurement Unit (IMU) publisher.
+/// 
+/// COORDINATE FRAME: FLU
+/// +X: Forward
+/// +Y: Left
+/// +Z: Up
+/// 
+/// HANDEDNESS:
+/// All angular data follows the RIGHT-HAND RULE.
+/// </summary>
 public class IMUPublisher : ROSPublisher
 {
     public override string Topic => ROSSettings.Instance.IMUTopic;
@@ -293,9 +304,10 @@ public class IMUPublisher : ROSPublisher
         // Angular velocity is a PSEUDOVECTOR (axial vector, defined by cross product)
         // Standard To<FLU> is (z, -x, y) for position vectors.
         // For angular velocity, hand-rule flip affects axes differently:
-        //   - X axis (Forward): same physical axis, hand-rule flipped → negate
-        //   - Y axis (Left → Right): axis direction + hand-rule both flip → cancels out, NO negate
-        //   - Z axis (Up): same physical axis, hand-rule flipped → negate
+        //   - X axis (Forward): same physical axis, hand-rule flipped → negate (Roll)
+        //   - Y axis (Left): Unity X is Right, so FLU Y is -Unity X. Hand-rule flip + axis flip → cancels (Pitch)
+        //   - Z axis (Up): same physical axis, hand-rule flipped → negate (Yaw)
+        //   Note: All angular data follows the RIGHT-HAND RULE.
         imuMsg.angular_velocity = new Vector3Msg
         {
             x = -noisyAngVel.z,  // FLU X = -Unity Z (roll)

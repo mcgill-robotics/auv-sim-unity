@@ -1,19 +1,29 @@
 using UnityEngine;
 
+/// <summary>
+/// Centralized registry for all ROS topic names and frame IDs.
+/// 
+/// COORDINATE FRAME CONVENTIONS:
+/// - DVL (FRD): +X Forward, +Y Right, +Z Down
+/// - IMU (FLU): +X Forward, +Y Left, +Z Up
+/// - Depth: + Down (Positive value increasing with depth)
+/// - Ground Truth (Unity): X Right, Y Up, Z Front
+/// 
+/// HANDEDNESS:
+/// All angular data (velocities/accelerations) across all sensors follows the 
+/// RIGHT-HAND RULE (positive = CCW when viewed along the axis).
+/// </summary>
 [DefaultExecutionOrder(-100)]
 public class ROSSettings : MonoBehaviour
 {
     public static ROSSettings Instance { get; private set; }
 
     [Header("Actuator Topics")]
-    [Tooltip("Topic for thruster command messages (legacy)")]
-    public string ThrustersTopic = "/auv/thrusters";
-    
     [Tooltip("Topic for individual thruster force commands (8 thrusters)")]
-    public string ThrusterForcesTopic = "/auv/thruster_forces";
+    public string ThrusterForcesTopic = "/propulsion/forces";
     
     [Tooltip("Topic for dropper trigger command (Bool)")]
-    public string DropperTopic = "/auv/dropper";
+    public string DropperTopic = "/auv/dropper/trigger";
 
     [Tooltip("Topic for torpedo launch command (Bool)")]
     public string TorpedoLaunchTopic = "/auv/torpedo/launch";
@@ -27,16 +37,13 @@ public class ROSSettings : MonoBehaviour
     [Space(10)]
     [Header("Sensor Topics")]
     [Tooltip("DVL velocity and altitude data topic")]
-    public string DVLTopic = "/dvl/velocity";
+    public string DVLTopic = "/sensors/dvl/data";
     
     [Tooltip("IMU orientation, gyro, and accelerometer data topic")]
-    public string IMUTopic = "/imu/data";
+    public string IMUTopic = "/sensors/imu/data";
     
     [Tooltip("Depth sensor data topic")]
-    public string DepthTopic = "/raw/depth";
-    
-    [Tooltip("Pressure sensor data topic (FluidPressure)")]
-    public string PressureTopic = "/sensors/pressure";
+    public string DepthTopic = "/sensors/depth/data";
     
     [Tooltip("Hydrophone bearing data topic")]
     public string HydrophonesTopic = "/sensors/hydrophones/data";
@@ -45,10 +52,10 @@ public class ROSSettings : MonoBehaviour
     public string FrontCameraTopic = "/sensors/camera/front/image_raw";
     
     [Tooltip("Down camera image topic")]
-    public string DownCameraTopic = "/down_cam/image_raw";
+    public string DownCameraTopic = "/sensors/camera/down/image_raw";
     
     [Tooltip("Front depth camera topic")]
-    public string DepthCameraTopic = "/sensors/camera/depth/image_raw";
+    public string DepthCameraTopic = "/sensors/camera/front/depth_raw";
     
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";

@@ -63,7 +63,7 @@ public class CameraRenderManager : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         // Render front camera if needed
         if (NeedsFrontCamera())

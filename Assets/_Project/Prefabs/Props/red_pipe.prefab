@@ -68,7 +68,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: red_pipe
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7990118405736988650, guid: b52f8e21b5f4d47d0858a7a8a8a772bd, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

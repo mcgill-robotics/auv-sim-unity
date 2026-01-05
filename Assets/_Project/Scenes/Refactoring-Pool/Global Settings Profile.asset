@@ -92,8 +92,8 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.9756691
-          value: 0.056410253
+          time: 0.9253333
+          value: 0.13559324
           inSlope: 1.0376331
           outSlope: 1.0376331
           tangentMode: 0
@@ -402,13 +402,13 @@ MonoBehaviour:
   active: 1
   type:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 8
   intensity:
     m_OverrideState: 1
     m_Value: 0.5
   response:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0
   texture:
     m_OverrideState: 0
     m_Value: {fileID: 0}
