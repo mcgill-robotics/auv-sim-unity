@@ -120,6 +120,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2958579989946816274}
   - component: {fileID: 1759971961849757090}
+  - component: {fileID: 5661077102382492177}
+  - component: {fileID: 3220821329936287380}
   m_Layer: 0
   m_Name: board
   m_TagString: Untagged
@@ -168,6 +170,39 @@ MonoBehaviour:
   - board
   useAutoLabeling: 1
   autoLabelingSchemeType: AssetNameLabelingScheme
+--- !u!114 &5661077102382492177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976002720483355549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce341973f33d8cab84746681dc25adb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 4214278606299907990}
+  configs: []
+--- !u!114 &3220821329936287380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976002720483355549}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 0
+  maxDistance: 15
+  useAngleFilter: 0
+  maxViewAngle: 60
+  allowBackFace: 1
 --- !u!1 &1380471177355856484
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,7 +488,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 53ec33cfe419c7084b683e3091a36623, type: 2}
+  - {fileID: 2100000, guid: 8acd449d6875a738a959105cb517f9f3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -782,7 +817,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: fc9a323e949073b43b6dc443db56601a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

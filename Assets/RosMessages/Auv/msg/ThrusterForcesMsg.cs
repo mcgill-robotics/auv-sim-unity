@@ -14,7 +14,6 @@ namespace RosMessageTypes.Auv
         public override string RosMessageName => k_RosMessageName;
 
         //  force with which to spin each thruster (N)
-        //  force with which to spin each thruster (N)
         public double back_right;
         public double heave_back_right;
         public double heave_front_right;

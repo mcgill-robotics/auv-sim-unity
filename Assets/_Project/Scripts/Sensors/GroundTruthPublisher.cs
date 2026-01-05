@@ -6,16 +6,18 @@ using RosMessageTypes.Std;
 /// Publishes ground truth state of the AUV from the Rigidbody center.
 /// Used for comparing against noisy sensor outputs and validating sensor fusion.
 /// 
-/// Frame Convention: Unity axes with RIGHT-HAND rule for rotations
+/// COORDINATE FRAME (UNITY):
 /// - X = Right
 /// - Y = Up
 /// - Z = Forward
 /// 
-/// Rotation Convention: Right-hand rule (positive rotation = CCW when viewed along axis)
-/// - Angular velocities are negated from Unity's left-hand convention
-/// - Quaternion X and Z components are negated for right-handed coordinate system
+/// ROTATION HANDEDNESS:
+/// All angular data follows the RIGHT-HAND RULE (positive = CCW when viewed along axis).
+/// - Angular velocities are negated from Unity's default left-hand convention.
+/// - Quaternion X and Z components are negated for right-handed coordinate system.
 /// 
-/// This allows easier comparison with standard robotics conventions.
+/// DEPTH CONVENTION:
+/// - Depth is published as a positive value increasing with depth (+ Down).
 /// </summary>
 public class GroundTruthPublisher : ROSPublisher
 {

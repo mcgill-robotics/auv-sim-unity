@@ -338,14 +338,17 @@ public class Thrusters : MonoBehaviour
     
     private void SetThrusterForces(ThrusterForcesMsg msg)
     {
-        rosThrusterForces[0] = msg.front_left;
-        rosThrusterForces[1] = msg.front_right;
-        rosThrusterForces[2] = msg.back_left;
-        rosThrusterForces[3] = msg.back_right;
-        rosThrusterForces[4] = msg.heave_front_left;
-        rosThrusterForces[5] = msg.heave_front_right;
+        // Thruster order matches hardware configuration (CCL):
+        // 0: back_right, 1: heave_back_right, 2: heave_front_right, 3: front_right
+        // 4: front_left, 5: heave_front_left, 6: heave_back_left, 7: back_left
+        rosThrusterForces[0] = msg.back_right;
+        rosThrusterForces[1] = msg.heave_back_right;
+        rosThrusterForces[2] = msg.heave_front_right;
+        rosThrusterForces[3] = msg.front_right;
+        rosThrusterForces[4] = msg.front_left;
+        rosThrusterForces[5] = msg.heave_front_left;
         rosThrusterForces[6] = msg.heave_back_left;
-        rosThrusterForces[7] = msg.heave_back_right;
+        rosThrusterForces[7] = msg.back_left;
     }
 
     private void InitializeEfficiency()
