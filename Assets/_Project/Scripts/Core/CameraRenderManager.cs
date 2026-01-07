@@ -15,17 +15,17 @@ public class CameraRenderManager : MonoBehaviour
     [Header("Camera References")]
     [Tooltip("Front/Left camera used for RGB, depth, and ZED left eye")]
     public Camera frontCamera;
-    
+
     [Tooltip("Front/Right camera for ZED stereo (optional, only needed for ZED streaming)")]
     public Camera frontRightCamera;
-    
+
     [Tooltip("Downward-facing camera")]
     public Camera downCamera;
 
     [Header("Frame Rate Settings")]
     [Tooltip("Front camera rate comes from SimulationSettings.FrontCamRate")]
     public float frontCameraRate = 30f;
-    
+
     [Tooltip("Down camera rate comes from SimulationSettings.DownCamRate")]
     public float downCameraRate = 30f;
 
@@ -46,7 +46,7 @@ public class CameraRenderManager : MonoBehaviour
             return;
         }
         Instance = this;
-        
+
         // Disable cameras - we control rendering manually
         if (frontCamera != null) frontCamera.enabled = false;
         if (frontRightCamera != null) frontRightCamera.enabled = false;
@@ -94,19 +94,19 @@ public class CameraRenderManager : MonoBehaviour
     private bool NeedsFrontCamera()
     {
         if (frontCamera == null) return false;
-        
+
         var s = SimulationSettings.Instance;
         if (s == null) return false;
-        
+
         // ROS publishing (front camera or depth - both use front camera)
         bool rosNeeded = s.PublishROS && (s.PublishFrontCam || s.PublishDepthCamera);
-        
+
         // ZED streaming needs the camera rendered
         bool zedNeeded = s.StreamZEDCamera;
-        
+
         // UI display selection
         bool uiNeeded = frontCameraUINeeded || frontDepthUINeeded;
-        
+
         return rosNeeded || zedNeeded || uiNeeded;
     }
 
@@ -116,16 +116,16 @@ public class CameraRenderManager : MonoBehaviour
     private bool NeedsDownCamera()
     {
         if (downCamera == null) return false;
-        
+
         var s = SimulationSettings.Instance;
         if (s == null) return false;
-        
+
         // ROS publishing
         bool rosNeeded = s.PublishROS && s.PublishDownCam;
-        
+
         // UI display selection
         bool uiNeeded = downCameraUINeeded;
-        
+
         return rosNeeded || uiNeeded;
     }
 
@@ -135,7 +135,7 @@ public class CameraRenderManager : MonoBehaviour
         {
             frontCamera.Render();
         }
-        
+
         // Also render right camera for ZED stereo streaming
         if (frontRightCamera != null && SimulationSettings.Instance.StreamZEDCamera)
         {

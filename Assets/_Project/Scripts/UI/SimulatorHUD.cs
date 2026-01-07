@@ -23,22 +23,24 @@ public class SimulatorHUD : MonoBehaviour
     [Header("Camera Sources for HUD Display")]
     [Tooltip("Front-left camera - leave empty to use SimulationSettings.FrontCamera")]
     [SerializeField] private Camera frontLeftCameraOverride;
-    
+
     [Tooltip("Downward-facing camera - leave empty to use SimulationSettings.DownCamera")]
     [SerializeField] private Camera downCameraOverride;
-    
+
+    [SerializeField] private CameraEnhancedSubscriber frontEnhancedSubscriber;
+
     /// <summary>Returns the front camera from override or SimulationSettings.</summary>
     private Camera FrontLeftCamera => frontLeftCameraOverride != null ? frontLeftCameraOverride : SimulationSettings.Instance?.FrontCamera;
-    
+
     /// <summary>Returns the down camera from override or SimulationSettings.</summary>
     private Camera DownCamera => downCameraOverride != null ? downCameraOverride : SimulationSettings.Instance?.DownCamera;
-    
+
     // Controllers (initialized in OnEnable)
     private SettingsController settingsController;
     private TelemetryController telemetryController;
     private CameraFeedController cameraFeedController;
     private SensorDataController sensorDataController;
-    
+
     // UI Update Throttling (Performance Optimization)
     private float lastUIUpdateTime;
     private const float UI_UPDATE_INTERVAL = 0.1f; // 10Hz
@@ -63,7 +65,7 @@ public class SimulatorHUD : MonoBehaviour
     private VisualElement telemetryDrawer;
     private VisualElement sensorsDrawer;
     private VisualElement cameraDrawer;
-    
+
     // Drawer Indicators
     private Label configIndicator;
     private Label telemetryIndicator;
@@ -84,50 +86,57 @@ public class SimulatorHUD : MonoBehaviour
     private void OnEnable()
     {
         if (uiDocument == null) return;
-        
+
         var root = uiDocument.rootVisualElement;
-        
+
         root.focusable = false;
-        
+
         // Helper to check if currently typing in a text field
-        Func<bool> isTyping = () => {
+        Func<bool> isTyping = () =>
+        {
             var focused = root.focusController.focusedElement;
-            return focused is TextInputBaseField<string> || 
+            return focused is TextInputBaseField<string> ||
                    focused is TextField ||
                    focused is IntegerField ||
                    focused is FloatField ||
                    focused is DoubleField;
         };
-        
+
         // Block ALL keyboard events unless typing in a text field
-        root.RegisterCallback<KeyDownEvent>(evt => {
+        root.RegisterCallback<KeyDownEvent>(evt =>
+        {
             if (!isTyping()) { evt.PreventDefault(); evt.StopImmediatePropagation(); }
         }, TrickleDown.TrickleDown);
-        
-        root.RegisterCallback<KeyUpEvent>(evt => {
+
+        root.RegisterCallback<KeyUpEvent>(evt =>
+        {
             if (!isTyping()) { evt.PreventDefault(); evt.StopImmediatePropagation(); }
         }, TrickleDown.TrickleDown);
-        
+
         // Block ALL navigation events unconditionally (arrow keys, tab, etc.)
-        root.RegisterCallback<NavigationMoveEvent>(evt => {
+        root.RegisterCallback<NavigationMoveEvent>(evt =>
+        {
             evt.PreventDefault(); evt.StopImmediatePropagation();
         }, TrickleDown.TrickleDown);
-        
+
         // Block submit events (Space/Enter pressing buttons)
-        root.RegisterCallback<NavigationSubmitEvent>(evt => {
+        root.RegisterCallback<NavigationSubmitEvent>(evt =>
+        {
             evt.PreventDefault(); evt.StopImmediatePropagation();
         }, TrickleDown.TrickleDown);
-        
+
         // Block cancel events (Escape triggering UI)
-        root.RegisterCallback<NavigationCancelEvent>(evt => {
+        root.RegisterCallback<NavigationCancelEvent>(evt =>
+        {
             evt.PreventDefault(); evt.StopImmediatePropagation();
         }, TrickleDown.TrickleDown);
-        
+
         // Auto-blur when clicking on non-input areas (releases focus back to game)
-        root.RegisterCallback<PointerDownEvent>(evt => {
+        root.RegisterCallback<PointerDownEvent>(evt =>
+        {
             var focused = root.focusController.focusedElement;
-            if (focused != null && !(evt.target is TextInputBaseField<string>) && 
-                !(evt.target is TextField) && !(evt.target is IntegerField) && 
+            if (focused != null && !(evt.target is TextInputBaseField<string>) &&
+                !(evt.target is TextField) && !(evt.target is IntegerField) &&
                 !(evt.target is FloatField) && !(evt.target is DoubleField))
             {
                 focused.Blur();
@@ -141,50 +150,52 @@ public class SimulatorHUD : MonoBehaviour
         telemetryDrawer = root.Q<VisualElement>("TelemetryDrawer");
         sensorsDrawer = root.Q<VisualElement>("SensorsDrawer");
         cameraDrawer = root.Q<VisualElement>("CameraDrawer");
-        
+
         // Drawer indicators
         configIndicator = root.Q<Label>("ConfigDrawer-Indicator");
         telemetryIndicator = root.Q<Label>("TelemetryDrawer-Indicator");
         sensorsIndicator = root.Q<Label>("SensorsDrawer-Indicator");
         cameraIndicator = root.Q<Label>("CameraDrawer-Indicator");
-        
+
         // Competition elements
         textTimer = root.Q<Label>("Text-Timer");
         textScore = root.Q<Label>("Text-Score");
         dropdownTask = root.Q<DropdownField>("Dropdown-Task");
         btnStartComp = root.Q<Button>("Btn-StartComp");
-        
+
         // Logging elements
         textLog = root.Q<Label>("Text-Log");
         logToggle = root.Q<Label>("LogPanel-Toggle");
         logPanel = root.Q<VisualElement>("LogPanel");
         logScrollView = root.Q<ScrollView>("LogScroll");
-        
+
         // Initialize drawers
         InitializeDrawers();
-        
+
         // Click-to-blur: Clear focus when clicking anywhere outside text inputs
         // This handles both clicking on the root background AND clicking on the 3D game view
-        root.RegisterCallback<PointerDownEvent>(evt => {
+        root.RegisterCallback<PointerDownEvent>(evt =>
+        {
             var focused = root.focusController.focusedElement;
             if (focused == null) return;
-            
+
             // If clicking on something that isn't the focused element or its children, blur
             bool clickedOnFocused = focused == evt.target;
             if (!clickedOnFocused && focused is VisualElement focusedVE && evt.target is VisualElement clickedVE)
             {
                 clickedOnFocused = focusedVE.Contains(clickedVE);
             }
-            
+
             if (!clickedOnFocused)
             {
                 focused.Blur();
             }
         });
-        
+
         // Focus guard: If ANY element gains focus while mouse is NOT over UI, immediately blur it.
         // This prevents accidental focus from Tab navigation, keyboard shortcuts, or Unity quirks.
-        root.RegisterCallback<FocusInEvent>(evt => {
+        root.RegisterCallback<FocusInEvent>(evt =>
+        {
             if (evt.target is Focusable focusable)
             {
                 // If mouse is not over UI, this focus was unintentional - blur immediately
@@ -195,40 +206,41 @@ public class SimulatorHUD : MonoBehaviour
             }
         });
     }
-    
+
     // --- Drawer System ---
-    
+
     private void InitializeDrawers()
     {
         var root = uiDocument.rootVisualElement;
-        
+
         RegisterDrawerTab("ConfigDrawer-Tab", configDrawer, "Config");
         RegisterDrawerTab("ControlsDrawer-Tab", controlsDrawer, "Controls");
         RegisterDrawerTab("TelemetryDrawer-Tab", telemetryDrawer, "Telemetry");
         RegisterDrawerTab("SensorsDrawer-Tab", sensorsDrawer, "Sensors");
         RegisterDrawerTab("CameraDrawer-Tab", cameraDrawer, "Camera");
-        
+
         // Load saved drawer states
         ApplyDrawerState(configDrawer, SimulationSettings.Instance.DrawerConfigOpen);
         ApplyDrawerState(controlsDrawer, SimulationSettings.Instance.DrawerControlsOpen);
         ApplyDrawerState(telemetryDrawer, SimulationSettings.Instance.DrawerTelemetryOpen);
         ApplyDrawerState(sensorsDrawer, SimulationSettings.Instance.DrawerSensorsOpen);
         ApplyDrawerState(cameraDrawer, SimulationSettings.Instance.DrawerCameraOpen);
-        
+
         // Log panel toggle
         if (logToggle != null && logPanel != null)
         {
-            logToggle.RegisterCallback<PointerDownEvent>(evt => {
+            logToggle.RegisterCallback<PointerDownEvent>(evt =>
+            {
                 ToggleLogPanel();
                 evt.StopPropagation();
             });
         }
     }
-    
+
     private void ApplyDrawerState(VisualElement drawer, bool isOpen)
     {
         if (drawer == null) return;
-        
+
         if (isOpen)
         {
             drawer.RemoveFromClassList(DRAWER_COLLAPSED_CLASS);
@@ -240,30 +252,31 @@ public class SimulatorHUD : MonoBehaviour
             drawer.AddToClassList(DRAWER_COLLAPSED_CLASS);
         }
     }
-    
+
     private void RegisterDrawerTab(string tabName, VisualElement drawer, string drawerName)
     {
         if (drawer == null) return;
-        
+
         var root = uiDocument.rootVisualElement;
         var tab = root.Q<VisualElement>(tabName);
-        
+
         if (tab != null)
         {
-            tab.RegisterCallback<PointerDownEvent>(evt => {
+            tab.RegisterCallback<PointerDownEvent>(evt =>
+            {
                 ToggleDrawer(drawer, drawerName);
                 evt.StopPropagation();
             });
         }
     }
-    
+
     private void ToggleDrawer(VisualElement drawer, string drawerName)
     {
         if (drawer == null) return;
-        
+
         bool isOpen = drawer.ClassListContains(DRAWER_OPEN_CLASS);
         bool newState = !isOpen;
-        
+
         if (isOpen)
         {
             drawer.RemoveFromClassList(DRAWER_OPEN_CLASS);
@@ -274,14 +287,14 @@ public class SimulatorHUD : MonoBehaviour
             drawer.RemoveFromClassList(DRAWER_COLLAPSED_CLASS);
             drawer.AddToClassList(DRAWER_OPEN_CLASS);
         }
-        
+
         SaveDrawerState(drawerName, newState);
     }
-    
+
     private void SaveDrawerState(string drawerName, bool isOpen)
     {
         if (SimulationSettings.Instance == null) return;
-        
+
         switch (drawerName)
         {
             case "Config": SimulationSettings.Instance.DrawerConfigOpen = isOpen; break;
@@ -290,16 +303,16 @@ public class SimulatorHUD : MonoBehaviour
             case "Sensors": SimulationSettings.Instance.DrawerSensorsOpen = isOpen; break;
             case "Camera": SimulationSettings.Instance.DrawerCameraOpen = isOpen; break;
         }
-        
+
         SimulationSettings.Instance.SaveSettings();
     }
-    
+
     private void ToggleLogPanel()
     {
         if (logPanel == null) return;
-        
+
         bool isCollapsed = logPanel.ClassListContains("log-overlay-collapsed");
-        
+
         if (isCollapsed)
         {
             logPanel.RemoveFromClassList("log-overlay-collapsed");
@@ -313,35 +326,35 @@ public class SimulatorHUD : MonoBehaviour
     }
 
     // --- Initialization ---
-    
+
     private IEnumerator Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
         var root = uiDocument.rootVisualElement;
-        
+
         // Initialize controllers
         settingsController = new SettingsController(root, ros, Log);
         telemetryController = new TelemetryController(root, ros);
         sensorDataController = new SensorDataController(root);
         cameraFeedController = new CameraFeedController(root, FrontLeftCamera, DownCamera, Log);
-        
+
         // Load settings to UI
         settingsController.LoadSettingsToUI();
-        
+
         // Subscribe to ROS telemetry
         if (ros != null)
         {
             telemetryController.SubscribeToTelemetry();
             settingsController.UpdateROSConnectionState();
         }
-        
+
         // Wait for camera textures to initialize
         yield return new WaitForEndOfFrame();
-        
+
         // Find publishers and initialize camera dropdown
         sensorDataController.FindPublishers();
-        cameraFeedController.InitializeCameraDropdown(sensorDataController.GetDepthPublisher());
-        
+        cameraFeedController.InitializeCameraDropdown(sensorDataController.GetDepthPublisher(), frontEnhancedSubscriber);
+
         Log("HUD initialized successfully.");
     }
 
@@ -362,7 +375,7 @@ public class SimulatorHUD : MonoBehaviour
     public void Log(string message)
     {
         Debug.Log($"[HUD Log] {message}");
-        
+
         if (textLog != null)
         {
             // Maintain a rolling list of log lines for performance
@@ -373,11 +386,12 @@ public class SimulatorHUD : MonoBehaviour
             }
 
             textLog.text = string.Join("\n", logLines);
-            
+
             // Auto-scroll to bottom
             if (logScrollView != null)
             {
-                logScrollView.schedule.Execute(() => {
+                logScrollView.schedule.Execute(() =>
+                {
                     logScrollView.scrollOffset = new Vector2(0, logScrollView.contentContainer.layout.height);
                 });
             }
@@ -389,12 +403,12 @@ public class SimulatorHUD : MonoBehaviour
     private void Update()
     {
         if (uiDocument == null) return;
-        
+
         // Input focus detection
         var focusedElement = uiDocument.rootVisualElement.focusController.focusedElement;
-        
+
         // Check if we're in a text input field (typing mode)
-        IsInputFocused = focusedElement is TextInputBaseField<string> || 
+        IsInputFocused = focusedElement is TextInputBaseField<string> ||
                          focusedElement is TextField ||
                          focusedElement is IntegerField ||
                          focusedElement is FloatField ||
@@ -406,20 +420,20 @@ public class SimulatorHUD : MonoBehaviour
             focusedElement?.Blur();
             IsInputFocused = false;
         }
-        
+
         // AGGRESSIVE: If ANY element has focus (not just text fields) and a game control key is pressed,
         // blur it immediately. This prevents buttons/sliders/dropdowns from capturing keyboard input.
         if (!IsInputFocused && focusedElement != null)
         {
             // Check if any common game control keys are being pressed
-            bool gameKeyPressed = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || 
+            bool gameKeyPressed = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
                                   Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) ||
                                   Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.E) ||
                                   Input.GetKey(KeyCode.I) || Input.GetKey(KeyCode.J) ||
                                   Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L) ||
                                   Input.GetKey(KeyCode.U) || Input.GetKey(KeyCode.O) ||
                                   Input.GetKey(KeyCode.Space);
-            
+
             if (gameKeyPressed)
             {
                 focusedElement.Blur();
@@ -438,7 +452,7 @@ public class SimulatorHUD : MonoBehaviour
                 cameraFeedController?.CycleCamera();
             }
         }
-        
+
         // Throttled sensor data updates (10Hz)
         if (Time.time - lastUIUpdateTime > UI_UPDATE_INTERVAL)
         {

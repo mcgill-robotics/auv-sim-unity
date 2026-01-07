@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,26 +16,27 @@ public class CameraFeedController
     private Image fullscreenCameraBackground;
     private Button btnFullscreen;
     private Button btnSaveImage;
-    
+
     // Camera References
     private Camera frontLeftCamera;
     private Camera downCamera;
     private CameraDepthPublisher depthPublisher;
-    
+    private CameraEnhancedSubscriber frontEnhancedSubscriber;
+
     // State
     private bool isFullscreenCamera = false;
     private System.Action<string> logCallback;
-    
+
     public CameraFeedController(VisualElement root, Camera frontLeft, Camera down, System.Action<string> log)
     {
         frontLeftCamera = frontLeft;
         downCamera = down;
         logCallback = log;
-        
+
         QueryElements(root);
         RegisterCallbacks();
     }
-    
+
     private void QueryElements(VisualElement root)
     {
         dropdownCamTopic = root.Q<DropdownField>("Dropdown-CamTopic");
@@ -44,33 +45,35 @@ public class CameraFeedController
         btnFullscreen = root.Q<Button>("Btn-Fullscreen");
         btnSaveImage = root.Q<Button>("Btn-SaveImage");
     }
-    
+
     private void RegisterCallbacks()
     {
         if (btnFullscreen != null)
         {
             btnFullscreen.clicked += ToggleFullscreenCamera;
         }
-        
+
         if (btnSaveImage != null)
         {
             btnSaveImage.clicked += OnSaveImage;
         }
     }
-    
+
     /// <summary>
     /// Initialize camera dropdown with available feeds.
     /// Call this after camera publishers have initialized their textures.
     /// </summary>
-    public void InitializeCameraDropdown(CameraDepthPublisher depth)
+    public void InitializeCameraDropdown(CameraDepthPublisher depth, CameraEnhancedSubscriber enhanced)
     {
         depthPublisher = depth;
-        
+        frontEnhancedSubscriber = enhanced;
+
         var choices = new List<string>();
         choices.Add("None"); // Allow disabling camera feed for performance
         if (frontLeftCamera != null) choices.Add("Front Left");
         if (downCamera != null) choices.Add("Down");
         if (depthPublisher != null) choices.Add("Front Depth");
+        if (frontEnhancedSubscriber != null) choices.Add("Front Enhanced");
 
         if (dropdownCamTopic != null)
         {
@@ -78,11 +81,11 @@ public class CameraFeedController
             dropdownCamTopic.index = 0; // Start with None selected
             dropdownCamTopic.RegisterValueChangedCallback(evt => UpdateCameraFeed(evt.newValue));
         }
-        
+
         // Initial update
         UpdateCameraFeed(choices[0]);
     }
-    
+
     private void UpdateCameraFeed(string selection)
     {
         // Reset all feeds
@@ -96,7 +99,7 @@ public class CameraFeedController
             CameraRenderManager.Instance.frontDepthUINeeded = false;
             CameraRenderManager.Instance.downCameraUINeeded = false;
         }
-        
+
         // Exit early if None selected (no camera feed)
         if (selection == "None")
         {
@@ -114,34 +117,50 @@ public class CameraFeedController
             CameraRenderManager.Instance.frontCameraUINeeded = (selection == "Front Left");
             CameraRenderManager.Instance.frontDepthUINeeded = (selection == "Front Depth");
             CameraRenderManager.Instance.downCameraUINeeded = (selection == "Down");
+            // since enhanced camera feed comes from a ROS topic independently, no need to set any camera renderer flags
         }
 
         Texture selectedTexture = null;
-        
-        if (selection == "Front Left" && frontLeftCamera != null)
+
+        switch (selection)
         {
-            selectedTexture = frontLeftCamera.targetTexture;
+            case "Front Left":
+                if (frontLeftCamera != null)
+                {
+                    selectedTexture = frontLeftCamera.targetTexture;
+                }
+                break;
+            case "Down":
+                if (downCamera != null)
+                {
+                    selectedTexture = downCamera.targetTexture;
+                }
+                break;
+            case "Front Depth":
+                if (depthPublisher != null)
+                {
+                    selectedTexture = depthPublisher.VisualizationTexture;
+                }
+                break;
+            case "Front Enhanced":
+                if (frontEnhancedSubscriber != null)
+                {
+                    selectedTexture = frontEnhancedSubscriber.CurrentEnhancedTexture;
+                }
+                break;
         }
-        else if (selection == "Down" && downCamera != null)
-        {
-            selectedTexture = downCamera.targetTexture;
-        }
-        else if (selection == "Front Depth" && depthPublisher != null)
-        {
-            selectedTexture = depthPublisher.VisualizationTexture;
-        }
-        
+
         // Set both preview and fullscreen background
         if (cameraFeedImage != null) cameraFeedImage.image = selectedTexture;
         if (fullscreenCameraBackground != null) fullscreenCameraBackground.image = selectedTexture;
     }
-    
+
     private void ToggleFullscreenCamera()
     {
         if (fullscreenCameraBackground == null) return;
-        
+
         isFullscreenCamera = !isFullscreenCamera;
-        
+
         if (isFullscreenCamera)
         {
             fullscreenCameraBackground.style.display = DisplayStyle.Flex;
@@ -153,7 +172,7 @@ public class CameraFeedController
             if (btnFullscreen != null) btnFullscreen.text = "⛶";
         }
     }
-    
+
     public void OnSaveImage()
     {
         if (cameraFeedImage == null || cameraFeedImage.image == null)
@@ -218,7 +237,7 @@ public class CameraFeedController
 
         int nextIndex = (dropdownCamTopic.index + 1) % dropdownCamTopic.choices.Count;
         dropdownCamTopic.index = nextIndex;
-        
+
         // This triggers the value changed callback which calls UpdateCameraFeed
         logCallback?.Invoke($"Switched to camera: {dropdownCamTopic.value}");
     }
