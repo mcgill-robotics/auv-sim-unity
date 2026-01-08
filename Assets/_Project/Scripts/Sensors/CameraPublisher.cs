@@ -1,15 +1,15 @@
-using UnityEngine;
 using RosMessageTypes.Sensor;
 using RosMessageTypes.Std;
+using UnityEngine;
 
+public enum CameraType { Front, Down }
 public class CameraPublisher : ROSPublisher
 {
-    public enum CameraType { Front, Down }
-    
+
     [Header("Camera Configuration")]
     [Tooltip("Camera type determines which settings and topic to use")]
     public CameraType cameraType;
-    
+
     [Tooltip("Unity Camera component to capture from. Must have a target RenderTexture")]
     public Camera cam;
 
@@ -22,7 +22,7 @@ public class CameraPublisher : ROSPublisher
 
     private ImageMsg message;
     private RenderTexture renderTexture;
-    
+
     // JPEG encoding
     private Texture2D encodingTexture;
     private byte[] cachedRawBuffer;
@@ -36,8 +36,8 @@ public class CameraPublisher : ROSPublisher
     protected override void Start()
     {
         // Disable front camera ROS publishing if ZED streaming is active
-        if (cameraType == CameraType.Front && 
-            SimulationSettings.Instance != null && 
+        if (cameraType == CameraType.Front &&
+            SimulationSettings.Instance != null &&
             SimulationSettings.Instance.StreamZEDCamera)
         {
             enabled = false;
@@ -46,10 +46,10 @@ public class CameraPublisher : ROSPublisher
         }
 
         base.Start();
-        
+
         // Camera uses custom rendering logic, not base class rate limiting
         useBaseRateLimiting = false;
-        
+
         InitializeTexture();
         InitializeCameraInfo();
     }
@@ -57,11 +57,11 @@ public class CameraPublisher : ROSPublisher
     protected override void RegisterPublisher()
     {
         ros.RegisterPublisher<ImageMsg>(Topic);
-        
+
         // Register compressed image topic (ROS convention: topic/compressed)
         compressedTopic = Topic + "/compressed";
         ros.RegisterPublisher<CompressedImageMsg>(compressedTopic);
-        
+
         // Register Camera Info Topic
         cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
         ros.RegisterPublisher<CameraInfoMsg>(cameraInfoTopic);
@@ -86,7 +86,7 @@ public class CameraPublisher : ROSPublisher
         // K Matrix
         cameraInfoMsg.K = new double[] { f, 0, cx, 0, f, cy, 0, 0, 1 };
         // P Matrix
-        cameraInfoMsg.P = new double[] { f, 0, cx, 0,  0, f, cy, 0,  0, 0, 1, 0 };
+        cameraInfoMsg.P = new double[] { f, 0, cx, 0, 0, f, cy, 0, 0, 0, 1, 0 };
         // R Matrix
         cameraInfoMsg.R = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     }
@@ -109,8 +109,8 @@ public class CameraPublisher : ROSPublisher
 
 
         // Texture Safety: Reuse existing if valid, otherwise create new
-        if (cam.targetTexture != null && 
-            cam.targetTexture.width == resolutionWidth && 
+        if (cam.targetTexture != null &&
+            cam.targetTexture.width == resolutionWidth &&
             cam.targetTexture.height == resolutionHeight)
         {
             // Reuse existing texture (likely created by SimulatorHUD or previous run)
@@ -136,18 +136,18 @@ public class CameraPublisher : ROSPublisher
         message.width = (uint)resolutionWidth;
         message.height = (uint)resolutionHeight;
         message.step = (uint)(resolutionWidth * 3);
-        
+
         // Initialize compressed message
         compressedMessage = new CompressedImageMsg();
         compressedMessage.header = new HeaderMsg { frame_id = currentFrameId };
         compressedMessage.format = "jpeg";
-        
+
         // Create encoding texture for JPEG compression
         encodingTexture = new Texture2D(resolutionWidth, resolutionHeight, TextureFormat.RGB24, false);
     }
 
     private bool isReading = false;  // Prevent queueing too many async requests
-    
+
     protected override void FixedUpdate()
     {
         // Check if we should publish to ROS
@@ -159,7 +159,7 @@ public class CameraPublisher : ROSPublisher
         }
 
         if (!shouldPublish || isReading) return;
-        
+
         // Rate limiting
         timeSinceLastPublish += Time.fixedDeltaTime;
         if (timeSinceLastPublish >= timeBetweenPublishes)
@@ -168,34 +168,34 @@ public class CameraPublisher : ROSPublisher
 
             // Safety Check
             if (cam == null || renderTexture == null || !renderTexture.IsCreated()) return;
-            
+
             // Capture timestamp NOW (when frame was rendered), not when readback completes
             var stamp = ROSClock.GetROSTimestamp();
-            
+
             isReading = true;
-            
+
             // Async GPU Readback - doesn't stall CPU waiting for GPU
-            UnityEngine.Rendering.AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGB24, 
+            UnityEngine.Rendering.AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGB24,
                 req => OnReadbackComplete(req, stamp));
         }
     }
-    
+
     private void OnReadbackComplete(UnityEngine.Rendering.AsyncGPUReadbackRequest req, RosMessageTypes.BuiltinInterfaces.TimeMsg stamp)
     {
         isReading = false;
-        
+
         if (req.hasError)
         {
             Debug.LogWarning($"[CameraPublisher] AsyncGPUReadback failed for {cameraType}");
             return;
         }
-        
+
         // Get raw data as NativeArray (no allocation)
         var rawData = req.GetData<byte>();
-        
+
         // Check if JPEG compression is enabled
         bool useJPEG = SimulationSettings.Instance != null && SimulationSettings.Instance.UseJPEGCompression;
-        
+
         if (useJPEG)
         {
             // JPEG encoding path - publish to /compressed topic using CompressedImageMsg
@@ -204,13 +204,13 @@ public class CameraPublisher : ROSPublisher
                 cachedRawBuffer = new byte[rawData.Length];
             }
             rawData.CopyTo(cachedRawBuffer);
-            
+
             // Load into texture and encode
             if (encodingTexture != null)
             {
                 encodingTexture.LoadRawTextureData(cachedRawBuffer);
                 encodingTexture.Apply();
-                
+
                 int quality = SimulationSettings.Instance.JPEGQuality;
                 compressedMessage.data = encodingTexture.EncodeToJPG(quality);
                 compressedMessage.header.stamp = stamp;
@@ -247,7 +247,7 @@ public class CameraPublisher : ROSPublisher
             renderTexture.Release();
             Destroy(renderTexture);
         }
-        
+
         if (encodingTexture != null)
         {
             Destroy(encodingTexture);

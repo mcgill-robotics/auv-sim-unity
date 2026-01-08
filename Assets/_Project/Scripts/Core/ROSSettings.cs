@@ -58,7 +58,10 @@ public class ROSSettings : MonoBehaviour
     public string DepthCameraTopic = "/sensors/camera/front/depth_raw";
 
     [Tooltip("Front enhanced camera topic")]
-    public string EnhancedCameraTopic = "/vision/front_cam/image_enhanced";
+    public string EnhancedFrontCameraTopic = "/vision/front_cam/image_enhanced";
+
+    [Tooltip("Down enhanced camera topic")]
+    public string EnhancedDownCameraTopic = "/vision/down_cam/image_enhanced";
 
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";

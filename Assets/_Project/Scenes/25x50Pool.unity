@@ -821,7 +821,8 @@ MonoBehaviour:
   uiDocument: {fileID: 293730101}
   frontLeftCameraOverride: {fileID: 0}
   downCameraOverride: {fileID: 0}
-  frontEnhancedSubscriber: {fileID: 2065946907}
+  frontEnhancedSubscriber: {fileID: 517653515}
+  downEnhancedSubscriber: {fileID: 1457579018}
 --- !u!1 &343577644
 GameObject:
   m_ObjectHideFlags: 1
@@ -1567,6 +1568,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 947108272}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 90}
+--- !u!1 &517653513
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 517653514}
+  - component: {fileID: 517653515}
+  m_Layer: 0
+  m_Name: FrontCamEnhanced
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &517653514
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517653513}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2065946908}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &517653515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517653513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1427d1c2d01da43b5e327d4035659a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraType: 0
 --- !u!43 &529125281
 Mesh:
   m_ObjectHideFlags: 0
@@ -2340,6 +2386,7 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -5378,7 +5425,8 @@ MonoBehaviour:
   FrontCameraTopic: /sensors/camera/front/image_raw
   DownCameraTopic: /sensors/camera/down/image_raw
   DepthCameraTopic: /sensors/camera/depth/image_raw
-  EnhancedCameraTopic: /vision/front_cam/image_enhanced
+  EnhancedFrontCameraTopic: /vision/front_cam/image_enhanced
+  EnhancedDownCameraTopic: /vision/down_cam/image_enhanced
   ClockTopic: /clock
   PIDEnableTopic: /auv/pid/enable
   PIDSetpointTopic: /auv/pid/setpoint
@@ -5445,6 +5493,51 @@ MonoBehaviour:
   frontCameraUINeeded: 0
   frontDepthUINeeded: 0
   downCameraUINeeded: 0
+--- !u!1 &1457579016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1457579017}
+  - component: {fileID: 1457579018}
+  m_Layer: 0
+  m_Name: DownCamEnhanced
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1457579017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457579016}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2065946908}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1457579018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457579016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb1427d1c2d01da43b5e327d4035659a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraType: 1
 --- !u!1 &1481776557
 GameObject:
   m_ObjectHideFlags: 0
@@ -7936,7 +8029,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2065946908}
-  - component: {fileID: 2065946907}
   m_Layer: 0
   m_Name: Enhancers
   m_TagString: Untagged
@@ -7944,18 +8036,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2065946907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2065946906}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb1427d1c2d01da43b5e327d4035659a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &2065946908
 Transform:
   m_ObjectHideFlags: 0
@@ -7968,7 +8048,9 @@ Transform:
   m_LocalPosition: {x: 1.1538439, y: -3.5083435, z: 1.6124477}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1457579017}
+  - {fileID: 517653514}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2083545326

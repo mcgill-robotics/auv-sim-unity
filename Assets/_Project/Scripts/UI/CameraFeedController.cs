@@ -22,6 +22,7 @@ public class CameraFeedController
     private Camera downCamera;
     private CameraDepthPublisher depthPublisher;
     private CameraEnhancedSubscriber frontEnhancedSubscriber;
+    private CameraEnhancedSubscriber downEnhancedSubscriber;
 
     // State
     private bool isFullscreenCamera = false;
@@ -63,10 +64,11 @@ public class CameraFeedController
     /// Initialize camera dropdown with available feeds.
     /// Call this after camera publishers have initialized their textures.
     /// </summary>
-    public void InitializeCameraDropdown(CameraDepthPublisher depth, CameraEnhancedSubscriber enhanced)
+    public void InitializeCameraDropdown(CameraDepthPublisher depth, CameraEnhancedSubscriber FrontEnhanced, CameraEnhancedSubscriber DownEnhanced)
     {
         depthPublisher = depth;
-        frontEnhancedSubscriber = enhanced;
+        frontEnhancedSubscriber = FrontEnhanced;
+        downEnhancedSubscriber = DownEnhanced;
 
         var choices = new List<string>();
         choices.Add("None"); // Allow disabling camera feed for performance
@@ -74,6 +76,7 @@ public class CameraFeedController
         if (downCamera != null) choices.Add("Down");
         if (depthPublisher != null) choices.Add("Front Depth");
         if (frontEnhancedSubscriber != null) choices.Add("Front Enhanced");
+        if (downEnhancedSubscriber != null) choices.Add("Down Enhanced");
 
         if (dropdownCamTopic != null)
         {
@@ -146,6 +149,12 @@ public class CameraFeedController
                 if (frontEnhancedSubscriber != null)
                 {
                     selectedTexture = frontEnhancedSubscriber.CurrentEnhancedTexture;
+                }
+                break;
+            case "Down Enhanced":
+                if (downEnhancedSubscriber != null)
+                {
+                    selectedTexture = downEnhancedSubscriber.CurrentEnhancedTexture;
                 }
                 break;
         }

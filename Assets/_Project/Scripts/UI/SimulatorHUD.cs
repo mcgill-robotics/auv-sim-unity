@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Unity.Robotics.ROSTCPConnector;
-using System.Collections.Generic;
 /// <summary>
 /// Main HUD coordinator. Manages drawer system, logging, competition UI, and delegates
 /// specific functionality to specialized controllers.
@@ -28,6 +28,7 @@ public class SimulatorHUD : MonoBehaviour
     [SerializeField] private Camera downCameraOverride;
 
     [SerializeField] private CameraEnhancedSubscriber frontEnhancedSubscriber;
+    [SerializeField] private CameraEnhancedSubscriber downEnhancedSubscriber;
 
     /// <summary>Returns the front camera from override or SimulationSettings.</summary>
     private Camera FrontLeftCamera => frontLeftCameraOverride != null ? frontLeftCameraOverride : SimulationSettings.Instance?.FrontCamera;
@@ -353,7 +354,7 @@ public class SimulatorHUD : MonoBehaviour
 
         // Find publishers and initialize camera dropdown
         sensorDataController.FindPublishers();
-        cameraFeedController.InitializeCameraDropdown(sensorDataController.GetDepthPublisher(), frontEnhancedSubscriber);
+        cameraFeedController.InitializeCameraDropdown(sensorDataController.GetDepthPublisher(), frontEnhancedSubscriber, downEnhancedSubscriber);
 
         Log("HUD initialized successfully.");
     }
