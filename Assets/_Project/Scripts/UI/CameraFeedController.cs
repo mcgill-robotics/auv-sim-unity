@@ -73,9 +73,9 @@ public class CameraFeedController
         var choices = new List<string>();
         choices.Add("None"); // Allow disabling camera feed for performance
         if (frontLeftCamera != null) choices.Add("Front Left");
-        if (downCamera != null) choices.Add("Down");
         if (depthPublisher != null) choices.Add("Front Depth");
         if (frontEnhancedSubscriber != null) choices.Add("Front Enhanced");
+        if (downCamera != null) choices.Add("Down");
         if (downEnhancedSubscriber != null) choices.Add("Down Enhanced");
 
         if (dropdownCamTopic != null)
