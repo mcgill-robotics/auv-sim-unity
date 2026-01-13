@@ -225,7 +225,7 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
     ros2 topic list
     ros2 topic echo /sensors/dvl/data --once
     ros2 topic echo /sensors/imu/data --once
-    ros2 topic echo /sensors/depth --once
+    ros2 topic echo /sensors/depth/data --once
     ```
 
     View Camera Feeds:
