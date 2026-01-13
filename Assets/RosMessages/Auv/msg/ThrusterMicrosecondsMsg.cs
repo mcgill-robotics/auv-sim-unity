@@ -14,14 +14,14 @@ namespace RosMessageTypes.Auv
         public override string RosMessageName => k_RosMessageName;
 
         // Thruster definitions
-        public const byte FRONT_LEFT = 0;
-        public const byte FRONT_RIGHT = 1;
-        public const byte BACK_LEFT = 2;
-        public const byte BACK_RIGHT = 3;
-        public const byte HEAVE_FRONT_LEFT = 4;
-        public const byte HEAVE_FRONT_RIGHT = 5;
+        public const byte BACK_RIGHT = 0;
+        public const byte HEAVE_BACK_RIGHT = 1;
+        public const byte HEAVE_FRONT_RIGHT = 2;
+        public const byte FRONT_RIGHT = 3;
+        public const byte FRONT_LEFT = 4;
+        public const byte HEAVE_FRONT_LEFT = 5;
         public const byte HEAVE_BACK_LEFT = 6;
-        public const byte HEAVE_BACK_RIGHT = 7;
+        public const byte BACK_LEFT = 7;
         public ushort[] microseconds;
 
         public ThrusterMicrosecondsMsg()

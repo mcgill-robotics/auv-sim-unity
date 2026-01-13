@@ -15,6 +15,7 @@ namespace RosMessageTypes.Auv
 
         //  Vision Object class
         public string label;
+        public int id;
         // pose info
         public double x;
         public double y;
@@ -28,6 +29,7 @@ namespace RosMessageTypes.Auv
         public VisionObjectMsg()
         {
             this.label = "";
+            this.id = 0;
             this.x = 0.0;
             this.y = 0.0;
             this.z = 0.0;
@@ -36,9 +38,10 @@ namespace RosMessageTypes.Auv
             this.confidence = 0.0;
         }
 
-        public VisionObjectMsg(string label, double x, double y, double z, double theta_z, double extra_field, double confidence)
+        public VisionObjectMsg(string label, int id, double x, double y, double z, double theta_z, double extra_field, double confidence)
         {
             this.label = label;
+            this.id = id;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -52,6 +55,7 @@ namespace RosMessageTypes.Auv
         private VisionObjectMsg(MessageDeserializer deserializer)
         {
             deserializer.Read(out this.label);
+            deserializer.Read(out this.id);
             deserializer.Read(out this.x);
             deserializer.Read(out this.y);
             deserializer.Read(out this.z);
@@ -63,6 +67,7 @@ namespace RosMessageTypes.Auv
         public override void SerializeTo(MessageSerializer serializer)
         {
             serializer.Write(this.label);
+            serializer.Write(this.id);
             serializer.Write(this.x);
             serializer.Write(this.y);
             serializer.Write(this.z);
@@ -75,6 +80,7 @@ namespace RosMessageTypes.Auv
         {
             return "VisionObjectMsg: " +
             "\nlabel: " + label.ToString() +
+            "\nid: " + id.ToString() +
             "\nx: " + x.ToString() +
             "\ny: " + y.ToString() +
             "\nz: " + z.ToString() +
