@@ -73,10 +73,10 @@ public class StatePublisher : ROSPublisher
         stateMsg.linear_acceleration = acceleration.To<RUF>();
 
         // Update sensor status from SimulationSettings
-        stateMsg.isDVLActive = Convert.ToInt32(SimulationSettings.Instance.PublishDVL);
-        stateMsg.isDepthSensorActive = Convert.ToInt32(SimulationSettings.Instance.PublishDepth);
-        stateMsg.isIMUActive = Convert.ToInt32(SimulationSettings.Instance.PublishIMU);
-        stateMsg.isHydrophonesActive = Convert.ToInt32(SimulationSettings.Instance.PublishHydrophones);
+        stateMsg.is_dvl_active = Convert.ToInt32(SimulationSettings.Instance.PublishDVL);
+        stateMsg.is_depth_sensor_active = Convert.ToInt32(SimulationSettings.Instance.PublishDepth);
+        stateMsg.is_imu_active = Convert.ToInt32(SimulationSettings.Instance.PublishIMU);
+        stateMsg.is_hydrophones_active = Convert.ToInt32(SimulationSettings.Instance.PublishHydrophones);
 
         // Pinger data
         if (pingerTimeDifference != null)

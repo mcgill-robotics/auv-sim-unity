@@ -103,6 +103,12 @@ public class ROSSettings : MonoBehaviour
     public string PingerBearingTopic = "/sensors/hydrophones/pinger_bearing";
     public string VisionDetectionFrameTopic = "/vision/detection_frame";
     public string VisionObjectMapTopic = "/vision/object_map";
+    
+    [Tooltip("3D Vision objects detected by YOLO + ZED")]
+    public string VisionObjects3DTopic = "/vision/objects_3d";
+    
+    [Tooltip("VIO camera pose from ZED positional tracking")]
+    public string VIOPoseTopic = "/vision/vio_pose";
 
     [Header("Frames")]
     public string WorldFrameId = "world";
