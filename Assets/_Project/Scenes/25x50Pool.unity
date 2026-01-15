@@ -4835,7 +4835,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1371465005}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.43, y: -1.035, z: -4.8075}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5240,14 +5240,14 @@ MonoBehaviour:
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 1
-  VisualizeDVL: 1
-  VisualizeIMU: 1
+  StreamZEDCamera: 0
+  VisualizeDVL: 0
+  VisualizeIMU: 0
   VisualizeDepth: 0
-  DrawerConfigOpen: 1
+  DrawerConfigOpen: 0
   DrawerControlsOpen: 0
-  DrawerTelemetryOpen: 1
-  DrawerSensorsOpen: 1
+  DrawerTelemetryOpen: 0
+  DrawerSensorsOpen: 0
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
@@ -5415,6 +5415,7 @@ MonoBehaviour:
   GroundTruthAccelTopic: /auv/ground_truth/accel
   GroundTruthOrientationTopic: /auv/ground_truth/orientation
   GroundTruthDepthTopic: /auv/ground_truth/depth
+  GroundTruthPoseTopic: /auv/ground_truth/pose
   PingerBearingTopic: /sensors/hydrophones/pinger_bearing
   VisionDetectionFrameTopic: /vision/detection_frame
   VisionObjectMapTopic: /vision/object_map
@@ -7653,6 +7654,7 @@ MonoBehaviour:
   minConfidence: 0.3
   vioPoseColor: {r: 1, g: 0.5, b: 0, a: 1}
   vioPoseSize: 0.3
+  autoFixDrift: 1
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   classColors:
   - className: gate

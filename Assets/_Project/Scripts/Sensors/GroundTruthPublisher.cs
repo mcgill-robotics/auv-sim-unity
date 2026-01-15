@@ -1,20 +1,18 @@
 using UnityEngine;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Std;
+using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 
 /// <summary>
 /// Publishes ground truth state of the AUV from the Rigidbody center.
-/// Used for comparing against noisy sensor outputs and validating sensor fusion.
+/// Used for verifying sensor outputs and validating sensor fusion.
 /// 
-/// COORDINATE FRAME (UNITY):
-/// - X = Right
-/// - Y = Up
-/// - Z = Forward
+/// COORDINATE FRAME (ROS FLU):
+/// - X = Forward (Unity Z)
+/// - Y = Left    (Unity -X)
+/// - Z = Up      (Unity Y)
 /// 
-/// ROTATION HANDEDNESS:
-/// All angular data follows the RIGHT-HAND RULE (positive = CCW when viewed along axis).
-/// - Angular velocities are negated from Unity's default left-hand convention.
-/// - Quaternion X and Z components are negated for right-handed coordinate system.
+/// This matches standard ROS conventions and the output of the IMUPublisher.
 /// 
 /// DEPTH CONVENTION:
 /// - Depth is published as a positive value increasing with depth (+ Down).
@@ -33,7 +31,12 @@ public class GroundTruthPublisher : ROSPublisher
     private TwistStampedMsg twistMsg;           // Linear + Angular velocity
     private AccelStampedMsg accelMsg;           // Linear + Angular acceleration
     private QuaternionStampedMsg orientationMsg;
+    private PoseStampedMsg poseMsg;             // Relative pose (Position + Orientation)
     private Float64Msg depthMsg;
+
+    // Initial state for relative validation
+    private Vector3 initialPosition;
+    private Quaternion initialRotation;
 
     // For acceleration calculation
     private Vector3 prevVelocity;
@@ -56,6 +59,10 @@ public class GroundTruthPublisher : ROSPublisher
         orientationMsg = new QuaternionStampedMsg();
         orientationMsg.header = new HeaderMsg { frame_id = ROSSettings.Instance.BaseLinkFrameId };
         
+        poseMsg = new PoseStampedMsg();
+        // Pose is relative to the "world" or "odom" frame fixed at the start location
+        poseMsg.header = new HeaderMsg { frame_id = ROSSettings.Instance.WorldFrameId };
+
         depthMsg = new Float64Msg();
         
         // Initialize previous velocity for acceleration calculation
@@ -63,6 +70,10 @@ public class GroundTruthPublisher : ROSPublisher
         {
             prevVelocity = AuvRb.linearVelocity;
             prevAngularVelocity = AuvRb.angularVelocity;
+            
+            // Capture initial state
+            initialPosition = AuvRb.position;
+            initialRotation = AuvRb.rotation;
         }
     }
 
@@ -80,6 +91,7 @@ public class GroundTruthPublisher : ROSPublisher
         ros.RegisterPublisher<TwistStampedMsg>(ROSSettings.Instance.GroundTruthTwistTopic);
         ros.RegisterPublisher<AccelStampedMsg>(ROSSettings.Instance.GroundTruthAccelTopic);
         ros.RegisterPublisher<QuaternionStampedMsg>(ROSSettings.Instance.GroundTruthOrientationTopic);
+        ros.RegisterPublisher<PoseStampedMsg>(ROSSettings.Instance.GroundTruthPoseTopic);
         ros.RegisterPublisher<Float64Msg>(ROSSettings.Instance.GroundTruthDepthTopic);
     }
 
@@ -95,19 +107,25 @@ public class GroundTruthPublisher : ROSPublisher
         Vector3 linearVelWorld = AuvRb.linearVelocity;
         Vector3 angularVelWorld = AuvRb.angularVelocity;
         
-        // Transform to body frame (local Unity coordinates: X=right, Y=up, Z=forward)
+        // Transform to body frame (local Unity coordinates)
         Vector3 linearVelLocal = AuvRb.transform.InverseTransformDirection(linearVelWorld);
         Vector3 angularVelLocal = AuvRb.transform.InverseTransformDirection(angularVelWorld);
         
-        // Publish in Unity frame with RIGHT-HAND RULE for rotations
-        // Unity uses left-hand rule, so negate angular velocities to convert
+        // PUBLISH IN ROS FLU FRAME
         twistMsg.header.stamp = stamp;
-        twistMsg.twist.linear.x = linearVelLocal.x;  // Right
-        twistMsg.twist.linear.y = linearVelLocal.y;  // Up
-        twistMsg.twist.linear.z = linearVelLocal.z;  // Forward
-        twistMsg.twist.angular.x = -angularVelLocal.x;  // Roll rate (around X/Right axis) - negated for RH rule
-        twistMsg.twist.angular.y = -angularVelLocal.y;  // Yaw rate (around Y/Up axis) - negated for RH rule
-        twistMsg.twist.angular.z = -angularVelLocal.z;  // Pitch rate (around Z/Forward axis) - negated for RH rule
+        
+        // Linear: Direct mapping via ROSGeometry
+        twistMsg.twist.linear = linearVelLocal.To<FLU>();
+
+        // Angular: Pseudovector mapping (Unity -> FLU)
+        // Unity (Right, Up, Fwd) -> FLU (Fwd, Left, Up)
+        // Rule: x_ros = -z_unity, y_ros = x_unity, z_ros = -y_unity
+        twistMsg.twist.angular = new Vector3Msg
+        {
+            x = -angularVelLocal.z,
+            y = angularVelLocal.x,
+            z = -angularVelLocal.y
+        };
         ros.Publish(ROSSettings.Instance.GroundTruthTwistTopic, twistMsg);
         
         // === ACCELERATION ===
@@ -123,27 +141,54 @@ public class GroundTruthPublisher : ROSPublisher
         Vector3 linearAccelLocal = AuvRb.transform.InverseTransformDirection(linearAccelWorld);
         Vector3 angularAccelLocal = AuvRb.transform.InverseTransformDirection(angularAccelWorld);
         
-        // Publish in Unity frame with RIGHT-HAND RULE
+        // PUBLISH IN ROS FLU FRAME
         accelMsg.header.stamp = stamp;
-        accelMsg.accel.linear.x = linearAccelLocal.x;
-        accelMsg.accel.linear.y = linearAccelLocal.y;
-        accelMsg.accel.linear.z = linearAccelLocal.z;
-        accelMsg.accel.angular.x = -angularAccelLocal.x;  // Negated for RH rule
-        accelMsg.accel.angular.y = -angularAccelLocal.y;  // Negated for RH rule
-        accelMsg.accel.angular.z = -angularAccelLocal.z;  // Negated for RH rule
+        
+        // Linear: Direct mapping via ROSGeometry
+        accelMsg.accel.linear = linearAccelLocal.To<FLU>();
+        
+        // Angular: Pseudovector mapping
+        accelMsg.accel.angular = new Vector3Msg
+        {
+            x = -angularAccelLocal.z,
+            y = angularAccelLocal.x,
+            z = -angularAccelLocal.y
+        };
         ros.Publish(ROSSettings.Instance.GroundTruthAccelTopic, accelMsg);
         
         // === ORIENTATION ===
-        // Convert Unity quaternion from left-handed to right-handed
-        // For same axes but opposite handedness: negate ALL imaginary components (X, Y, Z)
-        // This reverses the rotation direction to match right-hand rule
-        Quaternion q = AuvRb.rotation;
+        // Convert Unity quaternion to ROS FLU
         orientationMsg.header.stamp = stamp;
-        orientationMsg.quaternion.x = -q.x;  // Negated for RH coordinate system
-        orientationMsg.quaternion.y = -q.y;  // Negated for RH coordinate system
-        orientationMsg.quaternion.z = -q.z;  // Negated for RH coordinate system
-        orientationMsg.quaternion.w = q.w;   // W unchanged
+        orientationMsg.quaternion = AuvRb.rotation.To<FLU>();
         ros.Publish(ROSSettings.Instance.GroundTruthOrientationTopic, orientationMsg);
+        
+        // === RELATIVE POSE ===
+        // Calculate relative position and rotation from start
+        if (poseMsg != null)
+        {
+            poseMsg.header.stamp = stamp;
+            
+            // Relative Position (vector from start to current, ROTATED into start frame)
+            // This makes the position relative to the "orientation in which we started"
+            Vector3 worldDisp = AuvRb.position - initialPosition;
+            Vector3 relPos = Quaternion.Inverse(initialRotation) * worldDisp;
+            
+            // Convert to FLU:
+            // Unity Z (Local Fwd) -> ROS X (Relative)
+            // Unity X (Local Right) -> ROS -Y (Relative)
+            // Unity Y (Absolute Up) -> ROS Z (Absolute)
+            // We use absolute altitude/depth for Z, but relative X/Y
+            poseMsg.pose.position.x = relPos.z;
+            poseMsg.pose.position.y = -relPos.x;
+            poseMsg.pose.position.z = AuvRb.position.y; // Absolute vertical position (FLU Z = Up)
+            
+            // Relative Rotation (rotation from start to current)
+            // q_rel = Inverse(q_start) * q_current
+            Quaternion relRot = Quaternion.Inverse(initialRotation) * AuvRb.rotation;
+            poseMsg.pose.orientation = relRot.To<FLU>();
+            
+            ros.Publish(ROSSettings.Instance.GroundTruthPoseTopic, poseMsg);
+        }
         
         // === DEPTH ===
         // Depth as positive-down (negate Unity Y which is up)

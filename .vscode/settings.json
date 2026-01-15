@@ -61,7 +61,6 @@
         "/opt/ros/noetic/lib/python3/dist-packages"
     ],
     "dotnet.preferCSharpExtension": true,
-    "omnisharp.organizeImportsOnFormat": true,
     "[csharp]": {
         "editor.formatOnSave": true,
         "editor.codeLens": false,
@@ -69,5 +68,6 @@
         "editor.defaultFormatter": "ms-dotnettools.csharp",
         "editor.wordWrap": "wordWrapColumn"
     },
-    "dotnet.defaultSolution": "auv-sim-unity.slnx"
+    "dotnet.defaultSolution": "auv-sim-unity.slnx",
+    "dotnet.formatting.organizeImportsOnFormat": true
 }

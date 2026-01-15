@@ -75,7 +75,7 @@ public class VisionObjectsVisualizer : MonoBehaviour
     private void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
-        ros.Subscribe<VisionObjectArrayMsg>(ROSSettings.Instance.VisionObjects3DTopic, OnVisionObjectsReceived);
+        ros.Subscribe<VisionObjectArrayMsg>(ROSSettings.Instance.VisionObjectMapTopic, OnVisionObjectsReceived);
         ros.Subscribe<PoseStampedMsg>(ROSSettings.Instance.VIOPoseTopic, OnVIOPoseReceived);
 
         visualizerRoot = new GameObject("VisionObjects_Visualizer").transform;
