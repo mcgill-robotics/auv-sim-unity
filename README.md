@@ -204,11 +204,11 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
     ```bash
     # Build ROS workspace
     source /opt/ros/humble/setup.bash
-    cd <AUV-2026>/ros2_ws
-    colcon build --symlink-install
+    cd <AUV-2026>/
+    ./build.sh
     
     # Source the workspace
-    source install/setup.bash
+    source ros2_ws/install/setup.bash
 
     # Launch endpoint
     ros2 launch ros_tcp_endpoint endpoint.py
@@ -316,16 +316,18 @@ The simulator communicates over the following default topics (configurable in `R
 
 | Topic | Description | Frame / Convention | Message Type |
 | :--- | :--- | :--- | :--- |
-| `/auv/ground_truth/twist` | Ground truth linear/angular velocity | **Unity** (X-Right, Y-Up, Z-Fwd) + RH Rule | `TwistStamped` |
-| `/auv/ground_truth/accel` | Ground truth linear/angular acceleration | **Unity** (X-Right, Y-Up, Z-Fwd) + RH Rule | `AccelStamped` |
+| `/auv/ground_truth/twist` | Ground truth linear/angular velocity | **FLU** (+X Fwd, +Y Left, +Z Up) | `TwistStamped` |
+| `/auv/ground_truth/accel` | Ground truth linear/angular acceleration | **FLU** (+X Fwd, +Y Left, +Z Up) | `AccelStamped` |
+| `/auv/ground_truth/pose` | **Hybrid Pose:** <br>• **Pos X/Y:** Relative to Start (Locally Aligned) <br>• **Pos Z:** Absolute (World Up) <br>• **Orientation:** Relative to Start | **FLU** | `PoseStamped` |
+| `/auv/ground_truth/orientation` | Absolute World Orientation | **FLU** | `QuaternionStamped` |
 | `/sensors/dvl/data` | Doppler Velocity Log (A50) | **FRD** (+X Fwd, +Y Right, +Z Down) | `TwistWithCovarianceStamped` (DvlMsg in the future) |
 | `/sensors/imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `Imu` |
 | `/sensors/depth/data` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
-| `/sensors/camera/front/image_raw` | Front RGB Camera (raw) | Optical Frame | `Image` |
-| `/sensors/camera/front/image_raw/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
+| `/zed2i/zed_node/stereo/image_rect_color` | Front RGB Camera (rectified) | Optical Frame | `Image` |
+| `/zed2i/zed_node/stereo/image_rect_color/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
 | `/sensors/camera/front/depth_raw` | Front Depth Map (always raw) | Optical Frame | `Image` |
-| `/sensors/camera/down/image_raw` | Downward RGB Camera (raw) | Optical Frame | `Image` |
-| `/sensors/camera/down/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
+| `/down_cam/image_raw` | Downward RGB Camera (raw) | Optical Frame | `Image` |
+| `/down_cam/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
 
 > [!NOTE]
 > **JPEG Compression (enabled by default):** When enabled, only the `/compressed` topics are published for RGB cameras. The raw `image_raw` topics are not published. Disable JPEG compression in `SimulationSettings` to publish raw images instead. The depth map is always published as raw (no compression).
@@ -338,6 +340,8 @@ The simulator communicates over the following default topics (configurable in `R
 | `/auv/dropper/trigger` | Trigger for the dropper mechanism | `Bool` |
 | `/auv/torpedo/launch` | Trigger for torpedo launch | `Bool` |
 | `/auv/torpedo/rotate` | Torpedo launcher rotation angle | `Float32` |
+| `/vision/object_map` | Array of detected objects (YOLO + ZED) | **FLU** (World Frame) | `VisionObjectArray` |
+| `/vision/vio_pose` | Visual Odometry Pose | **FLU** (World Frame) | `PoseStamped` |
 
 ## Roadmap & TODO
 

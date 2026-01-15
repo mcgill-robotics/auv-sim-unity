@@ -7,7 +7,7 @@ using UnityEngine;
 /// - DVL (FRD): +X Forward, +Y Right, +Z Down
 /// - IMU (FLU): +X Forward, +Y Left, +Z Up
 /// - Depth: + Down (Positive value increasing with depth)
-/// - Ground Truth (Unity): X Right, Y Up, Z Front
+/// - Ground Truth (FLU): +X Forward, +Y Left, +Z Up
 /// 
 /// HANDEDNESS:
 /// All angular data (velocities/accelerations) across all sensors follows the 
@@ -49,10 +49,10 @@ public class ROSSettings : MonoBehaviour
     public string HydrophonesTopic = "/sensors/hydrophones/data";
     
     [Tooltip("Front camera image topic")]
-    public string FrontCameraTopic = "/sensors/camera/front/image_raw";
+    public string FrontCameraTopic = "/zed2i/zed_node/stereo/image_rect_color";
     
     [Tooltip("Down camera image topic")]
-    public string DownCameraTopic = "/sensors/camera/down/image_raw";
+    public string DownCameraTopic = "/down_cam/image_raw";
     
     [Tooltip("Front depth camera topic")]
     public string DepthCameraTopic = "/sensors/camera/front/depth_raw";
@@ -99,13 +99,13 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Ground truth depth (positive down)")]
     public string GroundTruthDepthTopic = "/auv/ground_truth/depth";
 
+    [Tooltip("Ground truth pose (relative to start)")]
+    public string GroundTruthPoseTopic = "/auv/ground_truth/pose";
+
     [Header("Competition")]
     public string PingerBearingTopic = "/sensors/hydrophones/pinger_bearing";
     public string VisionDetectionFrameTopic = "/vision/detection_frame";
     public string VisionObjectMapTopic = "/vision/object_map";
-    
-    [Tooltip("3D Vision objects detected by YOLO + ZED")]
-    public string VisionObjects3DTopic = "/vision/objects_3d";
     
     [Tooltip("VIO camera pose from ZED positional tracking")]
     public string VIOPoseTopic = "/vision/vio_pose";
