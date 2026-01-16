@@ -1912,19 +1912,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff181945c507470aad31576d724eb5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _publishRate: 10
+  _publishRate: 100
   auvRbOverride: {fileID: 0}
-  accelNoise: 0
+  accelNoise: 0.1
   accelBiasCorrelationTime: 300
-  accelBiasSigma: 0
-  gyroNoise: 0
+  accelBiasSigma: 0.02
+  gyroNoise: 0.05
   gyroBiasCorrelationTime: 100
-  gyroBiasSigma: 0
+  gyroBiasSigma: 0.01
   publishOrientation: 1
   simulateAHRS: 1
-  orientationNoiseRoll: 0
-  orientationNoisePitch: 0
-  orientationNoiseYaw: 0
+  orientationNoiseRoll: 0.1
+  orientationNoisePitch: 0.1
+  orientationNoiseYaw: 1
   enableVisualization: 1
   accelArrowScale: 0.1
   angVelArrowScale: 0.5
@@ -4701,7 +4701,7 @@ MonoBehaviour:
   _publishRate: 10
   sourceCamera: {fileID: 1621375949}
   maxDepth: 20
-  minDepth: 0.3
+  minDepth: 0.1
   encoding: 32FC1
 --- !u!114 &1370920608
 MonoBehaviour:
@@ -5237,17 +5237,17 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 0
-  PublishDownCam: 0
-  PublishDepthCamera: 0
+  PublishFrontCam: 1
+  PublishDownCam: 1
+  PublishDepthCamera: 1
   StreamZEDCamera: 0
   VisualizeDVL: 0
   VisualizeIMU: 0
-  VisualizeDepth: 0
-  DrawerConfigOpen: 0
+  VisualizeDepth: 1
+  DrawerConfigOpen: 1
   DrawerControlsOpen: 0
   DrawerTelemetryOpen: 0
-  DrawerSensorsOpen: 0
+  DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
@@ -5264,7 +5264,7 @@ MonoBehaviour:
   JPEGQuality: 75
   PoseRate: 50
   QualityLevel: 3
-  SimulationTargetFrameRate: 300
+  SimulationTargetFrameRate: 60
   SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
@@ -5381,8 +5381,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a3386402d8eb2d1fb117126a2a351e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ThrusterForcesTopic: /auv/thruster_forces
-  DropperTopic: /auv/dropper
+  ThrusterForcesTopic: /propulsion/forces
+  DropperTopic: /auv/dropper/trigger
   TorpedoLaunchTopic: /auv/torpedo/launch
   TorpedoResetTopic: /auv/torpedo/reset
   TorpedoRotationTopic: /auv/torpedo/rotate
@@ -5390,9 +5390,9 @@ MonoBehaviour:
   IMUTopic: /sensors/imu/data
   DepthTopic: /sensors/depth/data
   HydrophonesTopic: /sensors/hydrophones/data
-  FrontCameraTopic: /sensors/camera/front/image_raw
-  DownCameraTopic: /sensors/camera/down/image_raw
-  DepthCameraTopic: /sensors/camera/depth/image_raw
+  FrontCameraTopic: /zed2i/zed_node/stereo/image_rect_color
+  DownCameraTopic: /down_cam/image_raw
+  DepthCameraTopic: /zed2i/zed_node/depth/image_rect
   ClockTopic: /clock
   PIDEnableTopic: /auv/pid/enable
   PIDSetpointTopic: /auv/pid/setpoint
@@ -5419,15 +5419,14 @@ MonoBehaviour:
   PingerBearingTopic: /sensors/hydrophones/pinger_bearing
   VisionDetectionFrameTopic: /vision/detection_frame
   VisionObjectMapTopic: /vision/object_map
-  VisionObjects3DTopic: /vision/objects_3d
   VIOPoseTopic: /vision/vio_pose
   WorldFrameId: world
   BaseLinkFrameId: base_link
   ImuFrameId: imu_link
   DvlFrameId: dvl_link
-  FrontCamFrameId: front_cam_link
-  DownCamFrameId: down_cam_link
-  DepthCamFrameId: camera_link
+  FrontCamFrameId: zed_left_camera_optical_frame
+  DownCamFrameId: down_camera_optical_frame
+  DepthCamFrameId: zed_left_camera_optical_frame
   PressureFrameId: pressure_link
 --- !u!114 &1443981352
 MonoBehaviour:
@@ -5441,7 +5440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32a587fdf98191e429e9df04d264750c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _publishRate: 10
+  _publishRate: 100
 --- !u!114 &1443981353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5617,12 +5616,12 @@ MonoBehaviour:
   maxAltitude: 50
   beamTiltAngle: 22.5
   minBeamsForLock: 3
-  sigmaVelocityHorizontal: 0
-  sigmaVelocityVertical: 0
+  sigmaVelocityHorizontal: 0.0099
+  sigmaVelocityVertical: 0.0132
   biasCorrelationTime: 100
-  biasSigma: 0
-  outlierProbability: 0
-  outlierMagnitude: 0
+  biasSigma: 0.0086
+  outlierProbability: 0.0078
+  outlierMagnitude: 0.37
   simulateAdaptiveRate: 1
   maxGrazingAngle: 60
   enableVisualization: 1
@@ -7932,9 +7931,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3de366220f27c89aa761498edf1f473, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _publishRate: 10
+  _publishRate: 100
   useUnityYAsDepth: 1
-  noiseStdDev: 0
+  noiseStdDev: 0.01
   bias: 0
   enableVisualization: 1
   visualizationColor: {r: 1, g: 1, b: 1, a: 1}
@@ -7959,7 +7958,7 @@ PrefabInstance:
     - target: {fileID: 1140574625281327492, guid: db73982fab23cbb7d8fcf37cfd9a0854,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1240946352364984440, guid: db73982fab23cbb7d8fcf37cfd9a0854,
         type: 3}
@@ -29880,6 +29879,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 789371016}
+    - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: meshRenderers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4279926887075288456, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: m_Mesh

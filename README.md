@@ -325,7 +325,7 @@ The simulator communicates over the following default topics (configurable in `R
 | `/sensors/depth/data` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
 | `/zed2i/zed_node/stereo/image_rect_color` | Front RGB Camera (rectified) | Optical Frame | `Image` |
 | `/zed2i/zed_node/stereo/image_rect_color/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
-| `/sensors/camera/front/depth_raw` | Front Depth Map (always raw) | Optical Frame | `Image` |
+| `/zed2i/zed_node/depth/image_rect` | Front Depth Map (always raw) | Optical Frame | `Image` |
 | `/down_cam/image_raw` | Downward RGB Camera (raw) | Optical Frame | `Image` |
 | `/down_cam/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
 
