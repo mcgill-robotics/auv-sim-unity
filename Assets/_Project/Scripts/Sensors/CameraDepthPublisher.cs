@@ -244,7 +244,15 @@ public class CameraDepthPublisher : ROSPublisher
             cameraInfoMsg.R = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
         }
 
-        cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
+        int lastSlashIndex = Topic.LastIndexOf('/');
+        if (lastSlashIndex >= 0)
+        {
+            cameraInfoTopic = Topic.Substring(0, lastSlashIndex + 1) + "camera_info";
+        }
+        else
+        {
+            cameraInfoTopic = "camera_info";
+        }
     }
 
     protected override void RegisterPublisher()
@@ -257,7 +265,15 @@ public class CameraDepthPublisher : ROSPublisher
         
         if (string.IsNullOrEmpty(cameraInfoTopic))
         {
-            cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
+            int lastSlashIndex = Topic.LastIndexOf('/');
+            if (lastSlashIndex >= 0)
+            {
+                cameraInfoTopic = Topic.Substring(0, lastSlashIndex + 1) + "camera_info";
+            }
+            else
+            {
+                cameraInfoTopic = "camera_info";
+            }
         }
         
         ros.RegisterPublisher<ImageMsg>(Topic);

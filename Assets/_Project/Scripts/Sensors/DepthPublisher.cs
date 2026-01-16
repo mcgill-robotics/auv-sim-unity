@@ -146,7 +146,7 @@ public class DepthPublisher : ROSPublisher
             noisyDepth += (float)Stochastic.GenerateGaussian() * noiseStdDev;
         }
         
-        LastDepth = depth; // Clean depth for simple display/viz
+        LastDepth = noisyDepth; // Clean depth for simple display/viz
         depthMsg.data = noisyDepth;
     }
 
@@ -163,8 +163,8 @@ public class DepthPublisher : ROSPublisher
         Vector3 sensorPos = transform.position;
         Vector3 surfacePos = new Vector3(sensorPos.x, 0f, sensorPos.z);
         
-        depthLine.SetPosition(0, sensorPos);
-        depthLine.SetPosition(1, surfacePos);
+        depthLine.SetPosition(0, surfacePos);
+        depthLine.SetPosition(1, surfacePos-Vector3.up*LastDepth);
         
         depthLine.enabled = sensorPos.y < 0;
     }
