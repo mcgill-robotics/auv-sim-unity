@@ -63,7 +63,16 @@ public class CameraPublisher : ROSPublisher
         ros.RegisterPublisher<CompressedImageMsg>(compressedTopic);
         
         // Register Camera Info Topic
-        cameraInfoTopic = Topic.Replace("image_raw", "camera_info");
+        int lastSlashIndex = Topic.LastIndexOf('/');
+        if (lastSlashIndex >= 0)
+        {
+            cameraInfoTopic = Topic.Substring(0, lastSlashIndex + 1) + "camera_info";
+        }
+        else
+        {
+            cameraInfoTopic = "camera_info";
+        }
+        
         ros.RegisterPublisher<CameraInfoMsg>(cameraInfoTopic);
     }
 

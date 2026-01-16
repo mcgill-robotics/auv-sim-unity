@@ -55,7 +55,7 @@ public class ROSSettings : MonoBehaviour
     public string DownCameraTopic = "/down_cam/image_raw";
     
     [Tooltip("Front depth camera topic")]
-    public string DepthCameraTopic = "/sensors/camera/front/depth_raw";
+    public string DepthCameraTopic = "/zed2i/zed_node/depth/image_rect";
     
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";
