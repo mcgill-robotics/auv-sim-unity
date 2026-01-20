@@ -7809,6 +7809,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ros Connection
       objectReference: {fileID: 0}
+    - target: {fileID: 7798632748547098708, guid: 25cd8633a8a0ac648aa1883997bc26b8,
+        type: 3}
+      propertyPath: m_RosIPAddress
+      value: 127.0.0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798632748547098708, guid: 25cd8633a8a0ac648aa1883997bc26b8,
+        type: 3}
+      propertyPath: m_ConnectOnStart
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
