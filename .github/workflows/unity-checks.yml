@@ -37,7 +37,7 @@ jobs:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          unityVersion: 2022.3.9f1
+          unityVersion: 6000.0.62f1
           projectPath: .
           testMode: EditMode
           artifactsPath: unity-test-results
