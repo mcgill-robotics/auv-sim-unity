@@ -12,8 +12,8 @@ using UnityEditor;
 public class YoloConverterWindow : EditorWindow
 {
     // Settings
-    private float _minVisibility = 0.25f;
-    private Vector2 _resolution = new Vector2(960, 600);
+    private float _minVisibility = 0.35f;
+    private Vector2 _resolution = new Vector2(672, 376);
     private string _customDatasetPath = "";
     
     // UI State

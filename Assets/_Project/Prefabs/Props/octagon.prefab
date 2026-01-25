@@ -1031,7 +1031,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 8
+  maxDistance: 6
   useAngleFilter: 1
   maxViewAngle: 70
   allowBackFace: 1
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 8
+  maxDistance: 6
   useAngleFilter: 1
   maxViewAngle: 70
   allowBackFace: 1

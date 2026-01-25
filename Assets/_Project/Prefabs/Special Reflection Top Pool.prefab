@@ -262,9 +262,9 @@ MonoBehaviour:
     timeSlicing: 0
     lighting:
       importance: 64
-      multiplier: 1.5
+      multiplier: 3
       weight: 1
-      lightLayer: 1
+      lightLayer: -1
       fadeDistance: 10000
       rangeCompressionFactor: 1
     influence:
