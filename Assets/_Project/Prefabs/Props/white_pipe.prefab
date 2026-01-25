@@ -167,14 +167,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3539300048157702698}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
-  useDistanceFilter: 0
-  maxDistance: 15
+  useDistanceFilter: 1
+  maxDistance: 10
   useAngleFilter: 0
   maxViewAngle: 60
   allowBackFace: 1
