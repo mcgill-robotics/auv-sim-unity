@@ -15,13 +15,18 @@ MonoBehaviour:
   m_LabelEntries:
   - label: Crate
     id: 1
+    hierarchyRelation: 0
   - label: Cube
     id: 2
+    hierarchyRelation: 0
   - label: Box
     id: 3
+    hierarchyRelation: 0
   - label: Terrain
     id: 4
+    hierarchyRelation: 0
   - label: Character
     id: 5
+    hierarchyRelation: 0
   autoAssignIds: 1
   startingLabelId: 1

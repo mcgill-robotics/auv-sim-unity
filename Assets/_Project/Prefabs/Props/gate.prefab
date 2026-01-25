@@ -617,9 +617,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 8
+  maxDistance: 6
   useAngleFilter: 1
-  maxViewAngle: 75
+  maxViewAngle: 70
   allowBackFace: 1
 --- !u!1 &2575631805521033454
 GameObject:
@@ -1002,6 +1002,7 @@ GameObject:
   - component: {fileID: -9017123237855313294}
   - component: {fileID: 7649786554625563876}
   - component: {fileID: 7156733213410740778}
+  - component: {fileID: 2697910172353265325}
   m_Layer: 0
   m_Name: gate
   m_TagString: Untagged
@@ -1088,6 +1089,24 @@ MonoBehaviour:
     label: shark
   - material: {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
     label: sawfish
+--- !u!114 &2697910172353265325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3383246300767830565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 0
+  maxDistance: 15
+  useAngleFilter: 1
+  maxViewAngle: 87.5
+  allowBackFace: 1
 --- !u!1 &3765967146489334903
 GameObject:
   m_ObjectHideFlags: 0
@@ -1337,9 +1356,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 8
+  maxDistance: 6
   useAngleFilter: 1
-  maxViewAngle: 75
+  maxViewAngle: 70
   allowBackFace: 1
 --- !u!1 &5372567935848453626
 GameObject:
