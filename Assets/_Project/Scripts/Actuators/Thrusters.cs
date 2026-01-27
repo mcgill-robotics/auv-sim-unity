@@ -1,7 +1,7 @@
 using System;
-using UnityEngine;
-using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Auv;
+using Unity.Robotics.ROSTCPConnector;
+using UnityEngine;
 using Utils;
 
 public class Thrusters : MonoBehaviour
@@ -10,36 +10,36 @@ public class Thrusters : MonoBehaviour
     [Tooltip("Force (N) applied per thruster when sinking (Q key)")]
     [Range(1f, 100f)]
     public float sinkForce = 30f;
-    
+
     [Tooltip("Force (N) applied per thruster when floating (E key)")]
     [Range(1f, 50f)]
     public float floatForce = 12f;
-    
+
     [Tooltip("Force (N) applied per thruster for forward/backward movement (WASD)")]
     [Range(1f, 50f)]
     public float moveForce = 15f;
-    
+
     [Tooltip("Force (N) applied per thruster for rotation (IJKL/UO)")]
-    [Range(0.1f, 10f)]
+    [Range(0.1f, 20f)]
     public float rotationForce = 1.0f;
-    
+
     [Space(10)]
     [Header("Thruster Configuration")]
     [Tooltip("Array of thruster transforms (8 total: 4 horizontal, 4 vertical)")]
     public Transform[] thrusters;
-    
+
     [Tooltip("Particle systems for each thruster (visual feedback)")]
     public ParticleSystem[] thrusterParticles;
-    
+
     [Tooltip("Real-to-sim force scaling factor. Higher = more sensitive to ROS commands")]
     [Range(1f, 10f)]
     public float AUVRealForceMultiplier = 3;
-    
+
     [Space(10)]
     [Header("Force Visualization")]
     [Tooltip("Show 3D arrows indicating thruster force direction and magnitude")]
     public bool enableForceVisualization = true;
-    
+
     [Tooltip("Scale factor for arrow length (magnitude visualization)")]
     [Range(0.001f, 0.1f)]
     public float forceVisualScale = 0.01f;
@@ -60,10 +60,10 @@ public class Thrusters : MonoBehaviour
     [Tooltip("Random efficiency variance (+/- percent) applied to each thruster at startup. 0.1 = +/- 10%")]
     [Range(0f, 0.1f)]
     public float efficiencyVariance = 0.05f;
-    
+
     [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
     [SerializeField] private Rigidbody auvRbOverride;
-    
+
     /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
     private Rigidbody AuvRb => auvRbOverride != null ? auvRbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
@@ -77,15 +77,15 @@ public class Thrusters : MonoBehaviour
     private float[] thrusterEfficiencyScalars = new float[8];
     private float[] currentThrusterLevels = new float[8];
     private float massScalarRealToSim;
-    
+
     // Performance: State tracking to avoid redundant updates
     private bool[] particlesPlaying = new bool[8];
     private float[] previousForces = new float[8];
     private const float FORCE_UPDATE_THRESHOLD = 0.5f;  // Only update arrows if force changes by this amount
-    
+
     // Pre-calculated force multipliers
     private float moveForceOver4, moveForceOver2, sinkForceOver4, floatForceOver4, rotationForceOver4;
-    
+
     // Cached quality level to avoid repeated calls
     private int cachedQualityLevel;
 
@@ -93,7 +93,7 @@ public class Thrusters : MonoBehaviour
     {
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.Subscribe<ThrusterForcesMsg>(ROSSettings.Instance.ThrusterForcesTopic, SetThrusterForces);
-        
+
         massScalarRealToSim = 1f / AUVRealForceMultiplier;
         moveForceOver4 = moveForce / 4;
         moveForceOver2 = moveForce / 2;
@@ -103,11 +103,11 @@ public class Thrusters : MonoBehaviour
 
         InitializeEfficiency();
         InitializeArrows();
-        
+
         // Cache quality level
         cachedQualityLevel = QualitySettings.GetQualityLevel();
     }
-    
+
     public void UpdateQualityLevel(int newQualityLevel)
     {
         cachedQualityLevel = newQualityLevel;
@@ -116,23 +116,23 @@ public class Thrusters : MonoBehaviour
     private void InitializeArrows()
     {
         arrowInstances = new GameObject[thrusters.Length];
-        
+
         // Create material and template arrow using shared utility
-        arrowMat =VisualizationUtils.CreateMaterial(visualizationColor);
-        GameObject templateArrow =VisualizationUtils.CreateArrow("DefaultArrow", arrowMat, 0.03f);
+        arrowMat = VisualizationUtils.CreateMaterial(visualizationColor);
+        GameObject templateArrow = VisualizationUtils.CreateArrow("DefaultArrow", arrowMat, 0.03f);
 
         for (int i = 0; i < thrusters.Length; i++)
         {
             arrowInstances[i] = Instantiate(templateArrow, thrusters[i].position, Quaternion.identity);
             arrowInstances[i].transform.parent = thrusters[i]; // Parent to thruster so it moves with AUV
-           VisualizationUtils.SetXRayLayer(arrowInstances[i]);
-            
+            VisualizationUtils.SetXRayLayer(arrowInstances[i]);
+
             // Apply color to each instance's renderers (MaterialPropertyBlock is NOT copied by Instantiate)
             foreach (var ren in arrowInstances[i].GetComponentsInChildren<Renderer>())
             {
-               VisualizationUtils.SetColorProperty(ren, visualizationColor);
+                VisualizationUtils.SetColorProperty(ren, visualizationColor);
             }
-            
+
             arrowInstances[i].SetActive(false);
         }
 
@@ -147,30 +147,30 @@ public class Thrusters : MonoBehaviour
         HandleFreezeInput();
         HandleMovementInput();
     }
-    
+
     private void FixedUpdate()
     {
         for (int i = 0; i < thrusters.Length; i++)
         {
             if (thrusters[i].position.y >= 0) continue;
-            
+
             float targetForce = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
-            
+
             // Apply Ramp-up (Motor Inertia) - command signal ramps toward target
             currentThrusterLevels[i] = Mathf.MoveTowards(currentThrusterLevels[i], targetForce, rampRate * Time.fixedDeltaTime);
             float finalForce = currentThrusterLevels[i];
-            
+
             // Apply Efficiency Variance (per-thruster manufacturing variance)
             finalForce *= thrusterEfficiencyScalars[i];
-            
+
             // Clamp AFTER efficiency - physical thruster saturation (motor torque/RPM limit)
             finalForce = Mathf.Clamp(finalForce, -maxThrusterForce, maxThrusterForce);
 
             Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
             Vector3 thrusterForceVector = worldForceDirection * (finalForce * massScalarRealToSim);
-            
+
             AuvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
-            
+
             bool shouldPlay = Math.Abs(finalForce) > 0.01f && cachedQualityLevel < 2;
 
             // Particles - only change state when needed
@@ -188,7 +188,7 @@ public class Thrusters : MonoBehaviour
             {
                 bool hasForce = Math.Abs(finalForce) > 0.01f;
                 float forceDelta = Math.Abs(finalForce - previousForces[i]);
-                
+
                 if (hasForce)
                 {
                     // Only update transforms if force changed significantly
@@ -196,7 +196,7 @@ public class Thrusters : MonoBehaviour
                     {
                         arrowInstances[i].SetActive(true);
                         arrowInstances[i].transform.position = thrusters[i].position;
-                        
+
                         if (thrusterForceVector.sqrMagnitude > 0.001f)
                         {
                             arrowInstances[i].transform.rotation = Quaternion.LookRotation(thrusterForceVector) * Quaternion.Euler(90, 0, 0);
@@ -245,11 +245,11 @@ public class Thrusters : MonoBehaviour
 
         // Ignore movement input if user is typing in HUD
         if (SimulatorHUD.Instance != null && SimulatorHUD.Instance.IsInputFocused) return;
-        
+
         Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
-        
+
         if (!Input.anyKey) return;
-        
+
         if (Input.GetKey(InputManager.Instance.GetKey("pitchKeybind", KeyCode.I)))
         {
             inputThrusterForces[5] += rotationForceOver4;
@@ -335,7 +335,7 @@ public class Thrusters : MonoBehaviour
             inputThrusterForces[1] -= floatForceOver4;
         }
     }
-    
+
     private void SetThrusterForces(ThrusterForcesMsg msg)
     {
         // Thruster order matches hardware configuration (CCL):
@@ -365,11 +365,11 @@ public class Thrusters : MonoBehaviour
     private void OnValidate()
     {
         if (!Application.isPlaying || arrowMat == null) return;
-        
+
         // Update material color
         if (arrowMat.HasProperty("_BaseColor")) arrowMat.SetColor("_BaseColor", visualizationColor);
         if (arrowMat.HasProperty("_Color")) arrowMat.SetColor("_Color", visualizationColor);
-        
+
         // Update MPB on all instances for X-Ray
         if (arrowInstances != null)
         {
@@ -379,7 +379,7 @@ public class Thrusters : MonoBehaviour
                 var renders = arrow.GetComponentsInChildren<Renderer>(true);
                 foreach (var r in renders)
                 {
-                   VisualizationUtils.SetColorProperty(r, visualizationColor);
+                    VisualizationUtils.SetColorProperty(r, visualizationColor);
                 }
             }
         }
