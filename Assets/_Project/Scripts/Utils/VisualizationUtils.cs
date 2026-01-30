@@ -155,5 +155,64 @@ namespace Utils
             
             return arrowRoot;
         }
+
+        /// <summary>
+        /// Creates a 3-axis coordinate frame (RGB = XYZ).
+        /// </summary>
+        public static GameObject CreateAxis(string name, Transform parent, float scale = 1.0f)
+        {
+            GameObject axisRoot = new GameObject(name);
+            axisRoot.transform.SetParent(parent);
+            axisRoot.transform.localPosition = Vector3.zero;
+            axisRoot.transform.localRotation = Quaternion.identity;
+            
+            // X Axis - Red
+            Material matX = CreateMaterial(Color.red);
+            GameObject arrowX = CreateArrow("AxisX", matX, 0.05f * scale);
+            arrowX.transform.SetParent(axisRoot.transform);
+            arrowX.transform.localPosition = Vector3.zero;
+            arrowX.transform.localRotation = Quaternion.Euler(0, 0, -90); // Up(Y) to Right(X)
+            arrowX.transform.localScale = new Vector3(1, scale, 1);
+            SetXRayLayer(arrowX);
+            
+            // Y Axis - Green
+            Material matY = CreateMaterial(Color.green);
+            GameObject arrowY = CreateArrow("AxisY", matY, 0.05f * scale);
+            arrowY.transform.SetParent(axisRoot.transform);
+            arrowY.transform.localPosition = Vector3.zero;
+            arrowY.transform.localRotation = Quaternion.identity; // Up(Y) is default
+            arrowY.transform.localScale = new Vector3(1, scale, 1);
+            SetXRayLayer(arrowY);
+            
+            // Z Axis - Blue
+            Material matZ = CreateMaterial(Color.blue);
+            GameObject arrowZ = CreateArrow("AxisZ", matZ, 0.05f * scale);
+            arrowZ.transform.SetParent(axisRoot.transform);
+            arrowZ.transform.localPosition = Vector3.zero;
+            arrowZ.transform.localRotation = Quaternion.Euler(90, 0, 0); // Up(Y) to Fwd(Z)
+            arrowZ.transform.localScale = new Vector3(1, scale, 1);
+            SetXRayLayer(arrowZ);
+            
+            return axisRoot;
+        }
+
+        /// <summary>
+        /// Creates a simple text label in world space.
+        /// </summary>
+        public static GameObject CreateLabel(string content, Transform parent, Color color, float fontSize = 12f)
+        {
+            GameObject labelObj = new GameObject("Label_" + content);
+            if (parent != null) labelObj.transform.SetParent(parent, false);
+            
+            TextMesh textMesh = labelObj.AddComponent<TextMesh>();
+            textMesh.text = content;
+            textMesh.color = color;
+            textMesh.characterSize = 0.1f * (fontSize / 12f);
+            textMesh.fontSize = (int)fontSize;
+            textMesh.anchor = TextAnchor.MiddleCenter;
+            textMesh.alignment = TextAlignment.Center;
+            
+            return labelObj;
+        }
     }
 }

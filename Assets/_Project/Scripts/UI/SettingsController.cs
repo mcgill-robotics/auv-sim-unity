@@ -191,7 +191,16 @@ public class SettingsController
 
         if (togglePublishROS != null) togglePublishROS.value = SimulationSettings.Instance.PublishROS;
         if (toggleSimObjects != null) toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
-        if (toggleStreamZED != null) toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
+        if (toggleStreamZED != null) 
+        {
+            #if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+            toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
+            toggleStreamZED.style.display = DisplayStyle.Flex;
+            #else
+            toggleStreamZED.value = false;
+            toggleStreamZED.style.display = DisplayStyle.None;
+            #endif
+        }
         if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
         if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;
         if (toggleDVL != null) toggleDVL.value = SimulationSettings.Instance.PublishDVL;

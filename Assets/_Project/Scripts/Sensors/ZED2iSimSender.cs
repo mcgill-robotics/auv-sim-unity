@@ -137,6 +137,13 @@ public class ZED2iSimSender : MonoBehaviour
             return;
         }
 
+        // Safety check: Ensure we are on Linux
+        #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
+        enabled = false;
+        Debug.LogWarning("[ZED Sim] ZED Virtual Streamer is only supported on Linux. Disabling component.");
+        return;
+        #endif
+
         // Load camera settings from SimulationSettings
         if (SimulationSettings.Instance != null)
         {

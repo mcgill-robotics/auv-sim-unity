@@ -87,21 +87,25 @@ public class VisionObjectsVisualizer : MonoBehaviour
                 colorLookup[cc.className.ToLower()] = cc.color;
         }
 
-        // Capture AUV's starting position and rotation as world origin
-        // Note: Y (vertical) is set to 0 because VIO already has correct depth from depth sensor
-        // Note: Actual origin capture is deferred to first VIO message for proper sync with ZED SDK init
-        Transform auvTransform = SimulationSettings.Instance?.AUVTransform;
-        if (auvTransform != null)
+        // Initialize World Origin from centralized singleton
+        // This ensures VIO/Vision objects share the same reference frame as DVL DR
+        if (SimulationOrigin.Instance != null)
         {
-            worldRotation = auvTransform.rotation;
-            Debug.Log($"[VisionObjectsVisualizer] Rotation captured, waiting for first VIO message to set origin...");
+            // Ensure origin is initialized (it runs before this script usually, but just within frame)
+            SimulationOrigin.Instance.InitializeOrigin();
+            
+            worldRotation = SimulationOrigin.Instance.InitialRotation;
+            worldOrigin = SimulationOrigin.Instance.InitialPosition;
+            worldOriginInitialized = true;
+            
+            Debug.Log($"[VisionObjectsVisualizer] Initialized Origin from SimulationOrigin: {worldOrigin}");
         }
         else
         {
             worldOrigin = Vector3.zero;
             worldRotation = Quaternion.identity;
             worldOriginInitialized = true;
-            Debug.LogWarning("[VisionObjectsVisualizer] AUVTransform not found - using Unity origin (0,0,0)");
+            Debug.LogWarning("[VisionObjectsVisualizer] SimulationOrigin not found - using Unity origin (0,0,0)");
         }
 
         // Create VIO pose marker (cube to distinguish from object spheres)
@@ -143,17 +147,8 @@ public class VisionObjectsVisualizer : MonoBehaviour
 
     private void OnVIOPoseReceived(PoseStampedMsg msg)
     {
-        // Initialize world origin on first VIO message (syncs with ZED SDK init)
-        if (!worldOriginInitialized)
-        {
-            Transform auvTransform = SimulationSettings.Instance?.AUVTransform;
-            if (auvTransform != null)
-            {
-                worldOrigin = new Vector3(auvTransform.position.x, 0f, auvTransform.position.z);
-                Debug.Log($"[VisionObjectsVisualizer] World origin set on first VIO: {worldOrigin}");
-            }
-            worldOriginInitialized = true;
-        }
+        // origin initialized in Start() via SimulationOrigin
+
 
         // Convert from ROS (X-Fwd, Y-Left, Z-Up) to Unity (X-Right, Y-Up, Z-Fwd)
         Vector3 rosToUnity = new Vector3(
