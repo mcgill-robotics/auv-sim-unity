@@ -187,8 +187,11 @@
             <ui:VisualElement name="SensorsDrawer-Content" class="drawer-content drawer-content-right" style="width: 305px; padding: 10px; height: 391px;">
                 <ui:Label text="SENSOR DATA" class="header" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:Label name="Label-DVL" text="DVL" class="data-label text-accent" />
-                    <ui:Toggle name="Toggle-DVLViz" label="👁" tooltip="Show DVL beam visualization" style="margin: 0;" />
+                    <ui:Label name="Label-DVL" text="DVL (FRD)" class="data-label text-accent" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Toggle name="Toggle-DVLNoise" label="Noise" value="true" tooltip="Enable Sensor Noise" style="margin-right: 10px;" />
+                        <ui:Toggle name="Toggle-DVLViz" label="👁" tooltip="Show DVL beam visualization" style="margin: 0;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
                     <ui:Label text="Velocity" class="data-label" />
@@ -206,10 +209,21 @@
                     <ui:Label text="Lock" class="data-label" />
                     <ui:Label name="Text-DVLLock" text="4/4 LOCK" class="data-value status-ok" style="width: 70px; font-size: 11px;" />
                 </ui:VisualElement>
+                <ui:VisualElement class="data-row">
+                    <ui:Label text="Pos (Est)" class="data-label" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Label name="Text-DVLPosX" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
+                        <ui:Label name="Text-DVLPosY" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
+                        <ui:Label name="Text-DVLPosZ" text="+0.00" class="data-value" style="width: 45px; font-size: 11px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
-                    <ui:Label name="Label-IMU" text="IMU" class="data-label text-accent" />
-                    <ui:Toggle name="Toggle-IMUViz" label="👁" tooltip="Show IMU visualization" style="margin: 0;" />
+                    <ui:Label name="Label-IMU" text="IMU (FLU)" class="data-label text-accent" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Toggle name="Toggle-IMUNoise" label="Noise" value="true" tooltip="Enable Sensor Noise" style="margin-right: 10px;" />
+                        <ui:Toggle name="Toggle-IMUViz" label="👁" tooltip="Show IMU visualization" style="margin: 0;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
                     <ui:Label text="Accel" class="data-label" />
@@ -238,7 +252,10 @@
                 <ui:VisualElement style="height: 6px;" />
                 <ui:VisualElement style="flex-direction: row; justify-content: space-between; align-items: center;">
                     <ui:Label name="Label-Depth" text="DEPTH" class="data-label text-accent" />
-                    <ui:Toggle name="Toggle-DepthViz" label="👁" tooltip="Show depth line visualization" style="margin: 0;" />
+                    <ui:VisualElement style="flex-direction: row;">
+                        <ui:Toggle name="Toggle-DepthNoise" label="Noise" value="true" tooltip="Enable Sensor Noise" style="margin-right: 10px;" />
+                        <ui:Toggle name="Toggle-DepthViz" label="👁" tooltip="Show depth line visualization" style="margin: 0;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement class="data-row">
                     <ui:Label text="Depth" class="data-label" />

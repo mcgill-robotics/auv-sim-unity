@@ -28,6 +28,10 @@ public class IMUPublisher : ROSPublisher
     private Rigidbody AuvRb => auvRbOverride != null ? auvRbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
     [Space(10)]
+    [Header("Noise Settings")]
+    [Tooltip("If enabled, noise and bias are added to the IMU measurements.")]
+    public bool enableNoise = true;
+
     [Header("Accelerometer Noise")]
     [Tooltip("White noise std dev (m/s²) added to acceleration measurements")]
     [Range(0.0f, 1.0f)]
@@ -249,8 +253,12 @@ public class IMUPublisher : ROSPublisher
         
         // Apply noise: White noise + Gauss-Markov bias
         Vector3 noisyAngVel = sensorAngularVel;
-        noisyAngVel += Stochastic.GenerateWhiteNoiseVector(gyroNoise);
-        noisyAngVel += gyroBias.CurrentBias;
+        
+        if (enableNoise)
+        {
+            noisyAngVel += Stochastic.GenerateWhiteNoiseVector(gyroNoise);
+            noisyAngVel += gyroBias.CurrentBias;
+        }
         
         LastAngularVelocity = noisyAngVel;
 
@@ -264,8 +272,12 @@ public class IMUPublisher : ROSPublisher
         
         // Apply noise: White noise + Gauss-Markov bias
         Vector3 noisyAccel = sensorAccel;
-        noisyAccel += Stochastic.GenerateWhiteNoiseVector(accelNoise);
-        noisyAccel += accelBias.CurrentBias;
+        
+        if (enableNoise)
+        {
+            noisyAccel += Stochastic.GenerateWhiteNoiseVector(accelNoise);
+            noisyAccel += accelBias.CurrentBias;
+        }
         
         LastAcceleration = noisyAccel;
         lastPointVelocity = currentPointVelocity;
@@ -275,7 +287,7 @@ public class IMUPublisher : ROSPublisher
         
         if (publishOrientation)
         {
-            if (simulateAHRS)
+            if (simulateAHRS && enableNoise)
             {
                 // Apply AHRS-style orientation noise
                 float noiseRoll = Stochastic.GenerateGaussian() * orientationNoiseRoll;

@@ -81,6 +81,17 @@ public class SimulationSettings : MonoBehaviour
     
     [Tooltip("Show Depth sensor line")]
     public bool VisualizeDepth = true;
+
+    [Space(10)]
+    [Header("Sensor Noise Settings")]
+    [Tooltip("Enable simulated noise/bias for DVL")]
+    public bool EnableDVLNoise = true;
+
+    [Tooltip("Enable simulated noise/bias for IMU")]
+    public bool EnableIMUNoise = true;
+
+    [Tooltip("Enable simulated noise/bias for Depth sensor")]
+    public bool EnableDepthNoise = true;
     
     [Space(10)]
     [Header("UI Drawer States")]
@@ -262,9 +273,18 @@ public class SimulationSettings : MonoBehaviour
         PublishDepthCamera = bool.Parse(PlayerPrefs.GetString("PublishDepthCameraToggle", "false"));
         StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
 
+        // Force disable ZED streaming on non-Linux platforms
+        #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
+        StreamZEDCamera = false;
+        #endif
+
         VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
         VisualizeIMU = bool.Parse(PlayerPrefs.GetString("VisualizeIMUToggle", "true"));
         VisualizeDepth = bool.Parse(PlayerPrefs.GetString("VisualizeDepthToggle", "true"));
+
+        EnableDVLNoise = bool.Parse(PlayerPrefs.GetString("EnableDVLNoiseToggle", "true"));
+        EnableIMUNoise = bool.Parse(PlayerPrefs.GetString("EnableIMUNoiseToggle", "true"));
+        EnableDepthNoise = bool.Parse(PlayerPrefs.GetString("EnableDepthNoiseToggle", "true"));
 
         DrawerConfigOpen = bool.Parse(PlayerPrefs.GetString("DrawerConfigOpen", "true"));
         DrawerControlsOpen = bool.Parse(PlayerPrefs.GetString("DrawerControlsOpen", "true"));
@@ -362,6 +382,10 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("VisualizeDVLToggle", VisualizeDVL.ToString());
         PlayerPrefs.SetString("VisualizeIMUToggle", VisualizeIMU.ToString());
         PlayerPrefs.SetString("VisualizeDepthToggle", VisualizeDepth.ToString());
+
+        PlayerPrefs.SetString("EnableDVLNoiseToggle", EnableDVLNoise.ToString());
+        PlayerPrefs.SetString("EnableIMUNoiseToggle", EnableIMUNoise.ToString());
+        PlayerPrefs.SetString("EnableDepthNoiseToggle", EnableDepthNoise.ToString());
 
         PlayerPrefs.SetString("DrawerConfigOpen", DrawerConfigOpen.ToString());
         PlayerPrefs.SetString("DrawerControlsOpen", DrawerControlsOpen.ToString());

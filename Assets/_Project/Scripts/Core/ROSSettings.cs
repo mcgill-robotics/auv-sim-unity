@@ -37,13 +37,15 @@ public class ROSSettings : MonoBehaviour
     [Space(10)]
     [Header("Sensor Topics")]
     [Tooltip("DVL velocity and altitude data topic")]
-    public string DVLTopic = "/sensors/dvl/data";
+    public string DVLTopic = "dvl/velocity";
+    public string DVLDeadReckoningTopic = "dvl/dead_reckoning";
+    public string DVLOdometryTopic = "dvl/odometry";
     
     [Tooltip("IMU orientation, gyro, and accelerometer data topic")]
-    public string IMUTopic = "/sensors/imu/data";
+    public string IMUTopic = "imu/data";
     
     [Tooltip("Depth sensor data topic")]
-    public string DepthTopic = "/sensors/depth/data";
+    public string DepthTopic = "/sensors/depth/z";
     
     [Tooltip("Hydrophone bearing data topic")]
     public string HydrophonesTopic = "/sensors/hydrophones/data";
@@ -110,7 +112,10 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("VIO camera pose from ZED positional tracking")]
     public string VIOPoseTopic = "/vision/vio_pose";
 
+    [Space(10)]
+    
     [Header("Frames")]
+    public string OdomFrameId = "odom";
     public string WorldFrameId = "world";
     public string BaseLinkFrameId = "base_link";
     public string ImuFrameId = "imu_link";
