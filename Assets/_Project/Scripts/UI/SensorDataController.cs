@@ -11,6 +11,10 @@ public class SensorDataController
     private Label textDVLVx, textDVLVy, textDVLVz;
     private Label textDVLAlt, textDVLLock;
     private Label labelDVL;
+    
+    // DVL DR Labels (Optional, if present in UXML)
+    private Label textDVLPosX, textDVLPosY, textDVLPosZ;
+    
     private Toggle toggleDVLViz;
     
     // IMU Labels
@@ -26,6 +30,11 @@ public class SensorDataController
     private Label textDepthValue;
     private Label labelDepth;
     private Toggle toggleDepthViz;
+    
+    // Noise Toggles
+    private Toggle toggleDVLNoise;
+    private Toggle toggleIMUNoise;
+    private Toggle toggleDepthNoise;
     
     // Publisher References
     private DVLPublisher dvlPublisher;
@@ -46,7 +55,14 @@ public class SensorDataController
         textDVLVz = root.Q<Label>("Text-DVLVz");
         textDVLAlt = root.Q<Label>("Text-DVLAlt");
         textDVLLock = root.Q<Label>("Text-DVLLock");
+        
+        // DR Pos Labels - allow them to be null if not in UXML yet
+        textDVLPosX = root.Q<Label>("Text-DVLPosX");
+        textDVLPosY = root.Q<Label>("Text-DVLPosY");
+        textDVLPosZ = root.Q<Label>("Text-DVLPosZ");
+        
         toggleDVLViz = root.Q<Toggle>("Toggle-DVLViz");
+        toggleDVLNoise = root.Q<Toggle>("Toggle-DVLNoise");
         
         // IMU
         textIMUAx = root.Q<Label>("Text-IMUAx");
@@ -59,10 +75,12 @@ public class SensorDataController
         textIMUPitch = root.Q<Label>("Text-IMUPitch");
         textIMUYaw = root.Q<Label>("Text-IMUYaw");
         toggleIMUViz = root.Q<Toggle>("Toggle-IMUViz");
+        toggleIMUNoise = root.Q<Toggle>("Toggle-IMUNoise");
         
         // Depth
         textDepthValue = root.Q<Label>("Text-DepthValue");
         toggleDepthViz = root.Q<Toggle>("Toggle-DepthViz");
+        toggleDepthNoise = root.Q<Toggle>("Toggle-DepthNoise");
         
         labelDVL = root.Q<Label>("Label-DVL");
         labelIMU = root.Q<Label>("Label-IMU");
@@ -106,6 +124,35 @@ public class SensorDataController
                 SimulationSettings.Instance.SaveSettings();
             });
         }
+
+        
+        // Noise Toggle Callbacks
+        if (toggleDVLNoise != null)
+        {
+            toggleDVLNoise.RegisterValueChangedCallback(evt => {
+                if (dvlPublisher != null) dvlPublisher.enableNoise = evt.newValue;
+                SimulationSettings.Instance.EnableDVLNoise = evt.newValue;
+                SimulationSettings.Instance.SaveSettings();
+            });
+        }
+        
+        if (toggleIMUNoise != null)
+        {
+            toggleIMUNoise.RegisterValueChangedCallback(evt => {
+                if (imuPublisher != null) imuPublisher.enableNoise = evt.newValue;
+                SimulationSettings.Instance.EnableIMUNoise = evt.newValue;
+                SimulationSettings.Instance.SaveSettings();
+            });
+        }
+        
+        if (toggleDepthNoise != null)
+        {
+            toggleDepthNoise.RegisterValueChangedCallback(evt => {
+                if (depthPublisher != null) depthPublisher.enableNoise = evt.newValue;
+                SimulationSettings.Instance.EnableDepthNoise = evt.newValue;
+                SimulationSettings.Instance.SaveSettings();
+            });
+        }
     }
     
     /// <summary>
@@ -138,7 +185,24 @@ public class SensorDataController
             if (toggleDepthViz != null)
                 toggleDepthViz.SetValueWithoutNotify(SimulationSettings.Instance.VisualizeDepth);
         }
-
+        // Apply saved Noise Settings (Source of Truth is SimulationSettings)
+        if (dvlPublisher != null) 
+            dvlPublisher.enableNoise = SimulationSettings.Instance.EnableDVLNoise;
+            
+        if (toggleDVLNoise != null)
+            toggleDVLNoise.SetValueWithoutNotify(SimulationSettings.Instance.EnableDVLNoise);
+            
+        if (imuPublisher != null)
+            imuPublisher.enableNoise = SimulationSettings.Instance.EnableIMUNoise;
+            
+        if (toggleIMUNoise != null)
+            toggleIMUNoise.SetValueWithoutNotify(SimulationSettings.Instance.EnableIMUNoise);
+            
+        if (depthPublisher != null)
+            depthPublisher.enableNoise = SimulationSettings.Instance.EnableDepthNoise;
+            
+        if (toggleDepthNoise != null)
+            toggleDepthNoise.SetValueWithoutNotify(SimulationSettings.Instance.EnableDepthNoise);
         // Apply colors to UI labels
         UpdateLabelColors();
     }
@@ -183,6 +247,12 @@ public class SensorDataController
                 textDVLLock.RemoveFromClassList("status-bad");
                 textDVLLock.AddToClassList(dvlPublisher.IsValid ? "status-ok" : "status-bad");
             }
+            
+            // DVL Dead Reckoning Position (Odom Frame)
+            var pose = dvlPublisher.RosDeadReckoningPosition;
+            if (textDVLPosX != null) textDVLPosX.text = $"{pose.x:+0.00;-0.00}";
+            if (textDVLPosY != null) textDVLPosY.text = $"{pose.y:+0.00;-0.00}";
+            if (textDVLPosZ != null) textDVLPosZ.text = $"{pose.z:+0.00;-0.00}";
         }
         
         // IMU Data - Using ROS accessors (FLU frame: X=Forward, Y=Left, Z=Up)

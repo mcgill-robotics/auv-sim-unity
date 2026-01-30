@@ -50,6 +50,12 @@ public class OrbitFollowCamera : MonoBehaviour
     [Tooltip("How smoothly the camera rotation updates")]
     public float rotationSmoothing = 10f;
 
+    [Header("Collision")]
+    [Tooltip("Layers that obstruct the camera view")]
+    public LayerMask collisionLayerMask = 1; // Default
+    [Tooltip("Offset from the wall to prevent clipping")]
+    public float collisionBuffer = 0.2f;
+
     private float x = 0.0f;
     private float y = 0.0f;
     private float currentDistance;
@@ -119,23 +125,37 @@ public class OrbitFollowCamera : MonoBehaviour
         // 2. Clamp Pitch (Y)
         y = ClampAngle(y, yMinLimit, yMaxLimit);
 
-        // 3. Calculate Target State (Relative to target rotation)
-        // We multiply target.rotation by our orbital delta
+        // 3. Calculate Target Rotation
         Quaternion orbitalRotation = Quaternion.Euler(y, x, 0);
         Quaternion targetRotation = Target.rotation * orbitalRotation;
         
-        // Position is base target pos + (relative rotation offset)
-        Vector3 targetPosition = Target.position + targetRotation * new Vector3(0.0f, 0.0f, -distance);
+        // 4. Calculate Desired Distance (Collision Check)
+        // Desired position without collision
+        Vector3 direction = targetRotation * new Vector3(0.0f, 0.0f, -1.0f);
+        Vector3 idealPosition = Target.position + direction * distance;
+        
+        float targetDist = distance;
+        
+        // Raycast from target to ideal position to check for blockers
+        RaycastHit hit;
+        if (Physics.Linecast(Target.position, idealPosition, out hit, collisionLayerMask))
+        {
+            float hitDist = Vector3.Distance(Target.position, hit.point);
+            // Clamp distance to avoid clipping, but respect minDistance
+            targetDist = Mathf.Clamp(hitDist - collisionBuffer, minDistance, distance);
+        }
 
-        // 4. Smooth State Transitions
+        // 5. Smooth State Transitions
         float dt = Time.deltaTime;
         currentRotation = Quaternion.Slerp(currentRotation, targetRotation, dt * rotationSmoothing);
-        currentDistance = Mathf.Lerp(currentDistance, distance, dt * movementSmoothing);
+        
+        // Use the collision-aware targetDist, but smooth it
+        currentDistance = Mathf.Lerp(currentDistance, targetDist, dt * movementSmoothing);
         
         // Re-calculate smoothed position
         currentPosition = Target.position + currentRotation * new Vector3(0.0f, 0.0f, -currentDistance);
 
-        // 5. Apply to transform
+        // 6. Apply to transform
         transform.rotation = currentRotation;
         transform.position = currentPosition;
     }

@@ -20,6 +20,9 @@ public class DepthPublisher : ROSPublisher
     
     [Space(10)]
     [Header("Noise Model")]
+    [Tooltip("If enabled, noise and bias are added to the depth measurements.")]
+    public bool enableNoise = true;
+
     [Tooltip("White noise standard deviation (meters)")]
     [Range(0f, 0.5f)]
     public float noiseStdDev = 0.01f;
@@ -140,10 +143,15 @@ public class DepthPublisher : ROSPublisher
         depth = Mathf.Max(0f, depth);
         
         // Add noise/bias only for the "noisy" measurement sent to ROS
-        float noisyDepth = depth + bias;
-        if (noiseStdDev > 0)
+        float noisyDepth = depth;
+        
+        if (enableNoise)
         {
-            noisyDepth += (float)Stochastic.GenerateGaussian() * noiseStdDev;
+             noisyDepth += bias;
+             if (noiseStdDev > 0)
+             {
+                 noisyDepth += (float)Stochastic.GenerateGaussian() * noiseStdDev;
+             }
         }
         
         LastDepth = noisyDepth; // Clean depth for simple display/viz

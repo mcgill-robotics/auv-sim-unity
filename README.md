@@ -174,7 +174,7 @@ Assets/
 * **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
 * **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
-### ⚠️ Important: ZED SDK & Plugin Setup (not tested on Windows, ignore if not using ZED SDK)
+### ⚠️ Important: ZED SDK & Plugin Setup (ONLY ON UBUNTU w/ NVIDIA GPU, ignore if on Windows/Mac)
 The simulator relies on the ZED SDK. Due to GitHub file size limits, the required binary files (`.dll` and `.so`) are **NOT** included in the repository.
 
 **You must follow these steps or the project will have compile errors:**
@@ -223,9 +223,9 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
     Check Sensor Data:
     ```bash
     ros2 topic list
-    ros2 topic echo /sensors/dvl/data --once
-    ros2 topic echo /sensors/imu/data --once
-    ros2 topic echo /sensors/depth/data --once
+    ros2 topic echo dvl/velocity --once
+    ros2 topic echo imu/data --once
+    ros2 topic echo /sensors/depth/z --once
     ```
 
     View Camera Feeds:
@@ -320,9 +320,11 @@ The simulator communicates over the following default topics (configurable in `R
 | `/auv/ground_truth/accel` | Ground truth linear/angular acceleration | **FLU** (+X Fwd, +Y Left, +Z Up) | `AccelStamped` |
 | `/auv/ground_truth/pose` | **Hybrid Pose:** <br>• **Pos X/Y:** Relative to Start (Locally Aligned) <br>• **Pos Z:** Absolute (World Up) <br>• **Orientation:** Relative to Start | **FLU** | `PoseStamped` |
 | `/auv/ground_truth/orientation` | Absolute World Orientation | **FLU** | `QuaternionStamped` |
-| `/sensors/dvl/data` | Doppler Velocity Log (A50) | **FRD** (+X Fwd, +Y Right, +Z Down) | `TwistWithCovarianceStamped` (DvlMsg in the future) |
-| `/sensors/imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `Imu` |
-| `/sensors/depth/data` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
+| `dvl/velocity` | Doppler Velocity Log (A50) | **FRD** (+X Fwd, +Y Right, +Z Down) | `TwistWithCovarianceStamped` (DvlMsg in the future) |
+| `dvl/dead_reckoning` | DVL Dead Reckoning Position | **NED** (North-East-Down) Start-Relative | `PoseWithCovarianceStamped` |
+| `dvl/odometry` | DVL Odometry | **NED** Position / **FRD** Twist | `Odometry` |
+| `imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `Imu` |
+| `/sensors/depth/z` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
 | `/zed2i/zed_node/stereo/image_rect_color` | Front RGB Camera (rectified) | Optical Frame | `Image` |
 | `/zed2i/zed_node/stereo/image_rect_color/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
 | `/zed2i/zed_node/depth/image_rect` | Front Depth Map (always raw) | Optical Frame | `Image` |
@@ -336,7 +338,7 @@ The simulator communicates over the following default topics (configurable in `R
 
 | Topic | Description | Message Type |
 | :--- | :--- | :--- |
-| `/auv/thruster_forces` | Individual thruster force commands (8 thrusters) | `ThrusterForces` |
+| `/propulsion/forces` | Individual thruster force commands (8 thrusters) | `ThrusterForces` |
 | `/auv/dropper/trigger` | Trigger for the dropper mechanism | `Bool` |
 | `/auv/torpedo/launch` | Trigger for torpedo launch | `Bool` |
 | `/auv/torpedo/rotate` | Torpedo launcher rotation angle | `Float32` |
