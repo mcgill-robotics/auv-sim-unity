@@ -5297,9 +5297,9 @@ MonoBehaviour:
   PublishDownCam: 0
   PublishDepthCamera: 0
   StreamZEDCamera: 0
-  VisualizeDVL: 1
-  VisualizeIMU: 1
-  VisualizeDepth: 0
+  VisualizeDVL: 0
+  VisualizeIMU: 0
+  VisualizeDepth: 1
   EnableDVLNoise: 0
   EnableIMUNoise: 0
   EnableDepthNoise: 0

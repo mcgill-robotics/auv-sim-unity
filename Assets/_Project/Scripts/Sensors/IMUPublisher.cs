@@ -301,6 +301,14 @@ public class IMUPublisher : ROSPublisher
             {
                 LastOrientation = trueOrientation;
             }
+            
+            // Convert Absolute Rotation to Relative Rotation (Start-Relative / Odom Frame)
+            // This ensures IMU starts at (0,0,0) (or current-start) orientation.
+            if (SimulationOrigin.Instance != null && SimulationOrigin.Instance.IsInitialized)
+            {
+                LastOrientation = Quaternion.Inverse(SimulationOrigin.Instance.InitialRotation) * LastOrientation;
+            }
+            
             imuMsg.orientation = LastOrientation.To<FLU>();
         }
         else
