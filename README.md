@@ -213,12 +213,14 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
     # Launch endpoint
     ros2 launch ros_tcp_endpoint endpoint.py
     ```
+    _Sometimes ros_tcp_endpoint fails on the ros2 end, you just need to run this command again_
 
 2.  **Verify Connection**
+    - Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
     - In Unity: Press Play. The ROS Settings menu should show a green "Connected" status.
     - In Terminal: You should see logs indicating registration of publishers (e.g., RegisterPublisher(/sensors/dvl/data, ...)).
 
-3.  **Visualize Data**
+4.  **Visualize Data**
     To verify data is flowing correctly:
     Check Sensor Data:
     ```bash
