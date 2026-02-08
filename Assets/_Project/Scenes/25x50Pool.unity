@@ -2923,7 +2923,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -3170,7 +3170,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  AUVRealForceMultiplier: 3
+  forceMultiplier: 1
   enableForceVisualization: 1
   forceVisualScale: 0.01
   visualizationColor: {r: 1, g: 0, b: 0, a: 1}
@@ -5284,7 +5284,7 @@ MonoBehaviour:
   PublishROS: 1
   DisplaySimObjects: 0
   NoWaterMode: 1
-  EnableShadows: 0
+  EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}

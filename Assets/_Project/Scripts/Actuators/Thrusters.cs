@@ -31,9 +31,9 @@ public class Thrusters : MonoBehaviour
     [Tooltip("Particle systems for each thruster (visual feedback)")]
     public ParticleSystem[] thrusterParticles;
 
-    [Tooltip("Real-to-sim force scaling factor. Higher = more sensitive to ROS commands")]
-    [Range(1f, 10f)]
-    public float AUVRealForceMultiplier = 3;
+    [Tooltip("Force multiplier. Directly scales the applied force. 1.0 = 100%, 0.5 = 50%, 2.0 = 200%.")]
+    [Range(0.1f, 10f)]
+    public float forceMultiplier = 1f;
 
     [Space(10)]
     [Header("Force Visualization")]
@@ -76,7 +76,7 @@ public class Thrusters : MonoBehaviour
     private double[] inputThrusterForces = new double[8];
     private float[] thrusterEfficiencyScalars = new float[8];
     private float[] currentThrusterLevels = new float[8];
-    private float massScalarRealToSim;
+
 
     // Performance: State tracking to avoid redundant updates
     private bool[] particlesPlaying = new bool[8];
@@ -94,7 +94,7 @@ public class Thrusters : MonoBehaviour
         roscon = ROSConnection.GetOrCreateInstance();
         roscon.Subscribe<ThrusterForcesMsg>(ROSSettings.Instance.ThrusterForcesTopic, SetThrusterForces);
 
-        massScalarRealToSim = 1f / AUVRealForceMultiplier;
+
         moveForceOver4 = moveForce / 4;
         moveForceOver2 = moveForce / 2;
         sinkForceOver4 = sinkForce / 4;
@@ -167,7 +167,7 @@ public class Thrusters : MonoBehaviour
             finalForce = Mathf.Clamp(finalForce, -maxThrusterForce, maxThrusterForce);
 
             Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
-            Vector3 thrusterForceVector = worldForceDirection * (finalForce * massScalarRealToSim);
+            Vector3 thrusterForceVector = worldForceDirection * (finalForce * forceMultiplier);
 
             AuvRb.AddForceAtPosition(thrusterForceVector, thrusters[i].position, ForceMode.Force);
 
