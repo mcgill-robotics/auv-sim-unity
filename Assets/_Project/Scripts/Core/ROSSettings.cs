@@ -21,7 +21,7 @@ public class ROSSettings : MonoBehaviour
     [Header("Actuator Topics")]
     [Tooltip("Topic for individual thruster force commands (8 thrusters)")]
     public string ThrusterForcesTopic = "/propulsion/forces";
-    
+
     [Tooltip("Topic for dropper trigger command (Bool)")]
     public string DropperTopic = "/auv/dropper/trigger";
 
@@ -40,45 +40,45 @@ public class ROSSettings : MonoBehaviour
     public string DVLTopic = "dvl/velocity";
     public string DVLDeadReckoningTopic = "dvl/dead_reckoning";
     public string DVLOdometryTopic = "dvl/odometry";
-    
+
     [Tooltip("IMU orientation, gyro, and accelerometer data topic")]
     public string IMUTopic = "imu/data";
-    
+
     [Tooltip("Depth sensor data topic")]
     public string DepthTopic = "/sensors/depth/z";
-    
+
     [Tooltip("Hydrophone bearing data topic")]
     public string HydrophonesTopic = "/sensors/hydrophones/data";
-    
+
     [Tooltip("Front camera image topic")]
-    public string FrontCameraTopic = "/zed2i/zed_node/stereo/image_rect_color";
-    
+    public string FrontCameraTopic = "/zed/zed_node/left/image_rect_color";
+
     [Tooltip("Down camera image topic")]
     public string DownCameraTopic = "/down_cam/image_raw";
-    
+
     [Tooltip("Front depth camera topic")]
-    public string DepthCameraTopic = "/zed2i/zed_node/depth/image_rect";
-    
+    public string DepthCameraTopic = "/zed/zed_node/depth/depth_registered";
+
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";
 
     [Header("Control")]
     public string PIDEnableTopic = "/auv/pid/enable";
     public string PIDSetpointTopic = "/auv/pid/setpoint";
-    
+
     // PID Individual Axis Topics
     public string PidXEnableTopic = "/auv/pid/x/enable";
     public string PidYEnableTopic = "/auv/pid/y/enable";
     public string PidZEnableTopic = "/auv/pid/z/enable";
     public string PidQuatEnableTopic = "/auv/pid/quat/enable";
-    
+
     public string PidXSetpointTopic = "/auv/pid/x/setpoint";
     public string PidYSetpointTopic = "/auv/pid/y/setpoint";
     public string PidZSetpointTopic = "/auv/pid/z/setpoint";
     public string PidQuatSetpointTopic = "/auv/pid/quat/setpoint";
 
     public string StateTopic = "/auv/state";
-    
+
     // State Components
     public string StateXTopic = "/auv/state/x";
     public string StateYTopic = "/auv/state/y";
@@ -91,13 +91,13 @@ public class ROSSettings : MonoBehaviour
     [Header("Ground Truth")]
     [Tooltip("Ground truth velocity (linear + angular) in body frame")]
     public string GroundTruthTwistTopic = "/auv/ground_truth/twist";
-    
+
     [Tooltip("Ground truth acceleration (linear + angular) in body frame")]
     public string GroundTruthAccelTopic = "/auv/ground_truth/accel";
-    
+
     [Tooltip("Ground truth orientation quaternion")]
     public string GroundTruthOrientationTopic = "/auv/ground_truth/orientation";
-    
+
     [Tooltip("Ground truth depth (positive down)")]
     public string GroundTruthDepthTopic = "/auv/ground_truth/depth";
 
@@ -108,12 +108,12 @@ public class ROSSettings : MonoBehaviour
     public string PingerBearingTopic = "/sensors/hydrophones/pinger_bearing";
     public string VisionDetectionFrameTopic = "/vision/detection_frame";
     public string VisionObjectMapTopic = "/vision/object_map";
-    
+
     [Tooltip("VIO camera pose from ZED positional tracking")]
     public string VIOPoseTopic = "/vision/vio_pose";
 
     [Space(10)]
-    
+
     [Header("Frames")]
     public string OdomFrameId = "odom";
     public string WorldFrameId = "world";
