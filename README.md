@@ -327,9 +327,9 @@ The simulator communicates over the following default topics (configurable in `R
 | `dvl/odometry` | DVL Odometry | **NED** Position / **FRD** Twist | `Odometry` |
 | `imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `Imu` |
 | `/sensors/depth/z` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
-| `/zed2i/zed_node/stereo/image_rect_color` | Front RGB Camera (rectified) | Optical Frame | `Image` |
-| `/zed2i/zed_node/stereo/image_rect_color/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
-| `/zed2i/zed_node/depth/image_rect` | Front Depth Map (always raw) | Optical Frame | `Image` |
+| `/zed/zed_node/left/image_rect_color` | Front RGB Camera (rectified) | Optical Frame | `Image` |
+| `/zed/zed_node/left/image_rect_color/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
+| `/zed/zed_node/depth/depth_registered` | Front Depth Map (always raw) | Optical Frame | `Image` |
 | `/down_cam/image_raw` | Downward RGB Camera (raw) | Optical Frame | `Image` |
 | `/down_cam/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
 
