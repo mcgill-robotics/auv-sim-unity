@@ -5451,9 +5451,9 @@ MonoBehaviour:
   IMUTopic: imu/data
   DepthTopic: /sensors/depth/z
   HydrophonesTopic: /sensors/hydrophones/data
-  FrontCameraTopic: /zed2i/zed_node/stereo/image_rect_color
+  FrontCameraTopic: /zed/zed_node/rgb/color/rect/image
   DownCameraTopic: /down_cam/image_raw
-  DepthCameraTopic: /zed2i/zed_node/depth/image_rect
+  DepthCameraTopic: /zed/zed_node/depth/depth_registered
   ClockTopic: /clock
   PIDEnableTopic: /auv/pid/enable
   PIDSetpointTopic: /auv/pid/setpoint

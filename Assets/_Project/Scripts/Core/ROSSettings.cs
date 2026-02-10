@@ -51,7 +51,7 @@ public class ROSSettings : MonoBehaviour
     public string HydrophonesTopic = "/sensors/hydrophones/data";
 
     [Tooltip("Front camera image topic")]
-    public string FrontCameraTopic = "/zed/zed_node/left/image_rect_color";
+    public string FrontCameraTopic = "/zed/zed_node/rgb/color/rect/image";
 
     [Tooltip("Down camera image topic")]
     public string DownCameraTopic = "/down_cam/image_raw";
