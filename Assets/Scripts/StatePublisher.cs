@@ -23,10 +23,10 @@ public class StatePublisher : MonoBehaviour
 
 	private RosMessageTypes.Auv.UnityStateMsg stateMsg = new RosMessageTypes.Auv.UnityStateMsg();
 	private float timeSinceLastPublish;
-	private bool isDVLActive;
-	private bool isDepthSensorActive;
-	private bool isIMUActive;
-	private bool isHydrophonesActive;
+	private bool is_dvl_active;
+	private bool is_depth_sensor_active;
+	private bool is_imu_active;
+	private bool is_hydrophones_active;
 	private bool publishToRos;
 	private float timeBetweenPublishes = 0.1f;
 
@@ -62,10 +62,10 @@ public class StatePublisher : MonoBehaviour
 		classLogicManager = FindObjectOfType<LogicManager1>();
 		if (classLogicManager != null)
 		{
-			SubscribeToggle(classLogicManager.PublishDVLToggle, SetisDVLActive);
-			SubscribeToggle(classLogicManager.PublishDepthToggle, SetisDepthSensorActive);
-			SubscribeToggle(classLogicManager.PublishIMUToggle, SetisIMUActive);
-			SubscribeToggle(classLogicManager.PublishHydrophonesToggle, SetisHydrophonesActive);
+			SubscribeToggle(classLogicManager.PublishDVLToggle, Setis_dvl_active);
+			SubscribeToggle(classLogicManager.PublishDepthToggle, Setis_depth_sensor_active);
+			SubscribeToggle(classLogicManager.PublishIMUToggle, Setis_imu_active);
+			SubscribeToggle(classLogicManager.PublishHydrophonesToggle, Setis_hydrophones_active);
 			SubscribeToggle(classLogicManager.PublishROSToggle, SetPublishToRos);
 		}
 		else
@@ -93,11 +93,11 @@ public class StatePublisher : MonoBehaviour
 	private void OnDestroy()
 	{
 		// Unsubscribe from the events to prevent memory leaks.
-		UnsubscribeToggle(classLogicManager.PublishDVLToggle, SetisDVLActive);
+		UnsubscribeToggle(classLogicManager.PublishDVLToggle, Setis_dvl_active);
 		UnsubscribeToggle(classLogicManager.PublishROSToggle, SetPublishToRos);
-		UnsubscribeToggle(classLogicManager.PublishDepthToggle, SetisDepthSensorActive);
-		UnsubscribeToggle(classLogicManager.PublishIMUToggle, SetisIMUActive);
-		UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, SetisHydrophonesActive);
+		UnsubscribeToggle(classLogicManager.PublishDepthToggle, Setis_depth_sensor_active);
+		UnsubscribeToggle(classLogicManager.PublishIMUToggle, Setis_imu_active);
+		UnsubscribeToggle(classLogicManager.PublishHydrophonesToggle, Setis_hydrophones_active);
 	}
 
 	private void SendState()
@@ -122,16 +122,16 @@ public class StatePublisher : MonoBehaviour
 		stateMsg.angular_velocity = auvRb.angularVelocity.To<RUF>();
 		stateMsg.velocity = currentVelocity.To<RUF>();
 		stateMsg.frequencies = frequencies;
-		stateMsg.times_pinger_1 = times[0];
-		stateMsg.times_pinger_2 = times[1];
-		stateMsg.times_pinger_3 = times[2];
-		stateMsg.times_pinger_4 = times[3];
+		stateMsg.hydrophone_one_freqs = times[0];
+		stateMsg.hydrophone_two_freqs = times[1];
+		stateMsg.hydrophone_three_freqs = times[2];
+		stateMsg.hydrophone_four_freqs = times[3];
 		stateMsg.linear_acceleration = acceleration.To<RUF>();
 
-		stateMsg.isDVLActive = Convert.ToInt32(isDVLActive);
-		stateMsg.isDepthSensorActive = Convert.ToInt32(isDepthSensorActive);
-		stateMsg.isIMUActive = Convert.ToInt32(isIMUActive);
-		stateMsg.isHydrophonesActive = Convert.ToInt32(isHydrophonesActive);
+		stateMsg.is_dvl_active = Convert.ToInt32(is_dvl_active);
+		stateMsg.is_depth_sensor_active = Convert.ToInt32(is_depth_sensor_active);
+		stateMsg.is_imu_active = Convert.ToInt32(is_imu_active);
+		stateMsg.is_hydrophones_active = Convert.ToInt32(is_hydrophones_active);
 
 		roscon.Publish(stateTopicName, stateMsg);
 		
@@ -163,24 +163,24 @@ public class StatePublisher : MonoBehaviour
 		}
 	}
 
-	private void SetisDVLActive(bool active)
+	private void Setis_dvl_active(bool active)
 	{
-		isDVLActive = active;
+		is_hydrophones_active = active;
 	}
 
-	private void SetisDepthSensorActive(bool active)
+	private void Setis_depth_sensor_active(bool active)
 	{
-		isDepthSensorActive = active;
+		is_depth_sensor_active = active;
 	}
 
-	private void SetisIMUActive(bool active)
+	private void Setis_imu_active(bool active)
 	{
-		isIMUActive = active;
+		is_imu_active = active;
 	}
 
-	private void SetisHydrophonesActive(bool active)
+	private void Setis_hydrophones_active(bool active)
 	{
-		isHydrophonesActive = active;
+		is_hydrophones_active = active;
 	}
 	
 	private void SetPublishToRos(bool active)
