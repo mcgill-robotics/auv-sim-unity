@@ -12,7 +12,13 @@ public class ZEDDependencyChecker
   [DllImport("kernel32.dll", SetLastError = true)]
   private static extern bool FreeLibrary(IntPtr hModule);
 
-  string[] DLLCriticalDeps = {
+  // same for Linux
+  [DllImport("libdl.so.2")]
+  private static extern IntPtr dlopen(string fileName, int flags);
+  [DllImport("libdl.so.2")]
+  private static extern int dlclose(IntPtr handle);
+
+  private static string[] DLLCriticalDeps = {
             "nvcuda.dll",           // Core CUDA
             "nvEncodeAPI64.dll",    // Needed for H264/H265 streaming
             "nvcuvid.dll",          // Video Decoding
@@ -48,8 +54,20 @@ public class ZEDDependencyChecker
             "api-ms-win-crt-time-l1-1-0.dll"
         };
 
-  string[] SOCriticalDeps = {
-
+  private static string[] SOCriticalDeps = {
+          "libcuda.so.1",
+          "libpng16.so.16",
+          "libjpeg.so.8",
+          "libturbojpeg.so.0",
+          "libusb-1.0.so.0",
+          "libnvcuvid.so.1",
+          "libnvidia-encode.so.1",
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgomp.so.1",
+          "libgcc_s.so.1",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
         };
 
   public ZEDDependencyChecker(bool verbose = false)
@@ -76,26 +94,30 @@ public class ZEDDependencyChecker
     {
       Debug.Log($"<color=cyan><b>--- CHECKING ZED SDK DEPENDENCIES ---</b></color>");
       Debug.Log($"Operating System: {OS}");
+      Debug.Log("LD_LIBRARY_PATH=" + Environment.GetEnvironmentVariable("LD_LIBRARY_PATH"));
     }
 
     // 1. Check for NVIDIA Driver / CUDA
     if (!CheckNvidiaStack()) return false;
 
 
-    foreach (string dll in criticalDeps)
+    foreach (string dep in criticalDeps)
     {
-      if (verbose) Debug.Log($"Checking for {dll}...");
-      IntPtr handle = LoadLibrary(dll);
-      if (handle != IntPtr.Zero)
+      if (OS == OperatingSystemFamily.Windows)
       {
-        if (verbose) Debug.Log($"<color=green>[FOUND]</color> {dll}");
-        FreeLibrary(handle); // Clean up
+        if (!CheckWindowsDependency(dep))
+        {
+          Debug.LogError($"CRITICAL: Missing dependency: {dep}");
+          return false;
+        }
       }
-      else
+      else if (OS == OperatingSystemFamily.Linux)
       {
-        // This will tell us exactly which file is missing
-        Debug.LogError($"<color=red>[MISSING]</color> {dll}. This will cause init_streamer to return -1.");
-        return false;
+        if (!CheckLinuxDependency(dep))
+        {
+          Debug.LogError($"CRITICAL: Missing dependency: {dep}");
+          return false;
+        }
       }
     }
 
@@ -110,12 +132,59 @@ public class ZEDDependencyChecker
     if (verbose)
     {
       Debug.Log($"Detected GPU: {gpuName}");
+      Debug.Log($"Graphics Device Vendor: {SystemInfo.graphicsDeviceVendor}");
+      Debug.Log($"SystemInfo.graphicsDeviceName: {SystemInfo.graphicsDeviceName}");
     }
     if (!gpuName.Contains("nvidia"))
     {
       Debug.LogError("CRITICAL: No NVIDIA GPU detected. ZED SDK requires NVIDIA hardware on Windows.");
       return false;
     }
+    return true;
+  }
+
+  bool CheckWindowsDependency(string dllName)
+  {
+    try
+    {
+      IntPtr handle = LoadLibrary(dllName);
+      if (handle == IntPtr.Zero)
+      {
+        int errorCode = Marshal.GetLastWin32Error();
+        if (verbose) Debug.LogWarning($"Failed to load {dllName}. Error code: {errorCode}");
+        return false;
+      }
+      FreeLibrary(handle);
+    }
+    catch (Exception ex)
+    {
+      if (verbose) Debug.LogWarning($"Exception while loading {dllName}: {ex.Message}");
+      return false;
+    }
+
+    if (verbose) Debug.Log($"Found dependency: {dllName}");
+    return true;
+  }
+  bool CheckLinuxDependency(string soName)
+  {
+    const int RTLD_NOW = 2;
+    try
+    {
+      IntPtr handle = dlopen(soName, RTLD_NOW);
+      if (handle == IntPtr.Zero)
+      {
+        if (verbose) Debug.LogWarning($"Failed to load {soName}. It may be missing or not in the library path.");
+        return false;
+      }
+      dlclose(handle);
+    }
+    catch (Exception ex)
+    {
+      if (verbose) Debug.LogWarning($"Exception while loading {soName}: {ex.Message}");
+      return false;
+    }
+
+    if (verbose) Debug.Log($"Found dependency: {soName}");
     return true;
   }
 }
