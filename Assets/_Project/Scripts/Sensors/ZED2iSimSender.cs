@@ -91,7 +91,13 @@ public class ZED2iSimSender : MonoBehaviour
     const string DLL_NAME = "sl_zed";
 #endif
 
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    public enum INPUT_FORMAT : int
+    {
+        RGB = 0,
+        BGR = 1,
+        YUV = 2
+    };
+    [StructLayout(LayoutKind.Sequential)]
     public struct StreamingParametersFlattened
     {
         public int mode;
@@ -108,7 +114,48 @@ public class ZED2iSimSender : MonoBehaviour
         public byte padding4; public byte padding5; public byte padding6;
         public int transport_layer_mode;
     }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct StreamingParametersTest
+    {
+        public int mode;
 
+        public float imu_cam_q0;
+        public float imu_cam_q1;
+        public float imu_cam_q2;
+        public float imu_cam_q3;
+
+        public float imu_cam_t0;
+        public float imu_cam_t1;
+        public float imu_cam_t2;
+
+        public int image_width;
+        public int image_height;
+        public int codec_type;
+
+        public ushort port;
+        private ushort _pad0; // alignment padding
+
+        public int fps;
+        public int serial_number;
+
+        public byte alpha_channel_included;
+        private byte _pad1;
+        private byte _pad2;
+        private byte _pad3;
+
+        public int input_format;
+
+        public byte verbose;
+        private byte _pad4;
+        private byte _pad5;
+        private byte _pad6;
+
+        public int transport_layer_mode;
+        public int bitrate;
+
+        public ushort chunk_size;
+        private ushort _pad7;
+    }
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
     private static extern int init_streamer(int id, ref StreamingParametersFlattened params_stream);
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
@@ -127,7 +174,12 @@ public class ZED2iSimSender : MonoBehaviour
 
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
     private static extern void close_streamer(int id);
+    // Necessary Win32 imports to check for DLLs without crashing the app
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    private static extern IntPtr LoadLibrary(string lpFileName);
 
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool FreeLibrary(IntPtr hModule);
     void Start()
     {
         // CameraRenderManager handles camera state
@@ -325,28 +377,130 @@ public class ZED2iSimSender : MonoBehaviour
             qw, qx, qy, qz,
             ax, ay, az);
     }
-
-
+    public StreamingParametersTest CreateDefault()
+    {
+        return new StreamingParametersTest
+        {
+            mode = 1,
+            imu_cam_q3 = 1.0f,
+            image_width = targetWidth,
+            image_height = targetHeight,
+            codec_type = 1,
+            port = (ushort)streamPort,
+            fps = 30,
+            serial_number = 0,
+            alpha_channel_included = 1,
+            input_format = 0,
+            verbose = 1,
+            transport_layer_mode = 0,
+            bitrate = 10,
+            chunk_size = 1024
+        };
+    }
+    StreamingParametersTest CreateParams(int codec, int serial, ushort port)
+    {
+        return new StreamingParametersTest
+        {
+            mode = 1,
+            imu_cam_q3 = 1.0f,
+            image_width = targetWidth,
+            image_height = targetHeight,
+            codec_type = codec,
+            port = port,
+            fps = 30,
+            serial_number = serial,
+            alpha_channel_included = 1,
+            input_format = 0,
+            verbose = 1,
+            transport_layer_mode = 0,
+            bitrate = 10,
+            chunk_size = 1024
+        };
+    }
     IEnumerator InitializeNativeStreamer()
     {
         yield return new WaitForSeconds(1.0f);
         streamerID = UnityEngine.Random.Range(1, 9999);
         StreamingParametersFlattened p = new StreamingParametersFlattened();
+        StreamingParametersTest defaultParams = CreateDefault();
+        // Debug.Log("[Zed Sim] Size of StreamingParametersTest: " + Marshal.SizeOf<StreamingParametersTest>() + ", Size of StreamingParametersFlattened: " + Marshal.SizeOf<StreamingParametersFlattened>());
         p.mode = 1;
         p.image_width = targetWidth; p.image_height = targetHeight;
         p.port = (ushort)streamPort; p.fps = targetFPS; p.serial_number = serialNumber;
         p.codec_type = 0; p.alpha_channel_included = 0; p.input_format = 0; p.verbose = 0;
         p.q3 = 1; // Identity extrinsics
         p.transport_layer_mode = 0;
-        if (init_streamer(streamerID, ref p) == 1)
+        int successp = init_streamer(streamerID, ref p);
+
+        // int[] codecs = { 1, 0 };
+
+        // // Serial: 0 (Auto/Virtual), 41116066 (Your specific ID)
+        // int[] serials = { 0, 41116066 };
+
+        // // Ports: 30000 (Default), 30002 (Alternative)
+        // ushort[] ports = { 30000, 30002 };
+
+        // foreach (int codec in codecs)
+        // {
+        //     foreach (int serial in serials)
+        //     {
+        //         foreach (ushort port in ports)
+        //         {
+        //             // Create params
+        //             defaultParams = CreateParams(codec, serial, port);
+
+        //             Debug.Log($"Testing :: Codec: {(codec == 0 ? "H265" : "H264")} | Serial: {serial} | Port: {port}...");
+
+        //             // Attempt Init
+        //             int result = init_streamer(streamerID, ref defaultParams);
+
+        //             if (result == 1)
+        //             {
+        //                 Debug.Log($"<color=green>SUCCESS! Valid Config Found:</color> Codec={codec}, Serial={serial}, Port={port}");
+
+        //                 // Cleanup and Exit
+        //                 close_streamer(streamerID);
+        //                 yield break; // Stop testing, we found a winner
+        //             }
+        //             else
+        //             {
+        //                 Debug.LogWarning($"Failed (Result: {result}). Retrying...");
+        //                 SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer Failed to Start with error {result} for Codec={codec}, Serial={serial}, Port={port}.");
+        //                 // Always close to ensure we don't leave a "zombie" streamer
+        //                 close_streamer(streamerID);
+        //             }
+
+        //             // Brief pause to let the DLL cleanup sockets
+        //             yield return new WaitForSeconds(0.2f);
+        //         }
+        //     }
+        // }
+
+        // Debug.LogError("--- DIAGNOSTICS COMPLETE: No working configuration found. ---");
+        // SimulatorHUD.Instance.Log("ZED2i Simulator Streamer Failed to Start with all tested configurations.");
+        // Debug.Log("Next steps: Check Windows Firewall or install HEVC Video Extensions.");
+
+        // if (successp == 1)
+        // {
+        //     Debug.Log($"[ZED Sim] Streamer {streamerID} Started with Default Params.");
+        // }
+        // else
+        // {
+        //     Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start. Error code: {successp}");
+        //     SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer {streamerID} Failed to Start with error {successp}.");
+        //     close_streamer(streamerID);
+        // }
+
+        int successdefault = init_streamer(streamerID, ref defaultParams);
+
+        if (successdefault == 1)
         {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Started.");
-            isStreaming = true;
-            StartCoroutine(CaptureAndSend()); // Start the loop
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Started with Default Params.");
         }
         else
         {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start.");
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start with Default Params. Error code: {successdefault}");
+            SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer {streamerID} Failed to Start with error {successdefault}.");
             close_streamer(streamerID);
         }
     }
