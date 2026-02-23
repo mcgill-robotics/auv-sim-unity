@@ -12,18 +12,7 @@ public class ZEDDependencyChecker
   [DllImport("kernel32.dll", SetLastError = true)]
   private static extern bool FreeLibrary(IntPtr hModule);
 
-  public ZEDDependencyChecker(bool verbose = false)
-  {
-    this.verbose = verbose;
-  }
-  public bool CheckDependencies()
-  {
-    if (verbose) Debug.Log("<color=cyan><b>--- ZED WINDOWS DEPENDENCY SCAN ---</b></color>");
-
-    // 1. Check for NVIDIA Driver / CUDA
-    if (!CheckNvidiaStack()) return false;
-
-    string[] criticalDeps = {
+  string[] DLLCriticalDeps = {
             "nvcuda.dll",           // Core CUDA
             "nvEncodeAPI64.dll",    // Needed for H264/H265 streaming
             "nvcuvid.dll",          // Video Decoding
@@ -58,6 +47,40 @@ public class ZEDDependencyChecker
             "api-ms-win-crt-utility-l1-1-0.dll",
             "api-ms-win-crt-time-l1-1-0.dll"
         };
+
+  string[] SOCriticalDeps = {
+
+        };
+
+  public ZEDDependencyChecker(bool verbose = false)
+  {
+    this.verbose = verbose;
+  }
+  public bool CheckDependencies(OperatingSystemFamily OS)
+  {
+    string[] criticalDeps;
+    if (OS == OperatingSystemFamily.Windows)
+    {
+      criticalDeps = DLLCriticalDeps;
+    }
+    else if (OS == OperatingSystemFamily.Linux)
+    {
+      criticalDeps = SOCriticalDeps;
+    }
+    else
+    {
+      Debug.LogError("Unsupported OS for ZED SDK. Only Windows and Linux are supported.");
+      return false;
+    }
+    if (verbose)
+    {
+      Debug.Log($"<color=cyan><b>--- CHECKING ZED SDK DEPENDENCIES ---</b></color>");
+      Debug.Log($"Operating System: {OS}");
+    }
+
+    // 1. Check for NVIDIA Driver / CUDA
+    if (!CheckNvidiaStack()) return false;
+
 
     foreach (string dll in criticalDeps)
     {

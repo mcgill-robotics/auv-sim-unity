@@ -111,6 +111,8 @@ public class ZED2iSimSender : MonoBehaviour
 
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
     private static extern int init_streamer(int id, ref StreamingParametersFlattened params_stream);
+    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
+    private static extern int init_streamer(int id, ref StreamingParametersTest params_stream);
 
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
     private static extern int stream_rgb(int id, IntPtr left, IntPtr right, long timestamp_ns,
@@ -167,10 +169,8 @@ public class ZED2iSimSender : MonoBehaviour
 
         InitializeCameraCapture();
         StartCoroutine(InitializeNativeStreamer());
-        if (dependencyChecker != null && dependencyChecker.CheckDependencies())
-        {
-        }
-        else
+        OperatingSystemFamily currentOS = SystemInfo.operatingSystemFamily;
+        if (dependencyChecker == null || !dependencyChecker.CheckDependencies(currentOS))
         {
             Debug.LogError("[ZED Sim] Dependency check failed. ZED2iSimSender will not stream.");
             enabled = false;
