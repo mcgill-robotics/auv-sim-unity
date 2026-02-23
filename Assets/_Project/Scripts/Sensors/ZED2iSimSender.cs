@@ -1,9 +1,9 @@
-using UnityEngine;
 using System;
-using System.Runtime.InteropServices;
 using System.Collections;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
 
 public class ZED2iSimSender : MonoBehaviour
 {
@@ -11,10 +11,10 @@ public class ZED2iSimSender : MonoBehaviour
     [Tooltip("Port for ZED SDK local streaming connection")]
     [Range(1024, 65535)]
     public int streamPort = 30000;
-    
+
     [Tooltip("ZED camera serial number identifier")]
     public int serialNumber = 41116066; // ZED X Serial
-    
+
     [Tooltip("Target streaming framerate (Hz). Will be clamped by ZED SDK limits")]
     [Range(1, 60)]
     public int targetFPS = 30;
@@ -23,7 +23,7 @@ public class ZED2iSimSender : MonoBehaviour
     [Header("Camera References")]
     [Tooltip("Assign THIS GameObject (Left Camera) here")]
     public Camera leftCamera;
-    
+
     [Tooltip("Assign the Right Camera GameObject here")]
     public Camera rightCamera;
 
@@ -31,31 +31,31 @@ public class ZED2iSimSender : MonoBehaviour
     [Header("Coordinate System Mapping")]
     [Tooltip("Invert rotation Y axis to convert Unity LHS to ZED RHS")]
     public bool invertRotY = false;
-    
+
     [Tooltip("Invert rotation X axis")]
     public bool invertRotX = true;
-    
+
     [Tooltip("Invert rotation Z axis")]
     public bool invertRotZ = true;
-    
+
     [Space(5)]
     [Tooltip("Invert acceleration Y axis. Unity static = +9.81 Y, Bridge flips Y internally, so we send +9.81 (False)")]
     public bool invertAccelY = false;
-    
+
     [Tooltip("Invert acceleration X axis")]
     public bool invertAccelX = false;
-    
+
     [Tooltip("Invert acceleration Z axis")]
     public bool invertAccelZ = false;
-    
+
     [Space(10)]
     [Header("Debug")]
     [Tooltip("Send orientation to ZED SDK. Disable to send Identity (helps debug tracking issues)")]
     public bool sendOrientation = true;
-    
+
     [Tooltip("Enable debug logging of orientation and acceleration values")]
     public bool debugLogging = false;
-    
+
     [Tooltip("Log every N frames (to reduce spam)")]
     [Range(1, 300)]
     public int debugLogInterval = 60;
@@ -69,7 +69,7 @@ public class ZED2iSimSender : MonoBehaviour
     private Vector3 lastLinearVelocity;
     private Vector3 currentProperAccelLocal;
     private Vector3 currentAngularVelocityLocal;
-    
+
     private Quaternion initialRotationInv;
     private RenderTexture leftRT, rightRT, flipRT;
     private Texture2D texBufferLeft, texBufferRight;
@@ -77,18 +77,18 @@ public class ZED2iSimSender : MonoBehaviour
     private int streamerID = 0;
     private int frameCount = 0;
     private WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
-    
+
     [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
     [SerializeField] private Rigidbody rbOverride;
-    
+
     /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
     private Rigidbody Rb => rbOverride != null ? rbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
-    #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-        const string DLL_NAME = "sl_zed64";
-    #else
-        const string DLL_NAME = "sl_zed";
-    #endif
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+    const string DLL_NAME = "sl_zed64";
+#else
+    const string DLL_NAME = "sl_zed";
+#endif
 
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct StreamingParametersFlattened
@@ -112,8 +112,8 @@ public class ZED2iSimSender : MonoBehaviour
     private static extern int init_streamer(int id, ref StreamingParametersFlattened params_stream);
 
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int stream_rgb(int id, IntPtr left, IntPtr right, long timestamp_ns, 
-        float qw, float qx, float qy, float qz, 
+    private static extern int stream_rgb(int id, IntPtr left, IntPtr right, long timestamp_ns,
+        float qw, float qx, float qy, float qz,
         float ax, float ay, float az);
 
     [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
@@ -128,7 +128,7 @@ public class ZED2iSimSender : MonoBehaviour
     void Start()
     {
         // CameraRenderManager handles camera state
-        
+
         // Check if ZED streaming is enabled in settings
         if (SimulationSettings.Instance != null && !SimulationSettings.Instance.StreamZEDCamera)
         {
@@ -138,11 +138,11 @@ public class ZED2iSimSender : MonoBehaviour
         }
 
         // Safety check: Ensure we are on Linux
-        #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
-        enabled = false;
-        Debug.LogWarning("[ZED Sim] ZED Virtual Streamer is only supported on Linux. Disabling component.");
-        return;
-        #endif
+        // #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
+        // enabled = false;
+        // Debug.LogWarning("[ZED Sim] ZED Virtual Streamer is only supported on Linux. Disabling component.");
+        // return;
+        // #endif
 
         // Load camera settings from SimulationSettings
         if (SimulationSettings.Instance != null)
@@ -156,7 +156,7 @@ public class ZED2iSimSender : MonoBehaviour
 
         // Init physics state
         lastLinearVelocity = Vector3.zero;
-        
+
         // Zero out start rotation so ZED starts at Identity
         initialRotationInv = Quaternion.Inverse(transform.rotation);
 
@@ -173,9 +173,9 @@ public class ZED2iSimSender : MonoBehaviour
     void FixedUpdate()
     {
         if (Rb == null || !isStreaming) return;
-        
+
         if (Rb.IsSleeping()) Rb.WakeUp();
-        
+
         float dt = Time.fixedDeltaTime;
         if (dt <= 0) return;
 
@@ -183,27 +183,27 @@ public class ZED2iSimSender : MonoBehaviour
         Vector3 currentVelocity = Rb.linearVelocity;
         Vector3 worldAccel = (currentVelocity - lastLinearVelocity) / dt;
         Vector3 properAccelWorld = worldAccel - Physics.gravity; // +9.81 UP when static
-        
+
         // Transform to Local Sensor Frame
         currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
-        
+
         // Angular Velocity: World rad/s -> Local deg/s
         Vector3 angVelLocal = transform.InverseTransformDirection(Rb.angularVelocity);
         currentAngularVelocityLocal = angVelLocal * Mathf.Rad2Deg;
-        
+
         lastLinearVelocity = currentVelocity;
-        
+
         // --- SEND HIGH-FREQUENCY IMU DATA (50Hz) ---
         SendIMUData();
     }
-    
+
     private static readonly DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     private void SendIMUData()
     {
         // Get timestamp (no allocation)
         long timestamp_ns = (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
-        
+
         // Orientation (Unity LHS -> ZED RHS)
         float qx, qy, qz, qw;
         if (sendOrientation)
@@ -218,17 +218,17 @@ public class ZED2iSimSender : MonoBehaviour
         {
             qx = 0; qy = 0; qz = 0; qw = 1;
         }
-        
+
         // Acceleration (m/s²)
         float ax = invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x;
         float ay = invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y;
         float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
-        
+
         // Angular Velocity (deg/s) - match rotation axis inversions
         float vx = invertRotX ? -currentAngularVelocityLocal.x : currentAngularVelocityLocal.x;
         float vy = invertRotY ? -currentAngularVelocityLocal.y : currentAngularVelocityLocal.y;
         float vz = invertRotZ ? -currentAngularVelocityLocal.z : currentAngularVelocityLocal.z;
-        
+
         ingest_imu(streamerID, timestamp_ns, vx, vy, vz, ax, ay, az, qw, qx, qy, qz);
     }
 
@@ -271,7 +271,7 @@ public class ZED2iSimSender : MonoBehaviour
 
                 // Unity (LHS) -> ZED (RHS)
                 qx = invertRotX ? -deltaRot.x : deltaRot.x;
-                qy = invertRotY ? -deltaRot.y : deltaRot.y; 
+                qy = invertRotY ? -deltaRot.y : deltaRot.y;
                 qz = invertRotZ ? -deltaRot.z : deltaRot.z;
                 qw = deltaRot.w;
             }
@@ -294,12 +294,12 @@ public class ZED2iSimSender : MonoBehaviour
             NativeArray<byte> rawRight = texBufferRight.GetRawTextureData<byte>();
 
             SendFrameToDLL(rawLeft, rawRight, timestamp_ns, qw, qx, qy, qz, ax, ay, az);
-            
+
             // Debug logging
             if (debugLogging && (frameCount % debugLogInterval == 0))
             {
                 // Format string less spammy than interpolation in loop
-                Debug.LogFormat("[ZED Debug] Frame {0}: Quat({1:F3}, {2:F3}, {3:F3}, {4:F3}) | Accel({5:F2}, {6:F2}, {7:F2}) m/s²", 
+                Debug.LogFormat("[ZED Debug] Frame {0}: Quat({1:F3}, {2:F3}, {3:F3}, {4:F3}) | Accel({5:F2}, {6:F2}, {7:F2}) m/s²",
                     frameCount, qw, qx, qy, qz, ax, ay, az);
             }
             frameCount++;
@@ -309,11 +309,11 @@ public class ZED2iSimSender : MonoBehaviour
     private unsafe void SendFrameToDLL(NativeArray<byte> rawLeft, NativeArray<byte> rawRight, long timestamp_ns, float qw, float qx, float qy, float qz, float ax, float ay, float az)
     {
         // Pass the memory address directly to C++
-        stream_rgb(streamerID, 
-            (IntPtr)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(rawLeft), 
-            (IntPtr)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(rawRight), 
-            timestamp_ns, 
-            qw, qx, qy, qz, 
+        stream_rgb(streamerID,
+            (IntPtr)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(rawLeft),
+            (IntPtr)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(rawRight),
+            timestamp_ns,
+            qw, qx, qy, qz,
             ax, ay, az);
     }
 
@@ -323,17 +323,20 @@ public class ZED2iSimSender : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         streamerID = UnityEngine.Random.Range(1, 9999);
         StreamingParametersFlattened p = new StreamingParametersFlattened();
-        p.mode = 1; 
+        p.mode = 1;
         p.image_width = targetWidth; p.image_height = targetHeight;
         p.port = (ushort)streamPort; p.fps = targetFPS; p.serial_number = serialNumber;
-        p.codec_type = 0; p.alpha_channel_included = 0; p.input_format = 0; p.verbose = 0; 
+        p.codec_type = 0; p.alpha_channel_included = 0; p.input_format = 0; p.verbose = 0;
         p.q3 = 1; // Identity extrinsics
         p.transport_layer_mode = 0;
-        if (init_streamer(streamerID, ref p) == 1) {
+        if (init_streamer(streamerID, ref p) == 1)
+        {
             Debug.Log($"[ZED Sim] Streamer {streamerID} Started.");
             isStreaming = true;
             StartCoroutine(CaptureAndSend()); // Start the loop
-        } else {
+        }
+        else
+        {
             Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start.");
             close_streamer(streamerID);
         }
@@ -343,10 +346,10 @@ public class ZED2iSimSender : MonoBehaviour
     {
         leftRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false, antiAliasing = 1 };
         rightRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false, antiAliasing = 1 };
-        
+
         leftCamera.targetTexture = leftRT;
         rightCamera.targetTexture = rightRT;
-        
+
         // Set ZED FOV from settings
         float fov = SimulationSettings.Instance != null ? SimulationSettings.Instance.FrontCamFOV : 77.9f;
         leftCamera.fieldOfView = fov;
@@ -356,19 +359,19 @@ public class ZED2iSimSender : MonoBehaviour
         texBufferRight = new Texture2D(targetWidth, targetHeight, TextureFormat.RGB24, false);
     }
 
-    void LateUpdate() 
-    { 
+    void LateUpdate()
+    {
         // Coroutine loop handles timing now
     }
-    void OnDestroy() 
-    { 
+    void OnDestroy()
+    {
         if (isStreaming) close_streamer(streamerID);
-        
+
         // Release RenderTextures
         if (leftRT != null) { leftRT.Release(); Destroy(leftRT); }
         if (rightRT != null) { rightRT.Release(); Destroy(rightRT); }
         if (flipRT != null) { flipRT.Release(); Destroy(flipRT); }
-        
+
         // Destroy Texture2D buffers
         if (texBufferLeft != null) Destroy(texBufferLeft);
         if (texBufferRight != null) Destroy(texBufferRight);

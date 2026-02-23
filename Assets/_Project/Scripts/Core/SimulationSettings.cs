@@ -9,23 +9,23 @@ public class SimulationSettings : MonoBehaviour
     [Header("AUV References")]
     [Tooltip("The AUV's Rigidbody - used by physics and sensor scripts")]
     public Rigidbody AUVRigidbody;
-    
+
     [Tooltip("The AUV's root Transform")]
     public Transform AUVTransform;
-    
+
     [Tooltip("Front camera (ZED left or mono front camera)")]
     public Camera FrontCamera;
-    
+
     [Tooltip("Down-facing camera")]
     public Camera DownCamera;
 
     [Header("Global Toggles")]
     [Tooltip("Enable ROS TCP connection and publishing")]
     public bool PublishROS = false;
-    
+
     [Tooltip("Show simulation objects (gates, buoys, etc.) in scene")]
     public bool DisplaySimObjects = false;
-    
+
     [Tooltip("Disable water volume and rendering for performance (when vision isn't needed)")]
     public bool NoWaterMode = false;
 
@@ -34,13 +34,13 @@ public class SimulationSettings : MonoBehaviour
 
     [Tooltip("The main directional light (Sun) to control shadows for")]
     public Light sunLight;
-    
+
     [Tooltip("Water surface GameObject to disable in No Water Mode")]
     public GameObject waterSurfaceObject;
-    
+
     [Tooltip("Optional: Pool post-processing volume to disable in No Water Mode")]
     public GameObject poolPostProcessingVolume;
-    
+
     [Tooltip("Number of hydrophones option (0-4)")]
     [Range(0, 4)]
     public int HydrophonesNumberOption = 0;
@@ -49,36 +49,36 @@ public class SimulationSettings : MonoBehaviour
     [Header("Sensor Publisher Toggles")]
     [Tooltip("Publish DVL velocity and altitude data")]
     public bool PublishDVL = false;
-    
+
     [Tooltip("Publish IMU orientation, gyroscope, and accelerometer data")]
     public bool PublishIMU = false;
-    
+
     [Tooltip("Publish depth sensor data")]
     public bool PublishDepth = false;
-    
+
     [Tooltip("Publish hydrophone bearing data")]
     public bool PublishHydrophones = false;
-    
+
     [Tooltip("Publish front camera images")]
     public bool PublishFrontCam = false;
-    
+
     [Tooltip("Publish down camera images")]
     public bool PublishDownCam = false;
-    
+
     [Tooltip("Publish depth camera images (depth map from front camera)")]
     public bool PublishDepthCamera = false;
-    
+
     [Tooltip("Stream ZED stereo camera via ZED SDK (disables front camera ROS publishing)")]
     public bool StreamZEDCamera = false;
-    
+
     [Space(10)]
     [Header("Sensor Visualization")]
     [Tooltip("Show DVL beam visualization")]
     public bool VisualizeDVL = true;
-    
+
     [Tooltip("Show IMU acceleration/angular velocity arrows")]
     public bool VisualizeIMU = true;
-    
+
     [Tooltip("Show Depth sensor line")]
     public bool VisualizeDepth = true;
 
@@ -92,21 +92,21 @@ public class SimulationSettings : MonoBehaviour
 
     [Tooltip("Enable simulated noise/bias for Depth sensor")]
     public bool EnableDepthNoise = true;
-    
+
     [Space(10)]
     [Header("UI Drawer States")]
     [Tooltip("Config drawer open state")]
     public bool DrawerConfigOpen = true;
-    
+
     [Tooltip("Controls drawer open state")]
     public bool DrawerControlsOpen = true;
-    
+
     [Tooltip("Telemetry drawer open state")]
     public bool DrawerTelemetryOpen = true;
-    
+
     [Tooltip("Sensors drawer open state")]
     public bool DrawerSensorsOpen = true;
-    
+
     [Tooltip("Camera drawer open state")]
     public bool DrawerCameraOpen = true;
 
@@ -114,13 +114,13 @@ public class SimulationSettings : MonoBehaviour
     [Header("Pinger Bearing Visualization")]
     [Tooltip("Show bearing visualization for pinger 1")]
     public bool VisualizeBearing1 = false;
-    
+
     [Tooltip("Show bearing visualization for pinger 2")]
     public bool VisualizeBearing2 = false;
-    
+
     [Tooltip("Show bearing visualization for pinger 3")]
     public bool VisualizeBearing3 = false;
-    
+
     [Tooltip("Show bearing visualization for pinger 4")]
     public bool VisualizeBearing4 = false;
 
@@ -129,37 +129,37 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Front camera publish rate (Hz)")]
     [Range(1, 60)]
     public int FrontCamRate = 10;
-    
+
     [Tooltip("Down camera publish rate (Hz)")]
     [Range(1, 60)]
     public int DownCamRate = 10;
-    
+
     [Space(5)]
     [Tooltip("Front camera resolution width (ZED X native: 960)")]
     [Range(320, 1920)]
     public int FrontCamWidth = 960;
-    
+
     [Tooltip("Front camera resolution height (ZED X native: 600)")]
     [Range(240, 1200)]
     public int FrontCamHeight = 600;
-    
+
     [Tooltip("Front camera vertical FOV in degrees (ZED X: 77.9°)")]
     [Range(30f, 120f)]
     public float FrontCamFOV = 77.9f;
-    
+
     [Space(5)]
     [Tooltip("Down camera resolution width")]
     [Range(320, 1920)]
     public int DownCamWidth = 640;
-    
+
     [Tooltip("Down camera resolution height")]
     [Range(240, 1080)]
     public int DownCamHeight = 480;
-    
+
     [Space(5)]
     [Tooltip("Use JPEG compression for camera images (reduces bandwidth ~10x)")]
     public bool UseJPEGCompression = true;
-    
+
     [Tooltip("JPEG compression quality (1-100, higher = better quality but larger size)")]
     [Range(1, 100)]
     public int JPEGQuality = 75;
@@ -169,11 +169,11 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("AUV state publish rate (Hz)")]
     [Range(10, 100)]
     public int PoseRate = 50;
-    
+
     [Tooltip("Unity quality level (0=Very Low, 5=Very High)")]
     [Range(0, 5)]
     public int QualityLevel = 3;
-    
+
     [Tooltip("Target framerate for physics simulation")]
     [Range(30, 300)]
     public int SimulationTargetFrameRate = 60;
@@ -194,7 +194,7 @@ public class SimulationSettings : MonoBehaviour
             {
                 DontDestroyOnLoad(gameObject);
             }
-            
+
             // Always load settings to ensure we have valid data
             // In Edit Mode, this syncs Inspector with PlayerPrefs
             LoadSettings();
@@ -207,13 +207,13 @@ public class SimulationSettings : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        
+
         if (Application.isPlaying)
         {
             Application.targetFrameRate = SimulationTargetFrameRate;
         }
     }
-    
+
     private void Start()
     {
         if (Application.isPlaying && NoWaterMode)
@@ -221,7 +221,7 @@ public class SimulationSettings : MonoBehaviour
             ApplyNoWaterMode();
         }
     }
-    
+
     /// <summary>
     /// Applies No Water Mode - can be called at runtime from UI.
     /// </summary>
@@ -232,13 +232,13 @@ public class SimulationSettings : MonoBehaviour
         {
             waterSurfaceObject.SetActive(!NoWaterMode);
         }
-        
+
         // Disable/Enable pool post-processing volume
         if (poolPostProcessingVolume != null)
         {
             poolPostProcessingVolume.SetActive(!NoWaterMode);
         }
-        
+
         if (NoWaterMode)
         {
             Debug.Log("[SimulationSettings] No Water Mode enabled");
@@ -274,9 +274,9 @@ public class SimulationSettings : MonoBehaviour
         StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
 
         // Force disable ZED streaming on non-Linux platforms
-        #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
-        StreamZEDCamera = false;
-        #endif
+        // #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
+        // StreamZEDCamera = false;
+        // #endif
 
         VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
         VisualizeIMU = bool.Parse(PlayerPrefs.GetString("VisualizeIMUToggle", "true"));
@@ -304,13 +304,13 @@ public class SimulationSettings : MonoBehaviour
 
         PoseRate = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
         QualityLevel = int.Parse(PlayerPrefs.GetString("qualityLevel", "3"));
-        
+
         string defaultPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "../Recordings"));
         SnapshotSavePath = PlayerPrefs.GetString("SnapshotSavePath", defaultPath);
-        
+
         // Validate and possibly correct the path
         SnapshotSavePath = ValidateAndGetSavePath(SnapshotSavePath);
-        
+
         QualitySettings.SetQualityLevel(QualityLevel);
         ApplyShadows();
     }
