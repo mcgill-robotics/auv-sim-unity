@@ -22,7 +22,7 @@ public class SettingsController
     private Toggle toggleFrontCam;
     private Toggle toggleDownCam;
     private Toggle toggleDepthCamera;
-    
+
     // UI Elements - Camera Parameters
     private IntegerField inputFrontRate;
     private IntegerField inputDownRate;
@@ -30,15 +30,15 @@ public class SettingsController
     private IntegerField inputFrontH;
     private IntegerField inputDownW;
     private IntegerField inputDownH;
-    
+
     // UI Elements - Dropdowns & Buttons
     private DropdownField dropdownQuality;
     private DropdownField dropdownScreenRes;
     private Button btnSave;
-    
+
     private ROSConnection ros;
     private System.Action<string> logCallback;
-    
+
     public SettingsController(VisualElement root, ROSConnection rosConnection, System.Action<string> log)
     {
         ros = rosConnection;
@@ -46,7 +46,7 @@ public class SettingsController
         QueryElements(root);
         RegisterCallbacks(root);
     }
-    
+
     private void QueryElements(VisualElement root)
     {
         // Settings toggles
@@ -63,7 +63,7 @@ public class SettingsController
         toggleFrontCam = root.Q<Toggle>("Toggle-FrontCam");
         toggleDownCam = root.Q<Toggle>("Toggle-DownCam");
         toggleDepthCamera = root.Q<Toggle>("Toggle-DepthCamera");
-        
+
         // Camera parameters
         inputFrontRate = root.Q<IntegerField>("Input-FrontRate");
         inputDownRate = root.Q<IntegerField>("Input-DownRate");
@@ -71,13 +71,13 @@ public class SettingsController
         inputFrontH = root.Q<IntegerField>("Input-FrontH");
         inputDownW = root.Q<IntegerField>("Input-DownW");
         inputDownH = root.Q<IntegerField>("Input-DownH");
-        
+
         // Dropdowns and buttons
         dropdownQuality = root.Q<DropdownField>("Dropdown-Quality");
         dropdownScreenRes = root.Q<DropdownField>("Dropdown-ScreenRes");
         btnSave = root.Q<Button>("Btn-Save");
     }
-    
+
     private void RegisterCallbacks(VisualElement root)
     {
         // Water toggle - immediate effect (Inverted: Enable Water = true means NoWaterMode = false)
@@ -103,7 +103,7 @@ public class SettingsController
                 }
             });
         }
-        
+
         // Free Camera toggle - immediate effect
         if (toggleFreeCamera != null)
         {
@@ -117,7 +117,7 @@ public class SettingsController
                 }
             });
         }
-        
+
         // Sensor publishing toggles - immediate effect (no restart needed)
         if (togglePublishROS != null)
         {
@@ -125,63 +125,63 @@ public class SettingsController
                 SimulationSettings.Instance.PublishROS = evt.newValue;
             });
         }
-        
+
         if (toggleDVL != null)
         {
             toggleDVL.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishDVL = evt.newValue;
             });
         }
-        
+
         if (toggleIMU != null)
         {
             toggleIMU.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishIMU = evt.newValue;
             });
         }
-        
+
         if (toggleDepth != null)
         {
             toggleDepth.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishDepth = evt.newValue;
             });
         }
-        
+
         if (toggleHydro != null)
         {
             toggleHydro.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishHydrophones = evt.newValue;
             });
         }
-        
+
         if (toggleFrontCam != null)
         {
             toggleFrontCam.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishFrontCam = evt.newValue;
             });
         }
-        
+
         if (toggleDownCam != null)
         {
             toggleDownCam.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishDownCam = evt.newValue;
             });
         }
-        
+
         if (toggleDepthCamera != null)
         {
             toggleDepthCamera.RegisterValueChangedCallback(evt => {
                 SimulationSettings.Instance.PublishDepthCamera = evt.newValue;
             });
         }
-        
+
         // Save button
         if (btnSave != null)
         {
             btnSave.clicked += OnSaveSettings;
         }
     }
-    
+
     /// <summary>
     /// Load current settings values to UI elements.
     /// </summary>
@@ -191,15 +191,15 @@ public class SettingsController
 
         if (togglePublishROS != null) togglePublishROS.value = SimulationSettings.Instance.PublishROS;
         if (toggleSimObjects != null) toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
-        if (toggleStreamZED != null) 
+        if (toggleStreamZED != null)
         {
-            #if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+            // #if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
             toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
             toggleStreamZED.style.display = DisplayStyle.Flex;
-            #else
-            toggleStreamZED.value = false;
-            toggleStreamZED.style.display = DisplayStyle.None;
-            #endif
+            // #else
+            // toggleStreamZED.value = false;
+            // toggleStreamZED.style.display = DisplayStyle.None;
+            // #endif
         }
         if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
         if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;
@@ -217,10 +217,10 @@ public class SettingsController
         if (inputFrontH != null) inputFrontH.value = SimulationSettings.Instance.FrontCamHeight;
         if (inputDownW != null) inputDownW.value = SimulationSettings.Instance.DownCamWidth;
         if (inputDownH != null) inputDownH.value = SimulationSettings.Instance.DownCamHeight;
-        
+
         if (dropdownQuality != null) dropdownQuality.index = SimulationSettings.Instance.QualityLevel;
     }
-    
+
     private void OnSaveSettings()
     {
         if (SimulationSettings.Instance == null) return;
@@ -245,13 +245,13 @@ public class SettingsController
         if (inputFrontH != null) SimulationSettings.Instance.FrontCamHeight = inputFrontH.value;
         if (inputDownW != null) SimulationSettings.Instance.DownCamWidth = inputDownW.value;
         if (inputDownH != null) SimulationSettings.Instance.DownCamHeight = inputDownH.value;
-        
+
         if (dropdownQuality != null)
         {
             SimulationSettings.Instance.QualityLevel = dropdownQuality.index;
             QualitySettings.SetQualityLevel(SimulationSettings.Instance.QualityLevel);
         }
-        
+
         // Apply screen resolution
         if (dropdownScreenRes != null)
         {
@@ -265,7 +265,7 @@ public class SettingsController
                 }
             }
         }
-        
+
         // Update Thrusters cached quality level
         var thrusters = Object.FindFirstObjectByType<Thrusters>();
         if (thrusters != null)
@@ -276,14 +276,14 @@ public class SettingsController
         SimulationSettings.Instance.SaveSettings();
         logCallback?.Invoke("Settings saved. Restart may be required for some changes.");
     }
-    
+
     /// <summary>
     /// Ensure ROS connection state matches settings.
     /// </summary>
     public void UpdateROSConnectionState()
     {
         if (ros == null) return;
-        
+
         if (SimulationSettings.Instance.PublishROS)
         {
             if (!ros.HasConnectionThread)
