@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.IO;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -162,12 +163,20 @@ public class ZED2iSimSender : MonoBehaviour
 
         // Get Rigidbody
         // rb = GetComponentInParent<Rigidbody>();
+        ZEDDependencyChecker dependencyChecker = new(verbose: true);
 
         InitializeCameraCapture();
-
         StartCoroutine(InitializeNativeStreamer());
+        if (dependencyChecker != null && dependencyChecker.CheckDependencies())
+        {
+        }
+        else
+        {
+            Debug.LogError("[ZED Sim] Dependency check failed. ZED2iSimSender will not stream.");
+            enabled = false;
+            return;
+        }
     }
-
     // --- PHYSICS CALCULATION (50Hz) ---
     // Calculates and sends high-frequency IMU data for stable positional tracking
     void FixedUpdate()
