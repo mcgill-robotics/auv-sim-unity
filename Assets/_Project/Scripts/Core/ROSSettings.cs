@@ -62,21 +62,6 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";
 
-    [Header("Control")]
-    public string PIDEnableTopic = "/auv/pid/enable";
-    public string PIDSetpointTopic = "/auv/pid/setpoint";
-
-    // PID Individual Axis Topics
-    public string PidXEnableTopic = "/auv/pid/x/enable";
-    public string PidYEnableTopic = "/auv/pid/y/enable";
-    public string PidZEnableTopic = "/auv/pid/z/enable";
-    public string PidQuatEnableTopic = "/auv/pid/quat/enable";
-
-    public string PidXSetpointTopic = "/auv/pid/x/setpoint";
-    public string PidYSetpointTopic = "/auv/pid/y/setpoint";
-    public string PidZSetpointTopic = "/auv/pid/z/setpoint";
-    public string PidQuatSetpointTopic = "/auv/pid/quat/setpoint";
-
     public string StateTopic = "/auv/state";
 
     // State Components
