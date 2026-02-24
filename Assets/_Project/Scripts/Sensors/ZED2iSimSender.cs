@@ -421,88 +421,53 @@ public class ZED2iSimSender : MonoBehaviour
     {
         yield return new WaitForSeconds(1.0f);
         streamerID = UnityEngine.Random.Range(1, 9999);
-        StreamingParametersFlattened p = new StreamingParametersFlattened();
-        StreamingParametersTest defaultParams = CreateDefault();
-        // Debug.Log("[Zed Sim] Size of StreamingParametersTest: " + Marshal.SizeOf<StreamingParametersTest>() + ", Size of StreamingParametersFlattened: " + Marshal.SizeOf<StreamingParametersFlattened>());
-        p.mode = 1;
-        p.image_width = targetWidth; p.image_height = targetHeight;
-        p.port = (ushort)streamPort; p.fps = targetFPS; p.serial_number = serialNumber;
-        p.codec_type = 0; p.alpha_channel_included = 0; p.input_format = 0; p.verbose = 0;
-        p.q3 = 1; // Identity extrinsics
-        p.transport_layer_mode = 0;
+        StreamingParametersFlattened p = new StreamingParametersFlattened
+        {
+            mode = 1,
+            image_width = 1280,
+            image_height = 720,
+            port = (ushort)streamPort,
+            fps = 30,
+            serial_number = serialNumber,
+            codec_type = 0,
+            alpha_channel_included = 0,
+            input_format = 0,
+            verbose = 1,
+            q3 = 1, // Identity extrinsics
+            transport_layer_mode = 0,
+            // bitrate = 4000,
+            // gop_size = -1,
+            // adaptative_bitrate = 0,
+            // chunk_size = 16384
+        };
         int successp = init_streamer(streamerID, ref p);
+        if (successp == 1)
+        {
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Started with Flattened Params.");
+            isStreaming = true;
+            StartCoroutine(CaptureAndSend());
+        }
+        else
+        {
+            Debug.LogError($"[ZED Sim] Streamer {streamerID} Failed to Start with Flattened Params. Error code: {successp}");
+            SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer {streamerID} Failed to Start with error {successp} using flattened params.");
+            close_streamer(streamerID);
+        }
 
-        // int[] codecs = { 1, 0 };
+        // StreamingParametersTest defaultParams = CreateDefault();
 
-        // // Serial: 0 (Auto/Virtual), 41116066 (Your specific ID)
-        // int[] serials = { 0, 41116066 };
+        // int successdefault = init_streamer(streamerID, ref defaultParams);
 
-        // // Ports: 30000 (Default), 30002 (Alternative)
-        // ushort[] ports = { 30000, 30002 };
-
-        // foreach (int codec in codecs)
-        // {
-        //     foreach (int serial in serials)
-        //     {
-        //         foreach (ushort port in ports)
-        //         {
-        //             // Create params
-        //             defaultParams = CreateParams(codec, serial, port);
-
-        //             Debug.Log($"Testing :: Codec: {(codec == 0 ? "H265" : "H264")} | Serial: {serial} | Port: {port}...");
-
-        //             // Attempt Init
-        //             int result = init_streamer(streamerID, ref defaultParams);
-
-        //             if (result == 1)
-        //             {
-        //                 Debug.Log($"<color=green>SUCCESS! Valid Config Found:</color> Codec={codec}, Serial={serial}, Port={port}");
-
-        //                 // Cleanup and Exit
-        //                 close_streamer(streamerID);
-        //                 yield break; // Stop testing, we found a winner
-        //             }
-        //             else
-        //             {
-        //                 Debug.LogWarning($"Failed (Result: {result}). Retrying...");
-        //                 SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer Failed to Start with error {result} for Codec={codec}, Serial={serial}, Port={port}.");
-        //                 // Always close to ensure we don't leave a "zombie" streamer
-        //                 close_streamer(streamerID);
-        //             }
-
-        //             // Brief pause to let the DLL cleanup sockets
-        //             yield return new WaitForSeconds(0.2f);
-        //         }
-        //     }
-        // }
-
-        // Debug.LogError("--- DIAGNOSTICS COMPLETE: No working configuration found. ---");
-        // SimulatorHUD.Instance.Log("ZED2i Simulator Streamer Failed to Start with all tested configurations.");
-        // Debug.Log("Next steps: Check Windows Firewall or install HEVC Video Extensions.");
-
-        // if (successp == 1)
+        // if (successdefault == 1)
         // {
         //     Debug.Log($"[ZED Sim] Streamer {streamerID} Started with Default Params.");
         // }
         // else
         // {
-        //     Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start. Error code: {successp}");
-        //     SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer {streamerID} Failed to Start with error {successp}.");
+        //     Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start with Default Params. Error code: {successdefault}");
+        //     SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer {streamerID} Failed to Start with error {successdefault}.");
         //     close_streamer(streamerID);
         // }
-
-        int successdefault = init_streamer(streamerID, ref defaultParams);
-
-        if (successdefault == 1)
-        {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Started with Default Params.");
-        }
-        else
-        {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start with Default Params. Error code: {successdefault}");
-            SimulatorHUD.Instance.Log($"ZED2i Simulator Streamer {streamerID} Failed to Start with error {successdefault}.");
-            close_streamer(streamerID);
-        }
     }
 
     void InitializeCameraCapture()
