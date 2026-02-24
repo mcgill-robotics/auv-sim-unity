@@ -4,6 +4,17 @@ This repository contains the Unity-based simulator for the McGill Robotics Auton
 
 It communicates with the ROS software stack via TCP, simulating sensors (IMU, DVL, Depth, Hydrophones, and ZED Cameras) and receiving thruster commands.
 
+## Table of Contents
+
+- [Current Status](#current-status)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Workflows](#workflows)
+- [ROS Interface](#ros-interface)
+
+---
+
 ## Current Status
 
 **Version:** Unity 6 (6000.0.62f1)
@@ -169,12 +180,14 @@ Assets/
 └── Settings/                    # Project render & quality settings
 ```
 
+## Getting Started
+
 ### Prerequisites
 * **Unity Hub**
 * **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
 * **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
-### ⚠️ Important: ZED SDK & Plugin Setup (ONLY ON UBUNTU w/ NVIDIA GPU, ignore if on Windows/Mac)
+### ⚠️ Important: ZED SDK & Plugin Setup (ONLY ON UBUNTU 22.04 w/ NVIDIA GPU, ignore if on Windows/Mac)
 The simulator relies on the ZED SDK. Due to GitHub file size limits, the required binary files (`.dll` and `.so`) are **NOT** included in the repository.
 
 **You must follow these steps or the project will have compile errors:**
@@ -318,20 +331,20 @@ The simulator communicates over the following default topics (configurable in `R
 
 | Topic | Description | Frame / Convention | Message Type |
 | :--- | :--- | :--- | :--- |
-| `/auv/ground_truth/twist` | Ground truth linear/angular velocity | **FLU** (+X Fwd, +Y Left, +Z Up) | `TwistStamped` |
-| `/auv/ground_truth/accel` | Ground truth linear/angular acceleration | **FLU** (+X Fwd, +Y Left, +Z Up) | `AccelStamped` |
-| `/auv/ground_truth/pose` | **Hybrid Pose:** <br>• **Pos X/Y:** Relative to Start (Locally Aligned) <br>• **Pos Z:** Absolute (World Up) <br>• **Orientation:** Relative to Start | **FLU** | `PoseStamped` |
-| `/auv/ground_truth/orientation` | Absolute World Orientation | **FLU** | `QuaternionStamped` |
-| `dvl/velocity` | Doppler Velocity Log (A50) | **FRD** (+X Fwd, +Y Right, +Z Down) | `TwistWithCovarianceStamped` (DvlMsg in the future) |
-| `dvl/dead_reckoning` | DVL Dead Reckoning Position | **NED** (North-East-Down) Start-Relative | `PoseWithCovarianceStamped` |
-| `dvl/odometry` | DVL Odometry | **NED** Position / **FRD** Twist | `Odometry` |
-| `imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `Imu` |
+| `/auv/ground_truth/twist` | Ground truth linear/angular velocity | **FLU** (+X Fwd, +Y Left, +Z Up) | `geometry_msgs/TwistStamped` |
+| `/auv/ground_truth/accel` | Ground truth linear/angular acceleration | **FLU** (+X Fwd, +Y Left, +Z Up) | `geometry_msgs/AccelStamped` |
+| `/auv/ground_truth/pose` | **Hybrid Pose:** <br>• **Pos X/Y:** Relative to Start (Locally Aligned) <br>• **Pos Z:** Absolute (World Up) <br>• **Orientation:** Relative to Start | **FLU** | `geometry_msgs/PoseStamped` |
+| `/auv/ground_truth/orientation` | Absolute World Orientation | **FLU** | `geometry_msgs/QuaternionStamped` |
+| `dvl/velocity` | Doppler Velocity Log (A50) | **FRD** (+X Fwd, +Y Right, +Z Down) | `marine_acoustic_msgs/Dvl` |
+| `dvl/dead_reckoning` | DVL Dead Reckoning Position | **NED** (North-East-Down) Start-Relative | `geometry_msgs/PoseWithCovarianceStamped` |
+| `dvl/odometry` | DVL Odometry | **NED** Position / **FRD** Twist | `nav_msgs/Odometry` |
+| `imu/data` | IMU Orientation, Gyro, and Accel | **FLU** (+X Fwd, +Y Left, +Z Up) + RH Rule | `sensor_msgs/Imu` |
 | `/sensors/depth/z` | Vertical Depth | **Positive Down** (+Z Down) | `Float64` |
-| `/zed/zed_node/rgb/color/rect/image` | Front RGB Camera (rectified) | Optical Frame | `Image` |
-| `/zed/zed_node/rgb/color/rect/image/compressed` | Front RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
-| `/zed/zed_node/depth/depth_registered` | Front Depth Map (always raw) | Optical Frame | `Image` |
-| `/down_cam/image_raw` | Downward RGB Camera (raw) | Optical Frame | `Image` |
-| `/down_cam/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `CompressedImage` |
+| `/zed/zed_node/rgb/color/rect/image` | Front RGB Camera (rectified) | Optical Frame | `sensor_msgs/Image` |
+| `/zed/zed_node/rgb/color/rect/image/compressed` | Front RGB Camera (JPEG) | Optical Frame | `sensor_msgs/CompressedImage` |
+| `/zed/zed_node/depth/depth_registered` | Front Depth Map (always raw) | Optical Frame | `sensor_msgs/Image` |
+| `/down_cam/image_raw` | Downward RGB Camera (raw) | Optical Frame | `sensor_msgs/Image` |
+| `/down_cam/image_raw/compressed` | Downward RGB Camera (JPEG) | Optical Frame | `sensor_msgs/CompressedImage` |
 
 > [!NOTE]
 > **JPEG Compression (enabled by default):** When enabled, only the `/compressed` topics are published for RGB cameras. The raw `image_raw` topics are not published. Disable JPEG compression in `SimulationSettings` to publish raw images instead. The depth map is always published as raw (no compression).
@@ -346,32 +359,3 @@ The simulator communicates over the following default topics (configurable in `R
 | `/auv/torpedo/rotate` | Torpedo launcher rotation angle | `Float32` |
 | `/vision/object_map` | Array of detected objects (YOLO + ZED) | **FLU** (World Frame) | `VisionObjectArray` |
 | `/vision/vio_pose` | Visual Odometry Pose | **FLU** (World Frame) | `PoseStamped` |
-
-## Roadmap & TODO
-
-**Priority 1: Sensor Verification**
-*   [ ] **Sensor Validation:** Rigorously test all sensor outputs (DVL, IMU, Depth) against Unity ground truth.
-*   [ ] **Frame of Reference:** Verify that all coordinate conversions (Unity Left-Handed --> ROS FLU) are mathematically correct.
-*   [ ] **Frame IDs:** Ensure `frame_id` fields in ROS messages match the TF tree expected by the ROS stack.
-
-**Priority 2: Critical Fixes**
-*   [X] **ZED Bridge IMU:** Fix the IMU data transformation in `ZED2iSimSender`. Currently, sending rotational data breaks the ZED SDK's positional tracking loop.
-
-**Priority 3: Usability & Workflow**
-*   [ ] **Modular Camera Modes:** Implement presets in `SimulationSettings` to quickly toggle specific configurations:
-    *   Down-Cam only (navigation testing).
-    *   Front-Left only (YOLO/Object detection).
-    *   Stereo Front (VIO/SLAM).
-
-**Priority 4: Competition Logic**
-*   [ ] **Task State Machines:** Finalize the internal logic for individual tasks (Gate, Buoy, Bins, Octagon).
-*   [ ] **End-to-End Workflow:** Validate the full competition run flow via `CompetitionManager`, ensuring tasks reset and score correctly.
-
-**Priority 5: Integration**
-*   [ ] **ROS Integration:** Audit `ROSSettings.cs` against the external ROS 2 codebase. Ensure all topic strings and message definitions match exactly.
-
-**Priority 6: Documentation**
-*   [ ] **Architecture:** Document the new UI Toolkit structure (`.uxml`, `.uss`, and bindings) and the Core Manager pattern.
-*   [ ] **Sensor Models:** Document the math behind the DVL acoustics simulation and IMU noise models.
-*   [X] **Setup Guide:** specific instructions for configuring the Unity 6 environment.
-

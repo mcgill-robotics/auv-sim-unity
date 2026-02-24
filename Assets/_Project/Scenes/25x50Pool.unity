@@ -2923,7 +2923,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -4854,7 +4854,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buoyancyForce: 264
-  centerOfBuoyancy: {x: 0, y: 0.005, z: 0}
+  centerOfBuoyancy: {x: 0, y: 0.023, z: 0}
   centerOfMass: {x: 0, y: 0, z: 0}
 --- !u!54 &1371465008
 Rigidbody:
@@ -5168,8 +5168,6 @@ GameObject:
   - component: {fileID: 1443981351}
   - component: {fileID: 1443981352}
   - component: {fileID: 1443981339}
-  - component: {fileID: 1443981350}
-  - component: {fileID: 1443981349}
   - component: {fileID: 1443981342}
   m_Layer: 0
   m_Name: Managers-Configurations
@@ -5284,7 +5282,7 @@ MonoBehaviour:
   PublishROS: 1
   DisplaySimObjects: 0
   NoWaterMode: 1
-  EnableShadows: 1
+  EnableShadows: 0
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
@@ -5298,8 +5296,8 @@ MonoBehaviour:
   PublishDepthCamera: 0
   StreamZEDCamera: 0
   VisualizeDVL: 1
-  VisualizeIMU: 1
-  VisualizeDepth: 1
+  VisualizeIMU: 0
+  VisualizeDepth: 0
   EnableDVLNoise: 0
   EnableIMUNoise: 0
   EnableDepthNoise: 0
@@ -5363,6 +5361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22daac910322c95208ab923d8564af31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roscon: {fileID: 0}
 --- !u!4 &1443981348
 Transform:
   m_ObjectHideFlags: 0
@@ -5378,56 +5377,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1443981349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1443981338}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 121db7a400deefe43a79c736680d2028, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  competitionButton: {fileID: 0}
-  competitionButtonText: {fileID: 0}
-  competitionAudioStart: {fileID: 0}
-  competitionAudioEnd: {fileID: 0}
-  timeText: {fileID: 0}
-  scoreText: {fileID: 0}
-  pidUI: {fileID: 0}
-  taskSelectionUI: {fileID: 0}
-  messageBox: {fileID: 0}
-  competitionTasks: []
-  taskSelection: {fileID: 0}
---- !u!114 &1443981350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1443981338}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21210d4f218806c41af23cc981d82f9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Diana: {fileID: 0}
-  PoleQuali: {fileID: 0}
-  GateQuali: {fileID: 0}
-  Gate: {fileID: 0}
-  LaneMarkerStraight: {fileID: 0}
-  LaneMarker45Left: {fileID: 0}
-  Buoy: {fileID: 0}
-  Pinger1: {fileID: 0}
-  Pinger2: {fileID: 0}
-  Pinger3: {fileID: 0}
-  Pinger4: {fileID: 0}
-  OctagonTable: {fileID: 0}
-  Bin: {fileID: 0}
-  TaskSelectionDropdown: {fileID: 0}
-  current_option: 0
 --- !u!114 &1443981351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5455,16 +5404,6 @@ MonoBehaviour:
   DownCameraTopic: /down_cam/image_raw
   DepthCameraTopic: /zed/zed_node/depth/depth_registered
   ClockTopic: /clock
-  PIDEnableTopic: /auv/pid/enable
-  PIDSetpointTopic: /auv/pid/setpoint
-  PidXEnableTopic: /auv/pid/x/enable
-  PidYEnableTopic: /auv/pid/y/enable
-  PidZEnableTopic: /auv/pid/z/enable
-  PidQuatEnableTopic: /auv/pid/quat/enable
-  PidXSetpointTopic: /auv/pid/x/setpoint
-  PidYSetpointTopic: /auv/pid/y/setpoint
-  PidZSetpointTopic: /auv/pid/z/setpoint
-  PidQuatSetpointTopic: /auv/pid/quat/setpoint
   StateTopic: /auv/state
   StateXTopic: /auv/state/x
   StateYTopic: /auv/state/y
