@@ -1,6 +1,6 @@
+using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Unity.Robotics.ROSTCPConnector;
 
 /// <summary>
 /// Handles the Config drawer UI: sensor toggles, camera parameters, quality settings, save button.
@@ -83,7 +83,8 @@ public class SettingsController
         // Water toggle - immediate effect (Inverted: Enable Water = true means NoWaterMode = false)
         if (toggleWater != null)
         {
-            toggleWater.RegisterValueChangedCallback(evt => {
+            toggleWater.RegisterValueChangedCallback(evt =>
+            {
                 if (SimulationSettings.Instance != null)
                 {
                     SimulationSettings.Instance.NoWaterMode = !evt.newValue;
@@ -95,7 +96,8 @@ public class SettingsController
         // Shadows toggle - immediate effect
         if (toggleShadows != null)
         {
-            toggleShadows.RegisterValueChangedCallback(evt => {
+            toggleShadows.RegisterValueChangedCallback(evt =>
+            {
                 if (SimulationSettings.Instance != null)
                 {
                     SimulationSettings.Instance.EnableShadows = evt.newValue;
@@ -107,7 +109,8 @@ public class SettingsController
         // Free Camera toggle - immediate effect
         if (toggleFreeCamera != null)
         {
-            toggleFreeCamera.RegisterValueChangedCallback(evt => {
+            toggleFreeCamera.RegisterValueChangedCallback(evt =>
+            {
                 if (CameraManager.Instance != null)
                 {
                     if (evt.newValue)
@@ -121,56 +124,64 @@ public class SettingsController
         // Sensor publishing toggles - immediate effect (no restart needed)
         if (togglePublishROS != null)
         {
-            togglePublishROS.RegisterValueChangedCallback(evt => {
+            togglePublishROS.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishROS = evt.newValue;
             });
         }
 
         if (toggleDVL != null)
         {
-            toggleDVL.RegisterValueChangedCallback(evt => {
+            toggleDVL.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishDVL = evt.newValue;
             });
         }
 
         if (toggleIMU != null)
         {
-            toggleIMU.RegisterValueChangedCallback(evt => {
+            toggleIMU.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishIMU = evt.newValue;
             });
         }
 
         if (toggleDepth != null)
         {
-            toggleDepth.RegisterValueChangedCallback(evt => {
+            toggleDepth.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishDepth = evt.newValue;
             });
         }
 
         if (toggleHydro != null)
         {
-            toggleHydro.RegisterValueChangedCallback(evt => {
+            toggleHydro.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishHydrophones = evt.newValue;
             });
         }
 
         if (toggleFrontCam != null)
         {
-            toggleFrontCam.RegisterValueChangedCallback(evt => {
+            toggleFrontCam.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishFrontCam = evt.newValue;
             });
         }
 
         if (toggleDownCam != null)
         {
-            toggleDownCam.RegisterValueChangedCallback(evt => {
+            toggleDownCam.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishDownCam = evt.newValue;
             });
         }
 
         if (toggleDepthCamera != null)
         {
-            toggleDepthCamera.RegisterValueChangedCallback(evt => {
+            toggleDepthCamera.RegisterValueChangedCallback(evt =>
+            {
                 SimulationSettings.Instance.PublishDepthCamera = evt.newValue;
             });
         }
@@ -193,13 +204,13 @@ public class SettingsController
         if (toggleSimObjects != null) toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
         if (toggleStreamZED != null)
         {
-            // #if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
             toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
             toggleStreamZED.style.display = DisplayStyle.Flex;
-            // #else
-            // toggleStreamZED.value = false;
-            // toggleStreamZED.style.display = DisplayStyle.None;
-            // #endif
+#else
+            toggleStreamZED.value = false;
+            toggleStreamZED.style.display = DisplayStyle.None;
+#endif
         }
         if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
         if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;

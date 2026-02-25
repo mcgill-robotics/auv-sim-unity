@@ -187,7 +187,9 @@ Assets/
 * **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
 * **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
-### ⚠️ Important: ZED SDK & Plugin Setup (ONLY ON UBUNTU 22.04 w/ NVIDIA GPU, ignore if on Windows/Mac)
+### ⚠️ Important: ZED SDK & Plugin Setup
+*Strict requirement*: NVIDIA drivers must be version **< 590.x.x** for the ZED plugin to work. Ensure you have compatible drivers installed, and downgrade is necessary (newest versions are typically 590).
+
 The simulator relies on the ZED SDK. Due to GitHub file size limits, the required binary files (`.dll` and `.so`) are **NOT** included in the repository.
 
 **You must follow these steps or the project will have compile errors:**
