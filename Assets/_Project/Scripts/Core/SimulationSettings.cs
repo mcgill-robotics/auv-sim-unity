@@ -273,10 +273,10 @@ public class SimulationSettings : MonoBehaviour
         PublishDepthCamera = bool.Parse(PlayerPrefs.GetString("PublishDepthCameraToggle", "false"));
         StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
 
-        // Force disable ZED streaming on non-Linux platforms
-        // #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
-        // StreamZEDCamera = false;
-        // #endif
+        // Force disable ZED streaming on platforms other than Windows or Linux
+#if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX && !UNITY_EDITOR_WIN && !UNITY_STANDALONE_WIN
+        StreamZEDCamera = false;
+#endif
 
         VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
         VisualizeIMU = bool.Parse(PlayerPrefs.GetString("VisualizeIMUToggle", "true"));

@@ -137,12 +137,12 @@ public class ZED2iSimSender : MonoBehaviour
             return;
         }
 
-        // Safety check: Ensure we are on Linux
-        // #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX
-        // enabled = false;
-        // Debug.LogWarning("[ZED Sim] ZED Virtual Streamer is only supported on Linux. Disabling component.");
-        // return;
-        // #endif
+        // Safety check: Ensure we are on Linux or Windows (ZED SDK supported platforms)
+#if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX && !UNITY_EDITOR_WIN && !UNITY_STANDALONE_WIN
+        enabled = false;
+        Debug.LogWarning("[ZED Sim] ZED Virtual Streamer is only supported on Linux or Windows. Disabling component.");
+        return;
+#endif
 
         // Load camera settings from SimulationSettings
         if (SimulationSettings.Instance != null)
@@ -337,7 +337,7 @@ public class ZED2iSimSender : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start.");
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start. Please ensure ZED SDK version >= 5.1.x and NVIDIA driver version < 590.x.x are installed.");
             close_streamer(streamerID);
         }
     }
