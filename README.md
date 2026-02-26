@@ -280,6 +280,10 @@ The simulator includes a `CompetitionManager` that orchestrates specific tasks (
 2.  Click **Initiate Run**.
 3.  The simulator will reset the AUV and props to the starting configuration for that task.
 
+### Synthetic Data Generation
+The simulator includes a comprehensive programmatic synthetic data generator built on the Unity Perception package for training computer vision models. 
+For detailed instructions on configuring props, running the generator, and converting the dataset, please read the [Synthetic Data Setup Guide](SYNTHETIC_DATA_SETUP.md).
+
 ### Unity Editor Tips
 
 **Set Aspect Ratio:**
