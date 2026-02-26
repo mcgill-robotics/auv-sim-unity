@@ -4930,12 +4930,9 @@ MonoBehaviour:
   buoyancyForce: 264
   centerOfBuoyancy: {x: 0, y: 0.023, z: 0}
   centerOfMass: {x: 0, y: 0, z: 0}
-  floaters:
-  - {fileID: 95484379}
-  - {fileID: 1559925194}
-  - {fileID: 550169289}
-  - {fileID: 1777276593}
   waterSurface: {fileID: 762281602}
+  hydrodynamicDrag: {fileID: 0}
+  floaterPositions: []
 --- !u!54 &1371465008
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ using UnityEngine.Rendering.HighDefinition;
 /// Applies buoyancy force to the AUV. Force is applied at the center of buoyancy,
 /// which creates a righting torque when offset from the center of mass.
 /// </summary>
+[RequireComponent(typeof(Rigidbody))]
 public class Buoyancy : MonoBehaviour
 {
     [Header("Buoyancy Configuration")]
@@ -21,11 +22,14 @@ public class Buoyancy : MonoBehaviour
     public Vector3 centerOfMass;
 
     [SerializeField] private WaterSurface waterSurface;
+    [SerializeField] private HydrodynamicDrag hydrodynamicDrag;
 
     public List<Vector3> floaterPositions;
 
     private Rigidbody auvRb;
+
     private Vector3 surfaceToCoB;
+    private float auvVolume;
 
     /// <summary>
     /// Threshold depth (in meters) for partial submersion calculation.
@@ -62,6 +66,21 @@ public class Buoyancy : MonoBehaviour
 
         buoyancyForceVector = Vector3.up * buoyancyForce;
         buoyancyForceVectorScaled = buoyancyForceVector / auvLengthOver4;
+        // floaterPositions = new List<Vector3>
+        // {
+        //     centerOfBuoyancy + transform.position
+        // };
+        Collider[] colliders = auvRb.GetComponentsInChildren<Collider>();
+
+        Bounds combinedBounds = colliders[0].bounds;
+
+        for (int i = 1; i < colliders.Length; i++)
+        {
+            combinedBounds.Encapsulate(colliders[i].bounds);
+        }
+        Debug.Log($"Combined AUV bounds: center={combinedBounds.center}, size={combinedBounds.size} Number of colliders: {colliders.Length}");
+        // very crude approximation of volume based on bounding box, but should be sufficient for scaling buoyancy force
+        auvVolume = combinedBounds.size.x * combinedBounds.size.y * combinedBounds.size.z;
     }
 
 
@@ -110,16 +129,19 @@ public class Buoyancy : MonoBehaviour
         {
             if (projectedPoint.projectedPositionWS.y > floaterPosition.y)
             {
+                // stored for debugging/visualization in OnDrawGizmos
                 surfaceToCoB = (Vector3)projectedPoint.projectedPositionWS - floaterPosition;
                 // Floater is submerged, apply upward buoyancy force
                 float submergedDepth = surfaceToCoB.y;
+                float waterDensity = hydrodynamicDrag.waterDensity;
 
-                float buoyancyForceMagnitude = Physics.gravity.magnitude * auvRb.mass * submergedDepth;
+                // Archimedes' principle: Buoyant force = density of fluid * volume of displaced fluid * gravity
+                float buoyancyForceMagnitude = waterDensity * auvVolume * Physics.gravity.magnitude;
                 Vector3 buoyancyForce = Vector3.up * buoyancyForceMagnitude;
 
                 auvRb.AddForceAtPosition(buoyancyForce, floaterPosition, ForceMode.Force);
 
-                Debug.Log($"Applying buoyancy force of {buoyancyForceMagnitude:F2} N at {floaterPosition} (submerged depth: {submergedDepth:F2} m)");
+                Debug.Log($"Applying buoyancy force of {buoyancyForce} N at {floaterPosition} (submerged depth: {submergedDepth:F2} m)");
             }
 
         }
