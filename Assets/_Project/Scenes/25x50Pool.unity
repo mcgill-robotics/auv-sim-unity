@@ -4931,7 +4931,10 @@ MonoBehaviour:
   centerOfBuoyancy: {x: 0, y: 0.023, z: 0}
   centerOfMass: {x: 0, y: 0, z: 0}
   waterSurface: {fileID: 762281602}
-  hydrodynamicDrag: {fileID: 0}
+  hydrodynamicDrag: {fileID: 1371465006}
+  auvBoxes:
+  - {fileID: 7649270088102046629}
+  - {fileID: 7031543448678077273}
   floaterPositions: []
 --- !u!54 &1371465008
 Rigidbody:

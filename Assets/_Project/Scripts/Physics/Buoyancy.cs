@@ -9,6 +9,8 @@ using UnityEngine.Rendering.HighDefinition;
 /// which creates a righting torque when offset from the center of mass.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(HydrodynamicDrag))]
+[RequireComponent(typeof(WaterSurface))]
 public class Buoyancy : MonoBehaviour
 {
     [Header("Buoyancy Configuration")]
@@ -24,12 +26,15 @@ public class Buoyancy : MonoBehaviour
     [SerializeField] private WaterSurface waterSurface;
     [SerializeField] private HydrodynamicDrag hydrodynamicDrag;
 
+    [SerializeField] private List<BoxCollider> auvBoxes;
+
     public List<Vector3> floaterPositions;
 
     private Rigidbody auvRb;
 
     private Vector3 surfaceToCoB;
     private float auvVolume;
+    private float buoyancyForceMagnitude;
 
     /// <summary>
     /// Threshold depth (in meters) for partial submersion calculation.
@@ -70,17 +75,19 @@ public class Buoyancy : MonoBehaviour
         // {
         //     centerOfBuoyancy + transform.position
         // };
-        Collider[] colliders = auvRb.GetComponentsInChildren<Collider>();
 
-        Bounds combinedBounds = colliders[0].bounds;
+        Bounds combinedBounds = auvBoxes[0].bounds;
 
-        for (int i = 1; i < colliders.Length; i++)
+        for (int i = 1; i < auvBoxes.Count; i++)
         {
-            combinedBounds.Encapsulate(colliders[i].bounds);
+            combinedBounds.Encapsulate(auvBoxes[i].bounds);
         }
-        Debug.Log($"Combined AUV bounds: center={combinedBounds.center}, size={combinedBounds.size} Number of colliders: {colliders.Length}");
+        Debug.Log($"Combined AUV bounds: center={combinedBounds.center}, size={combinedBounds.size} Number of colliders: {auvBoxes.Count}");
         // very crude approximation of volume based on bounding box, but should be sufficient for scaling buoyancy force
         auvVolume = combinedBounds.size.x * combinedBounds.size.y * combinedBounds.size.z;
+
+        // Archimedes' principle: Buoyant force = density of fluid * volume of displaced fluid * gravity
+        buoyancyForceMagnitude = hydrodynamicDrag.waterDensity * auvVolume * Physics.gravity.magnitude;
     }
 
 
@@ -127,16 +134,13 @@ public class Buoyancy : MonoBehaviour
 
         if (waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint))
         {
-            if (projectedPoint.projectedPositionWS.y > floaterPosition.y)
-            {
-                // stored for debugging/visualization in OnDrawGizmos
-                surfaceToCoB = (Vector3)projectedPoint.projectedPositionWS - floaterPosition;
-                // Floater is submerged, apply upward buoyancy force
-                float submergedDepth = surfaceToCoB.y;
-                float waterDensity = hydrodynamicDrag.waterDensity;
+            // stored for debugging/visualization in OnDrawGizmos
+            surfaceToCoB = (Vector3)projectedPoint.projectedPositionWS - floaterPosition;
+            float submergedDepth = surfaceToCoB.y;
 
-                // Archimedes' principle: Buoyant force = density of fluid * volume of displaced fluid * gravity
-                float buoyancyForceMagnitude = waterDensity * auvVolume * Physics.gravity.magnitude;
+            if (submergedDepth > 0)
+            {
+                // Floater is submerged, apply upward buoyancy force
                 Vector3 buoyancyForce = Vector3.up * buoyancyForceMagnitude;
 
                 auvRb.AddForceAtPosition(buoyancyForce, floaterPosition, ForceMode.Force);
@@ -155,5 +159,16 @@ public class Buoyancy : MonoBehaviour
         Gizmos.DrawSphere(transform.TransformPoint(centerOfBuoyancy), 0.02f);
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(transform.TransformPoint(centerOfBuoyancy) + surfaceToCoB, transform.TransformPoint(centerOfBuoyancy));
+
+
+        Bounds combinedBounds = auvBoxes[0].bounds;
+
+        for (int i = 1; i < auvBoxes.Count; i++)
+        {
+            combinedBounds.Encapsulate(auvBoxes[i].bounds);
+        }
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(combinedBounds.center, combinedBounds.size);
     }
 }
