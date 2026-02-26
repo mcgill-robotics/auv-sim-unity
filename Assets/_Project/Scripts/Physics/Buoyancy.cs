@@ -20,11 +20,12 @@ public class Buoyancy : MonoBehaviour
     [Tooltip("Center of mass offset (local coordinates). Applied to Rigidbody on Start.")]
     public Vector3 centerOfMass;
 
-    public List<GameObject> floaters;
+    [SerializeField] private WaterSurface waterSurface;
 
-    public WaterSurface waterSurface;
+    public List<Vector3> floaterPositions;
 
     private Rigidbody auvRb;
+    private Vector3 surfaceToCoB;
 
     /// <summary>
     /// Threshold depth (in meters) for partial submersion calculation.
@@ -74,32 +75,32 @@ public class Buoyancy : MonoBehaviour
         }
 #endif
 
-        float auvDistBelowSurface = -Math.Min(0, auvRb.transform.position.y);
-        Vector3 forcePoint = transform.TransformPoint(centerOfBuoyancy);
+        // float auvDistBelowSurface = -Math.Min(0, auvRb.transform.position.y);
+        // Vector3 forcePoint = transform.TransformPoint(centerOfBuoyancy);
 
-        if (auvDistBelowSurface < auvLengthOver4)
-        {
-            // AUV is partially submerged, apply buoyancy force scaled to the submerged volume
-            auvRb.AddForceAtPosition(auvDistBelowSurface * buoyancyForceVectorScaled, forcePoint, ForceMode.Force);
-        }
-        else
-        {
-            // AUV is fully submerged, apply full buoyancy force
-            auvRb.AddForceAtPosition(buoyancyForceVector, forcePoint, ForceMode.Force);
-        }
-        foreach (GameObject floater in floaters)
-        {
-            ApplyBuoyancyForce(floater);
-        }
+        // if (auvDistBelowSurface < auvLengthOver4)
+        // {
+        //     // AUV is partially submerged, apply buoyancy force scaled to the submerged volume
+        //     auvRb.AddForceAtPosition(auvDistBelowSurface * buoyancyForceVectorScaled, forcePoint, ForceMode.Force);
+        // }
+        // else
+        // {
+        //     // AUV is fully submerged, apply full buoyancy force
+        //     auvRb.AddForceAtPosition(buoyancyForceVector, forcePoint, ForceMode.Force);
+        // }
+        // foreach (Vector3 floater in floaterPositions)
+        // {
+        ApplyBuoyancyForce(transform.TransformPoint(centerOfBuoyancy));
+        // }
     }
-    // inspired by https://www.youtube.com/watch?v=vzqoLJmpUqU
-    void ApplyBuoyancyForce(GameObject floater)
+
+    void ApplyBuoyancyForce(Vector3 floaterPosition)
     {
 
         WaterSearchParameters waterSearchParams = new WaterSearchParameters
         {
             startPositionWS = Vector3.zero,
-            targetPositionWS = floater.transform.position,
+            targetPositionWS = floaterPosition,
             error = 0.01f,
             maxIterations = 8,
             includeDeformation = false, // Ignore water deformation for buoyancy force application for easier computation
@@ -107,7 +108,20 @@ public class Buoyancy : MonoBehaviour
 
         if (waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint))
         {
-            Debug.Log($"Projected Position = {projectedPoint.projectedPositionWS}, Normal = {projectedPoint.normalWS}, Error = {projectedPoint.error}");
+            if (projectedPoint.projectedPositionWS.y > floaterPosition.y)
+            {
+                surfaceToCoB = (Vector3)projectedPoint.projectedPositionWS - floaterPosition;
+                // Floater is submerged, apply upward buoyancy force
+                float submergedDepth = surfaceToCoB.y;
+
+                float buoyancyForceMagnitude = Physics.gravity.magnitude * auvRb.mass * submergedDepth;
+                Vector3 buoyancyForce = Vector3.up * buoyancyForceMagnitude;
+
+                auvRb.AddForceAtPosition(buoyancyForce, floaterPosition, ForceMode.Force);
+
+                Debug.Log($"Applying buoyancy force of {buoyancyForceMagnitude:F2} N at {floaterPosition} (submerged depth: {submergedDepth:F2} m)");
+            }
+
         }
     }
 
@@ -117,5 +131,7 @@ public class Buoyancy : MonoBehaviour
         Gizmos.DrawSphere(transform.TransformPoint(centerOfMass), 0.02f);
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(transform.TransformPoint(centerOfBuoyancy), 0.02f);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.TransformPoint(centerOfBuoyancy) + surfaceToCoB, transform.TransformPoint(centerOfBuoyancy));
     }
 }
