@@ -999,6 +999,8 @@ MonoBehaviour:
   manageColliders: 1
   nextTorpedoIndex: 0
   targetRotation: 0
+  publishCountContinuously: 1
+  countPublishHz: 1
 --- !u!1 &430683499
 GameObject:
   m_ObjectHideFlags: 0
@@ -1868,6 +1870,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 634586413}
+  - component: {fileID: 634586414}
   m_Layer: 7
   m_Name: Left Torpedo Parent
   m_TagString: Untagged
@@ -1891,6 +1894,33 @@ Transform:
   - {fileID: 6362377508993018389}
   m_Father: {fileID: 100362016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &634586414
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634586412}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &688476569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1967,7 +1997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff181945c507470aad31576d724eb5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _publishRate: 100
+  _publishRate: 1
   auvRbOverride: {fileID: 0}
   enableNoise: 1
   accelNoise: 0.1
@@ -4788,7 +4818,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   streamPort: 30000
   serialNumber: 41116066
-  targetFPS: 10
+  targetFPS: 30
   leftCamera: {fileID: 1621375949}
   rightCamera: {fileID: 1135839436}
   invertRotY: 0
@@ -5281,7 +5311,7 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  NoWaterMode: 1
+  NoWaterMode: 0
   EnableShadows: 0
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
@@ -5290,11 +5320,11 @@ MonoBehaviour:
   PublishDVL: 1
   PublishIMU: 1
   PublishDepth: 1
-  PublishHydrophones: 0
-  PublishFrontCam: 0
-  PublishDownCam: 0
-  PublishDepthCamera: 0
-  StreamZEDCamera: 0
+  PublishHydrophones: 1
+  PublishFrontCam: 1
+  PublishDownCam: 1
+  PublishDepthCamera: 1
+  StreamZEDCamera: 1
   VisualizeDVL: 1
   VisualizeIMU: 0
   VisualizeDepth: 0
@@ -5302,7 +5332,7 @@ MonoBehaviour:
   EnableIMUNoise: 0
   EnableDepthNoise: 0
   DrawerConfigOpen: 1
-  DrawerControlsOpen: 0
+  DrawerControlsOpen: 1
   DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
@@ -5310,7 +5340,7 @@ MonoBehaviour:
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 30
+  FrontCamRate: 1
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
@@ -5322,7 +5352,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/willz2205/Desktop/mcgill_robotics/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5394,6 +5424,7 @@ MonoBehaviour:
   TorpedoLaunchTopic: /auv/torpedo/launch
   TorpedoResetTopic: /auv/torpedo/reset
   TorpedoRotationTopic: /auv/torpedo/rotate
+  TorpedoCountTopic: /auv/torpedo/count
   DVLTopic: dvl/velocity
   DVLDeadReckoningTopic: dvl/dead_reckoning
   DVLOdometryTopic: dvl/odometry
@@ -8217,6 +8248,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2083545327}
+  - component: {fileID: 2083545328}
   m_Layer: 7
   m_Name: Right Torpedo Parent
   m_TagString: Untagged
@@ -8240,6 +8272,33 @@ Transform:
   - {fileID: 7689657270306945842}
   m_Father: {fileID: 100362016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &2083545328
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083545326}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &2089181265
 PrefabInstance:
   m_ObjectHideFlags: 0

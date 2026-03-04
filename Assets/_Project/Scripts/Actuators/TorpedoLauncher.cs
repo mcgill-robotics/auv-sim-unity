@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
+using Unity.Robotics.ROSTCPConnector;
+using UnityEngine;
 
 namespace Actuators
 {
@@ -12,45 +12,47 @@ namespace Actuators
     /// </summary>
     public class TorpedoLauncher : MonoBehaviour
     {
+        public string Topic => ROSSettings.Instance.TorpedoCountTopic;
+
         [Header("Launcher Configuration")]
         [Tooltip("The base transform that rotates")]
         public Transform rotatingBase;
-        
+
         [Tooltip("The two torpedo gameobjects")]
         public GameObject[] torpedos;
-        
+
         [Tooltip("Maximum rotation angle from center (80 degrees)")]
         public float maxRotationAngle = 80f;
-        
+
         [Tooltip("Speed of rotation (degrees per second)")]
         public float rotationSpeed = 30f;
-        
+
         [Tooltip("Initial forward velocity when launched")]
         public float launchForce = 10f;
 
         [Header("Torpedo Physics Configuration")]
         [Tooltip("Mass of the torpedo when launched")]
         public float torpedoMass = 1.0f;
-        
+
         [Tooltip("Linear drag of the torpedo")]
         public float torpedoDrag = 0.5f;
-        
+
         [Tooltip("Angular drag of the torpedo")]
         public float torpedoAngularDrag = 0.5f;
-        
+
         [Tooltip("Layers to exclude from collision (Unity 6+)")]
         public LayerMask excludeLayers;
 
         [Header("Outline Configuration")]
         [Tooltip("If true, an outline will be applied to the torpedo when launched")]
         public bool showOutlineOnLaunch = true;
-        
+
         [Tooltip("Color of the outline")]
         public Color outlineColor = Color.yellow;
-        
+
         [Tooltip("Width of the outline")]
         public float outlineWidth = 0.02f;
-        
+
         [Tooltip("The outline shader to use (Custom/TorpedoOutline)")]
         public Shader outlineShader;
 
@@ -62,7 +64,15 @@ namespace Actuators
         [SerializeField] private int nextTorpedoIndex = 0;
         [SerializeField] private float targetRotation = 0f;
 
+        [Header("Ros Torpedo Count Publishing")]
+        [Tooltip("Continuously publish the number of torpedos left as Int32Msg")]
+        public bool publishCountContinuously = true;
+
+        [Tooltip("Publish rate of Torpedo Count in Hz (default to 1 Hz)")]
+        public float countPublishHz = 1f;
+
         private ROSConnection roscon;
+        private float timeSinceLastPublish = 0f;
 
         // Store initial states for resetting
         private struct TorpedoState
@@ -78,7 +88,10 @@ namespace Actuators
         private void Start()
         {
             roscon = ROSConnection.GetOrCreateInstance();
-            
+
+            // Setup a publisher for torpedo count (Int32), to be used in the planner's logic as a means to dictate behaviour based on remaining torpedos.
+            roscon.RegisterPublisher<Int32Msg>(ROSSettings.Instance.TorpedoCountTopic);
+
             // Subscribe to ROS topics
             roscon.Subscribe<BoolMsg>(ROSSettings.Instance.TorpedoLaunchTopic, OnRosLaunch);
             roscon.Subscribe<BoolMsg>(ROSSettings.Instance.TorpedoResetTopic, OnRosReset);
@@ -89,7 +102,7 @@ namespace Actuators
             for (int i = 0; i < torpedos.Length; i++)
             {
                 if (torpedos[i] == null) continue;
-                
+
                 initialStates[i] = new TorpedoState
                 {
                     parent = torpedos[i].transform.parent,
@@ -120,6 +133,23 @@ namespace Actuators
             UpdateRotation();
         }
 
+        private void FixedUpdate()
+        {
+            // Publish ros2 topics count on every physics frame instead of
+            // on rendered frame. All published topics are published on
+            // FixedUpdate to ensure the planner receives the most up-to-date information
+            if (!publishCountContinuously || roscon == null) return;
+
+            timeSinceLastPublish += Time.fixedDeltaTime;
+            float interval = 1f / Mathf.Max(0.0001f, countPublishHz);
+            if (timeSinceLastPublish >= interval)
+            {
+                int torpedosRemaining = Mathf.Max(0, torpedos.Length - nextTorpedoIndex);
+                roscon.Publish(ROSSettings.Instance.TorpedoCountTopic, new Int32Msg(torpedosRemaining));
+                timeSinceLastPublish = 0f;
+            }
+        }
+
         private void HandleManualInput()
         {
             // Ignore if typing in HUD
@@ -141,7 +171,7 @@ namespace Actuators
             float rotInput = 0f;
             if (Input.GetKey(InputManager.Instance.GetKey("torpedoRotateLeftKeybind", KeyCode.LeftArrow))) rotInput -= 1f;
             if (Input.GetKey(InputManager.Instance.GetKey("torpedoRotateRightKeybind", KeyCode.RightArrow))) rotInput += 1f;
-            
+
             if (rotInput != 0)
             {
                 targetRotation += rotInput * rotationSpeed * Time.deltaTime;
@@ -152,7 +182,7 @@ namespace Actuators
         private void UpdateRotation()
         {
             if (rotatingBase == null) return;
-            
+
             // Smoothly rotate towards target
             Quaternion targetRot = Quaternion.Euler(0, targetRotation, 0);
             rotatingBase.localRotation = Quaternion.RotateTowards(rotatingBase.localRotation, targetRot, rotationSpeed * Time.deltaTime);
@@ -187,14 +217,14 @@ namespace Actuators
         private void ApplyOutline(GameObject obj)
         {
             if (!showOutlineOnLaunch) return;
-            
+
             if (outlineMat == null)
             {
                 Shader shader = outlineShader != null ? outlineShader : Shader.Find("Custom/TorpedoOutline");
                 if (shader == null) return;
                 outlineMat = new Material(shader);
             }
-            
+
             outlineMat.SetColor("_OutlineColor", outlineColor);
             outlineMat.SetFloat("_OutlineWidth", outlineWidth);
 
@@ -246,10 +276,10 @@ namespace Actuators
 
             // Configure Rigidbody
             rb.mass = torpedoMass;
-            rb.linearDamping = torpedoDrag;
+            rb.linearDamping = 1.0f;
             rb.angularDamping = torpedoAngularDrag;
             rb.excludeLayers = excludeLayers; // Exclude layers from collision (Unity 6 feature)
-            rb.useGravity = false; // Usually true for underwater if buoyancy isn't handled separately, but let's assume neutrally buoyant or handled by other scripts
+            rb.useGravity = true; // Usually true for underwater if buoyancy isn't handled separately, but let's assume neutrally buoyant or handled by other scripts
             rb.isKinematic = false;
 
             // Handle Collider
@@ -265,9 +295,9 @@ namespace Actuators
 
             torpedo.transform.parent = null; // Detach
             rb.linearVelocity = torpedo.transform.forward * launchForce;
-            
+
             ApplyOutline(torpedo);
-            
+
             Debug.Log($"[TorpedoLauncher] Launched torpedo {nextTorpedoIndex + 1}");
             nextTorpedoIndex++;
         }
@@ -299,14 +329,14 @@ namespace Actuators
                 torpedos[i].transform.parent = initialStates[i].parent;
                 torpedos[i].transform.localPosition = initialStates[i].localPosition;
                 torpedos[i].transform.localRotation = initialStates[i].localRotation;
-                
+
                 RemoveOutline(i);
             }
 
             nextTorpedoIndex = 0;
             targetRotation = 0f;
             if (rotatingBase != null) rotatingBase.localRotation = Quaternion.identity;
-            
+
             Debug.Log("[TorpedoLauncher] Launcher reset.");
         }
 

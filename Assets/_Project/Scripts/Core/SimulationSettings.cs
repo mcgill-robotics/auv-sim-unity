@@ -50,6 +50,9 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Publish DVL velocity and altitude data")]
     public bool PublishDVL = false;
 
+    [Tooltip("Enable adaptive DVL publish rate based on altitude (higher rate near the seafloor)")]
+    public bool PublishDynamicDVLRate = false;
+
     [Tooltip("Publish IMU orientation, gyroscope, and accelerometer data")]
     public bool PublishIMU = false;
 
@@ -92,6 +95,18 @@ public class SimulationSettings : MonoBehaviour
 
     [Tooltip("Enable simulated noise/bias for Depth sensor")]
     public bool EnableDepthNoise = true;
+
+    [Tooltip("DVL publish rate (Hz)")]
+    [Range(1, 100)]
+    public int DvlRate = 10;
+
+    [Tooltip("IMU publish rate (Hz)")]
+    [Range(1, 100)]
+    public int ImuRate = 10;
+
+    [Tooltip("Depth sensor publish rate (Hz)")]
+    [Range(1, 100)]
+    public int DepthRate = 10;
 
     [Space(10)]
     [Header("UI Drawer States")]
@@ -265,6 +280,7 @@ public class SimulationSettings : MonoBehaviour
         HydrophonesNumberOption = PlayerPrefs.GetInt("HydrophonesNumberOption", 0);
 
         PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "false"));
+        PublishDynamicDVLRate = bool.Parse(PlayerPrefs.GetString("PublishDynamicDVLRateToggle", "false"));
         PublishIMU = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "false"));
         PublishDepth = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "false"));
         PublishHydrophones = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "false"));
@@ -292,6 +308,9 @@ public class SimulationSettings : MonoBehaviour
         DrawerSensorsOpen = bool.Parse(PlayerPrefs.GetString("DrawerSensorsOpen", "true"));
         DrawerCameraOpen = bool.Parse(PlayerPrefs.GetString("DrawerCameraOpen", "true"));
 
+        DvlRate = int.Parse(PlayerPrefs.GetString("DVLRate", "10"));
+        ImuRate = int.Parse(PlayerPrefs.GetString("IMURate", "10"));
+        DepthRate = int.Parse(PlayerPrefs.GetString("DepthRate", "10"));
         FrontCamRate = int.Parse(PlayerPrefs.GetString("frontCamRate", "10"));
         DownCamRate = int.Parse(PlayerPrefs.GetString("downCamRate", "10"));
         FrontCamWidth = int.Parse(PlayerPrefs.GetString("frontCamWidth", "960"));
@@ -371,6 +390,7 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetInt("HydrophonesNumberOption", HydrophonesNumberOption);
 
         PlayerPrefs.SetString("PublishDVLToggle", PublishDVL.ToString());
+        PlayerPrefs.SetString("PublishDynamicDVLRateToggle", PublishDynamicDVLRate.ToString());
         PlayerPrefs.SetString("PublishIMUToggle", PublishIMU.ToString());
         PlayerPrefs.SetString("PublishDepthToggle", PublishDepth.ToString());
         PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophones.ToString());
@@ -393,6 +413,9 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("DrawerSensorsOpen", DrawerSensorsOpen.ToString());
         PlayerPrefs.SetString("DrawerCameraOpen", DrawerCameraOpen.ToString());
 
+        PlayerPrefs.SetString("DVLRate", DvlRate.ToString());
+        PlayerPrefs.SetString("IMURate", ImuRate.ToString());
+        PlayerPrefs.SetString("DepthRate", DepthRate.ToString());
         PlayerPrefs.SetString("frontCamRate", FrontCamRate.ToString());
         PlayerPrefs.SetString("downCamRate", DownCamRate.ToString());
         PlayerPrefs.SetString("frontCamWidth", FrontCamWidth.ToString());

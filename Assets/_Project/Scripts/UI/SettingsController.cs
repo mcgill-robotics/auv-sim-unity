@@ -19,9 +19,15 @@ public class SettingsController
     private Toggle toggleIMU;
     private Toggle toggleDepth;
     private Toggle toggleHydro;
+    private Toggle toggleDVLDynamicPublish;
     private Toggle toggleFrontCam;
     private Toggle toggleDownCam;
     private Toggle toggleDepthCamera;
+
+    // UI Elements - Sensor publish rates
+    private IntegerField inputDvlRate;
+    private IntegerField inputImuRate;
+    private IntegerField inputDepthRate;
 
     // UI Elements - Camera Parameters
     private IntegerField inputFrontRate;
@@ -57,12 +63,18 @@ public class SettingsController
         toggleShadows = root.Q<Toggle>("Toggle-Shadows");
         toggleFreeCamera = root.Q<Toggle>("Toggle-FreeCamera");
         toggleDVL = root.Q<Toggle>("Toggle-DVL");
+        toggleDVLDynamicPublish = root.Q<Toggle>("Toggle-DVLDynamicPublish");
         toggleIMU = root.Q<Toggle>("Toggle-IMU");
         toggleDepth = root.Q<Toggle>("Toggle-Depth");
         toggleHydro = root.Q<Toggle>("Toggle-Hydro");
         toggleFrontCam = root.Q<Toggle>("Toggle-FrontCam");
         toggleDownCam = root.Q<Toggle>("Toggle-DownCam");
         toggleDepthCamera = root.Q<Toggle>("Toggle-DepthCamera");
+
+        // Sensors Parameters - Sensor publish rates
+        inputDvlRate = root.Q<IntegerField>("Input-DVLRate");
+        inputImuRate = root.Q<IntegerField>("Input-IMURate");
+        inputDepthRate = root.Q<IntegerField>("Input-DepthRate");
 
         // Camera parameters
         inputFrontRate = root.Q<IntegerField>("Input-FrontRate");
@@ -215,9 +227,13 @@ public class SettingsController
         if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
         if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;
         if (toggleDVL != null) toggleDVL.value = SimulationSettings.Instance.PublishDVL;
+        if (toggleDVLDynamicPublish != null) toggleDVLDynamicPublish.value = SimulationSettings.Instance.PublishDynamicDVLRate;
         if (toggleIMU != null) toggleIMU.value = SimulationSettings.Instance.PublishIMU;
         if (toggleDepth != null) toggleDepth.value = SimulationSettings.Instance.PublishDepth;
         if (toggleHydro != null) toggleHydro.value = SimulationSettings.Instance.PublishHydrophones;
+        if (inputDvlRate != null) inputDvlRate.value = SimulationSettings.Instance.DvlRate;
+        if (inputImuRate != null) inputImuRate.value = SimulationSettings.Instance.ImuRate;
+        if (inputDepthRate != null) inputDepthRate.value = SimulationSettings.Instance.DepthRate;
         if (toggleFrontCam != null) toggleFrontCam.value = SimulationSettings.Instance.PublishFrontCam;
         if (toggleDownCam != null) toggleDownCam.value = SimulationSettings.Instance.PublishDownCam;
         if (toggleDepthCamera != null) toggleDepthCamera.value = SimulationSettings.Instance.PublishDepthCamera;
@@ -243,9 +259,14 @@ public class SettingsController
         if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
         if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
         if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;
+        if (toggleDVLDynamicPublish != null) SimulationSettings.Instance.
+        PublishDynamicDVLRate = toggleDVLDynamicPublish.value;
         if (toggleIMU != null) SimulationSettings.Instance.PublishIMU = toggleIMU.value;
         if (toggleDepth != null) SimulationSettings.Instance.PublishDepth = toggleDepth.value;
         if (toggleHydro != null) SimulationSettings.Instance.PublishHydrophones = toggleHydro.value;
+        if (inputDvlRate != null) SimulationSettings.Instance.DvlRate = inputDvlRate.value;
+        if (inputImuRate != null) SimulationSettings.Instance.ImuRate = inputImuRate.value;
+        if (inputDepthRate != null) SimulationSettings.Instance.DepthRate = inputDepthRate.value;
         if (toggleFrontCam != null) SimulationSettings.Instance.PublishFrontCam = toggleFrontCam.value;
         if (toggleDownCam != null) SimulationSettings.Instance.PublishDownCam = toggleDownCam.value;
         if (toggleDepthCamera != null) SimulationSettings.Instance.PublishDepthCamera = toggleDepthCamera.value;

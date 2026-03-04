@@ -40,9 +40,15 @@
                     
                     <ui:Label text="SENSORS" class="data-label text-accent margin-top-small" />
                     <ui:Toggle name="Toggle-DVL" label="Doppler Velocity" value="true" />
+                    <ui:Toggle name="Toggle-DVLDynamicPublish" label="Doppler Velocity Dynamic Publishing Rate" value="true" />
                     <ui:Toggle name="Toggle-IMU" label="IMU / AHRS" value="true" />
                     <ui:Toggle name="Toggle-Depth" label="Depth Sensor" value="true" />
                     <ui:Toggle name="Toggle-Hydro" label="Hydrophones" value="true" />
+                    <ui:VisualElement class="margin-top-small">
+                        <ui:IntegerField name="Input-DVLRate" label="DVL Manual Publish Hz" value="10" />
+                        <ui:IntegerField name="Input-IMURate" label="Imu Publish Hz" value="100" />
+                        <ui:IntegerField name="Input-DepthRate" label="Depth Sensor Publish Hz" value="15" />
+                    </ui:VisualElement>
                     <ui:Label text="OPTICS" class="data-label text-accent margin-top-small" />
                     <ui:Toggle name="Toggle-FrontCam" label="Front Feed" value="true" />
                     <ui:Toggle name="Toggle-DownCam" label="Down Feed" value="true" />

@@ -34,6 +34,9 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Topic for torpedo launcher rotation (Float32)")]
     public string TorpedoRotationTopic = "/auv/torpedo/rotate";
 
+    [Tooltip("Topic for torpedo count (Int32)")]
+    public string TorpedoCountTopic = "/auv/torpedo/count";
+
     [Space(10)]
     [Header("Sensor Topics")]
     [Tooltip("DVL velocity and altitude data topic")]
@@ -51,16 +54,31 @@ public class ROSSettings : MonoBehaviour
     public string HydrophonesTopic = "/sensors/hydrophones/data";
 
     [Tooltip("Front camera image topic")]
-    public string FrontCameraTopic = "/zed/zed_node/rgb/color/rect/image";
+    public string FrontCameraTopic = "/zed2i/zed_node/stereo/image_rect_color";
 
     [Tooltip("Down camera image topic")]
     public string DownCameraTopic = "/down_cam/image_raw";
 
     [Tooltip("Front depth camera topic")]
-    public string DepthCameraTopic = "/zed/zed_node/depth/depth_registered";
+    public string DepthCameraTopic = "/zed2i/zed_node/depth/image_rect";
 
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";
+
+    [Header("Control")]
+    public string PIDEnableTopic = "/auv/pid/enable";
+    public string PIDSetpointTopic = "/auv/pid/setpoint";
+
+    // PID Individual Axis Topics
+    public string PidXEnableTopic = "/auv/pid/x/enable";
+    public string PidYEnableTopic = "/auv/pid/y/enable";
+    public string PidZEnableTopic = "/auv/pid/z/enable";
+    public string PidQuatEnableTopic = "/auv/pid/quat/enable";
+
+    public string PidXSetpointTopic = "/auv/pid/x/setpoint";
+    public string PidYSetpointTopic = "/auv/pid/y/setpoint";
+    public string PidZSetpointTopic = "/auv/pid/z/setpoint";
+    public string PidQuatSetpointTopic = "/auv/pid/quat/setpoint";
 
     public string StateTopic = "/auv/state";
 
