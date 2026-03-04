@@ -21,7 +21,18 @@ public class VisionObjectsVisualizer : MonoBehaviour
 
     [Tooltip("Minimum confidence to display object")]
     [Range(0f, 1f)]
-    public float minConfidence = 0.3f;
+    public float minConfidence = 0.0f;
+
+    [Tooltip("Transparency of the visualized objects")]
+    [Range(0f, 1f)]
+    public float objectTransparency = 0.5f;
+
+    [Header("Outline Configuration")]
+    [Tooltip("Whether to apply the torpedo outline shader to make them distinct")]
+    public bool applyOutline = true;
+
+    [Tooltip("Width of the outline")]
+    public float outlineWidth = 0.05f;
 
     [Header("VIO Pose Visualization")]
     [Tooltip("Color for the VIO pose marker")]
@@ -39,35 +50,47 @@ public class VisionObjectsVisualizer : MonoBehaviour
     public Color defaultColor = Color.white;
 
     [System.Serializable]
-    public class ClassColor
+    public class ClassVisualizer
     {
         public string className;
         public Color color = Color.white;
+        [Tooltip("Optional prefab to instantiate instead of a sphere")]
+        public GameObject prefab;
     }
 
-    [Tooltip("Color assignments for each object class")]
-    public List<ClassColor> classColors = new List<ClassColor>()
+    [Tooltip("Visualizer assignments for each object class")]
+    public List<ClassVisualizer> classVisualizers = new List<ClassVisualizer>()
     {
-        new ClassColor { className = "gate", color = Color.green },
-        new ClassColor { className = "lane_marker", color = Color.yellow },
-        new ClassColor { className = "red_pipe", color = Color.red },
-        new ClassColor { className = "white_pipe", color = Color.white },
-        new ClassColor { className = "octagon", color = Color.magenta },
-        new ClassColor { className = "table", color = new Color(0.6f, 0.4f, 0.2f) },
-        new ClassColor { className = "bin", color = Color.blue },
-        new ClassColor { className = "board", color = Color.cyan },
-        new ClassColor { className = "shark", color = new Color(0.5f, 0.5f, 0.5f) },
-        new ClassColor { className = "sawfish", color = new Color(0.8f, 0.6f, 0.2f) }
+        new ClassVisualizer { className = "gate", color = Color.green },
+        new ClassVisualizer { className = "lane_marker", color = Color.yellow },
+        new ClassVisualizer { className = "red_pipe", color = Color.red },
+        new ClassVisualizer { className = "white_pipe", color = Color.white },
+        new ClassVisualizer { className = "octagon", color = Color.magenta },
+        new ClassVisualizer { className = "table", color = new Color(0.6f, 0.4f, 0.2f) },
+        new ClassVisualizer { className = "bin", color = Color.blue },
+        new ClassVisualizer { className = "board", color = Color.cyan },
+        new ClassVisualizer { className = "shark", color = new Color(0.5f, 0.5f, 0.5f) },
+        new ClassVisualizer { className = "sawfish", color = new Color(0.8f, 0.6f, 0.2f) }
     };
 
-    private List<GameObject> activeSpheres = new List<GameObject>();
-    private Dictionary<string, Color> colorLookup = new Dictionary<string, Color>();
+    private class PooledVisObject
+    {
+        public GameObject Root;
+        public TextMesh TextMesh;
+        public string PoolKey;
+        public int LastConfidenceInt = -1;
+    }
+
+    // Object Pooling
+    private Dictionary<string, Queue<PooledVisObject>> objectPools = new Dictionary<string, Queue<PooledVisObject>>();
+    private List<PooledVisObject> activeObjects = new List<PooledVisObject>();
+
+    private Dictionary<string, ClassVisualizer> classLookup = new Dictionary<string, ClassVisualizer>();
     private ROSConnection ros;
     private Transform visualizerRoot;
 
     private Vector3 worldOrigin; // AUV's position when VIO started
     private Quaternion worldRotation; // AUV's rotation when simulation started
-    private bool worldOriginInitialized = false;
 
     // VIO pose marker
     private GameObject vioPoseMarker;
@@ -81,10 +104,10 @@ public class VisionObjectsVisualizer : MonoBehaviour
         visualizerRoot = new GameObject("VisionObjects_Visualizer").transform;
         visualizerRoot.SetParent(transform);
 
-        foreach (var cc in classColors)
+        foreach (var cv in classVisualizers)
         {
-            if (!string.IsNullOrEmpty(cc.className))
-                colorLookup[cc.className.ToLower()] = cc.color;
+            if (!string.IsNullOrEmpty(cv.className))
+                classLookup[cv.className.ToLower()] = cv;
         }
 
         // Initialize World Origin from centralized singleton
@@ -96,7 +119,6 @@ public class VisionObjectsVisualizer : MonoBehaviour
             
             worldRotation = SimulationOrigin.Instance.InitialRotation;
             worldOrigin = SimulationOrigin.Instance.InitialPosition;
-            worldOriginInitialized = true;
             
             Debug.Log($"[VisionObjectsVisualizer] Initialized Origin from SimulationOrigin: {worldOrigin}");
         }
@@ -104,7 +126,6 @@ public class VisionObjectsVisualizer : MonoBehaviour
         {
             worldOrigin = Vector3.zero;
             worldRotation = Quaternion.identity;
-            worldOriginInitialized = true;
             Debug.LogWarning("[VisionObjectsVisualizer] SimulationOrigin not found - using Unity origin (0,0,0)");
         }
 
@@ -211,104 +232,288 @@ public class VisionObjectsVisualizer : MonoBehaviour
 
     private void OnVisionObjectsReceived(VisionObjectArrayMsg msg)
     {
-        // Clear all existing spheres
-        ClearAllSpheres();
+        // Deactivate all objects from the previous frame
+        DeactivateAllObjects();
 
-        // Create sphere for each object in current message
+        // Create or reuse visualizer for each object in current message
         foreach (var obj in msg.array)
         {
             if (obj.confidence < minConfidence)
                 continue;
 
-            // Convert from ROS (X-Fwd, Y-Left, Z-Up) to Unity (X-Right, Y-Up, Z-Fwd)
+            // Convert position from ROS (X-Fwd, Y-Left, Z-Up) to Unity (X-Right, Y-Up, Z-Fwd)
             Vector3 rosToUnity = new Vector3(
-                -(float)obj.y,  // ROS Y (left) -> Unity -X (right)
-                (float)obj.z,   // ROS Z (up) -> Unity Y
-                (float)obj.x    // ROS X (forward) -> Unity Z
+                -(float)obj.pose.position.y,
+                (float)obj.pose.position.z,
+                (float)obj.pose.position.x
             );
 
             // Apply starting rotation and position offset
             Vector3 unityPos = worldOrigin + (worldRotation * rosToUnity);
 
-            CreateSphere(obj.label, unityPos, (float)obj.confidence);
+            // Get rotation if available
+            Quaternion unityRot = Quaternion.identity;
+            if (obj.has_orientation)
+            {
+                // Convert orientation from ROS FLU to Unity RUDF
+                Quaternion rosRot = new Quaternion(
+                    -(float)obj.pose.orientation.y,
+                    (float)obj.pose.orientation.z,
+                    (float)obj.pose.orientation.x,
+                    -(float)obj.pose.orientation.w
+                );
+                unityRot = worldRotation * rosRot;
+            }
+
+            CreateVisualizer(obj.label, unityPos, unityRot, (float)obj.confidence, obj.has_orientation);
         }
     }
 
-    private void CreateSphere(string label, Vector3 position, float confidence)
+    private void CreateVisualizer(string label, Vector3 position, Quaternion rotation, float confidence, bool hasOrientation)
     {
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.name = $"VisionObj_{label}";
-        sphere.transform.SetParent(visualizerRoot);
-        sphere.transform.position = position;
-        sphere.transform.localScale = Vector3.one * sphereRadius * 2f;
+        string poolKey = string.IsNullOrEmpty(label) ? "unknown" : label.ToLower();
+        
+        if (!objectPools.ContainsKey(poolKey))
+        {
+            objectPools[poolKey] = new Queue<PooledVisObject>();
+        }
 
-        // Remove collider
-        var collider = sphere.GetComponent<Collider>();
-        if (collider != null) Destroy(collider);
+        Queue<PooledVisObject> pool = objectPools[poolKey];
+        PooledVisObject visObj = null;
 
-        // Set color
+        if (pool.Count > 0)
+        {
+            visObj = pool.Dequeue();
+        }
+        else
+        {
+            visObj = CreateNewVisualizerObject(label, poolKey);
+        }
+
+        // Update the object's transform and label
+        visObj.Root.transform.position = position;
+        if (hasOrientation)
+        {
+            visObj.Root.transform.rotation = rotation;
+        }
+        else
+        {
+            visObj.Root.transform.rotation = Quaternion.identity;
+        }
+
+        // Update TextMesh visibility and text
+        if (visObj.TextMesh != null)
+        {
+            int confInt = Mathf.RoundToInt(confidence * 100f);
+            if (confInt != visObj.LastConfidenceInt)
+            {
+                visObj.TextMesh.text = $"{label}\n{confidence:F2}";
+                visObj.LastConfidenceInt = confInt;
+            }
+            
+            if (visObj.TextMesh.gameObject.activeSelf != showLabels)
+            {
+                visObj.TextMesh.gameObject.SetActive(showLabels);
+            }
+        }
+
+        if (!visObj.Root.activeSelf)
+        {
+            visObj.Root.SetActive(true);
+        }
+
+        activeObjects.Add(visObj);
+    }
+
+    private PooledVisObject CreateNewVisualizerObject(string label, string poolKey)
+    {
+        GameObject visObj = null;
         Color objColor = defaultColor;
-        if (!string.IsNullOrEmpty(label) && colorLookup.TryGetValue(label.ToLower(), out Color classColor))
+        bool usingPrefab = false;
+
+        if (classLookup.TryGetValue(poolKey, out ClassVisualizer cv))
         {
-            objColor = classColor;
+            objColor = cv.color;
+            if (cv.prefab != null)
+            {
+                visObj = Instantiate(cv.prefab, visualizerRoot);
+                usingPrefab = true;
+
+                // Disable Labeling and ConditionalLabeling components to prevent recursive publishing loop
+                var autoLabels = visObj.GetComponentsInChildren<UnityEngine.Perception.GroundTruth.LabelManagement.Labeling>(true);
+                foreach(var al in autoLabels) al.enabled = false;
+                
+                // If there's a conditional labeling script, we need to disable it too or it will re-enable the label
+                var conditionalLabels = visObj.GetComponentsInChildren<MonoBehaviour>(true);
+                foreach(var cl in conditionalLabels)
+                {
+                    if (cl.GetType().Name.Contains("ConditionalLabeling"))
+                    {
+                        cl.enabled = false;
+                    }
+                }
+            }
         }
 
-        var renderer = sphere.GetComponent<Renderer>();
-        if (renderer != null)
+        if (!usingPrefab)
         {
-            renderer.material = new Material(Shader.Find("HDRP/Lit"));
-            renderer.material.color = objColor;
+            visObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            // Remove collider
+            var collider = visObj.GetComponent<Collider>();
+            if (collider != null) Destroy(collider);
+            
+            visObj.transform.SetParent(visualizerRoot);
+            visObj.transform.localScale = Vector3.one * sphereRadius * 2f;
+            
+            var renderer = visObj.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material = new Material(Shader.Find("HDRP/Lit"));
+                renderer.material.color = objColor;
+            }
         }
 
-        // Create label
-        if (showLabels)
+        visObj.name = $"VisionObj_{label}";
+
+        AddOutline(visObj, objColor);
+
+        // Create label object
+        var labelObj = new GameObject("Label");
+        labelObj.transform.SetParent(visObj.transform);
+        labelObj.transform.localPosition = Vector3.up * (usingPrefab ? 0.5f : sphereRadius + 0.1f);
+
+        var textMesh = labelObj.AddComponent<TextMesh>();
+        textMesh.fontSize = 24;
+        textMesh.characterSize = 0.05f;
+        textMesh.anchor = TextAnchor.LowerCenter;
+        textMesh.alignment = TextAlignment.Center;
+        textMesh.color = objColor;
+
+        return new PooledVisObject
         {
-            var labelObj = new GameObject("Label");
-            labelObj.transform.SetParent(sphere.transform);
-            labelObj.transform.localPosition = Vector3.up * (sphereRadius + 0.1f);
-
-            var textMesh = labelObj.AddComponent<TextMesh>();
-            textMesh.text = $"{label}\n{confidence:F2}";
-            textMesh.fontSize = 24;
-            textMesh.characterSize = 0.05f;
-            textMesh.anchor = TextAnchor.LowerCenter;
-            textMesh.alignment = TextAlignment.Center;
-            textMesh.color = objColor;
-        }
-
-        activeSpheres.Add(sphere);
+            Root = visObj,
+            TextMesh = textMesh,
+            PoolKey = poolKey,
+            LastConfidenceInt = -1
+        };
     }
 
-    private void ClearAllSpheres()
+    private void AddOutline(GameObject obj, Color classColor)
     {
-        foreach (var sphere in activeSpheres)
+        if (!applyOutline) return;
+
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        
+        Shader outlineShader = Shader.Find("Custom/TorpedoOutline");
+        if (outlineShader == null) return;
+        
+        Material outlineMat = new Material(outlineShader);
+        outlineMat.SetColor("_OutlineColor", classColor);
+        outlineMat.SetFloat("_OutlineWidth", outlineWidth);
+
+        foreach (var ren in renderers)
         {
-            if (sphere != null) Destroy(sphere);
+            if (ren.gameObject.name == "Label") continue;
+
+            Material[] currentMats = ren.materials; // instances materials to allow append
+            Material[] newMats = new Material[currentMats.Length + 1];
+            
+            for (int i = 0; i < currentMats.Length; i++)
+            {
+                newMats[i] = currentMats[i];
+            }
+            newMats[currentMats.Length] = outlineMat;
+            ren.materials = newMats;
         }
-        activeSpheres.Clear();
     }
 
-    private void Update()
+    private void DeactivateAllObjects()
+    {
+        foreach (var obj in activeObjects)
+        {
+            if (obj != null && obj.Root != null)
+            {
+                obj.Root.SetActive(false);
+                
+                if (!objectPools.ContainsKey(obj.PoolKey))
+                {
+                    objectPools[obj.PoolKey] = new Queue<PooledVisObject>();
+                }
+                objectPools[obj.PoolKey].Enqueue(obj);
+            }
+        }
+        activeObjects.Clear();
+    }
+
+    // Use LateUpdate so camera has finished moving for the frame before we align the labels
+    private void LateUpdate()
     {
         // Make labels face camera
-        if (!showLabels || Camera.main == null) return;
-
-        foreach (var sphere in activeSpheres)
+        if (!showLabels) return;
+        
+        Camera mainCam = Camera.main;
+        if (mainCam == null)
         {
-            if (sphere == null) continue;
-            var label = sphere.GetComponentInChildren<TextMesh>();
-            if (label != null)
+            return;
+        }
+
+        var camRot = mainCam.transform.rotation;
+        foreach (var obj in activeObjects)
+        {
+            if (obj != null && obj.TextMesh != null && obj.Root != null && obj.Root.activeInHierarchy)
             {
-                label.transform.rotation = Quaternion.LookRotation(
-                    label.transform.position - Camera.main.transform.position
-                );
+                // Align the label exactly with the camera's rotation so it always faces the screen
+                // TextMesh renders text facing +Z. We need its +Z to point AWAY from the camera (into the scene) to read it.
+                // We use LookRotation from the text position along the camera's forward vector.
+                obj.TextMesh.transform.rotation = Quaternion.LookRotation(mainCam.transform.forward, mainCam.transform.up);
+            }
+        }
+    }
+
+    private void CleanupMaterials(GameObject obj)
+    {
+        if (obj == null) return;
+        var renderers = obj.GetComponentsInChildren<Renderer>();
+        foreach (var r in renderers)
+        {
+            var mats = r.sharedMaterials;
+            foreach (var m in mats)
+            {
+                if (m != null && m.name.EndsWith("(Instance)"))
+                {
+                    Destroy(m);
+                }
             }
         }
     }
 
     private void OnDestroy()
     {
-        ClearAllSpheres();
+        foreach (var pool in objectPools.Values)
+        {
+            while (pool.Count > 0)
+            {
+                var obj = pool.Dequeue();
+                if (obj != null && obj.Root != null)
+                {
+                    CleanupMaterials(obj.Root);
+                    Destroy(obj.Root);
+                }
+            }
+        }
+        
+        foreach (var obj in activeObjects)
+        {
+            if (obj != null && obj.Root != null)
+            {
+                CleanupMaterials(obj.Root);
+                Destroy(obj.Root);
+            }
+        }
+
+        objectPools.Clear();
+        activeObjects.Clear();
+
         if (visualizerRoot != null) Destroy(visualizerRoot.gameObject);
     }
 }
