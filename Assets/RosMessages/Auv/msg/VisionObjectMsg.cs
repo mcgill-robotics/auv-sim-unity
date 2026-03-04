@@ -13,40 +13,43 @@ namespace RosMessageTypes.Auv
         public const string k_RosMessageName = "auv_msgs/VisionObject";
         public override string RosMessageName => k_RosMessageName;
 
-        //  Vision Object class
+        //  Standard Header (CRITICAL for TF/Time sync)
+        public Std.HeaderMsg header;
+        //  Logic Data
         public string label;
+        //  Semantic Class (e.g., "gate", "buoy")
         public int id;
-        // pose info
-        public double x;
-        public double y;
-        public double z;
-        public double theta_z;
-        // additional data field (for additional info on objects like lane marker second heading)
-        public double extra_field;
-        // confidence field
+        //  Unique tracking ID (e.g., Tracker ID 1)
+        //  Standard Geometry
+        //  Replaces x, y, z, theta_z. Allows direct use with TF2 and Planner
+        public Geometry.PoseMsg pose;
+        //  Domain Specifics
+        public bool has_orientation;
+        //  True if orientation was explicitly calculated
+        public Geometry.Vector3Msg size;
+        //  Dimensions (x, y, z)
         public double confidence;
+        //  0.0 to 1.0
 
         public VisionObjectMsg()
         {
+            this.header = new Std.HeaderMsg();
             this.label = "";
             this.id = 0;
-            this.x = 0.0;
-            this.y = 0.0;
-            this.z = 0.0;
-            this.theta_z = 0.0;
-            this.extra_field = 0.0;
+            this.pose = new Geometry.PoseMsg();
+            this.has_orientation = false;
+            this.size = new Geometry.Vector3Msg();
             this.confidence = 0.0;
         }
 
-        public VisionObjectMsg(string label, int id, double x, double y, double z, double theta_z, double extra_field, double confidence)
+        public VisionObjectMsg(Std.HeaderMsg header, string label, int id, Geometry.PoseMsg pose, bool has_orientation, Geometry.Vector3Msg size, double confidence)
         {
+            this.header = header;
             this.label = label;
             this.id = id;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.theta_z = theta_z;
-            this.extra_field = extra_field;
+            this.pose = pose;
+            this.has_orientation = has_orientation;
+            this.size = size;
             this.confidence = confidence;
         }
 
@@ -54,38 +57,35 @@ namespace RosMessageTypes.Auv
 
         private VisionObjectMsg(MessageDeserializer deserializer)
         {
+            this.header = Std.HeaderMsg.Deserialize(deserializer);
             deserializer.Read(out this.label);
             deserializer.Read(out this.id);
-            deserializer.Read(out this.x);
-            deserializer.Read(out this.y);
-            deserializer.Read(out this.z);
-            deserializer.Read(out this.theta_z);
-            deserializer.Read(out this.extra_field);
+            this.pose = Geometry.PoseMsg.Deserialize(deserializer);
+            deserializer.Read(out this.has_orientation);
+            this.size = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.confidence);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
+            serializer.Write(this.header);
             serializer.Write(this.label);
             serializer.Write(this.id);
-            serializer.Write(this.x);
-            serializer.Write(this.y);
-            serializer.Write(this.z);
-            serializer.Write(this.theta_z);
-            serializer.Write(this.extra_field);
+            serializer.Write(this.pose);
+            serializer.Write(this.has_orientation);
+            serializer.Write(this.size);
             serializer.Write(this.confidence);
         }
 
         public override string ToString()
         {
             return "VisionObjectMsg: " +
+            "\nheader: " + header.ToString() +
             "\nlabel: " + label.ToString() +
             "\nid: " + id.ToString() +
-            "\nx: " + x.ToString() +
-            "\ny: " + y.ToString() +
-            "\nz: " + z.ToString() +
-            "\ntheta_z: " + theta_z.ToString() +
-            "\nextra_field: " + extra_field.ToString() +
+            "\npose: " + pose.ToString() +
+            "\nhas_orientation: " + has_orientation.ToString() +
+            "\nsize: " + size.ToString() +
             "\nconfidence: " + confidence.ToString();
         }
 
