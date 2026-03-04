@@ -26,6 +26,9 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Show simulation objects (gates, buoys, etc.) in scene")]
     public bool DisplaySimObjects = false;
 
+    [Tooltip("Publish ground truth vision object map over ROS")]
+    public bool PublishGTObjectMap = true;
+
     [Tooltip("Disable water volume and rendering for performance (when vision isn't needed)")]
     public bool NoWaterMode = false;
 
@@ -260,6 +263,7 @@ public class SimulationSettings : MonoBehaviour
     {
         PublishROS = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "false"));
         DisplaySimObjects = bool.Parse(PlayerPrefs.GetString("DisplaySimToggle", "false"));
+        PublishGTObjectMap = bool.Parse(PlayerPrefs.GetString("PublishGTObjectMap", "true"));
         NoWaterMode = bool.Parse(PlayerPrefs.GetString("NoWaterModeToggle", "false"));
         EnableShadows = bool.Parse(PlayerPrefs.GetString("EnableShadowsToggle", "true"));
         HydrophonesNumberOption = PlayerPrefs.GetInt("HydrophonesNumberOption", 0);
@@ -366,6 +370,7 @@ public class SimulationSettings : MonoBehaviour
     {
         PlayerPrefs.SetString("PublishROSToggle", PublishROS.ToString());
         PlayerPrefs.SetString("DisplaySimToggle", DisplaySimObjects.ToString());
+        PlayerPrefs.SetString("PublishGTObjectMap", PublishGTObjectMap.ToString());
         PlayerPrefs.SetString("NoWaterModeToggle", NoWaterMode.ToString());
         PlayerPrefs.SetString("EnableShadowsToggle", EnableShadows.ToString());
         PlayerPrefs.SetInt("HydrophonesNumberOption", HydrophonesNumberOption);

@@ -11,6 +11,7 @@ public class SettingsController
     // UI Elements - Settings Toggles
     private Toggle togglePublishROS;
     private Toggle toggleSimObjects;
+    private Toggle toggleGTObjectMap;
     private Toggle toggleStreamZED;
     private Toggle toggleWater;
     private Toggle toggleShadows;
@@ -52,6 +53,7 @@ public class SettingsController
         // Settings toggles
         togglePublishROS = root.Q<Toggle>("Toggle-PublishROS");
         toggleSimObjects = root.Q<Toggle>("Toggle-SimObjects");
+        toggleGTObjectMap = root.Q<Toggle>("Toggle-GTObjectMap");
         toggleStreamZED = root.Q<Toggle>("Toggle-StreamZED");
         toggleWater = root.Q<Toggle>("Toggle-Water");
         toggleShadows = root.Q<Toggle>("Toggle-Shadows");
@@ -130,6 +132,14 @@ public class SettingsController
             });
         }
 
+        if (toggleGTObjectMap != null)
+        {
+            toggleGTObjectMap.RegisterValueChangedCallback(evt =>
+            {
+                SimulationSettings.Instance.PublishGTObjectMap = evt.newValue;
+            });
+        }
+
         if (toggleDVL != null)
         {
             toggleDVL.RegisterValueChangedCallback(evt =>
@@ -202,6 +212,7 @@ public class SettingsController
 
         if (togglePublishROS != null) togglePublishROS.value = SimulationSettings.Instance.PublishROS;
         if (toggleSimObjects != null) toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
+        if (toggleGTObjectMap != null) toggleGTObjectMap.value = SimulationSettings.Instance.PublishGTObjectMap;
         if (toggleStreamZED != null)
         {
 #if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
@@ -239,6 +250,7 @@ public class SettingsController
         // Transfer UI values to settings
         if (togglePublishROS != null) SimulationSettings.Instance.PublishROS = togglePublishROS.value;
         if (toggleSimObjects != null) SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
+        if (toggleGTObjectMap != null) SimulationSettings.Instance.PublishGTObjectMap = toggleGTObjectMap.value;
         if (toggleStreamZED != null) SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
         if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
         if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
