@@ -2412,7 +2412,6 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -5442,6 +5441,7 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 0
   DisplaySimObjects: 0
+  PublishGTObjectMap: 1
   NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
@@ -5455,7 +5455,7 @@ MonoBehaviour:
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 1
+  StreamZEDCamera: 0
   VisualizeDVL: 0
   VisualizeIMU: 0
   VisualizeDepth: 0
@@ -8111,7 +8111,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _publishRate: 10
-  publishTopic: /vision/object_map
   maxDetectionDistance: 20
   defaultConfidence: 0.95
 --- !u!43 &1983381474
@@ -30298,6 +30297,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 789371016}
+    - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: scriptInteractions
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: meshRenderers.Array.size
