@@ -11,7 +11,6 @@ using UnityEngine.Rendering.HighDefinition;
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(HydrodynamicDrag))]
-[RequireComponent(typeof(WaterSurface))]
 public class Buoyancy : MonoBehaviour
 {
     [Header("Buoyancy Configuration")]
