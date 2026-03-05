@@ -5487,7 +5487,7 @@ MonoBehaviour:
   EnableDepthNoise: 1
   DrawerConfigOpen: 1
   DrawerControlsOpen: 1
-  DrawerTelemetryOpen: 1
+  DrawerTelemetryOpen: 0
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
@@ -8385,11 +8385,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 7514507414065820609, guid: db73982fab23cbb7d8fcf37cfd9a0854,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -30135,11 +30130,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1492501075}
     m_Modifications:
-    - target: {fileID: 1258587467130263829, guid: 23a56bd1c20c876628004a14ea1b8261,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1344678753890176101, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: m_Mesh

@@ -91,6 +91,10 @@ public class Buoyancy : MonoBehaviour
         ApplyBuoyancyForce(transform.TransformPoint(centerOfBuoyancy));
     }
 
+    /// <summary>
+    /// Applies simple buoyancy force (Archimedes principle) at the given world position. Point is refered to as floater to keep buoyancy force application flexible enought o accept multiple floating points in the future. For now though, it should just be applied to the center of buoyancy, since any additional points would average out to applying a single force at the center of buoyancy anyway.
+    /// </summary>
+    /// <param name="floaterPosition"></param>
     void ApplyBuoyancyForce(Vector3 floaterPosition)
     {
         WaterSearchParameters waterSearchParams = new WaterSearchParameters
@@ -104,7 +108,7 @@ public class Buoyancy : MonoBehaviour
 
         if (waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint))
         {
-            // stored for debugging/visualization in OnDrawGizmos
+            Debug.Log($"Projected point on water surface: {projectedPoint.projectedPositionWS}");
             surfaceToCoB = (Vector3)projectedPoint.projectedPositionWS - floaterPosition;
             float submergedDepth = surfaceToCoB.y;
 
