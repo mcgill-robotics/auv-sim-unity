@@ -13,16 +13,19 @@ namespace RosMessageTypes.Auv
         public const string k_RosMessageName = "auv_msgs/VisionObjectArray";
         public override string RosMessageName => k_RosMessageName;
 
+        public Std.HeaderMsg header;
         //  array containing vision objects
         public VisionObjectMsg[] array;
 
         public VisionObjectArrayMsg()
         {
+            this.header = new Std.HeaderMsg();
             this.array = new VisionObjectMsg[0];
         }
 
-        public VisionObjectArrayMsg(VisionObjectMsg[] array)
+        public VisionObjectArrayMsg(Std.HeaderMsg header, VisionObjectMsg[] array)
         {
+            this.header = header;
             this.array = array;
         }
 
@@ -30,11 +33,13 @@ namespace RosMessageTypes.Auv
 
         private VisionObjectArrayMsg(MessageDeserializer deserializer)
         {
+            this.header = Std.HeaderMsg.Deserialize(deserializer);
             deserializer.Read(out this.array, VisionObjectMsg.Deserialize, deserializer.ReadLength());
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
+            serializer.Write(this.header);
             serializer.WriteLength(this.array);
             serializer.Write(this.array);
         }
@@ -42,6 +47,7 @@ namespace RosMessageTypes.Auv
         public override string ToString()
         {
             return "VisionObjectArrayMsg: " +
+            "\nheader: " + header.ToString() +
             "\narray: " + System.String.Join(", ", array.ToList());
         }
 

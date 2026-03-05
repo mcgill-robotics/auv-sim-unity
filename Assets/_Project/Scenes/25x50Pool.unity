@@ -3832,7 +3832,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.70710677
+      value: -0.63655597
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
@@ -3842,7 +3842,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071068
+      value: 0.7712305
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
@@ -3857,7 +3857,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 270
+      value: 259.07098
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 748e9383638f6e24580c5dd29295e718,
         type: 3}
@@ -5372,29 +5372,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fdf54c026133b44cba610a77d50bbea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dianaVisualization: {fileID: 0}
-  laneMarker1FromVisualization: {fileID: 0}
-  laneMarker1ToVisualization: {fileID: 0}
-  laneMarker2FromVisualization: {fileID: 0}
-  laneMarker2ToVisualization: {fileID: 0}
-  gateVisualization: {fileID: 0}
-  buoyVisualization: {fileID: 0}
-  octagonTableVisualization: {fileID: 0}
-  binVisualization: {fileID: 0}
-  abydosSymbol1Visualization: {fileID: 0}
-  abydosSymbol2Visualization: {fileID: 0}
-  earthSymbol1Visualization: {fileID: 0}
-  earthSymbol2Visualization: {fileID: 0}
-  detectionIndicatorPrefab: {fileID: 0}
-  maxDetectionFrameIndicators: 10
-  trueBearingPinger1: {fileID: 0}
-  trueBearingPinger2: {fileID: 0}
-  trueBearingPinger3: {fileID: 0}
-  trueBearingPinger4: {fileID: 0}
-  expectedBearingPinger1: {fileID: 0}
-  expectedBearingPinger2: {fileID: 0}
-  expectedBearingPinger3: {fileID: 0}
-  expectedBearingPinger4: {fileID: 0}
 --- !u!114 &1443981342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5478,7 +5455,7 @@ MonoBehaviour:
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 0
+  StreamZEDCamera: 1
   VisualizeDVL: 0
   VisualizeIMU: 0
   VisualizeDepth: 0
@@ -6633,6 +6610,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 467692891}
+    - target: {fileID: 11944008543641006, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 181999470436791272, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Mesh
@@ -6663,6 +6645,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1631498039}
+    - target: {fileID: 843766346388386003, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 906396964207764387, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Layer
@@ -6673,6 +6660,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1856359896}
+    - target: {fileID: 971502776680211255, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 976996375844341068, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Layer
@@ -6693,6 +6685,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1726877786}
+    - target: {fileID: 1047044928418413261, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 1230905066060382679, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Layer
@@ -6768,6 +6765,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1431853267}
+    - target: {fileID: 2126305607582085362, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 2159466816048564765, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Layer
@@ -6898,6 +6900,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1868888467}
+    - target: {fileID: 3953729244966891822, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 4088139802560025862, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Layer
@@ -6918,6 +6925,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1983381474}
+    - target: {fileID: 4233951123883931485, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 4249054880939986828, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Mesh
@@ -6978,6 +6990,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 761558557}
+    - target: {fileID: 6004465994811715497, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 6199668583892656247, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Layer
@@ -7028,6 +7045,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 804205226}
+    - target: {fileID: 7466101566090074426, guid: 826aca7a4eea169cfbce3dcbcccd5443,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 246
+      objectReference: {fileID: 0}
     - target: {fileID: 7509861665271294260, guid: 826aca7a4eea169cfbce3dcbcccd5443,
         type: 3}
       propertyPath: m_Mesh
@@ -7994,6 +8016,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1954163045}
   - component: {fileID: 1954163044}
+  - component: {fileID: 1954163046}
   m_Layer: 0
   m_Name: objectmap
   m_TagString: Untagged
@@ -8016,31 +8039,50 @@ MonoBehaviour:
   sphereRadius: 0.15
   showLabels: 1
   minConfidence: 0.3
+  objectTransparency: 0.5
+  applyOutline: 1
+  outlineWidth: 0.05
   vioPoseColor: {r: 1, g: 0.5, b: 0, a: 1}
   vioPoseSize: 0.3
   autoFixDrift: 1
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
-  classColors:
+  classVisualizers:
   - className: gate
     color: {r: 0, g: 1, b: 0, a: 1}
+    prefab: {fileID: 3383246300767830565, guid: 748e9383638f6e24580c5dd29295e718,
+      type: 3}
   - className: lane_marker
     color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    prefab: {fileID: 6836674003132753358, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+      type: 3}
   - className: red_pipe
     color: {r: 1, g: 0, b: 0, a: 1}
+    prefab: {fileID: 381483375981066568, guid: 15a3e1eff446a0fb599ad8807a89a279, type: 3}
   - className: white_pipe
     color: {r: 1, g: 1, b: 1, a: 1}
+    prefab: {fileID: 3539300048157702698, guid: b52f8e21b5f4d47d0858a7a8a8a772bd,
+      type: 3}
   - className: octagon
     color: {r: 1, g: 0, b: 1, a: 1}
+    prefab: {fileID: 7140615294393502085, guid: 4d5e143bd70355842a7e253c79b6637e,
+      type: 3}
   - className: table
     color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+    prefab: {fileID: 7602339298612929956, guid: ade684a0c6f48a06f958fab84c6e212c,
+      type: 3}
   - className: bin
     color: {r: 0, g: 0, b: 1, a: 1}
+    prefab: {fileID: 4360369998974418432, guid: bef96aaf040ddb949b3ae1345df82e8c,
+      type: 3}
   - className: board
     color: {r: 0, g: 1, b: 1, a: 1}
+    prefab: {fileID: 976002720483355549, guid: 6879801d142cb97b8af3ca47428c9cce, type: 3}
   - className: shark
     color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    prefab: {fileID: 0}
   - className: sawfish
     color: {r: 0.8, g: 0.6, b: 0.2, a: 1}
+    prefab: {fileID: 0}
 --- !u!4 &1954163045
 Transform:
   m_ObjectHideFlags: 0
@@ -8056,6 +8098,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1954163046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954163043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2b54ff17b2c60c68892eb8e336896e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _publishRate: 10
+  publishTopic: /vision/object_map
+  maxDetectionDistance: 20
+  defaultConfidence: 0.95
 --- !u!43 &1983381474
 Mesh:
   m_ObjectHideFlags: 0
@@ -30242,8 +30300,8 @@ PrefabInstance:
       objectReference: {fileID: 789371016}
     - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
-      propertyPath: scriptInteractions
-      value: 1
+      propertyPath: meshRenderers.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4279926887075288456, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
