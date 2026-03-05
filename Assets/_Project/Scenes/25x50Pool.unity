@@ -2335,6 +2335,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7025177105496563573}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &762281602 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
+    type: 3}
+  m_PrefabInstance: {fileID: 7025177105496563573}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762281599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8f6fd535518f5540b4bcc3099582f77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &767788488
 GameObject:
   m_ObjectHideFlags: 0
@@ -2400,7 +2412,6 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -4853,9 +4864,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72654cd3b1e01e845881bc182dcc2474, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buoyancyForce: 264
   centerOfBuoyancy: {x: 0, y: 0.023, z: 0}
   centerOfMass: {x: 0, y: 0, z: 0}
+  auvBoxes:
+  - {fileID: 7649270088102046629}
+  - {fileID: 7031543448678077273}
+  waterSurface: {fileID: 762281602}
+  hydrodynamicDrag: {fileID: 1371465006}
+  debugLogging: 0
 --- !u!54 &1371465008
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5256,38 +5272,39 @@ MonoBehaviour:
   AUVTransform: {fileID: 1371465009}
   FrontCamera: {fileID: 1621375949}
   DownCamera: {fileID: 1671108404}
-  PublishROS: 1
+  PublishROS: 0
   DisplaySimObjects: 0
+  PublishGTObjectMap: 1
   NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
   HydrophonesNumberOption: 0
-  PublishDVL: 1
-  PublishIMU: 1
-  PublishDepth: 1
+  PublishDVL: 0
+  PublishIMU: 0
+  PublishDepth: 0
   PublishHydrophones: 0
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 1
+  StreamZEDCamera: 0
   VisualizeDVL: 0
   VisualizeIMU: 0
   VisualizeDepth: 0
-  EnableDVLNoise: 0
-  EnableIMUNoise: 0
-  EnableDepthNoise: 0
+  EnableDVLNoise: 1
+  EnableIMUNoise: 1
+  EnableDepthNoise: 1
   DrawerConfigOpen: 1
-  DrawerControlsOpen: 0
-  DrawerTelemetryOpen: 1
+  DrawerControlsOpen: 1
+  DrawerTelemetryOpen: 0
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 30
+  FrontCamRate: 10
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
@@ -5299,7 +5316,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7927,7 +7944,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _publishRate: 10
-  publishTopic: /vision/object_map
   maxDetectionDistance: 20
   defaultConfidence: 0.95
 --- !u!43 &1983381474
@@ -30114,6 +30130,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 789371016}
+    - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: scriptInteractions
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: meshRenderers.Array.size

@@ -1,35 +1,48 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
 
 /// <summary>
 /// Applies buoyancy force to the AUV. Force is applied at the center of buoyancy,
 /// which creates a righting torque when offset from the center of mass.
 /// </summary>
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(HydrodynamicDrag))]
 public class Buoyancy : MonoBehaviour
-{   
+{
     [Header("Buoyancy Configuration")]
-    [Tooltip("Total upward buoyancy force in Newtons (should slightly exceed weight for positive buoyancy)")]
-    public float buoyancyForce;
-    
     [Tooltip("Point where buoyancy force is applied (local coordinates). Should be above COM for stability.")]
     public Vector3 centerOfBuoyancy;
-    
+
     [Tooltip("Center of mass offset (local coordinates). Applied to Rigidbody on Start.")]
     public Vector3 centerOfMass;
 
+    [Tooltip("List of box colliders that approximate the AUV's shape for volume calculation. Top and Chassis should be sufficient for a rough estimate.")]
+    [SerializeField] private List<BoxCollider> auvBoxes;
+
+    [Tooltip("Reference to the WaterSurface component for projecting points onto the water surface")]
+    [SerializeField] private WaterSurface waterSurface;
+
+    [Tooltip("Reference to the HydrodynamicDrag component to access water density for buoyancy calculations")]
+    [SerializeField] private HydrodynamicDrag hydrodynamicDrag;
+
+    [Header("Debug")]
+    [Tooltip("Log buoyancy force each frame")]
+    public bool debugLogging = false;
+
+    // cached reference to the AUV's Rigidbody for applying forces and setting center of mass
     private Rigidbody auvRb;
-    
-    /// <summary>
-    /// Threshold depth (in meters) for partial submersion calculation.
-    /// When AUV is within this distance of Y=0, buoyancy is scaled linearly.
-    /// Uses AUV length / 4 as a rough approximation of the vehicle's "waterline height".
-    /// </summary>
-    private float auvLengthOver4;
-    
-    private Vector3 buoyancyForceVector;
-    private Vector3 buoyancyForceVectorScaled;
+
+    // stored for visualization in OnDrawGizmos
+    private Vector3 surfaceToCoB;
+    // displaced volume approximation
+    private float auvVolume;
+    // buoyancy force does not depend on depth, it can be computed once at the start
+    private float buoyancyForceMagnitude;
+
 
     /// <summary>
     /// Called when a value changes in the Inspector. Updates the Rigidbody's center of mass immediately.
@@ -39,23 +52,29 @@ public class Buoyancy : MonoBehaviour
         // Get or cache the rigidbody reference
         if (auvRb == null)
             auvRb = GetComponent<Rigidbody>();
-        
+
         if (auvRb != null)
         {
             auvRb.centerOfMass = centerOfMass;
         }
     }
-    
+
     private void Start()
     {
         auvRb = GetComponent<Rigidbody>();
         auvRb.centerOfMass = centerOfMass;
-        
-        // Use 1/4 of AUV length as the "waterline zone" depth threshold
-        auvLengthOver4 = auvRb.transform.localScale.x / 4;
-        
-        buoyancyForceVector = Vector3.up * buoyancyForce;
-        buoyancyForceVectorScaled = buoyancyForceVector / auvLengthOver4;
+
+        Bounds combinedBounds = auvBoxes[0].bounds;
+
+        for (int i = 1; i < auvBoxes.Count; i++)
+        {
+            combinedBounds.Encapsulate(auvBoxes[i].bounds);
+        }
+        // very crude approximation of volume based on bounding box, but should be sufficient for scaling buoyancy force
+        auvVolume = combinedBounds.size.x * combinedBounds.size.y * combinedBounds.size.z;
+
+        // Archimedes' principle: Buoyant force = density of fluid * volume of displaced fluid * gravity
+        buoyancyForceMagnitude = hydrodynamicDrag.waterDensity * auvVolume * Physics.gravity.magnitude;
     }
 
 
@@ -68,19 +87,53 @@ public class Buoyancy : MonoBehaviour
             auvRb.centerOfMass = centerOfMass;
         }
 #endif
+        ApplyBuoyancyForce(transform.TransformPoint(centerOfBuoyancy));
+    }
 
-        float auvDistBelowSurface = -Math.Min(0, auvRb.transform.position.y);
-        Vector3 forcePoint = transform.TransformPoint(centerOfBuoyancy);
-
-        if (auvDistBelowSurface < auvLengthOver4)
+    /// <summary>
+    /// Applies simple buoyancy force (Archimedes principle) at the given world position. Point is refered to as floater to keep buoyancy force application flexible enought o accept multiple floating points in the future. For now though, it should just be applied to the center of buoyancy, since any additional points would average out to applying a single force at the center of buoyancy anyway.
+    /// </summary>
+    /// <param name="floaterPosition"></param>
+    void ApplyBuoyancyForce(Vector3 floaterPosition)
+    {
+        bool isBelowWater;
+        Vector3 surfaceProjection;
+        if (SimulationSettings.Instance.NoWaterMode)
         {
-            // AUV is partially submerged, apply buoyancy force scaled to the submerged volume
-            auvRb.AddForceAtPosition(auvDistBelowSurface * buoyancyForceVectorScaled, forcePoint, ForceMode.Force);
+            isBelowWater = floaterPosition.y < waterSurface.transform.position.y;
+            surfaceProjection = new Vector3(floaterPosition.x, waterSurface.transform.position.y, floaterPosition.z);
+
         }
         else
         {
-            // AUV is fully submerged, apply full buoyancy force
-            auvRb.AddForceAtPosition(buoyancyForceVector, forcePoint, ForceMode.Force);
+            WaterSearchParameters waterSearchParams = new WaterSearchParameters
+            {
+                startPositionWS = Vector3.zero,
+                targetPositionWS = floaterPosition,
+                error = 0.01f,
+                maxIterations = 8,
+                includeDeformation = false, // Ignore water deformation for buoyancy force application for easier computation
+            };
+            isBelowWater = waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint);
+            surfaceProjection = projectedPoint.projectedPositionWS;
+        }
+        if (isBelowWater)
+        {
+            surfaceToCoB = surfaceProjection - floaterPosition;
+            float submergedDepth = surfaceToCoB.y;
+
+            if (submergedDepth > 0)
+            {
+                // Floater is submerged, apply upward buoyancy force
+                Vector3 buoyancyForce = Vector3.up * buoyancyForceMagnitude;
+
+                auvRb.AddForceAtPosition(buoyancyForce, floaterPosition, ForceMode.Force);
+                if (debugLogging)
+                {
+                    Debug.Log($"Applying buoyancy force of {buoyancyForce} N at {floaterPosition} (submerged depth: {submergedDepth:F2} m)");
+                }
+            }
+
         }
     }
 
@@ -90,5 +143,18 @@ public class Buoyancy : MonoBehaviour
         Gizmos.DrawSphere(transform.TransformPoint(centerOfMass), 0.02f);
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(transform.TransformPoint(centerOfBuoyancy), 0.02f);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.TransformPoint(centerOfBuoyancy) + surfaceToCoB, transform.TransformPoint(centerOfBuoyancy));
+
+
+        Bounds combinedBounds = auvBoxes[0].bounds;
+
+        for (int i = 1; i < auvBoxes.Count; i++)
+        {
+            combinedBounds.Encapsulate(auvBoxes[i].bounds);
+        }
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(combinedBounds.center, combinedBounds.size);
     }
 }
