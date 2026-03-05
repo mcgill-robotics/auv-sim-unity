@@ -97,19 +97,30 @@ public class Buoyancy : MonoBehaviour
     /// <param name="floaterPosition"></param>
     void ApplyBuoyancyForce(Vector3 floaterPosition)
     {
-        WaterSearchParameters waterSearchParams = new WaterSearchParameters
+        bool isBelowWater;
+        Vector3 surfaceProjection;
+        if (SimulationSettings.Instance.NoWaterMode)
         {
-            startPositionWS = Vector3.zero,
-            targetPositionWS = floaterPosition,
-            error = 0.01f,
-            maxIterations = 8,
-            includeDeformation = false, // Ignore water deformation for buoyancy force application for easier computation
-        };
+            isBelowWater = floaterPosition.y < waterSurface.transform.position.y;
+            surfaceProjection = new Vector3(floaterPosition.x, waterSurface.transform.position.y, floaterPosition.z);
 
-        if (waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint))
+        }
+        else
         {
-            Debug.Log($"Projected point on water surface: {projectedPoint.projectedPositionWS}");
-            surfaceToCoB = (Vector3)projectedPoint.projectedPositionWS - floaterPosition;
+            WaterSearchParameters waterSearchParams = new WaterSearchParameters
+            {
+                startPositionWS = Vector3.zero,
+                targetPositionWS = floaterPosition,
+                error = 0.01f,
+                maxIterations = 8,
+                includeDeformation = false, // Ignore water deformation for buoyancy force application for easier computation
+            };
+            isBelowWater = waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint);
+            surfaceProjection = projectedPoint.projectedPositionWS;
+        }
+        if (isBelowWater)
+        {
+            surfaceToCoB = surfaceProjection - floaterPosition;
             float submergedDepth = surfaceToCoB.y;
 
             if (submergedDepth > 0)
