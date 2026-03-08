@@ -39,10 +39,10 @@ public class Buoyancy : MonoBehaviour
 
     // cached reference to the AUV's Rigidbody for applying forces and setting center of mass
     private Rigidbody auvRb;
-
-    private float DepthofAUVBottom;
+    // distance from bottom of the AUV to the transform position, used for determining how submerged the AUV is based on the depth of the transform position
+    private float RelativeDepthofAUVBottom;
+    // max submerged depth of the AUV, used for scaling buoyancy force as the AUV emerges from the water. Approximated based on the bounding box of the colliders, which should be sufficient for our purposes.
     private float HeightofAUV;
-    private float HeightOfChassis;
     // buoyancy scaling does not depend on depth underwater, it can be computed once at the start
     private float buoyancyScalingFactor;
 
@@ -66,11 +66,12 @@ public class Buoyancy : MonoBehaviour
     {
         auvRb = GetComponent<Rigidbody>();
         auvRb.centerOfMass = centerOfMass;
-
+        // for now, we simply assume the AUV is one big box that completely displaces water when fully submerged, so the submerged volume (and thus buoyancy force) scales linearly with depth until the AUV is fully submerged, at which point it remains constant. A more accurate implementation would compute the buoyancy force from each component of the AUV
+        // for instance, the foam top likely has a much larger impact on buoyancy than the chassis due to its lower density, so once that foam top component emerges, the buoyancy will reduce significantly, leading to equilibrium height as thge bottom of the foam collider. This refactor would require knowing the mass of the foam top and chassis separately, which we don't currently have, but could be added in the future if we want more accurate buoyancy behavior. For now, this simple approximation should be sufficient to get reasonable buoyancy behavior without needing to know the mass breakdown of the AUV components.
         Bounds combinedBounds = ChassisCollider.bounds;
         combinedBounds.Encapsulate(FoamTopCollider.bounds);
+        RelativeDepthofAUVBottom = combinedBounds.min.y - transform.position.y;
         HeightofAUV = combinedBounds.size.y;
-        HeightOfChassis = ChassisCollider.bounds.size.y;
         // very crude approximation of area based on bounding box, but should be sufficient for scaling buoyancy force
         float auvArea = combinedBounds.size.x * combinedBounds.size.z;
 
@@ -90,35 +91,41 @@ public class Buoyancy : MonoBehaviour
             auvRb.centerOfMass = centerOfMass;
         }
 #endif
-        DepthofAUVBottom = ChassisCollider.bounds.min.y;
+        float DepthofAUVBottom = transform.position.y + RelativeDepthofAUVBottom;
 
         if (BelowWater(DepthofAUVBottom, out float distanceToSurface))
         {
-            Debug.Log($"Bottom of AUV is underwater at {DepthofAUVBottom}, surface projection is {distanceToSurface}");
+            if (debugLogging)
+            {
+                Debug.Log($"AUV bottom is at depth {DepthofAUVBottom:F2} m, distance to surface is {distanceToSurface:F2} m");
+            }
             ApplyBuoyancyForce(transform.TransformPoint(centerOfBuoyancy), distanceToSurface);
         }
     }
 
+    // Determines if the AUV is below the water surface based on the depth of the bottom of the AUV. Also calculates the distance to the surface for buoyancy force scaling.
     bool BelowWater(float DepthofAUVBottom, out float distanceToSurface)
     {
         distanceToSurface = waterSurface.transform.position.y - DepthofAUVBottom;
         return distanceToSurface > 0;
     }
+
     /// Applies simple buoyancy force (Archimedes principle) at the given world position. Point is refered to as floater to keep buoyancy force application flexible enough to accept multiple floating points in the future. For now though, it should just be applied to the center of buoyancy, since any additional points would average out to applying a single force at the center of buoyancy anyway.
     /// </summary>
     /// <param name="floaterPosition"></param>
     void ApplyBuoyancyForce(Vector3 floaterPosition, float depth)
     {
         float submergedDepth = Mathf.Clamp(depth, 0, HeightofAUV);
-
-
         // Floater is submerged, apply upward buoyancy force, scale force by how deep the point is submerged
         Vector3 buoyancyForce = Vector3.up * buoyancyScalingFactor * submergedDepth;
 
         auvRb.AddForceAtPosition(buoyancyForce, floaterPosition, ForceMode.Force);
+
         if (debugLogging)
         {
-            Debug.Log($"Applying buoyancy force of {buoyancyForce} N at {floaterPosition} (submerged depth: {submergedDepth:F2} m)");
+            // add comparison of buoyancy force to weight of the AUV for debugging purposes
+            float weight = auvRb.mass * Physics.gravity.magnitude;
+            Debug.Log($"Applying buoyancy force of {buoyancyForce} N versus weight of {weight} N at {floaterPosition} (submerged depth: {submergedDepth:F2} m)");
         }
 
     }
