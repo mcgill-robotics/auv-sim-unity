@@ -101,25 +101,8 @@ public class Buoyancy : MonoBehaviour
 
     bool BelowWater(float DepthofAUVBottom, out float distanceToSurface)
     {
-        if (SimulationSettings.Instance.NoWaterMode)
-        {
-            distanceToSurface = waterSurface.transform.position.y - DepthofAUVBottom;
-            return distanceToSurface > 0;
-        }
-        else
-        {
-            WaterSearchParameters waterSearchParams = new WaterSearchParameters
-            {
-                startPositionWS = Vector3.zero,
-                targetPositionWS = new Vector3(0, DepthofAUVBottom, 0),
-                error = 0.01f,
-                maxIterations = 8,
-                includeDeformation = false, // Ignore water deformation for buoyancy force application for easier computation
-            };
-            bool result = waterSurface.ProjectPointOnWaterSurface(waterSearchParams, out WaterSearchResult projectedPoint);
-            distanceToSurface = projectedPoint.projectedPositionWS.y - DepthofAUVBottom;
-            return result && distanceToSurface > 0;
-        }
+        distanceToSurface = waterSurface.transform.position.y - DepthofAUVBottom;
+        return distanceToSurface > 0;
     }
     /// Applies simple buoyancy force (Archimedes principle) at the given world position. Point is refered to as floater to keep buoyancy force application flexible enough to accept multiple floating points in the future. For now though, it should just be applied to the center of buoyancy, since any additional points would average out to applying a single force at the center of buoyancy anyway.
     /// </summary>
