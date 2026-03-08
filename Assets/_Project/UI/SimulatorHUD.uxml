@@ -64,6 +64,11 @@
                         <ui:IntegerField name="Input-DownH" value="480" style="flex-grow: 1; margin-left: 2px;" />
                     </ui:VisualElement>
                     <ui:VisualElement style="height: 10px;" />
+                    <ui:Label text="DEBUG" class="data-label text-accent margin-top-small" />
+                    <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                        <ui:Toggle name="Toggle-ShowOrigin" label="Show Simulation Origin" value="true" />
+                    </ui:VisualElement>
+                    <ui:VisualElement style="height: 10px;" />
                 </ui:ScrollView>
                 <ui:Button name="Btn-Save" text="SAVE &amp; RESTART" class="mcgill-button" style="margin: 10px; margin-top: 0; align-self: flex-end; width: 140px;" />
             </ui:VisualElement>

@@ -37,6 +37,9 @@ public class SettingsController
     private DropdownField dropdownScreenRes;
     private Button btnSave;
 
+    // Debug Elements
+    private Toggle toggleShowOrigin;
+
     private ROSConnection ros;
     private System.Action<string> logCallback;
 
@@ -78,6 +81,9 @@ public class SettingsController
         dropdownQuality = root.Q<DropdownField>("Dropdown-Quality");
         dropdownScreenRes = root.Q<DropdownField>("Dropdown-ScreenRes");
         btnSave = root.Q<Button>("Btn-Save");
+
+        // Debug
+        toggleShowOrigin = root.Q<Toggle>("Toggle-ShowOrigin");
     }
 
     private void RegisterCallbacks(VisualElement root)
@@ -196,6 +202,19 @@ public class SettingsController
             });
         }
 
+        if (toggleShowOrigin != null)
+        {
+            toggleShowOrigin.RegisterValueChangedCallback(evt =>
+            {
+                SimulationSettings.Instance.ShowSimulationOrigin = evt.newValue;
+                if (SimulationOrigin.Instance != null)
+                {
+                    SimulationOrigin.Instance.showOriginAxes = evt.newValue;
+                    SimulationOrigin.Instance.SetShowOriginAxes(evt.newValue);
+                }
+            });
+        }
+
         // Save button
         if (btnSave != null)
         {
@@ -239,6 +258,8 @@ public class SettingsController
         if (inputFrontH != null) inputFrontH.value = SimulationSettings.Instance.FrontCamHeight;
         if (inputDownW != null) inputDownW.value = SimulationSettings.Instance.DownCamWidth;
         if (inputDownH != null) inputDownH.value = SimulationSettings.Instance.DownCamHeight;
+
+        if (toggleShowOrigin != null) toggleShowOrigin.value = SimulationSettings.Instance.ShowSimulationOrigin;
 
         if (dropdownQuality != null) dropdownQuality.index = SimulationSettings.Instance.QualityLevel;
     }

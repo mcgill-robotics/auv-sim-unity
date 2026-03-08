@@ -160,6 +160,9 @@ public class SimulationSettings : MonoBehaviour
     public int DownCamHeight = 480;
 
     [Space(5)]
+    public bool ShowSimulationOrigin = true;
+
+    [Space(5)]
     [Tooltip("Use JPEG compression for camera images (reduces bandwidth ~10x)")]
     public bool UseJPEGCompression = true;
 
@@ -222,6 +225,10 @@ public class SimulationSettings : MonoBehaviour
         if (Application.isPlaying && NoWaterMode)
         {
             ApplyNoWaterMode();
+        }
+        if (Application.isPlaying)
+        {
+            SimulationOrigin.Instance.SetShowOriginAxes(ShowSimulationOrigin);
         }
     }
 
@@ -316,6 +323,7 @@ public class SimulationSettings : MonoBehaviour
         SnapshotSavePath = ValidateAndGetSavePath(SnapshotSavePath);
 
         QualitySettings.SetQualityLevel(QualityLevel);
+        ShowSimulationOrigin = bool.Parse(PlayerPrefs.GetString("ShowSimulationOrigin", "true"));
         ApplyShadows();
     }
 
@@ -412,6 +420,8 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("qualityLevel", QualityLevel.ToString());
         PlayerPrefs.SetString("SnapshotSavePath", SnapshotSavePath);
 
+        PlayerPrefs.SetString("ShowSimulationOrigin", ShowSimulationOrigin.ToString());
+
         PlayerPrefs.Save();
     }
 
@@ -425,6 +435,12 @@ public class SimulationSettings : MonoBehaviour
         {
             SaveSettings();
             ApplyShadows();
+
+            // Apply origin axes visibility if in play mode
+            if (Application.isPlaying && SimulationOrigin.Instance != null)
+            {
+                SimulationOrigin.Instance.SetShowOriginAxes(ShowSimulationOrigin);
+            }
         }
     }
 #endif

@@ -10,7 +10,7 @@ using Utils;
 public class SimulationOrigin : MonoBehaviour
 {
     private static SimulationOrigin _instance;
-    public static SimulationOrigin Instance 
+    public static SimulationOrigin Instance
     {
         get
         {
@@ -43,7 +43,7 @@ public class SimulationOrigin : MonoBehaviour
     // The reference frame for the "Odom" frame (or World frame relative to start)
     public Vector3 InitialPosition { get; private set; }
     public Quaternion InitialRotation { get; private set; }
-    
+
     public bool IsInitialized { get; private set; }
 
     private void Awake()
@@ -60,10 +60,9 @@ public class SimulationOrigin : MonoBehaviour
     private void Start()
     {
         InitializeOrigin();
-        if (showOriginAxes)
-        {
-            CreateOriginVisualization();
-        }
+        // Always create visualization, then set visibility
+        CreateOriginVisualization();
+        SetShowOriginAxes(showOriginAxes);
     }
 
     private void CreateOriginVisualization()
@@ -73,18 +72,25 @@ public class SimulationOrigin : MonoBehaviour
 
         // Create standard RGB axis (Red=Right(X), Green=Up(Y), Blue=Fwd(Z))
         originAxis = VisualizationUtils.CreateAxis("Origin_FLU", transform, 1.0f);
-        
+
         // Position at Origin
         originAxis.transform.position = InitialPosition;
-        
+
         // Rotate/Flip for FLU
         Quaternion rot = Quaternion.LookRotation(Vector3.up, Vector3.left);
         originAxis.transform.rotation = InitialRotation * rot;
         originAxis.transform.localScale = new Vector3(-1, 1, 1);
-        
+
         // Add Label (Parented to transform to avoid negative scale inheritance)
         originLabelObj = VisualizationUtils.CreateLabel("Origin", transform, Color.white, 24);
         originLabelObj.transform.position = InitialPosition; // World position
+    }
+
+    public void SetShowOriginAxes(bool show)
+    {
+        showOriginAxes = show;
+        originAxis.SetActive(show);
+        originLabelObj.SetActive(show);
     }
 
     private void Update()
@@ -94,7 +100,7 @@ public class SimulationOrigin : MonoBehaviour
             // Try to find a camera to face
             Camera cam = Camera.main;
             if (cam == null) cam = FindFirstObjectByType<Camera>(); // Fallback
-            
+
             if (cam != null)
             {
                 // Billboard: Face the camera
@@ -112,10 +118,10 @@ public class SimulationOrigin : MonoBehaviour
         if (captureAuvStartPose && SimulationSettings.Instance != null && SimulationSettings.Instance.AUVTransform != null)
         {
             InitialPosition = SimulationSettings.Instance.AUVTransform.position;
-            
+
             // Force Origin to Surface (Y=0) so Odom Depth matches Absolute Pressure Depth
             InitialPosition = new Vector3(InitialPosition.x, 0.0f, InitialPosition.z);
-            
+
             InitialRotation = SimulationSettings.Instance.AUVTransform.rotation;
             Debug.Log($"[SimulationOrigin] Captured Origin from AUV (Projected to Surface): Pos={InitialPosition}, Rot={InitialRotation.eulerAngles}");
         }
