@@ -26,12 +26,13 @@ class DVLTransducer
 [Serializable]
 class DVLVelocityReport
 {
-    public double time;
+    public long time;
     public double vx;
     public double vy;
     public double vz;
     public double fom;
     public double[][] covariance;
+    public double altitude;
     public List<DVLTransducer> transducers;
     public bool velocity_valid;
     public byte status;
@@ -119,6 +120,7 @@ public class DVLa50SimSender : MonoBehaviour
                         new double[] { 0, UnityEngine.Random.Range(0.1f, 1f), 0 },
                         new double[] { 0, 0, UnityEngine.Random.Range(0.1f, 1f) }
                     },
+                altitude = UnityEngine.Random.Range(0.1f, 10f),
                 transducers = new List<DVLTransducer>
                     {
                         new DVLTransducer
@@ -240,14 +242,12 @@ public class DVLa50SimSender : MonoBehaviour
                     jsonPositionReport = JsonUtility.ToJson(currentDeadReckoningReport);
                     jsonVelocityReport = JsonUtility.ToJson(currentVelocityReport);
                 }
-                // write dead reckoning first
-                byte[] data = Encoding.ASCII.GetBytes(jsonPositionReport + '\n'); // separate messages with newline for easy parsing on client side
+                byte[] data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
                 // Send the message to the client asynchronously
                 await stream.WriteAsync(data, 0, data.Length);
-
-                data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
-                // Send the message to the client asynchronously
-                await stream.WriteAsync(data, 0, data.Length);
+                // data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
+                // // Send the message to the client asynchronously
+                // await stream.WriteAsync(data, 0, data.Length);
 
                 // Wait for the next publish interval
                 await System.Threading.Tasks.Task.Delay(1000 / publishRateHz);
