@@ -5,49 +5,56 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+public enum DVLStatus : byte
+{
+    //bit mask where bit 0 set 1 to is high temperature, 0 otherwise
+    OK = 0,
+    HighTemperature = 1 << 0 // shift 1 to the left by 0 positions to set bit 0 to 1
+}
+
 // from https://docs.waterlinked.com/dvl/dvl-protocol/
 [Serializable]
-struct DVLTransducer
+class DVLTransducer
 {
-    public int id { get; set; }
-    public double velocity { get; set; }
-    public double distance { get; set; }
-    public double rssi { get; set; }
-    public double nsi { get; set; }
-    public bool beam_valid { get; set; }
+    public int id;
+    public double velocity;
+    public double distance;
+    public double rssi;
+    public double nsi;
+    public bool beam_valid;
 }
 [Serializable]
-struct DVLVelocityReport
+class DVLVelocityReport
 {
-    public double time { get; set; }
-    public double vx { get; set; }
-    public double vy { get; set; }
-    public double vz { get; set; }
-    public double fom { get; set; }
-    public double[][] covariance { get; set; }
-    public List<DVLTransducer> transducers { get; set; }
-    public bool velocity_valid { get; set; }
-    public byte status { get; set; }
-    public long time_of_validity { get; set; }
-    public long time_of_transmission { get; set; }
-    public string format { get; set; }
-    public string type { get; set; }
+    public double time;
+    public double vx;
+    public double vy;
+    public double vz;
+    public double fom;
+    public double[][] covariance;
+    public List<DVLTransducer> transducers;
+    public bool velocity_valid;
+    public byte status;
+    public long time_of_validity;
+    public long time_of_transmission;
+    public string format;
+    public string type;
 }
 
 [Serializable]
-struct DVLDeadReckoningReport
+class DVLDeadReckoningReport
 {
-    public long ts { get; set; }
-    public double x { get; set; }
-    public double y { get; set; }
-    public double z { get; set; }
-    public double std { get; set; }
-    public double roll { get; set; }
-    public double pitch { get; set; }
-    public double yaw { get; set; }
-    public string type { get; set; }
-    public byte status { get; set; }
-    public string format { get; set; }
+    public long ts;
+    public double x;
+    public double y;
+    public double z;
+    public double std;
+    public double roll;
+    public double pitch;
+    public double yaw;
+    public string type;
+    public byte status;
+    public string format;
 }
 
 
@@ -67,25 +74,112 @@ public class DVLa50SimSender : MonoBehaviour
     [SerializeField] private int publishRateHz = 10; // how often to send messages (in Hz)
 
     // DVL components
-    DVLDeadReckoningReport currentDVLReport;
+    DVLDeadReckoningReport currentDeadReckoningReport;
     DVLVelocityReport currentVelocityReport;
+    long lastPublishTime = 0;
+    private readonly object _lock = new object(); // lock to ensure reports are thread safe
 
 
     private void Start()
     {
+        lastPublishTime = GetTimeMicroseconds(); // Initialize last publish time to current time
         // Start the server in a separate thread to avoid blocking the main Unity thread
         serverThread = new Thread(new ThreadStart(SetupServer))
         {
-            IsBackground = true // Ensure the thread will close when the application exits
+            IsBackground = true, // Ensure the thread will close when the application exits
+            Name = "DVLa50SimSender_ServerThread"
         };
         isServerRunning = true;
         serverThread.Start();
     }
 
+
+    private long GetTimeMicroseconds()
+    {
+        return ROSClock.GetROSTimestampNanoseconds() / 1000; // Convert nanoseconds to microseconds
+    }
     // Fixed update to match physics update rate to update the stored DVL data report
     void FixedUpdate()
     {
-
+        long currentTime = GetTimeMicroseconds();
+        // TODO replace with actual data retrieval
+        // Update the DVL reports with random data, lock to ensure thread safety since the server thread may be reading these reports at the same time to send to clients
+        lock (_lock)
+        {
+            currentVelocityReport = new DVLVelocityReport
+            {
+                time = currentTime - lastPublishTime,
+                vx = UnityEngine.Random.Range(-5f, 5f),
+                vy = UnityEngine.Random.Range(-5f, 5f),
+                vz = UnityEngine.Random.Range(-5f, 5f),
+                fom = UnityEngine.Random.Range(0.1f, 1f),
+                covariance = new double[][]
+                    {
+                        new double[] { UnityEngine.Random.Range(0.1f, 1f), 0, 0 },
+                        new double[] { 0, UnityEngine.Random.Range(0.1f, 1f), 0 },
+                        new double[] { 0, 0, UnityEngine.Random.Range(0.1f, 1f) }
+                    },
+                transducers = new List<DVLTransducer>
+                    {
+                        new DVLTransducer
+                        {
+                            id = 0,
+                            velocity = UnityEngine.Random.Range(-5f, 5f),
+                            distance = UnityEngine.Random.Range(0.1f, 10f),
+                            rssi = UnityEngine.Random.Range(0.1f, 1f),
+                            nsi = UnityEngine.Random.Range(0.1f, 1f),
+                            beam_valid = true
+                        },
+                        new DVLTransducer
+                        {
+                            id = 1,
+                            velocity = UnityEngine.Random.Range(-5f, 5f),
+                            distance = UnityEngine.Random.Range(0.1f, 10f),
+                            rssi = UnityEngine.Random.Range(0.1f, 1f),
+                            nsi = UnityEngine.Random.Range(0.1f, 1f),
+                            beam_valid = true
+                        },
+                        new DVLTransducer
+                        {
+                            id = 2,
+                            velocity = UnityEngine.Random.Range(-5f, 5f),
+                            distance = UnityEngine.Random.Range(0.1f, 10f),
+                            rssi = UnityEngine.Random.Range(0.1f, 1f),
+                            nsi = UnityEngine.Random.Range(0.1f, 1f),
+                            beam_valid = true
+                        },
+                        new DVLTransducer
+                        {
+                            id = 3,
+                            velocity = UnityEngine.Random.Range(-5f, 5f),
+                            distance = UnityEngine.Random.Range(0.1f, 10f),
+                            rssi = UnityEngine.Random.Range(0.1f, 1f),
+                            nsi = UnityEngine.Random.Range(0.1f, 1f),
+                            beam_valid = true
+                        },
+                    },
+                velocity_valid = true,
+                status = (byte)DVLStatus.OK,
+                time_of_validity = (long)UnityEngine.Random.Range(lastPublishTime, currentTime), // choose random time between last publish and now for when the ping reached the bottom
+                time_of_transmission = currentTime,
+                format = "json_v3.1",
+                type = "velocity"
+            };
+            currentDeadReckoningReport = new DVLDeadReckoningReport
+            {
+                ts = currentTime,
+                x = UnityEngine.Random.Range(-10f, 10f),
+                y = UnityEngine.Random.Range(-10f, 10f),
+                z = UnityEngine.Random.Range(-10f, 10f),
+                std = UnityEngine.Random.Range(0.1f, 1f),
+                roll = UnityEngine.Random.Range(-180f, 180f),
+                pitch = UnityEngine.Random.Range(-180f, 180f),
+                yaw = UnityEngine.Random.Range(-180f, 180f),
+                type = "position_local",
+                status = (byte)DVLStatus.OK,
+                format = "json_v3"
+            };
+        }
     }
 
     async private void SetupServer()
@@ -131,15 +225,36 @@ public class DVLa50SimSender : MonoBehaviour
         {
             while (isServerRunning)
             {
-                // Create a test message (replace with actual DVL data in practice)
-                string message = "Hello from DVLa50SimSender!" + '\n';
-                byte[] data = Encoding.ASCII.GetBytes(message);
+                string jsonVelocityReport;
+                string jsonPositionReport;
+                // Check if the DVL reports have been initialized yet, if not skip this publish cycle to avoid sending empty data to clients
+                if (currentVelocityReport == null || currentDeadReckoningReport == null)
+                {
+                    Debug.LogWarning("DVL reports not initialized yet, skipping this publish cycle.");
+                    await System.Threading.Tasks.Task.Delay(100); // wait a bit before trying again
+                    continue;
+                }
+                // lock and quickly serialize velocity and position reports
+                lock (_lock)
+                {
+                    jsonPositionReport = JsonUtility.ToJson(currentDeadReckoningReport);
+                    jsonVelocityReport = JsonUtility.ToJson(currentVelocityReport);
+                }
+                // write dead reckoning first
+                byte[] data = Encoding.ASCII.GetBytes(jsonPositionReport + '\n'); // separate messages with newline for easy parsing on client side
+                // Send the message to the client asynchronously
+                await stream.WriteAsync(data, 0, data.Length);
 
+                data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
                 // Send the message to the client asynchronously
                 await stream.WriteAsync(data, 0, data.Length);
 
                 // Wait for the next publish interval
                 await System.Threading.Tasks.Task.Delay(1000 / publishRateHz);
+            }
+            if (!client.Connected)
+            {
+                Debug.Log("Client disconnected.");
             }
         }
         catch (Exception e)
