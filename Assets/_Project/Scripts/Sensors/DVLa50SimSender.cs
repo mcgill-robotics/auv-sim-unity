@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 using UnityEngine;
 public enum DVLStatus : byte
 {
@@ -239,8 +240,8 @@ public class DVLa50SimSender : MonoBehaviour
                 // lock and quickly serialize velocity and position reports
                 lock (_lock)
                 {
-                    jsonPositionReport = JsonUtility.ToJson(currentDeadReckoningReport);
-                    jsonVelocityReport = JsonUtility.ToJson(currentVelocityReport);
+                    jsonPositionReport = JsonConvert.SerializeObject(currentDeadReckoningReport);
+                    jsonVelocityReport = JsonConvert.SerializeObject(currentVelocityReport);
                 }
                 byte[] data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
                 // Send the message to the client asynchronously
