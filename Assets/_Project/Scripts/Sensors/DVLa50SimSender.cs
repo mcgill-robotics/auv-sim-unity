@@ -199,7 +199,7 @@ public class DVLa50SimSender : MonoBehaviour
             while (isServerRunning)
             {
                 // Accept incoming client connections asynchronously
-                using (TcpClient client = await server.AcceptTcpClientAsync())
+                using (client = await server.AcceptTcpClientAsync())
                 // start network stream for the connected client
                 using (NetworkStream stream = client.GetStream())
                 {
@@ -226,7 +226,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         try
         {
-            while (isServerRunning)
+            while (isServerRunning && client != null && client.Connected)
             {
                 string jsonVelocityReport;
                 string jsonPositionReport;
@@ -243,12 +243,9 @@ public class DVLa50SimSender : MonoBehaviour
                     jsonPositionReport = JsonConvert.SerializeObject(currentDeadReckoningReport);
                     jsonVelocityReport = JsonConvert.SerializeObject(currentVelocityReport);
                 }
-                byte[] data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
-                // Send the message to the client asynchronously
-                await stream.WriteAsync(data, 0, data.Length);
-                // data = Encoding.ASCII.GetBytes(jsonVelocityReport + '\n'); // separate messages with newline for easy parsing on client side
-                // // Send the message to the client asynchronously
-                // await stream.WriteAsync(data, 0, data.Length);
+
+                SendLine(stream, jsonPositionReport);
+                SendLine(stream, jsonVelocityReport);
 
                 // Wait for the next publish interval
                 await System.Threading.Tasks.Task.Delay(1000 / publishRateHz);
@@ -263,6 +260,22 @@ public class DVLa50SimSender : MonoBehaviour
             Debug.LogError("DVLa50SimSender: Exception in StreamDataAsync - " + e.Message);
         }
     }
+
+    async private void SendLine(NetworkStream stream, string jsonString)
+    {
+        try
+        {
+            // separate messages with newline for easy parsing on client side\
+            byte[] data = Encoding.ASCII.GetBytes(jsonString + '\n');
+            // Send the message to the client asynchronously
+            await stream.WriteAsync(data, 0, data.Length);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[DVL Server] Failed to write to stream: {e.Message}");
+        }
+    }
+
 
     void OnApplicationQuit()
     {
