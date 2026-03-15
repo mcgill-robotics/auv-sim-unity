@@ -334,13 +334,54 @@ public class DVLa50SimSender : MonoBehaviour
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true))
                 {
                     string jsonCommand = await reader.ReadLineAsync();
+                    await ProcessCommand(jsonCommand);
                     if (jsonCommand == null) break; // Client disconnected
-                    Debug.Log($"Received command from client: {jsonCommand}");
                 }
             }
         }
     }
 
+    async private System.Threading.Tasks.Task ProcessCommand(string jsonCommand)
+    {
+        try
+        {
+            DVLCommand command = JsonConvert.DeserializeObject<DVLCommand>(jsonCommand);
+            Debug.Log($"Processing command: {command.command}");
+            switch (command.command)
+            {
+                case "calibrate_gyro":
+
+                    Debug.Log("Calibrating gyro...");
+                    break;
+                case "trigger_ping":
+
+                    Debug.Log("Triggering DVL ping...");
+                    break;
+                case "get_config":
+
+                    Debug.Log("Sending DVL configuration...");
+                    break;
+                case "set_config":
+                    // check for parameters
+                    if (command.parameters != null)
+                    {
+                        foreach (var param in command.parameters)
+                        {
+                            Debug.Log($"Config param: {param.Key} = {param.Value}");
+                        }
+                    }
+                    Debug.Log("Updating DVL configuration...");
+                    break;
+                default:
+                    Debug.LogWarning($"Unknown command received: {command.command}");
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("DVLa50SimSender: Failed to process command - " + e.Message);
+        }
+    }
 
     void OnApplicationQuit()
     {
