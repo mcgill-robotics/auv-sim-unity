@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
@@ -77,6 +78,20 @@ class DVLCommandResponse
     public Dictionary<string, object> result;
     public string format;
     public string type;
+
+    // Factory method to create a default response with success=true and no error message, we could also add the defaults to the parameters about but that may lead to unpredictable behaviour if we forget to set something for a specific command response, this way we ensure all responses have consistent default values and we can easily update the defaults in one place if needed
+    public static DVLCommandResponse GetDefault(string CommandName)
+    {
+        return new DVLCommandResponse
+        {
+            response_to = CommandName,
+            success = true,
+            error_message = "",
+            result = null,
+            format = "json_v3.1",
+            type = "response"
+        };
+    }
 }
 
 public class DVLa50SimSender : MonoBehaviour
@@ -100,6 +115,7 @@ public class DVLa50SimSender : MonoBehaviour
     private readonly object _reportLock = new object(); // lock to ensure reports are thread safe
     // Network Stream Lock
     private readonly object _streamWriteLock = new object();
+
 
     private void Start()
     {
@@ -277,6 +293,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         try
         {
+
             while (isServerRunning && client.Connected && stream.CanWrite)
             {
                 string jsonVelocityReport;
@@ -334,14 +351,16 @@ public class DVLa50SimSender : MonoBehaviour
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true))
                 {
                     string jsonCommand = await reader.ReadLineAsync();
-                    await ProcessCommand(jsonCommand);
                     if (jsonCommand == null) break; // Client disconnected
+                    string response = await ProcessCommand(jsonCommand);
+                    // immediately send response back to client
+                    SendLine(stream, response);
                 }
             }
         }
     }
 
-    async private System.Threading.Tasks.Task ProcessCommand(string jsonCommand)
+    async private System.Threading.Tasks.Task<string> ProcessCommand(string jsonCommand)
     {
         try
         {
@@ -349,18 +368,18 @@ public class DVLa50SimSender : MonoBehaviour
             Debug.Log($"Processing command: {command.command}");
             switch (command.command)
             {
+                case "reset_dead_reckoning":
+                    Debug.Log("Resetting dead reckoning...");
+                    return ResetDeadReckoning();
                 case "calibrate_gyro":
-
                     Debug.Log("Calibrating gyro...");
-                    break;
+                    return CalibrateGyroResponse();
                 case "trigger_ping":
-
                     Debug.Log("Triggering DVL ping...");
-                    break;
+                    return TriggerPingResponse();
                 case "get_config":
-
                     Debug.Log("Sending DVL configuration...");
-                    break;
+                    return GetConfigResponse();
                 case "set_config":
                     // check for parameters
                     if (command.parameters != null)
@@ -371,16 +390,96 @@ public class DVLa50SimSender : MonoBehaviour
                         }
                     }
                     Debug.Log("Updating DVL configuration...");
-                    break;
+                    return SendConfigResponse();
                 default:
-                    Debug.LogWarning($"Unknown command received: {command.command}");
-                    break;
+                    Debug.LogWarning($"Unknown command: {command.command}");
+                    DVLCommandResponse unknownCmd = new DVLCommandResponse
+                    {
+                        response_to = command.command,
+                        success = false,
+                        error_message = $"Unknown command: {command.command}",
+                        result = null,
+                        format = "json_v3.1",
+                        type = "response"
+                    };
+                    return JsonConvert.SerializeObject(unknownCmd);
             }
         }
         catch (Exception e)
         {
             Debug.LogError("DVLa50SimSender: Failed to process command - " + e.Message);
+            DVLCommandResponse errorResponse = new DVLCommandResponse
+            {
+                response_to = "unknown",
+                success = false,
+                error_message = $"Exception: {e.Message}",
+                result = null,
+                format = "json_v3.1",
+                type = "response"
+            };
+            return JsonConvert.SerializeObject(errorResponse);
         }
+    }
+
+    string ResetDeadReckoning()
+    {
+        // Simulate resetting dead reckoning
+        // TODO actually reset position to (0,0,0) and maybe add some random noise to simulate realignment uncertainty
+        DVLCommandResponse reset_dr = DVLCommandResponse.GetDefault("reset_dead_reckoning");
+        Debug.Log("Dead reckoning reset.");
+        return JsonConvert.SerializeObject(reset_dr);
+    }
+
+    string CalibrateGyroResponse()
+    {
+        // Simulate gyro calibration delay
+        // TODO actually do calibration
+        DVLCommandResponse calibrate_gyro = DVLCommandResponse.GetDefault("calibrate_gyro");
+        Debug.Log("Gyro calibration complete.");
+        return JsonConvert.SerializeObject(calibrate_gyro);
+    }
+
+    string TriggerPingResponse()
+    {
+        // Simulate ping delay and response
+        // TODO actually trigger each of the 15 external pings
+        DVLCommandResponse trigger_ping = DVLCommandResponse.GetDefault("trigger_ping");
+        Debug.Log("DVL ping triggered.");
+        return JsonConvert.SerializeObject(trigger_ping);
+    }
+
+    string GetConfigResponse()
+    {
+        // Simulate sending config
+        // TODO actually query config parameters
+        DVLCommandResponse get_config = new DVLCommandResponse
+        {
+            response_to = "get_config",
+            success = true,
+            error_message = "",
+            result = new Dictionary<string, object>
+            {
+                { "speed_of_sound", 1475.00 },
+                { "acoustic_enabled", true},
+                { "dark_mode_enabled", false},
+                { "mounting_rotation_offset", "20.00"},
+                {"range_mode", "auto"},
+                {"periodic_cycling_enabled", true}
+            },
+            format = "json_v3.1",
+            type = "response"
+        };
+        Debug.Log("DVL configuration sent.");
+        return JsonConvert.SerializeObject(get_config);
+    }
+
+    string SendConfigResponse()
+    {
+        // Simulate setting config
+        // TODO actually change parameters where needed
+        DVLCommandResponse set_config = DVLCommandResponse.GetDefault("set_config");
+        Debug.Log("DVL configuration updated.");
+        return JsonConvert.SerializeObject(set_config);
     }
 
     void OnApplicationQuit()
