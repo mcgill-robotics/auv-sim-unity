@@ -61,6 +61,23 @@ class DVLDeadReckoningReport
     public string format;
 }
 
+[Serializable]
+class DVLCommand
+{
+    public string command;
+    public Dictionary<string, object> parameters;
+}
+
+[Serializable]
+class DVLCommandResponse
+{
+    public string response_to;
+    public bool success;
+    public string error_message;
+    public Dictionary<string, object> result;
+    public string format;
+    public string type;
+}
 
 public class DVLa50SimSender : MonoBehaviour
 {
