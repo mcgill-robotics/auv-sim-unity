@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -65,7 +67,6 @@ public class DVLa50SimSender : MonoBehaviour
     // server components
     TcpListener server; // server to listen for incoming connections
     TcpClient client; // connection to client
-    NetworkStream stream; // stream for sending data to client
     Thread serverThread;
     bool isServerRunning = false;
 
@@ -76,11 +77,12 @@ public class DVLa50SimSender : MonoBehaviour
     [SerializeField] private int publishRateHz = 10; // how often to send messages (in Hz)
 
     // DVL components
-    DVLDeadReckoningReport currentDeadReckoningReport;
-    DVLVelocityReport currentVelocityReport;
+    DVLDeadReckoningReport currentDeadReckoningReport; // store the most recent DVL dead reckoning report to send to clients when they request it
+    DVLVelocityReport currentVelocityReport; // same for velocity
     long lastPublishTime = 0;
-    private readonly object _lock = new object(); // lock to ensure reports are thread safe
-
+    private readonly object _reportLock = new object(); // lock to ensure reports are thread safe
+    // Network Stream Lock
+    private readonly object _streamWriteLock = new object();
 
     private void Start()
     {
@@ -106,7 +108,7 @@ public class DVLa50SimSender : MonoBehaviour
         long currentTime = GetTimeMicroseconds();
         // TODO replace with actual data retrieval
         // Update the DVL reports with random data, lock to ensure thread safety since the server thread may be reading these reports at the same time to send to clients
-        lock (_lock)
+        lock (_reportLock)
         {
             currentVelocityReport = new DVLVelocityReport
             {
@@ -198,14 +200,16 @@ public class DVLa50SimSender : MonoBehaviour
 
             while (isServerRunning)
             {
+                if (!server.Pending())
+                {
+                    await System.Threading.Tasks.Task.Delay(100); // wait a bit before checking for new connections to avoid busy waiting
+                    continue;
+                }
                 // Accept incoming client connections asynchronously
                 using (client = await server.AcceptTcpClientAsync())
-                // start network stream for the connected client
-                using (NetworkStream stream = client.GetStream())
                 {
-                    Debug.Log($"Client connected: {client.Client.RemoteEndPoint}");
-                    // return streamdata async task
-                    await StreamDataAsync(stream);
+
+                    await HandleClient(client); // Handle the client connection (send data and read commands) until the client disconnects or an error occurs
                 }
             }
         }
@@ -216,9 +220,39 @@ public class DVLa50SimSender : MonoBehaviour
         finally
         {
             // Clean up resources
-            stream?.Close();
             client?.Close();
             server?.Stop();
+        }
+    }
+
+    async private System.Threading.Tasks.Task HandleClient(TcpClient client)
+    {
+        NetworkStream stream = null;
+        try
+        {
+            Debug.Log($"Client connected: {client.Client.RemoteEndPoint}");
+            using (stream = client.GetStream())
+            {
+                // Spin up two independent tasks for reading and writing to stream
+                System.Threading.Tasks.Task rxTask = ReadDataFromClient(stream);
+                System.Threading.Tasks.Task txTask = StreamDataAsync(stream);
+
+                // If either task completes (or fails due to disconnect), we drop the connection
+                await System.Threading.Tasks.Task.WhenAll(rxTask, txTask);
+                if (!client.Connected)
+                {
+                    Debug.Log("Client disconnected.");
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("DVLa50SimSender: Exception in HandleClient - " + e.Message);
+        }
+        finally
+        {
+            stream?.Close();
         }
     }
 
@@ -226,7 +260,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         try
         {
-            while (isServerRunning && client != null && client.Connected)
+            while (isServerRunning && client.Connected && stream.CanWrite)
             {
                 string jsonVelocityReport;
                 string jsonPositionReport;
@@ -238,7 +272,7 @@ public class DVLa50SimSender : MonoBehaviour
                     continue;
                 }
                 // lock and quickly serialize velocity and position reports
-                lock (_lock)
+                lock (_reportLock)
                 {
                     jsonPositionReport = JsonConvert.SerializeObject(currentDeadReckoningReport);
                     jsonVelocityReport = JsonConvert.SerializeObject(currentVelocityReport);
@@ -249,10 +283,6 @@ public class DVLa50SimSender : MonoBehaviour
 
                 // Wait for the next publish interval
                 await System.Threading.Tasks.Task.Delay(1000 / publishRateHz);
-            }
-            if (!client.Connected)
-            {
-                Debug.Log("Client disconnected.");
             }
         }
         catch (Exception e)
@@ -267,12 +297,30 @@ public class DVLa50SimSender : MonoBehaviour
         {
             // separate messages with newline for easy parsing on client side\
             byte[] data = Encoding.ASCII.GetBytes(jsonString + '\n');
-            // Send the message to the client asynchronously
-            await stream.WriteAsync(data, 0, data.Length);
+            lock (_streamWriteLock)
+            {
+                // Send the message to the client asynchronously
+                stream.Write(data, 0, data.Length);
+            }
         }
         catch (Exception e)
         {
             Debug.LogWarning($"[DVL Server] Failed to write to stream: {e.Message}");
+        }
+    }
+    async private System.Threading.Tasks.Task ReadDataFromClient(NetworkStream stream)
+    {
+        while (isServerRunning && client.Connected && stream.CanWrite)
+        {
+            if (stream.DataAvailable)
+            {
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true))
+                {
+                    string jsonCommand = await reader.ReadLineAsync();
+                    if (jsonCommand == null) break; // Client disconnected
+                    Debug.Log($"Received command from client: {jsonCommand}");
+                }
+            }
         }
     }
 
