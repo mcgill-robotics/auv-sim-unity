@@ -4871,7 +4871,7 @@ MonoBehaviour:
   FoamTopCollider: {fileID: 7031543448678077273}
   waterSurface: {fileID: 762281602}
   hydrodynamicDrag: {fileID: 1371465006}
-  debugLogging: 1
+  debugLogging: 0
 --- !u!54 &1371465008
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5275,7 +5275,7 @@ MonoBehaviour:
   PublishROS: 0
   DisplaySimObjects: 0
   PublishGTObjectMap: 0
-  NoWaterMode: 1
+  NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
@@ -5566,6 +5566,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1565515643}
   - component: {fileID: 1565515644}
+  - component: {fileID: 1565515645}
   m_Layer: 7
   m_Name: DVL-A50
   m_TagString: Untagged
@@ -5623,6 +5624,21 @@ MonoBehaviour:
   visualizationColor: {r: 1, g: 0.8, b: 0.2, a: 1}
   velocityArrowScale: 1
   beamLineWidth: 0.01
+--- !u!114 &1565515645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1565515642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b95defaf917a05095ca977e9a15015, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 16171
+  ipAddress: 127.0.0.1
+  publishRateHz: 10
 --- !u!115 &1613045127
 MonoScript:
   m_ObjectHideFlags: 0
