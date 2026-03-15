@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
@@ -88,7 +86,7 @@ class DVLCommandResponse
             success = true,
             error_message = "",
             result = null,
-            format = "json_v3.1",
+            format = DVLa50SimSender.PROTOCOL_VERSION,
             type = "response"
         };
     }
@@ -96,6 +94,7 @@ class DVLCommandResponse
 
 public class DVLa50SimSender : MonoBehaviour
 {
+    public static string PROTOCOL_VERSION = "json_v3.1";
     // server components
     TcpListener server; // server to listen for incoming connections
     TcpClient client; // connection to client
@@ -200,7 +199,7 @@ public class DVLa50SimSender : MonoBehaviour
                 status = (byte)DVLStatus.OK,
                 time_of_validity = (long)UnityEngine.Random.Range(lastPublishTime, currentTime), // choose random time between last publish and now for when the ping reached the bottom
                 time_of_transmission = currentTime,
-                format = "json_v3.1",
+                format = PROTOCOL_VERSION,
                 type = "velocity"
             };
             currentDeadReckoningReport = new DVLDeadReckoningReport
@@ -215,7 +214,7 @@ public class DVLa50SimSender : MonoBehaviour
                 yaw = UnityEngine.Random.Range(-180f, 180f),
                 type = "position_local",
                 status = (byte)DVLStatus.OK,
-                format = "json_v3"
+                format = PROTOCOL_VERSION
             };
         }
     }
@@ -399,7 +398,7 @@ public class DVLa50SimSender : MonoBehaviour
                         success = false,
                         error_message = $"Unknown command: {command.command}",
                         result = null,
-                        format = "json_v3.1",
+                        format = PROTOCOL_VERSION,
                         type = "response"
                     };
                     return JsonConvert.SerializeObject(unknownCmd);
@@ -414,7 +413,7 @@ public class DVLa50SimSender : MonoBehaviour
                 success = false,
                 error_message = $"Exception: {e.Message}",
                 result = null,
-                format = "json_v3.1",
+                format = PROTOCOL_VERSION,
                 type = "response"
             };
             return JsonConvert.SerializeObject(errorResponse);
@@ -466,7 +465,7 @@ public class DVLa50SimSender : MonoBehaviour
                 {"range_mode", "auto"},
                 {"periodic_cycling_enabled", true}
             },
-            format = "json_v3.1",
+            format = PROTOCOL_VERSION,
             type = "response"
         };
         Debug.Log("DVL configuration sent.");
