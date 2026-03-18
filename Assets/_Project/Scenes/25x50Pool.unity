@@ -2412,7 +2412,6 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -2935,7 +2934,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -5272,39 +5271,39 @@ MonoBehaviour:
   AUVTransform: {fileID: 1371465009}
   FrontCamera: {fileID: 1621375949}
   DownCamera: {fileID: 1671108404}
-  PublishROS: 0
+  PublishROS: 1
   DisplaySimObjects: 0
   PublishGTObjectMap: 0
-  NoWaterMode: 1
-  EnableShadows: 1
+  NoWaterMode: 0
+  EnableShadows: 0
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
   HydrophonesNumberOption: 0
-  PublishDVL: 0
-  PublishIMU: 0
-  PublishDepth: 0
+  PublishDVL: 1
+  PublishIMU: 1
+  PublishDepth: 1
   PublishHydrophones: 0
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
   StreamZEDCamera: 0
-  VisualizeDVL: 0
+  VisualizeDVL: 1
   VisualizeIMU: 0
   VisualizeDepth: 0
-  EnableDVLNoise: 1
-  EnableIMUNoise: 1
-  EnableDepthNoise: 1
-  DrawerConfigOpen: 1
-  DrawerControlsOpen: 1
-  DrawerTelemetryOpen: 0
+  EnableDVLNoise: 0
+  EnableIMUNoise: 0
+  EnableDepthNoise: 0
+  DrawerConfigOpen: 0
+  DrawerControlsOpen: 0
+  DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 10
+  FrontCamRate: 30
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
@@ -5316,7 +5315,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
