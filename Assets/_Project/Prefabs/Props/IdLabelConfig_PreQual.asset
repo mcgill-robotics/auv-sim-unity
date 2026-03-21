@@ -13,11 +13,23 @@ MonoBehaviour:
   m_Name: IdLabelConfig_PreQual
   m_EditorClassIdentifier: 
   m_LabelEntries:
-  - label: gate_prequal
+  - label: board_image
     id: 1
     hierarchyRelation: 0
-  - label: marker_prequal
+  - label: gate_prequal
     id: 2
+    hierarchyRelation: 0
+  - label: shark
+    id: 3
+    hierarchyRelation: 0
+  - label: sawfish
+    id: 4
+    hierarchyRelation: 0
+  - label: marker_prequal
+    id: 5
+    hierarchyRelation: 0
+  - label: white_pipe_medn
+    id: 6
     hierarchyRelation: 0
   autoAssignIds: 1
   startingLabelId: 1

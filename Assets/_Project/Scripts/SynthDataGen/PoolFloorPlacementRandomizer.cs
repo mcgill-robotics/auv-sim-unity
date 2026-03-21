@@ -121,14 +121,19 @@ public class PoolFloorPlacementRandomizer : Randomizer
             // Center offset so placement area is centered at origin
             var centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
             
-            // Place unique objects 1-to-1 until we run out of samples or prefabs
-            int spawnCount = Mathf.Min(nativeSamples.Length, prefabsToSpawn.Count);
+            // Limit spawn count by available sample positions, and optionally by maxObjectCount
+            int spawnCount = nativeSamples.Length;
             if (maxObjectCount > 0) spawnCount = Mathf.Min(spawnCount, maxObjectCount);
 
             for (int i = 0; i < spawnCount; i++)
             {
                 var sample = nativeSamples[i];
-                var config = prefabsToSpawn[i];
+                
+                // Go through all prefabs once to guarantee at least one of each is spawned (if spawnCount permits).
+                // Once we've spawned all of them at least once, pick randomly for the remaining duplicates.
+                var config = i < prefabsToSpawn.Count 
+                    ? prefabsToSpawn[i] 
+                    : prefabsToSpawn[UnityEngine.Random.Range(0, prefabsToSpawn.Count)];
                 
                 var instance = _gameObjectCache.GetOrInstantiate(config.prefab);
                 
