@@ -122,6 +122,7 @@ GameObject:
   - component: {fileID: 1759971961849757090}
   - component: {fileID: 5661077102382492177}
   - component: {fileID: 3220821329936287380}
+  - component: {fileID: 8810047275350079884}
   m_Layer: 0
   m_Name: board
   m_TagString: Untagged
@@ -203,6 +204,18 @@ MonoBehaviour:
   useAngleFilter: 0
   maxViewAngle: 60
   allowBackFace: 1
+--- !u!114 &8810047275350079884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976002720483355549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b85e54e30bb74162b2d6bca9b68f5482, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1380471177355856484
 GameObject:
   m_ObjectHideFlags: 0
