@@ -234,10 +234,10 @@ MonoBehaviour:
     waterScriptInteractionsMode: 0
     waterFullCPUSimulation: 0
     supportComputeThickness: 0
-    computeThicknessResolution: 1
+    computeThicknessResolution: 0
     computeThicknessLayerMask:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 4294967295
     supportDistortion: 1
     supportTransparentBackface: 1
     supportTransparentDepthPrepass: 1
@@ -259,7 +259,7 @@ MonoBehaviour:
     supportSurfaceGradient: 1
     decalNormalBufferHP: 0
     supportHighQualityLineRendering: 1
-    highQualityLineRenderingMemoryBudget: 128
+    highQualityLineRenderingMemoryBudget: 512
     msaaSampleCount: 1
     supportMotionVectors: 1
     supportScreenSpaceLensFlare: 1
