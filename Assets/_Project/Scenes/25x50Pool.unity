@@ -4800,6 +4800,7 @@ MonoBehaviour:
   streamPort: 30000
   serialNumber: 41116066
   targetFPS: 10
+  UseSimTime: 0
   leftCamera: {fileID: 1621375949}
   rightCamera: {fileID: 1135839436}
   invertRotY: 0
@@ -5315,7 +5316,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
