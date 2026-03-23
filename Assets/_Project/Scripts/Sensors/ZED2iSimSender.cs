@@ -19,6 +19,9 @@ public class ZED2iSimSender : MonoBehaviour
     [Range(1, 60)]
     public int targetFPS = 30;
 
+    [Tooltip("Use ROS Clock simulation time instead of system time. If set to true, ZED SDK tools such as ZED Explorer will not work due to timestamp mismatch. Use only if you need synchronized timestamps with ROS messages.")]
+    public bool useSimTime = false;
+
     [Space(10)]
     [Header("Camera References")]
     [Tooltip("Assign THIS GameObject (Left Camera) here")]
@@ -202,7 +205,7 @@ public class ZED2iSimSender : MonoBehaviour
     private void SendIMUData()
     {
         // Get timestamp (no allocation)
-        long timestamp_ns = (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
+        long timestamp_ns = useSimTime ? ROSClock.GetROSTimestampNanoseconds() : (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
 
         // Orientation (Unity LHS -> ZED RHS)
         float qx, qy, qz, qw;
@@ -287,7 +290,7 @@ public class ZED2iSimSender : MonoBehaviour
             float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
 
             // Use System Time for smoother network sync (cached epoch)
-            long timestamp_ns = (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
+            long timestamp_ns = useSimTime ? ROSClock.GetROSTimestampNanoseconds() : (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
 
             // Get reference to raw data without creating a new byte[]
             NativeArray<byte> rawLeft = texBufferLeft.GetRawTextureData<byte>();
