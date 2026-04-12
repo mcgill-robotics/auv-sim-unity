@@ -4,10 +4,9 @@ using UnityEngine;
 using UnityEngine.Perception.Randomization.Randomizers;
 using UnityEngine.Perception.Randomization.Samplers;
 using UnityEngine.Perception.Randomization.Scenarios;
-
+using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorRgbParameter;
 // Aliases
 using PerceptionFloatParameter = UnityEngine.Perception.Randomization.Parameters.FloatParameter;
-using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorRgbParameter;
 
 public class BatchRunner : MonoBehaviour
 {
@@ -27,13 +26,15 @@ public class BatchRunner : MonoBehaviour
     public bool testModeEnabled = false;
     [Tooltip("Index of the batch to run in Test Mode.")]
     public int testBatchIndex = 0;
+    [Header("Reproducibility")]
+    public uint seed = 260716;
     #endregion
 
     #region Runtime State
     private FixedLengthScenario _scenario;
     private List<BatchRuntimeInfo> _schedule = new List<BatchRuntimeInfo>();
     private int _currentBatchIndex = -1;
-    
+
     // Randomizers
     private PoolFloorPlacementRandomizer _placementRandomizer;
     private UnderwaterEnvironmentRandomizer _underwaterRandomizer;
@@ -60,16 +61,18 @@ public class BatchRunner : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log($"[BatchRunner] Initializing BatchRunner with Seed: {seed}");
+        _scenario.constants.randomSeed = seed;
         BuildSchedule();
-        
+
         if (_schedule.Count > 0)
         {
             // Configure the Scenario to run the FULL length of all batches combined
             int totalIterations = _schedule[_schedule.Count - 1].endIteration;
             _scenario.constants.iterationCount = totalIterations;
-            
+
             Debug.Log($"[BatchRunner] Simulation configured for {totalIterations} total iterations across {_schedule.Count} batches.");
-            
+
             // Apply first batch immediately
             UpdateBatchConfig(0);
         }
@@ -116,7 +119,7 @@ public class BatchRunner : MonoBehaviour
             {
                 int start = currentIterCount;
                 int end = start + config.iterations;
-                
+
                 _schedule.Add(new BatchRuntimeInfo
                 {
                     startIteration = start,
@@ -156,7 +159,7 @@ public class BatchRunner : MonoBehaviour
         {
             _placementRandomizer.enabled = true; // Always stays enabled for cleanup
             _placementRandomizer.shouldSpawn = config.spawnObjects;
-            
+
             if (!config.spawnObjects)
             {
                 _placementRandomizer.ClearObjects();
