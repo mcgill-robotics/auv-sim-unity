@@ -3738,6 +3738,7 @@ MonoBehaviour:
     yawJitter: 45
   testModeEnabled: 0
   testBatchIndex: 0
+  seed: 260716
 --- !u!1 &1905536208
 GameObject:
   m_ObjectHideFlags: 3
