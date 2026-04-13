@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Perception.Randomization.Randomizers;
 using UnityEngine.Perception.Randomization.Randomizers.Tags;
 using UnityEngine.Perception.Randomization.Samplers;
-using UnityEngine.Perception.Randomization.Utilities;
 
 /// <summary>
 /// Randomizes materials and labels on 1 or 2 quads (e.g., Gate targets or Task Boards) every frame.

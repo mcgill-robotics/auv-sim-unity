@@ -3274,6 +3274,7 @@ MonoBehaviour:
   - rid: 2823715821560529000
   - rid: 2823715821560529048
   - rid: 2823715821560529017
+  - rid: 3031673826218344998
   configuration: {fileID: 0}
   constants:
     randomSeed: 539662031
@@ -3608,6 +3609,12 @@ MonoBehaviour:
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
+    - rid: 3031673826218344998
+      type: {class: VisualTargetRandomizer, ns: , asm: Assembly-CSharp}
+      data:
+        m_Enabled: 1
+        collapsed: 0
+        <enabledStateCanBeSwitchedByUser>k__BackingField: 1
     - rid: 7836056693691121873
       type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
         asm: Unity.Perception.Runtime}

@@ -39,6 +39,7 @@ public class BatchRunner : MonoBehaviour
     private PoolFloorPlacementRandomizer _placementRandomizer;
     private UnderwaterEnvironmentRandomizer _underwaterRandomizer;
     private BoundedCameraRandomizer _cameraRandomizer;
+    private VisualTargetRandomizer _visualTargetRandomizer;
     #endregion
 
     private void Awake()
@@ -57,6 +58,7 @@ public class BatchRunner : MonoBehaviour
         _placementRandomizer = GetRandomizer<PoolFloorPlacementRandomizer>();
         _underwaterRandomizer = GetRandomizer<UnderwaterEnvironmentRandomizer>();
         _cameraRandomizer = GetRandomizer<BoundedCameraRandomizer>();
+        _visualTargetRandomizer = GetRandomizer<VisualTargetRandomizer>();
     }
 
     private void Start()
@@ -205,6 +207,12 @@ public class BatchRunner : MonoBehaviour
             _cameraRandomizer.yaw = new PerceptionFloatParameter { value = new UniformSampler(config.randomYawRange.x, config.randomYawRange.y) };
             _cameraRandomizer.roll = new PerceptionFloatParameter { value = new UniformSampler(config.rollRange.x, config.rollRange.y) };
             _cameraRandomizer.yawJitter = new PerceptionFloatParameter { value = new UniformSampler(-config.yawJitter, config.yawJitter) };
+        }
+
+        // 4. Visual Target (Appearance)
+        if (_visualTargetRandomizer != null)
+        {
+            _visualTargetRandomizer.enabled = true;
         }
     }
 
