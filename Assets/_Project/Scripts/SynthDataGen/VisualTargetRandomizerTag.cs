@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Perception.Randomization.Scenarios;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
 using UnityEngine.Perception.Randomization.Randomizers.Tags;
+using System.Collections.Generic;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -22,7 +24,6 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             public Material material;
             public string label;
         }
-
         [Header("Targets")]
         [Tooltip("Assign 1 quad (for Board) or 2 quads (for Gate)")]
         public MeshRenderer[] targets;
@@ -31,56 +32,30 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         [Tooltip("List of material/label pairs to pick from.")]
         public MaterialLabelConfig[] configs;
 
-        private int _lastIteration = -1;
-
-        private void Start()
+        public int GetTargetCount()
         {
-            RandomizeMaterials();
+            int count = 0;
+            foreach (var t in targets)
+            {
+                if (t != null) count++;
+            }
+            return count;
         }
 
-        private void Update()
+        public int GetConfigCount()
         {
-            var scenario = ScenarioBase.activeScenario;
-            if (scenario == null) return;
-
-            if (scenario.currentIteration != _lastIteration)
-            {
-                _lastIteration = scenario.currentIteration;
-                RandomizeMaterials();
-            }
+            return configs != null ? configs.Length : 0;
         }
 
         /// <summary>
         /// Randomizes materials and labels. Ensures Left != Right if there are two targets.
         /// </summary>
-        public void RandomizeMaterials()
+        public void RandomizeMaterials(int targetIndex, int configIndex)
         {
-            if (configs == null || configs.Length == 0 || targets == null || targets.Length == 0)
-                return;
-
-            // Pick first config
-            int firstIndex = Random.Range(0, configs.Length);
-            ApplyConfig(targets[0], configs[firstIndex]);
-
-            // If there's a second target, pick a different config if possible
-            if (targets.Length > 1 && targets[1] != null)
-            {
-                if (configs.Length > 1)
-                {
-                    int secondIndex;
-                    do
-                    {
-                        secondIndex = Random.Range(0, configs.Length);
-                    } while (secondIndex == firstIndex);
-
-                    ApplyConfig(targets[1], configs[secondIndex]);
-                }
-                else
-                {
-                    // Fallback if only 1 config provided
-                    ApplyConfig(targets[1], configs[firstIndex]);
-                }
-            }
+            if (targets == null || configs == null) return;
+            if (targetIndex < 0 || targetIndex >= targets.Length) return;
+            if (configIndex < 0 || configIndex >= configs.Length) return;
+            ApplyConfig(targets[targetIndex], configs[configIndex]);
         }
 
         private void ApplyConfig(MeshRenderer target, MaterialLabelConfig config)
@@ -101,8 +76,39 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
                 labeling.RefreshLabeling();
             }
         }
+        /// <summary>
+        /// Generates a list of (targetIndex, configIndex) pairs to randomize materials/labels. Ensures different configs for each target if possible.
+        /// !!! SHOULD ONLY BE USED in editor for testing randomization on demand, the final dataset generation is handled by VisualTargetRandomizer to ensure consistency across runs. !!!!
+        /// </summary>
+        /// <returns>Array of (targetIndex, configIndex) pairs</returns>
+        public (int, int)[] GetRandomConfigIndices()
+        {
+            List<(int, int)> indices = new List<(int, int)>();
+            int firstIndex = Random.Range(0, configs.Length);
+            indices.Add((0, firstIndex));
+            if (targets.Length > 1 && targets[1] != null)
+            {
+                if (configs.Length > 1)
+                {
+                    int secondIndex;
+                    do
+                    {
+                        secondIndex = Random.Range(0, configs.Length);
+                    } while (secondIndex == firstIndex);
+                    indices.Add((1, secondIndex));
+                }
+                else
+                {
+                    // Fallback if only 1 config provided
+                    indices.Add((1, firstIndex));
+                }
+            }
+            return indices.ToArray();
+        }
     }
 }
+
+
 #if UNITY_EDITOR
 [CustomEditor(typeof(VisualTargetRandomizerTag))]
 public class VisualTargetRandomizerEditor : Editor
@@ -130,7 +136,10 @@ public class VisualTargetRandomizerEditor : Editor
 
                 Undo.RecordObjects(objectsToUndo.ToArray(), "Randomize Visual Targets");
 
-                script.RandomizeMaterials();
+                foreach (var (targetIndex, configIndex) in script.GetRandomConfigIndices())
+                {
+                    script.RandomizeMaterials(targetIndex, configIndex);
+                }
 
                 foreach (var t in script.targets)
                 {
