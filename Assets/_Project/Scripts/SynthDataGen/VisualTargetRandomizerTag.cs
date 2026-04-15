@@ -66,7 +66,11 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
                     target.transform.GetChild(i).gameObject.SetActive(true);
                     foreach (Labeling l in target.transform.GetChild(i).gameObject.GetComponentsInChildren<Labeling>())
                     {
-                        l.RefreshLabeling();
+                        if (l.gameObject.TryGetComponent<ConditionalLabeling>(out var cl))
+                        {
+                            l.enabled = cl.ShouldLabel(); // update the ConditionalLabeling state based on current camera position/angle
+                        }
+                        if (l.isActiveAndEnabled) l.RefreshLabeling(); // refresh to ensure ground truth is updated with the new material/visual
                     }
                 }
                 else
