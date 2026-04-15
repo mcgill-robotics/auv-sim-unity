@@ -15,7 +15,7 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
     /// Used to randomize materials and labels on 1 or 2 quads (e.g., Gate targets or Task Boards) every frame.
     /// Pairs each material with a specific label to ensure ground truth matches the visual.
     /// </summary>
-    [AddComponentMenu("Perception/RandomizerTags/Visual Target Randomizer Tag")]
+    [AddComponentMenu("RoboSub/RandomizerTags/Visual Target Randomizer Tag")]
     public class VisualTargetRandomizerTag : RandomizerTag
     {
         [System.Serializable]
@@ -78,7 +78,7 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         }
         /// <summary>
         /// Generates a list of (targetIndex, configIndex) pairs to randomize materials/labels. Ensures different configs for each target if possible.
-        /// !!! SHOULD ONLY BE USED in editor for testing randomization on demand, the final dataset generation is handled by VisualTargetRandomizer to ensure consistency across runs. !!!!
+        /// !!! SHOULD ONLY BE USED in editor for testing randomization on demand, the final dataset generation is handled by VisualTargetRandomizer to ensure consistency across runs.
         /// </summary>
         /// <returns>Array of (targetIndex, configIndex) pairs</returns>
         public (int, int)[] GetRandomConfigIndices()
