@@ -65,9 +65,17 @@ All randomization is driven by a `Unity.Mathematics.Random` state, which is seed
 2. **Never** use `UnityEngine.Random` or `System.Random` — use `SamplerState.NextRandomState()` instead to seed a `Unity.Mathematics.Random` instance, and use that for all random value generation:
 
 ```csharp
-// ✅ Correct way to generate a random float between 0 and 1
-RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
+// ✅ Correct way to generate a random float between 0 and 1, random state should be a class member reinitialized in OnIterationStart()
+Unity.Mathematics.Random RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
 float randomValue = RandomState.NextFloat(0f, 1f);
 // ❌ Incorrect way (breaks reproducibility)
 float randomValue = UnityEngine.Random.Range(0f, 1f);
 ```
+
+Since the image capture time is non deterministic (depends on the Unity rendering loop and the hardware), the images themselves will be ever imperceptibly different across runs even with the same random seed. Thus, to verify if seeding worked, one can generate two datasets with the same seed and batch config, then compare the JSON metadata dumps — they should be identical in terms of randomizer parameter values and captured labels. Go to the dataset directory (typical `~/.config/unity3d/McGill\ Robotics/AUV-SIM-UNITY`) and recursively diff the two datasets:
+
+```bash
+diff -r --exclude="*.png" solo solo_1
+```
+
+The only difference between the two directories should be simulation start and end times.
