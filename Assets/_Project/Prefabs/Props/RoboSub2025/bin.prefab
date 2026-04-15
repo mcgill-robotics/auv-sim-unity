@@ -830,8 +830,8 @@ Transform:
   - {fileID: 5290693343591135790}
   - {fileID: 2925845222295749533}
   - {fileID: 4099831590964382672}
-  - {fileID: 7013833098799834805}
   - {fileID: 1504906828283349589}
+  - {fileID: 7013833098799834805}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-1452599841100225227
@@ -875,13 +875,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targets:
-  - {fileID: 7644685165077050952}
-  - {fileID: 8268205768665538744}
-  configs:
-  - material: {fileID: 2100000, guid: b0cba11ecf74ccea0b3ff22fe1649188, type: 2}
-    label: shark
-  - material: {fileID: 2100000, guid: bfb6eb8671e6c34cb9eda0352f200235, type: 2}
-    label: sawfish
+  - {fileID: 2158635774616026020}
+  - {fileID: 2761545973134951403}
 --- !u!114 &2562162342493323814
 MonoBehaviour:
   m_ObjectHideFlags: 0

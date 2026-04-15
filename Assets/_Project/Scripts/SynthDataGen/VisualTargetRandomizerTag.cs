@@ -3,6 +3,8 @@ using UnityEngine.Perception.Randomization.Scenarios;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
 using UnityEngine.Perception.Randomization.Randomizers.Tags;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
+
 
 
 #if UNITY_EDITOR
@@ -18,19 +20,9 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
     [AddComponentMenu("RoboSub/RandomizerTags/Visual Target Randomizer Tag")]
     public class VisualTargetRandomizerTag : RandomizerTag
     {
-        [System.Serializable]
-        public struct MaterialLabelConfig
-        {
-            public Material material;
-            public string label;
-        }
         [Header("Targets")]
         [Tooltip("Assign 1 quad (for Board) or 2 quads (for Gate)")]
-        public MeshRenderer[] targets;
-
-        [Header("Configurations")]
-        [Tooltip("List of material/label pairs to pick from.")]
-        public MaterialLabelConfig[] configs;
+        public GameObject[] targets;
 
         public int GetTargetCount()
         {
@@ -41,39 +33,46 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             }
             return count;
         }
-
+        /// <summary>
+        /// Returns the number of valid configs (child objects) under this tag. Each child should be a visual variant with a specific Material and Labelling component
+        /// </summary>
+        /// <returns></returns>
         public int GetConfigCount()
         {
-            return configs != null ? configs.Length : 0;
+            // assume all targets have the same number of configs (child objects), so we just take first one.
+            // TODO add a validation method to check all targets have same number of configs and all children have Labeling + Material
+            return targets[0].transform.childCount;
         }
 
         /// <summary>
-        /// Randomizes materials and labels. Ensures Left != Right if there are two targets.
+        /// Randomizes materials and labels. Enables the config at configIndex and disables the others.
         /// </summary>
         public void RandomizeMaterials(int targetIndex, int configIndex)
         {
-            if (targets == null || configs == null) return;
+            if (targets == null) return;
             if (targetIndex < 0 || targetIndex >= targets.Length) return;
-            if (configIndex < 0 || configIndex >= configs.Length) return;
-            ApplyConfig(targets[targetIndex], configs[configIndex]);
+            if (configIndex < 0 || configIndex >= GetConfigCount()) return;
+            ApplyConfig(targets[targetIndex], configIndex);
         }
 
-        private void ApplyConfig(MeshRenderer target, MaterialLabelConfig config)
+        private void ApplyConfig(GameObject target, int configIndex)
         {
             if (target == null) return;
 
-            // Apply Material
-            target.sharedMaterial = config.material;
-
-            // Apply Labeling
-            if (target.TryGetComponent<Labeling>(out var labeling))
+            for (int i = 0; i < GetConfigCount(); i++)
             {
-                labeling.labels.Clear();
-                if (!string.IsNullOrEmpty(config.label))
+                if (i == configIndex)
                 {
-                    labeling.labels.Add(config.label);
+                    target.transform.GetChild(i).gameObject.SetActive(true);
+                    foreach (Labeling l in target.transform.GetChild(i).gameObject.GetComponentsInChildren<Labeling>())
+                    {
+                        l.RefreshLabeling();
+                    }
                 }
-                labeling.RefreshLabeling();
+                else
+                {
+                    target.transform.GetChild(i).gameObject.SetActive(false);
+                }
             }
         }
         /// <summary>
@@ -84,16 +83,17 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         public (int, int)[] GetRandomConfigIndices()
         {
             List<(int, int)> indices = new List<(int, int)>();
-            int firstIndex = Random.Range(0, configs.Length);
+            int ConfigCount = GetConfigCount();
+            int firstIndex = Random.Range(0, ConfigCount);
             indices.Add((0, firstIndex));
             if (targets.Length > 1 && targets[1] != null)
             {
-                if (configs.Length > 1)
+                if (ConfigCount > 1)
                 {
                     int secondIndex;
                     do
                     {
-                        secondIndex = Random.Range(0, configs.Length);
+                        secondIndex = Random.Range(0, ConfigCount);
                     } while (secondIndex == firstIndex);
                     indices.Add((1, secondIndex));
                 }
@@ -126,7 +126,8 @@ public class VisualTargetRandomizerEditor : Editor
             if (script.targets != null)
             {
                 // Gather targets and their labeling components for Undo
-                var objectsToUndo = new System.Collections.Generic.List<Object>();
+                // TODO fix this to undo all variants
+                var objectsToUndo = new List<Object>();
                 foreach (var t in script.targets)
                 {
                     if (t == null) continue;

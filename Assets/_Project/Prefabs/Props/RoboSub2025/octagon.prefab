@@ -2017,13 +2017,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targets:
-  - {fileID: 646193968104972225}
-  - {fileID: 8068062166928715583}
-  configs:
-  - material: {fileID: 2100000, guid: 70efb39bfaaf608aebd38f3439f9d075, type: 2}
-    label: shark
-  - material: {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
-    label: sawfish
+  - {fileID: 2162961153617132344}
+  - {fileID: 5443880798924003692}
 --- !u!1 &7600262506088577414
 GameObject:
   m_ObjectHideFlags: 0

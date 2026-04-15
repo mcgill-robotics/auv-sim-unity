@@ -421,7 +421,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3302216206692393420
 Transform:
   m_ObjectHideFlags: 0
@@ -566,7 +566,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8895913983658317145
 Transform:
   m_ObjectHideFlags: 0
@@ -1260,13 +1260,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targets:
-  - {fileID: 117772251433964429}
-  - {fileID: 1449502292313374176}
-  configs:
-  - material: {fileID: 2100000, guid: 70efb39bfaaf608aebd38f3439f9d075, type: 2}
-    label: shark
-  - material: {fileID: 2100000, guid: 4b4ef2ba6be1500eb90c298c2c3141ff, type: 2}
-    label: sawfish
+  - {fileID: 4244574515124722416}
+  - {fileID: 323319928928614140}
 --- !u!114 &2697910172353265325
 MonoBehaviour:
   m_ObjectHideFlags: 0
