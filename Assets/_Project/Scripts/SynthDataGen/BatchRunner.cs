@@ -34,6 +34,9 @@ public class BatchRunner : MonoBehaviour
     private FixedLengthScenario _scenario;
     private List<BatchRuntimeInfo> _schedule = new List<BatchRuntimeInfo>();
     private int _currentBatchIndex = -1;
+    private float lastTime = 0f;
+    // Use Stopwatch instead of Time.DeltaTime to compute actual runtime instead of time between frames, so not just game time but actual time taken to execute each batch
+    private System.Diagnostics.Stopwatch watch;
 
     // Randomizers
     private PoolFloorPlacementRandomizer _placementRandomizer;
@@ -74,7 +77,7 @@ public class BatchRunner : MonoBehaviour
             _scenario.constants.iterationCount = totalIterations;
 
             Debug.Log($"[BatchRunner] Simulation configured for {totalIterations} total iterations across {_schedule.Count} batches.");
-
+            watch = System.Diagnostics.Stopwatch.StartNew();
             // Apply first batch immediately
             UpdateBatchConfig(0);
         }
@@ -92,6 +95,13 @@ public class BatchRunner : MonoBehaviour
         if (batchIndex != -1 && batchIndex != _currentBatchIndex)
         {
             UpdateBatchConfig(batchIndex);
+        }
+        if (batchIndex == _schedule.Count - 1 && currentIter == _schedule[batchIndex].endIteration - 1)
+        {
+            float finalBatchElapsed = (watch.ElapsedMilliseconds - lastTime) / 1000f;
+            Debug.Log($"<color=yellow>[BatchRunner]</color> Elapsed time for final batch: {finalBatchElapsed:F6} seconds");
+            Debug.Log($"<color=green>[BatchRunner]</color> Completed all batches! Total iterations: {currentIter + 1}.");
+            Debug.Log($"<color=green>[BatchRunner]</color> Total elapsed time across all batches: {watch.ElapsedMilliseconds / 1000f:F6} seconds");
         }
     }
 
@@ -152,6 +162,12 @@ public class BatchRunner : MonoBehaviour
         var info = _schedule[index];
         var config = info.config;
 
+        if (index > 0)
+        {
+            float batchElapsed = (watch.ElapsedMilliseconds - lastTime) / 1000f;
+            Debug.Log($"<color=yellow>[BatchRunner]</color> Elapsed time for previous batch: {batchElapsed:F6} seconds");
+        }
+        lastTime = watch.ElapsedMilliseconds;
         Debug.Log($"<color=cyan>[BatchRunner]</color> Switching to Batch {index + 1}/{_schedule.Count}: <b>{config.batchName}</b> (Iters {info.startIteration}-{info.endIteration})");
 
         // --- Apply Configs ---
