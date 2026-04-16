@@ -228,7 +228,7 @@ public class BatchRunner : MonoBehaviour
         // 4. Visual Target (Appearance)
         if (_visualTargetRandomizer != null)
         {
-            _visualTargetRandomizer.enabled = true;
+            _visualTargetRandomizer.enabled = config.randomizeVisuals;
         }
     }
 
