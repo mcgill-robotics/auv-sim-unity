@@ -183,8 +183,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce341973f33d8cab84746681dc25adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceTarget: {fileID: 4736560086625909873}
   targets:
-  - {fileID: 2234962391882247544}
+  - {fileID: 4736560086625909873}
 --- !u!114 &3220821329936287380
 MonoBehaviour:
   m_ObjectHideFlags: 0

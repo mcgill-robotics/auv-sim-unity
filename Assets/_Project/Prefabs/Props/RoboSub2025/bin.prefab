@@ -874,9 +874,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce341973f33d8cab84746681dc25adb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceTarget: {fileID: 1504906828283349589}
   targets:
-  - {fileID: 2158635774616026020}
-  - {fileID: 2761545973134951403}
+  - {fileID: 1504906828283349589}
+  - {fileID: 7013833098799834805}
 --- !u!114 &2562162342493323814
 MonoBehaviour:
   m_ObjectHideFlags: 0
