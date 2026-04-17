@@ -3458,7 +3458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   batchConfigs:
   - batchName: Good visibility
-    iterations: 60
+    iterations: 6000
     spawnObjects: 1
     randomizeVisuals: 1
     absorptionDistanceRange: {x: 10, y: 25}
@@ -3479,7 +3479,7 @@ MonoBehaviour:
     rollRange: {x: -30, y: 30}
     yawJitter: 30
   - batchName: Hard cases
-    iterations: 40
+    iterations: 4000
     spawnObjects: 1
     randomizeVisuals: 1
     absorptionDistanceRange: {x: 3, y: 10}
@@ -3500,7 +3500,7 @@ MonoBehaviour:
     rollRange: {x: -15, y: 15}
     yawJitter: 45
   - batchName: Background
-    iterations: 20
+    iterations: 2000
     spawnObjects: 0
     randomizeVisuals: 0
     absorptionDistanceRange: {x: 4, y: 25}
@@ -4731,10 +4731,10 @@ SceneRoots:
   - {fileID: 1515365024}
   - {fileID: 1129468870}
   - {fileID: 6925684577414460007}
+  - {fileID: 540877769}
   - {fileID: 941738704}
   - {fileID: 1373735737}
   - {fileID: 223329983}
   - {fileID: 2128112837}
   - {fileID: 729307703}
   - {fileID: 1923574414}
-  - {fileID: 540877769}
