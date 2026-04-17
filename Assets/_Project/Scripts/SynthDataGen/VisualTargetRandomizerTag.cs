@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
-using UnityEngine.Perception.Randomization.Scenarios;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
 using UnityEngine.Perception.Randomization.Randomizers.Tags;
-using System.Collections.Generic;
+using UnityEngine.Perception.Randomization.Scenarios;
 using UnityEngine.UIElements;
-using UnityEditor.EditorTools;
+using UnityEngine.Perception.Randomization.Utilities;
+
 
 
 
@@ -22,17 +24,34 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
     [AddComponentMenu("RoboSub/RandomizerTags/Visual Target Randomizer Tag")]
     public class VisualTargetRandomizerTag : RandomizerTag
     {
-        [Header("Targets")]
-        [Tooltip("Reference target all target will be set to.")]
-        public Transform referenceTarget;
+        [Header("Randomization Setup")]
         [Tooltip("The target objects to randomize, their children will be made to match the reference target's children (configs) with different materials and labels. Can be 1 or 2 targets, if 2 ensures different configs for each.")]
         public Transform[] targets;
+        [Tooltip("The configuration objects to use for randomization. A random config from this list will be applied to each target every iteration.")]
+        public GameObject[] configs;
+
+        // for each target, parent of all config variants used in cache and in editor, this allows editor to clean up anything inside this container when a new config needs to be spawned
+        public GameObject[] ConfigContainers { private set; get; }
 
         void Awake()
         {
-            SetTargetsToReference(); // ensure all targets start with the same visuals and labels as the reference before randomization begins
+            InitializeConfigContainers();
         }
-
+        public void InitializeConfigContainers()
+        {
+            if (targets == null) return;
+            if (ConfigContainers != null && ConfigContainers.Length == targets.Length) return; // already initialized
+            // initialize config containers for each target
+            ConfigContainers = new GameObject[targets.Length];
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (targets[i] != null)
+                {
+                    ConfigContainers[i] = new GameObject(targets[i].name + "_Configs");
+                    ConfigContainers[i].transform.SetParent(targets[i], false); // parent to target so it moves with it and is organized in the hierarchy
+                }
+            }
+        }
         public int GetTargetCount()
         {
             int count = 0;
@@ -49,82 +68,24 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         public int GetConfigCount()
         {
             // assume all targets have the same number of configs (child objects), so we just take first one.
-            // TODO add a validation method to check all targets have same number of configs and all children have Labeling + Material
-            return referenceTarget.transform.childCount;
+            return configs != null ? configs.Length : 0;
         }
-        /// <summary>
-        /// Clones the reference target's children into each target, so they all start with the same set of configs/variants. Then randomization will just enable/disable the existing children to ensure consistent pairing of visuals and labels.
-        /// </summary>
-        public void SetTargetsToReference()
+
+        public void ConfigureSpawnedObject(GameObject SpawnedObject)
         {
-            if (referenceTarget == null || targets == null) return;
-            // Clone the reference's children into every target anchor
-            foreach (Transform target in targets)
+            // reset local transform so that spawned config is positioned correctly relative to the target
+            SpawnedObject.transform.localPosition = Vector3.zero;
+            SpawnedObject.transform.localRotation = Quaternion.identity;
+
+            // Force Perception labeller to update immediately
+            foreach (Labeling l in SpawnedObject.GetComponentsInChildren<Labeling>())
             {
-                if (target == null) continue;
-                if (target == referenceTarget) continue; // skip the reference target
-                for (int i = target.childCount - 1; i >= 0; i--)
+                // check if the label's game object is conditionally labeled
+                if (l.gameObject.TryGetComponent<ConditionalLabeling>(out var cl))
                 {
-                    // Destroy existing children to ensure we start with a clean slate and avoid duplicates if this is called multiple times
-                    DestroyImmediate(target.GetChild(i).gameObject);
+                    l.enabled = cl.ShouldLabel(); // update the ConditionalLabeling state based on current camera position/angle
                 }
-                // iterate over reference child and copy into target
-                for (int i = 0; i < referenceTarget.transform.childCount; i++)
-                {
-                    Transform referenceChild = referenceTarget.transform.GetChild(i);
-
-                    // Instantiate clones the scene object exactly as it is
-                    GameObject clone = Instantiate(referenceChild.gameObject, target);
-
-                    // Reset local transforms so it perfectly snaps to the target anchor
-                    clone.transform.localPosition = Vector3.zero;
-                    clone.transform.localRotation = Quaternion.identity;
-
-                    // Inherit the scale from the reference child, while the parent anchor scales the whole thing
-                    clone.transform.localScale = referenceChild.localScale;
-
-                    // Ensure it starts disabled
-                    clone.SetActive(false);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Randomizes materials and labels. Enables the config at configIndex and disables the others.
-        /// </summary>
-        public void RandomizeMaterials(int targetIndex, int configIndex)
-        {
-            if (targets == null) return;
-            if (targetIndex < 0 || targetIndex >= targets.Length) return;
-            if (configIndex < 0 || configIndex >= GetConfigCount()) return;
-            ApplyConfig(targets[targetIndex], configIndex);
-        }
-
-        private void ApplyConfig(Transform target, int configIndex)
-        {
-            if (target == null) return;
-
-            for (int i = 0; i < GetConfigCount(); i++)
-            {
-                // Enable the selected config and disable the others
-                if (i == configIndex)
-                {
-                    target.transform.GetChild(i).gameObject.SetActive(true);
-                    // also update the labels to ensure ground truth matches the new visual
-                    foreach (Labeling l in target.transform.GetChild(i).gameObject.GetComponentsInChildren<Labeling>())
-                    {
-                        // check if the label's game object is conditionally labeled
-                        if (l.gameObject.TryGetComponent<ConditionalLabeling>(out var cl))
-                        {
-                            l.enabled = cl.ShouldLabel(); // update the ConditionalLabeling state based on current camera position/angle
-                        }
-                        if (l.isActiveAndEnabled) l.RefreshLabeling(); // refresh to ensure ground truth is updated with the new material/visual
-                    }
-                }
-                else
-                {
-                    target.transform.GetChild(i).gameObject.SetActive(false);
-                }
+                if (l.isActiveAndEnabled) l.RefreshLabeling(); // refresh to ensure ground truth is updated with the new material/visual
             }
         }
     }
@@ -157,7 +118,7 @@ public class VisualTargetRandomizerEditor : Editor
         {
             Undo.RecordObjects(GatherUndoObjects(script), "Reset Visual Targets");
 
-            script.SetTargetsToReference();
+            // script.SetTargetsToReference();
 
             foreach (var t in script.targets)
             {
@@ -186,9 +147,23 @@ public class VisualTargetRandomizerEditor : Editor
 
     private void GUIRandomizeMaterials(VisualTargetRandomizerTag script)
     {
+        script.InitializeConfigContainers();
         foreach (var (targetIndex, configIndex) in GetRandomConfigIndices(script.targets, script.GetConfigCount()))
         {
-            script.RandomizeMaterials(targetIndex, configIndex);
+            Transform target = script.targets[targetIndex];
+            if (target == null) continue;
+
+            Transform ConfigContainerT = script.ConfigContainers[targetIndex].transform;
+            while (ConfigContainerT.childCount > 0)
+            {
+                DestroyImmediate(ConfigContainerT.GetChild(0).gameObject);
+            }
+            GameObject prefabToSpawn = script.configs[configIndex];
+
+            Instantiate(prefabToSpawn, ConfigContainerT); // spawn the new config as a child of the target so it automatically gets cleaned up and organized in the hierarchy
+
+            // initialize newly selected config for this target
+            script.ConfigureSpawnedObject(prefabToSpawn);
         }
 
         foreach (var t in script.targets)
