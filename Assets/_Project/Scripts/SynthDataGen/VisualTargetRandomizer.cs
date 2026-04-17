@@ -18,7 +18,7 @@ public class VisualTargetRandomizer : Randomizer
 {
     #region Private Fields
     // Cache to store configs for each possible target, to avoid expensive GetChild calls every iteration. Key is the target Transform, value is a cache of its config GameObjects (child objects).
-    private Dictionary<Transform, GameObjectOneWayCache> _caches;
+    private Dictionary<Transform, GameObjectOneWayCache> _caches = new Dictionary<Transform, GameObjectOneWayCache>();
     // random state must be based on random state of FixedLengthScenario owned by BatchRunner, to ensure consistent reproducibility across all randomizers in the scenario
     private Unity.Mathematics.Random RandomState;
 
@@ -43,7 +43,7 @@ public class VisualTargetRandomizer : Randomizer
             }
 
             // Get shuffled config indices to ensure different configs for each target
-            int[] shuffledIndices = GetShuffledIndices(configCount);
+            int[] shuffledIndices = DataSynthRandom.GetShuffledIndices(configCount, RandomState);
 
             for (int i = 0; i < targetCount; i++)
             {
@@ -73,22 +73,6 @@ public class VisualTargetRandomizer : Randomizer
             }
 
         }
-    }
-    #endregion
-
-    #region Helpers
-    private int[] GetShuffledIndices(int count)
-    {
-        // Shuffle a copy of the config indices, then assign in order
-        // Fisher-Yates shuffle guarantees no two targets get the same config
-        int[] indices = Enumerable.Range(0, count).ToArray();
-        for (int i = indices.Length - 1; i > 0; i--)
-        {
-            int j = RandomState.NextInt(0, i + 1);
-            (indices[i], indices[j]) = (indices[j], indices[i]);
-            // index j is swapped to position i, and so after shuffle we do not touch config at index i again (due to i-- and upper bound of NextInt), ensuring it is not assigned to another target 
-        }
-        return indices;
     }
     #endregion
 }
