@@ -274,7 +274,7 @@ public class DVLPublisher : ROSPublisher
         }
 
         // 2. Check Publish Trigger (Adaptive Rate)
-        if (Time.time >= nextPublishTime)
+        if (ROSClock.GetROSTimestampNanoseconds() >= nextPublishTime)
         {
             ProcessVelocitySample();
 
@@ -292,7 +292,7 @@ public class DVLPublisher : ROSPublisher
                 // Linearly interpolate between 15Hz (shallow) and 4Hz (deep) 
                 rate = Mathf.Lerp(15.0f, 4.0f, LastAltitude / maxAltitude);
             }
-            nextPublishTime = Time.time + (1.0f / rate);
+            nextPublishTime = ROSClock.GetROSTimestampNanoseconds() + (1.0f / rate);
         }
         
         // Update visualization (always if enabled)
