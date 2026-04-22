@@ -118,7 +118,7 @@ public class DVLPublisher : ROSPublisher
     
     private Vector3 drPositionNED; // Cached NED position for UI property
 
-    private float nextPublishTime = 0;
+    private ROSTime nextPublishTime = new ROSTime(0);
     private GaussMarkovVector velocityBias;
     
     // Dead Reckoning State (Unity Frame)
@@ -274,7 +274,8 @@ public class DVLPublisher : ROSPublisher
         }
 
         // 2. Check Publish Trigger (Adaptive Rate)
-        if (ROSClock.GetROSTimestampNanoseconds() >= nextPublishTime)
+        ROSTime currentTime = ROSClock.GetROSTime();
+        if (currentTime.GetNanoSec() >= nextPublishTime.GetNanoSec())
         {
             ProcessVelocitySample();
 
@@ -292,7 +293,8 @@ public class DVLPublisher : ROSPublisher
                 // Linearly interpolate between 15Hz (shallow) and 4Hz (deep) 
                 rate = Mathf.Lerp(15.0f, 4.0f, LastAltitude / maxAltitude);
             }
-            nextPublishTime = ROSClock.GetROSTimestampNanoseconds() + (1.0f / rate);
+            // update next publish time based on current time + interval from rate
+            nextPublishTime.sec = currentTime.sec + (1.0f / rate);
         }
         
         // Update visualization (always if enabled)
