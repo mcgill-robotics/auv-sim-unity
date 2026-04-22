@@ -110,6 +110,7 @@ public class DVLPublisher : ROSPublisher
     // ROS-frame accessor for UI (Odom Frame - NED)
     // Uses the calculated relative position (North, East, Down) from UpdateDeadReckoningInternal
     public Vector3 RosDeadReckoningPosition => drPositionNED;
+    public Quaternion ROSDeadReckoningOrientation => drOrientation;
 
     // Internals
     private DvlMsg dvlMsg;
@@ -117,8 +118,10 @@ public class DVLPublisher : ROSPublisher
     private OdometryMsg odomMsg;
     
     private Vector3 drPositionNED; // Cached NED position for UI property
+    private Quaternion drOrientation;
 
     private ROSTime nextPublishTime = new ROSTime(0);
+    private ROSTime lastPublishTime = new ROSTime(0); // used to compute center of ping
     private GaussMarkovVector velocityBias;
     
     // Dead Reckoning State (Unity Frame)
@@ -148,6 +151,9 @@ public class DVLPublisher : ROSPublisher
     private Vector3 accumulatedVelocity;
     private int sampleCount;
     private float accumulatedTime;
+
+    // DVL JSON Driver
+    private DVLa50SimSender jsonSender;
 
     protected override void Start()
     {
@@ -204,6 +210,8 @@ public class DVLPublisher : ROSPublisher
         {
             visualizationRoot.SetActive(enableVisualization);
         }
+        // Check for JSON sender component for optional driver fallback
+        TryGetComponent<DVLa50SimSender>(out jsonSender);
     }
 
     private void SetupVisualization()
@@ -284,8 +292,17 @@ public class DVLPublisher : ROSPublisher
             {
                 PublishMessage();
             }
-            
+            else
+            {
+                if (jsonSender != null)
+                {
+                    // If ROS publishing is disabled but JSON sender exists, send JSON message for driver testing
+                    UpdateJSONReports();
+                }
+            }
+
             // Calculate next update time
+            lastPublishTime = nextPublishTime;
             float rate = 2.0f; // Default "Search" rate when lock is lost
             
             if (simulateAdaptiveRate && IsValid)
@@ -376,8 +393,70 @@ public class DVLPublisher : ROSPublisher
             dvlMsg.beam_quality[i] = BeamValid[i] ? 100f : 0f;
         }
     }
-    
-    
+
+    private void UpdateJSONReports()
+    {
+        if (jsonSender == null) return;
+        ROSTime time = ROSClock.GetROSTime();
+        // time of validity is the center of the ping, which we approximate as the current time minus half the interval since the last publish (since the velocity is effectively averaged over that interval)
+        long timeOfValidity = time.GetMicroSec() - (lastPublishTime.GetMicroSec() / 1000 / 2);
+        // Update the DVL JSON reports with the latest data for external driver testing
+        DVLJSONProtocol.VelocityReport velReport = new DVLJSONProtocol.VelocityReport
+        {
+            time = lastPublishTime.GetMilliSec(), // Convert back to milliseconds for the report
+            vx = RosVelocity.x,
+            vy = RosVelocity.y,
+            vz = RosVelocity.z,
+            fom = IsValid ? 100 : 0, // Figure of Merit based on validity
+            covariance = new double[][] {
+                new double[] { dvlMsg.velocity_covar[0], dvlMsg.velocity_covar[1], dvlMsg.velocity_covar[2] },
+                new double[] { dvlMsg.velocity_covar[3], dvlMsg.velocity_covar[4], dvlMsg.velocity_covar[5] },
+                new double[] { dvlMsg.velocity_covar[6], dvlMsg.velocity_covar[7], dvlMsg.velocity_covar[8] }
+            },
+            altitude = LastAltitude,
+            transducers = new DVLJSONProtocol.Transducer[]
+            {
+                GetTransducerData(0),
+                GetTransducerData(1),
+                GetTransducerData(2),
+                GetTransducerData(3)
+            },
+            velocity_valid = IsValid,
+            status = 0, // always valid for simplicity, DVL will not overheat in simulation
+            time_of_validity = timeOfValidity,
+            time_of_transmission = time.GetMicroSec(),
+            type = "velocity",
+        };
+        Vector3 DREulerAngles = ROSDeadReckoningOrientation.eulerAngles;
+        DVLJSONProtocol.DeadReckoningReport drReport = new DVLJSONProtocol.DeadReckoningReport
+        {
+            ts = time.GetSec(),
+            x = RosDeadReckoningPosition.x,
+            y = RosDeadReckoningPosition.y,
+            z = RosDeadReckoningPosition.z,
+            std = 0.1f, // Sensible default
+            roll = DREulerAngles.x,
+            pitch = DREulerAngles.y,
+            yaw = DREulerAngles.z,
+            status = 0, // always valid for simplicity, DR will not diverge in simulation
+            type = "position_local"
+        };
+        jsonSender.UpdateReports(velReport, drReport);
+    }
+
+    private DVLJSONProtocol.Transducer GetTransducerData(int index)
+    {
+        if (index < 0 || index >= 4) return null;
+        return new DVLJSONProtocol.Transducer
+        {
+            id = index,
+            velocity = Vector3.Dot(LastVelocity, beamDirectionsLocal[index]),
+            distance = Vector3.Distance(transform.position, BeamHitPoints[index]),
+            rssi = BeamValid[index] ? 100 : 0, // Simplified RSSI based on validity
+            nsd = BeamValid[index] ? 1.0 : 10.0, // Normalized Signal Strength (lower is better), simplified
+            beam_valid = BeamValid[index]
+        };
+    }
     /// <summary>
     /// Updates the DR and Odometry messages based on the latest simulation step.
     /// </summary>
@@ -419,8 +498,13 @@ public class DVLPublisher : ROSPublisher
         // q.w = q_unity.w
         
         Quaternion q = relativeRot;
-        drMsg.pose.pose.orientation = new QuaternionMsg(-q.z, -q.x, q.y, q.w);
-        
+        drOrientation = new Quaternion(-q.z, -q.x, q.y, q.w);
+
+        drMsg.pose.pose.orientation.x = drOrientation.x;
+        drMsg.pose.pose.orientation.y = drOrientation.y;
+        drMsg.pose.pose.orientation.z = drOrientation.z;
+        drMsg.pose.pose.orientation.w = drOrientation.w;
+
         // 4. Copy to Odometry
         odomMsg.pose.pose = drMsg.pose.pose; // Share reference or copy? Msg classes are distinct, copy fields.
         odomMsg.pose.pose.position = drMsg.pose.pose.position; // Reference copy OK for messages if not parallel access

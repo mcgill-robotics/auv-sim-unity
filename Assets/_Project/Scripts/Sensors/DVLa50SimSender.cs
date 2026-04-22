@@ -136,88 +136,22 @@ public class DVLa50SimSender : MonoBehaviour
     {
         return ROSClock.GetROSTimestampNanoseconds() / 1000; // Convert nanoseconds to microseconds
     }
-    // Fixed update to match physics update rate to update the stored DVL data report
-    void FixedUpdate()
+    /// <summary>
+    /// Update the DVL reports with new data. Both reports must be filled out except for format which is signed by the sender
+    /// </summary>
+    /// <param name="velReport"></param>
+    /// <param name="drReport"></param>
+    public void UpdateReports(DVLJSONProtocol.VelocityReport velReport, DVLJSONProtocol.DeadReckoningReport drReport)
     {
-        long currentTime = GetTimeMicroseconds();
-        // TODO replace with actual data retrieval
-        // Update the DVL reports with random data, lock to ensure thread safety since the server thread may be reading these reports at the same time to send to clients
+        // lock to ensure thread safety since the server thread may be reading these reports at the same time to send to clients
         lock (_reportLock)
         {
-            currentVelocityReport = new DVLJSONProtocol.VelocityReport
-            {
-                time = currentTime - lastPublishTime,
-                vx = UnityEngine.Random.Range(-5f, 5f),
-                vy = UnityEngine.Random.Range(-5f, 5f),
-                vz = UnityEngine.Random.Range(-5f, 5f),
-                fom = UnityEngine.Random.Range(0.1f, 1f),
-                covariance = new double[][]
-                    {
-                        new double[] { UnityEngine.Random.Range(0.1f, 1f), 0, 0 },
-                        new double[] { 0, UnityEngine.Random.Range(0.1f, 1f), 0 },
-                        new double[] { 0, 0, UnityEngine.Random.Range(0.1f, 1f) }
-                    },
-                altitude = UnityEngine.Random.Range(0.1f, 10f),
-                transducers = new List<DVLJSONProtocol.Transducer>
-                    {
-                        new DVLJSONProtocol.Transducer
-                        {
-                            id = 0,
-                            velocity = UnityEngine.Random.Range(-5f, 5f),
-                            distance = UnityEngine.Random.Range(0.1f, 10f),
-                            rssi = UnityEngine.Random.Range(0.1f, 1f),
-                            nsi = UnityEngine.Random.Range(0.1f, 1f),
-                            beam_valid = true
-                        },
-                        new DVLJSONProtocol.Transducer
-                        {
-                            id = 1,
-                            velocity = UnityEngine.Random.Range(-5f, 5f),
-                            distance = UnityEngine.Random.Range(0.1f, 10f),
-                            rssi = UnityEngine.Random.Range(0.1f, 1f),
-                            nsi = UnityEngine.Random.Range(0.1f, 1f),
-                            beam_valid = true
-                        },
-                        new DVLJSONProtocol.Transducer
-                        {
-                            id = 2,
-                            velocity = UnityEngine.Random.Range(-5f, 5f),
-                            distance = UnityEngine.Random.Range(0.1f, 10f),
-                            rssi = UnityEngine.Random.Range(0.1f, 1f),
-                            nsi = UnityEngine.Random.Range(0.1f, 1f),
-                            beam_valid = true
-                        },
-                        new DVLJSONProtocol.Transducer
-                        {
-                            id = 3,
-                            velocity = UnityEngine.Random.Range(-5f, 5f),
-                            distance = UnityEngine.Random.Range(0.1f, 10f),
-                            rssi = UnityEngine.Random.Range(0.1f, 1f),
-                            nsi = UnityEngine.Random.Range(0.1f, 1f),
-                            beam_valid = true
-                        },
-                    },
-                velocity_valid = true,
-                status = (byte)DVLJSONProtocol.Status.OK,
-                time_of_validity = (long)UnityEngine.Random.Range(lastPublishTime, currentTime), // choose random time between last publish and now for when the ping reached the bottom
-                time_of_transmission = currentTime,
-                format = PROTOCOL_VERSION,
-                type = "velocity"
-            };
-            currentDeadReckoningReport = new DVLJSONProtocol.DeadReckoningReport
-            {
-                ts = currentTime,
-                x = UnityEngine.Random.Range(-10f, 10f),
-                y = UnityEngine.Random.Range(-10f, 10f),
-                z = UnityEngine.Random.Range(-10f, 10f),
-                std = UnityEngine.Random.Range(0.1f, 1f),
-                roll = UnityEngine.Random.Range(-180f, 180f),
-                pitch = UnityEngine.Random.Range(-180f, 180f),
-                yaw = UnityEngine.Random.Range(-180f, 180f),
-                type = "position_local",
-                status = (byte)DVLJSONProtocol.Status.OK,
-                format = PROTOCOL_VERSION
-            };
+            currentVelocityReport = velReport;
+            // fill values not set by caller
+            currentVelocityReport.format = PROTOCOL_VERSION;
+            currentDeadReckoningReport = drReport;
+            // fill values not set by caller
+            currentDeadReckoningReport.format = PROTOCOL_VERSION;
         }
     }
 
@@ -312,7 +246,7 @@ public class DVLa50SimSender : MonoBehaviour
                     localVelReport = currentVelocityReport;
                 }
 
-                Debug.Log("Serializing DVL reports to JSON...");
+                // Debug.Log("Serializing DVL reports to JSON...");
                 string jsonPositionReport = JsonConvert.SerializeObject(localDrReport);
                 string jsonVelocityReport = JsonConvert.SerializeObject(localVelReport);
 
