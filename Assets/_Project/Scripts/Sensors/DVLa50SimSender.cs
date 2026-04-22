@@ -7,91 +7,93 @@ using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using UnityEngine;
-public enum DVLStatus : byte
+namespace DVLJSONProtocol
 {
-    //bit mask where bit 0 set 1 to is high temperature, 0 otherwise
-    OK = 0,
-    HighTemperature = 1 << 0 // shift 1 to the left by 0 positions to set bit 0 to 1
-}
-
-// from https://docs.waterlinked.com/dvl/dvl-protocol/
-[Serializable]
-class DVLTransducer
-{
-    public int id;
-    public double velocity;
-    public double distance;
-    public double rssi;
-    public double nsi;
-    public bool beam_valid;
-}
-[Serializable]
-class DVLVelocityReport
-{
-    public long time;
-    public double vx;
-    public double vy;
-    public double vz;
-    public double fom;
-    public double[][] covariance;
-    public double altitude;
-    public List<DVLTransducer> transducers;
-    public bool velocity_valid;
-    public byte status;
-    public long time_of_validity;
-    public long time_of_transmission;
-    public string format;
-    public string type;
-}
-
-[Serializable]
-class DVLDeadReckoningReport
-{
-    public long ts;
-    public double x;
-    public double y;
-    public double z;
-    public double std;
-    public double roll;
-    public double pitch;
-    public double yaw;
-    public string type;
-    public byte status;
-    public string format;
-}
-
-[Serializable]
-class DVLCommand
-{
-    public string command;
-    public Dictionary<string, object> parameters;
-}
-
-[Serializable]
-class DVLCommandResponse
-{
-    public string response_to;
-    public bool success;
-    public string error_message;
-    public Dictionary<string, object> result;
-    public string format;
-    public string type;
-
-    // Factory method to create a default response with success=true and no error message, we could also add the defaults to the parameters about but that may lead to unpredictable behaviour if we forget to set something for a specific command response, this way we ensure all responses have consistent default values and we can easily update the defaults in one place if needed
-    public static DVLCommandResponse GetDefault(string CommandName)
+    public enum Status : byte
     {
-        return new DVLCommandResponse
+        //bit mask where bit 0 set 1 to is high temperature, 0 otherwise
+        OK = 0,
+        HighTemperature = 1 << 0 // shift 1 to the left by 0 positions to set bit 0 to 1
+    }
+
+    // from https://docs.waterlinked.com/dvl/dvl-protocol/
+    [Serializable]
+    public class Transducer
+    {
+        public int id;
+        public double velocity;
+        public double distance;
+        public double rssi;
+        public double nsi;
+        public bool beam_valid;
+    }
+    [Serializable]
+    public class VelocityReport
+    {
+        public long time;
+        public double vx;
+        public double vy;
+        public double vz;
+        public double fom;
+        public double[][] covariance;
+        public double altitude;
+        public List<Transducer> transducers;
+        public bool velocity_valid;
+        public byte status;
+        public long time_of_validity;
+        public long time_of_transmission;
+        public string format;
+        public string type;
+    }
+
+    [Serializable]
+    public class DeadReckoningReport
+    {
+        public long ts;
+        public double x;
+        public double y;
+        public double z;
+        public double std;
+        public double roll;
+        public double pitch;
+        public double yaw;
+        public string type;
+        public byte status;
+        public string format;
+    }
+
+    [Serializable]
+    public class Command
+    {
+        public string command;
+        public Dictionary<string, object> parameters;
+    }
+
+    [Serializable]
+    public class CommandResponse
+    {
+        public string response_to;
+        public bool success;
+        public string error_message;
+        public Dictionary<string, object> result;
+        public string format;
+        public string type;
+
+        // Factory method to create a default response with success=true and no error message, we could also add the defaults to the parameters about but that may lead to unpredictable behaviour if we forget to set something for a specific command response, this way we ensure all responses have consistent default values and we can easily update the defaults in one place if needed
+        public static CommandResponse GetDefault(string CommandName)
         {
-            response_to = CommandName,
-            success = true,
-            error_message = "",
-            result = null,
-            format = DVLa50SimSender.PROTOCOL_VERSION,
-            type = "response"
-        };
+            return new CommandResponse
+            {
+                response_to = CommandName,
+                success = true,
+                error_message = "",
+                result = null,
+                format = DVLa50SimSender.PROTOCOL_VERSION,
+                type = "response"
+            };
+        }
     }
 }
-
 public class DVLa50SimSender : MonoBehaviour
 {
     public static string PROTOCOL_VERSION = "json_v3.1";
@@ -108,8 +110,8 @@ public class DVLa50SimSender : MonoBehaviour
     [SerializeField] private int publishRateHz = 10; // how often to send messages (in Hz)
 
     // DVL components
-    DVLDeadReckoningReport currentDeadReckoningReport; // store the most recent DVL dead reckoning report to send to clients when they request it
-    DVLVelocityReport currentVelocityReport; // same for velocity
+    public DVLJSONProtocol.DeadReckoningReport currentDeadReckoningReport; // store the most recent DVL dead reckoning report to send to clients when they request it
+    public DVLJSONProtocol.VelocityReport currentVelocityReport; // same for velocity
     long lastPublishTime = 0;
     private readonly object _reportLock = new object(); // lock to ensure reports are thread safe
     // Network Stream Lock
@@ -142,7 +144,7 @@ public class DVLa50SimSender : MonoBehaviour
         // Update the DVL reports with random data, lock to ensure thread safety since the server thread may be reading these reports at the same time to send to clients
         lock (_reportLock)
         {
-            currentVelocityReport = new DVLVelocityReport
+            currentVelocityReport = new DVLJSONProtocol.VelocityReport
             {
                 time = currentTime - lastPublishTime,
                 vx = UnityEngine.Random.Range(-5f, 5f),
@@ -156,9 +158,9 @@ public class DVLa50SimSender : MonoBehaviour
                         new double[] { 0, 0, UnityEngine.Random.Range(0.1f, 1f) }
                     },
                 altitude = UnityEngine.Random.Range(0.1f, 10f),
-                transducers = new List<DVLTransducer>
+                transducers = new List<DVLJSONProtocol.Transducer>
                     {
-                        new DVLTransducer
+                        new DVLJSONProtocol.Transducer
                         {
                             id = 0,
                             velocity = UnityEngine.Random.Range(-5f, 5f),
@@ -167,7 +169,7 @@ public class DVLa50SimSender : MonoBehaviour
                             nsi = UnityEngine.Random.Range(0.1f, 1f),
                             beam_valid = true
                         },
-                        new DVLTransducer
+                        new DVLJSONProtocol.Transducer
                         {
                             id = 1,
                             velocity = UnityEngine.Random.Range(-5f, 5f),
@@ -176,7 +178,7 @@ public class DVLa50SimSender : MonoBehaviour
                             nsi = UnityEngine.Random.Range(0.1f, 1f),
                             beam_valid = true
                         },
-                        new DVLTransducer
+                        new DVLJSONProtocol.Transducer
                         {
                             id = 2,
                             velocity = UnityEngine.Random.Range(-5f, 5f),
@@ -185,7 +187,7 @@ public class DVLa50SimSender : MonoBehaviour
                             nsi = UnityEngine.Random.Range(0.1f, 1f),
                             beam_valid = true
                         },
-                        new DVLTransducer
+                        new DVLJSONProtocol.Transducer
                         {
                             id = 3,
                             velocity = UnityEngine.Random.Range(-5f, 5f),
@@ -196,13 +198,13 @@ public class DVLa50SimSender : MonoBehaviour
                         },
                     },
                 velocity_valid = true,
-                status = (byte)DVLStatus.OK,
+                status = (byte)DVLJSONProtocol.Status.OK,
                 time_of_validity = (long)UnityEngine.Random.Range(lastPublishTime, currentTime), // choose random time between last publish and now for when the ping reached the bottom
                 time_of_transmission = currentTime,
                 format = PROTOCOL_VERSION,
                 type = "velocity"
             };
-            currentDeadReckoningReport = new DVLDeadReckoningReport
+            currentDeadReckoningReport = new DVLJSONProtocol.DeadReckoningReport
             {
                 ts = currentTime,
                 x = UnityEngine.Random.Range(-10f, 10f),
@@ -213,7 +215,7 @@ public class DVLa50SimSender : MonoBehaviour
                 pitch = UnityEngine.Random.Range(-180f, 180f),
                 yaw = UnityEngine.Random.Range(-180f, 180f),
                 type = "position_local",
-                status = (byte)DVLStatus.OK,
+                status = (byte)DVLJSONProtocol.Status.OK,
                 format = PROTOCOL_VERSION
             };
         }
@@ -363,7 +365,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         try
         {
-            DVLCommand command = JsonConvert.DeserializeObject<DVLCommand>(jsonCommand);
+            DVLJSONProtocol.Command command = JsonConvert.DeserializeObject<DVLJSONProtocol.Command>(jsonCommand);
             Debug.Log($"Processing command: {command.command}");
             switch (command.command)
             {
@@ -392,7 +394,7 @@ public class DVLa50SimSender : MonoBehaviour
                     return SendConfigResponse();
                 default:
                     Debug.LogWarning($"Unknown command: {command.command}");
-                    DVLCommandResponse unknownCmd = new DVLCommandResponse
+                    DVLJSONProtocol.CommandResponse unknownCmd = new DVLJSONProtocol.CommandResponse
                     {
                         response_to = command.command,
                         success = false,
@@ -407,7 +409,7 @@ public class DVLa50SimSender : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError("DVLa50SimSender: Failed to process command - " + e.Message);
-            DVLCommandResponse errorResponse = new DVLCommandResponse
+            DVLJSONProtocol.CommandResponse errorResponse = new DVLJSONProtocol.CommandResponse
             {
                 response_to = "unknown",
                 success = false,
@@ -424,7 +426,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         // Simulate resetting dead reckoning
         // TODO actually reset position to (0,0,0) and maybe add some random noise to simulate realignment uncertainty
-        DVLCommandResponse reset_dr = DVLCommandResponse.GetDefault("reset_dead_reckoning");
+        DVLJSONProtocol.CommandResponse reset_dr = DVLJSONProtocol.CommandResponse.GetDefault("reset_dead_reckoning");
         Debug.Log("Dead reckoning reset.");
         return JsonConvert.SerializeObject(reset_dr);
     }
@@ -433,7 +435,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         // Simulate gyro calibration delay
         // TODO actually do calibration
-        DVLCommandResponse calibrate_gyro = DVLCommandResponse.GetDefault("calibrate_gyro");
+        DVLJSONProtocol.CommandResponse calibrate_gyro = DVLJSONProtocol.CommandResponse.GetDefault("calibrate_gyro");
         Debug.Log("Gyro calibration complete.");
         return JsonConvert.SerializeObject(calibrate_gyro);
     }
@@ -442,7 +444,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         // Simulate ping delay and response
         // TODO actually trigger each of the 15 external pings
-        DVLCommandResponse trigger_ping = DVLCommandResponse.GetDefault("trigger_ping");
+        DVLJSONProtocol.CommandResponse trigger_ping = DVLJSONProtocol.CommandResponse.GetDefault("trigger_ping");
         Debug.Log("DVL ping triggered.");
         return JsonConvert.SerializeObject(trigger_ping);
     }
@@ -451,7 +453,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         // Simulate sending config
         // TODO actually query config parameters
-        DVLCommandResponse get_config = new DVLCommandResponse
+        DVLJSONProtocol.CommandResponse get_config = new DVLJSONProtocol.CommandResponse
         {
             response_to = "get_config",
             success = true,
@@ -476,7 +478,7 @@ public class DVLa50SimSender : MonoBehaviour
     {
         // Simulate setting config
         // TODO actually change parameters where needed
-        DVLCommandResponse set_config = DVLCommandResponse.GetDefault("set_config");
+        DVLJSONProtocol.CommandResponse set_config = DVLJSONProtocol.CommandResponse.GetDefault("set_config");
         Debug.Log("DVL configuration updated.");
         return JsonConvert.SerializeObject(set_config);
     }
