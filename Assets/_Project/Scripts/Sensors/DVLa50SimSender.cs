@@ -24,7 +24,7 @@ namespace DVLJSONProtocol
         public double velocity;
         public double distance;
         public double rssi;
-        public double nsi;
+        public double nsd;
         public bool beam_valid;
     }
     [Serializable]
@@ -37,7 +37,7 @@ namespace DVLJSONProtocol
         public double fom;
         public double[][] covariance;
         public double altitude;
-        public List<Transducer> transducers;
+        public Transducer[] transducers;
         public bool velocity_valid;
         public byte status;
         public long time_of_validity;
@@ -110,8 +110,8 @@ public class DVLa50SimSender : MonoBehaviour
     [SerializeField] private int publishRateHz = 10; // how often to send messages (in Hz)
 
     // DVL components
-    public DVLJSONProtocol.DeadReckoningReport currentDeadReckoningReport; // store the most recent DVL dead reckoning report to send to clients when they request it
-    public DVLJSONProtocol.VelocityReport currentVelocityReport; // same for velocity
+    DVLJSONProtocol.DeadReckoningReport currentDeadReckoningReport; // store the most recent DVL dead reckoning report to send to clients when they request it
+    DVLJSONProtocol.VelocityReport currentVelocityReport; // same for velocity
     long lastPublishTime = 0;
     private readonly object _reportLock = new object(); // lock to ensure reports are thread safe
     // Network Stream Lock
@@ -297,26 +297,28 @@ public class DVLa50SimSender : MonoBehaviour
 
             while (isServerRunning && client.Connected && stream.CanWrite)
             {
-                string jsonVelocityReport;
-                string jsonPositionReport;
-                // Check if the DVL reports have been initialized yet, if not skip this publish cycle to avoid sending empty data to clients
                 if (currentVelocityReport == null || currentDeadReckoningReport == null)
                 {
-                    Debug.LogWarning("DVL reports not initialized yet, skipping this publish cycle.");
-                    await System.Threading.Tasks.Task.Delay(100); // wait a bit before trying again
+                    await System.Threading.Tasks.Task.Delay(100);
                     continue;
                 }
-                // lock and quickly serialize velocity and position reports
+
+                DVLJSONProtocol.DeadReckoningReport localDrReport;
+                DVLJSONProtocol.VelocityReport localVelReport;
+
                 lock (_reportLock)
                 {
-                    jsonPositionReport = JsonConvert.SerializeObject(currentDeadReckoningReport);
-                    jsonVelocityReport = JsonConvert.SerializeObject(currentVelocityReport);
+                    localDrReport = currentDeadReckoningReport;
+                    localVelReport = currentVelocityReport;
                 }
 
-                SendLine(stream, jsonPositionReport);
-                SendLine(stream, jsonVelocityReport);
+                Debug.Log("Serializing DVL reports to JSON...");
+                string jsonPositionReport = JsonConvert.SerializeObject(localDrReport);
+                string jsonVelocityReport = JsonConvert.SerializeObject(localVelReport);
 
-                // Wait for the next publish interval
+                await SendLine(stream, jsonPositionReport);
+                await SendLine(stream, jsonVelocityReport);
+
                 await System.Threading.Tasks.Task.Delay(1000 / publishRateHz);
             }
         }
@@ -326,17 +328,12 @@ public class DVLa50SimSender : MonoBehaviour
         }
     }
 
-    async private void SendLine(NetworkStream stream, string jsonString)
+    async private System.Threading.Tasks.Task SendLine(NetworkStream stream, string jsonString)
     {
         try
         {
-            // separate messages with newline for easy parsing on client side\
             byte[] data = Encoding.ASCII.GetBytes(jsonString + '\n');
-            lock (_streamWriteLock)
-            {
-                // Send the message to the client asynchronously
-                stream.Write(data, 0, data.Length);
-            }
+            await stream.WriteAsync(data, 0, data.Length);
         }
         catch (Exception e)
         {
@@ -345,17 +342,23 @@ public class DVLa50SimSender : MonoBehaviour
     }
     async private System.Threading.Tasks.Task ReadDataFromClient(NetworkStream stream)
     {
-        while (isServerRunning && client.Connected && stream.CanWrite)
+        // Define the reader outside the loop
+        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true))
         {
-            if (stream.DataAvailable)
+            while (isServerRunning && client.Connected)
             {
-                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true))
+                try
                 {
                     string jsonCommand = await reader.ReadLineAsync();
-                    if (jsonCommand == null) break; // Client disconnected
+
+                    if (jsonCommand == null) break; // Client disconnected gracefully
+
                     string response = await ProcessCommand(jsonCommand);
-                    // immediately send response back to client
-                    SendLine(stream, response);
+                    await SendLine(stream, response);
+                }
+                catch (IOException)
+                {
+                    break; // Connection lost or stream closed
                 }
             }
         }
