@@ -185,12 +185,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   referenceTarget: {fileID: 4736560086625909873}
   targets:
-  - {fileID: 4214278606299907990}
-  configs:
-  - material: {fileID: 2100000, guid: 53ec33cfe419c7084b683e3091a36623, type: 2}
-    label: 
-  - material: {fileID: 2100000, guid: 8acd449d6875a738a959105cb517f9f3, type: 2}
-    label: 
+  - {fileID: 4736560086625909873}
 --- !u!114 &3220821329936287380
 MonoBehaviour:
   m_ObjectHideFlags: 0
