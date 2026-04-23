@@ -12,20 +12,31 @@ using UnityEngine.Perception.Randomization.Utilities;
 /// Randomizes materials and labels on 1 or 2 quads (e.g., Gate targets or Task Boards) every frame.
 /// Pairs each material with a specific label to ensure ground truth matches the visual.
 /// </summary>
-[Serializable]
-[AddRandomizerMenu("RoboSub/Visual Target Randomizer")]
-public class VisualTargetRandomizer : Randomizer
+public class VisualTargetRandomizer : MonoBehaviour
 {
-    #region Private Fields
-    // Cache to store configs for each possible target, to avoid expensive GetChild calls every iteration. Key is the target Transform, value is a cache of its config GameObjects (child objects).
-    private Dictionary<Transform, GameObjectOneWayCache> _caches = new Dictionary<Transform, GameObjectOneWayCache>();
-    // random state must be based on random state of FixedLengthScenario owned by BatchRunner, to ensure consistent reproducibility across all randomizers in the scenario
-    private Unity.Mathematics.Random RandomState;
+    [System.Serializable]
+    public struct MaterialLabelConfig
+    {
+        public Material material;
+        public string label;
+    }
 
-    #endregion
+    [Header("Targets")]
+    [Tooltip("Assign 1 quad (for Board) or 2 quads (for Gate)")]
+    public MeshRenderer[] targets;
 
-    #region Randomizer Lifecycle
-    protected override void OnIterationStart()
+    [Header("Configurations")]
+    [Tooltip("List of material/label pairs to pick from.")]
+    public MaterialLabelConfig[] configs;
+
+    private int _lastIteration = -1;
+
+    private void Start()
+    {
+        RandomizeMaterials();
+    }
+
+    private void Update()
     {
         // SamplerState is statically set by FixedLengthScenario through reflection, so we can rely on it to set the seed consistently
         RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
@@ -39,40 +50,82 @@ public class VisualTargetRandomizer : Randomizer
 
             if (targetCount == 0 || configCount == 0)
             {
-                continue; // Nothing to randomize
-            }
-
-            // Get shuffled config indices to ensure different configs for each target
-            int[] shuffledIndices = DataSynthRandom.GetShuffledIndices(configCount, RandomState);
-
-            for (int i = 0; i < targetCount; i++)
-            {
-                Transform target = tag.targets[i];
-                if (target == null) continue;
-
-                // Wrap around if there are fewer configs than targets
-                GameObject prefabToSpawn = tag.configs[shuffledIndices[i % configCount]];
-
-                // Lazy initialize cache for this target if it doesn't exist yet
-                if (!_caches.TryGetValue(target, out var cache))
+                int secondIndex;
+                do
                 {
-                    // Cache is parented to the container target so that objects are organized in the hierarchy and automatically cleaned up if target is destroyed
-                    cache = new GameObjectOneWayCache(tag.ConfigContainers[i].transform, tag.configs, this);
-                    _caches[target] = cache;
-                }
+                    secondIndex = Random.Range(0, configs.Length);
+                } while (secondIndex == firstIndex);
 
-                // Disable previous config (if any) and return to cache
-                cache.ResetAllObjects();
-
-                // initialize newly selected config for this target
-                GameObject activeVariant = cache.GetOrInstantiate(prefabToSpawn);
-
-                // Configure the spawned config's transform and labeling based on the tag's setup
-                tag.ConfigureSpawnedObject(activeVariant);
-
+                ApplyConfig(targets[1], configs[secondIndex]);
             }
-
+            else
+            {
+                // Fallback if only 1 config provided
+                ApplyConfig(targets[1], configs[firstIndex]);
+            }
         }
     }
-    #endregion
+
+    private void ApplyConfig(MeshRenderer target, MaterialLabelConfig config)
+    {
+        if (target == null) return;
+
+        // Apply Material
+        target.sharedMaterial = config.material;
+
+        // Apply Labeling
+        if (target.TryGetComponent<Labeling>(out var labeling))
+        {
+            labeling.labels.Clear();
+            if (!string.IsNullOrEmpty(config.label))
+            {
+                labeling.labels.Add(config.label);
+            }
+            labeling.RefreshLabeling();
+        }
+    }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(VisualTargetRandomizer))]
+public class VisualTargetRandomizerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        VisualTargetRandomizer script = (VisualTargetRandomizer)target;
+
+        EditorGUILayout.Space();
+        GUI.backgroundColor = Color.cyan;
+        if (GUILayout.Button("Randomize Materials & Labels Now", GUILayout.Height(30)))
+        {
+            if (script.targets != null)
+            {
+                // Gather targets and their labeling components for Undo
+                var objectsToUndo = new System.Collections.Generic.List<Object>();
+                foreach (var t in script.targets)
+                {
+                    if (t == null) continue;
+                    objectsToUndo.Add(t);
+                    if (t.TryGetComponent<Labeling>(out var l)) objectsToUndo.Add(l);
+                }
+
+                Undo.RecordObjects(objectsToUndo.ToArray(), "Randomize Visual Targets");
+
+                script.RandomizeMaterials();
+
+                foreach (var t in script.targets)
+                {
+                    if (t != null)
+                    {
+                        EditorUtility.SetDirty(t);
+                        if (t.TryGetComponent<Labeling>(out var l)) EditorUtility.SetDirty(l);
+                    }
+                }
+            }
+        }
+        GUI.backgroundColor = Color.white;
+    }
+}
+#endif

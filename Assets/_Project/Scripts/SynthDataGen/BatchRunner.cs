@@ -34,9 +34,6 @@ public class BatchRunner : MonoBehaviour
     private FixedLengthScenario _scenario;
     private List<BatchRuntimeInfo> _schedule = new List<BatchRuntimeInfo>();
     private int _currentBatchIndex = -1;
-    private float lastTime = 0f;
-    // Use Stopwatch instead of Time.DeltaTime to compute actual runtime instead of time between frames, so not just game time but actual time taken to execute each batch
-    private System.Diagnostics.Stopwatch watch;
 
     // Randomizers
     private PoolFloorPlacementRandomizer _placementRandomizer;
@@ -77,7 +74,7 @@ public class BatchRunner : MonoBehaviour
             _scenario.constants.iterationCount = totalIterations;
 
             Debug.Log($"[BatchRunner] Simulation configured for {totalIterations} total iterations across {_schedule.Count} batches.");
-            watch = System.Diagnostics.Stopwatch.StartNew();
+
             // Apply first batch immediately
             UpdateBatchConfig(0);
         }
