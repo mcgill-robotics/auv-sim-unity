@@ -17,18 +17,18 @@ public class ConditionalLabeling : MonoBehaviour
     [Header("Distance Filter")]
     [Tooltip("Enable distance-based filtering.")]
     public bool useDistanceFilter = true;
-    
+
     [Tooltip("Maximum distance (meters) at which the object is labeled.")]
     public float maxDistance = 15f;
 
     [Header("Angle Filter")]
     [Tooltip("Enable angle-based filtering.")]
     public bool useAngleFilter = true;
-    
+
     [Tooltip("Max angle from head-on view (0=strictly front, 90=any angle).")]
     [Range(0, 90)]
     public float maxViewAngle = 60f;
-    
+
     [Tooltip("If true, also allows seeing the back face.")]
     public bool allowBackFace = true;
 
@@ -36,42 +36,43 @@ public class ConditionalLabeling : MonoBehaviour
 
     void Start()
     {
-      _labeling = GetComponent<Labeling>();
-      
-      if (perceptionCamera == null && Camera.main != null)
-          perceptionCamera = Camera.main.transform;
+        _labeling = GetComponent<Labeling>();
+
+        if (perceptionCamera == null && Camera.main != null)
+            perceptionCamera = Camera.main.transform;
     }
 
     void Update()
     {
-      if (perceptionCamera == null || _labeling == null) return;
+        _labeling.enabled = ShouldLabel();
+    }
 
-      bool shouldLabel = true;
+    public bool ShouldLabel()
+    {
+        if (perceptionCamera == null || _labeling == null) return false;
 
-      // 1. Distance Check
-      if (useDistanceFilter)
-      {
-          float distance = Vector3.Distance(transform.position, perceptionCamera.position);
-          if (distance > maxDistance)
-              shouldLabel = false;
-      }
 
-      // 2. Angle Check (only if still passing)
-      if (shouldLabel && useAngleFilter)
-      {
-          Vector3 cameraToObj = transform.position - perceptionCamera.position;
-          float angle = Vector3.Angle(transform.forward, -cameraToObj);
+        // 1. Distance Check
+        if (useDistanceFilter)
+        {
+            float distance = Vector3.Distance(transform.position, perceptionCamera.position);
+            if (distance > maxDistance)
+                return false; // too far, no need to check angle
+        }
 
-          bool isValidAngle = angle <= maxViewAngle;
-          if (!isValidAngle && allowBackFace)
-              isValidAngle = angle >= (180f - maxViewAngle);
+        // 2. Angle Check (only if still passing)
+        if (useAngleFilter)
+        {
+            Vector3 cameraToObj = transform.position - perceptionCamera.position;
+            float angle = Vector3.Angle(transform.forward, -cameraToObj);
 
-          if (!isValidAngle)
-              shouldLabel = false;
-      }
+            bool isValidAngle = angle <= maxViewAngle;
+            if (!isValidAngle && allowBackFace)
+                isValidAngle = angle >= (180f - maxViewAngle);
 
-      // 3. Apply result
-      if (_labeling.enabled != shouldLabel)
-          _labeling.enabled = shouldLabel;
+            if (!isValidAngle)
+                return false;
+        }
+        return true;
     }
 }

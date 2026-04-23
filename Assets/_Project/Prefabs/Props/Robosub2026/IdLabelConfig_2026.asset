@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f09f279848e42cea259348b13bce4c5, type: 3}
+  m_Name: IdLabelConfig_2026
+  m_EditorClassIdentifier: 
+  m_LabelEntries:
+  - label: gate
+    id: 0
+    hierarchyRelation: 0
+  - label: lane_marker
+    id: 1
+    hierarchyRelation: 0
+  - label: red_pipe
+    id: 2
+    hierarchyRelation: 0
+  - label: white_pipe
+    id: 3
+    hierarchyRelation: 0
+  - label: octagon
+    id: 4
+    hierarchyRelation: 0
+  - label: table
+    id: 5
+    hierarchyRelation: 0
+  - label: bin
+    id: 6
+    hierarchyRelation: 0
+  - label: board
+    id: 7
+    hierarchyRelation: 0
+  - label: survey_repair
+    id: 8
+    hierarchyRelation: 0
+  - label: search_rescue
+    id: 9
+    hierarchyRelation: 0
+  - label: compass
+    id: 10
+    hierarchyRelation: 0
+  - label: tools
+    id: 11
+    hierarchyRelation: 0
+  - label: lifebuoy
+    id: 12
+    hierarchyRelation: 0
+  - label: sos
+    id: 13
+    hierarchyRelation: 0
+  - label: fire
+    id: 14
+    hierarchyRelation: 0
+  - label: blood
+    id: 15
+    hierarchyRelation: 0
+  - label: bandaid
+    id: 16
+    hierarchyRelation: 0
+  - label: pill
+    id: 17
+    hierarchyRelation: 0
+  - label: nutbolt
+    id: 18
+    hierarchyRelation: 0
+  - label: electric
+    id: 19
+    hierarchyRelation: 0
+  - label: redcross_helmet
+    id: 20
+    hierarchyRelation: 0
+  - label: warning
+    id: 21
+    hierarchyRelation: 0
+  autoAssignIds: 1
+  startingLabelId: 0
