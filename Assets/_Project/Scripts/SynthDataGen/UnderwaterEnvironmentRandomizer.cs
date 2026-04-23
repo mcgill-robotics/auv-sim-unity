@@ -4,10 +4,9 @@ using UnityEngine.Perception.Randomization.Randomizers;
 using UnityEngine.Perception.Randomization.Samplers;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
-
+using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorRgbParameter;
 // Alias to resolve ambiguity with UnityEngine.Rendering.FloatParameter
 using PerceptionFloatParameter = UnityEngine.Perception.Randomization.Parameters.FloatParameter;
-using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorRgbParameter;
 
 /// <summary>
 /// Randomizes underwater environment properties for synthetic data generation.
@@ -18,28 +17,28 @@ using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorR
 public class UnderwaterEnvironmentRandomizer : Randomizer
 {
     #region References
-    
+
     [Header("Scene References")]
     [Tooltip("The Global Volume controlling Post-Processing (Fog, Exposure, Grain)")]
     public Volume globalVolume;
-    
+
     [Tooltip("The HDRP Water Surface component")]
     public WaterSurface waterSurface;
-    
+
     [Tooltip("The Planar Reflection Probe for water surface reflections")]
     public PlanarReflectionProbe planarReflectionProbe;
-    
+
     [Tooltip("The Directional Light representing the sun")]
     public Light sunLight;
-    
+
     #endregion
-    
+
     #region Water Parameters
-    
+
     [Header("Water Visibility")]
     [Tooltip("Low values (3-8m) = Murky/Muddy. High values (20-50m) = Crystal Clear.")]
     public PerceptionFloatParameter absorptionDistance = new PerceptionFloatParameter { value = new UniformSampler(4f, 20f) };
-    
+
     [Header("Water Color")]
     [Tooltip("Simulates different water chemical balances/algae (Teal vs Green vs Deep Blue)")]
     public ColorRgbParameter waterScatterColor = new ColorRgbParameter
@@ -50,21 +49,21 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
         blue = new UniformSampler(0.3f, 1.0f),    // Wide blue range
         alpha = new ConstantSampler(1f)
     };
-    
+
     #endregion
-    
+
     #region Color Grading Parameters
-    
+
     [Header("Color Grading")]
     [Tooltip("Post Exposure: Brightness adjustment (-1 to 1)")]
     public PerceptionFloatParameter postExposure = new PerceptionFloatParameter { value = new UniformSampler(-1f, 1f) };
-    
+
     [Tooltip("Contrast: Image contrast (0 = flat, 100 = high contrast). Default ~12")]
     public PerceptionFloatParameter contrast = new PerceptionFloatParameter { value = new UniformSampler(-30f, 25f) };
-    
+
     [Tooltip("Saturation: Color intensity (-100 = grayscale, 0 = normal). Default ~-30")]
     public PerceptionFloatParameter saturation = new PerceptionFloatParameter { value = new UniformSampler(-80f, 0f) };
-    
+
     [Header("Color Filter")]
     [Tooltip("Underwater tint color. Base: #8FDCEC (teal/cyan)")]
     public ColorRgbParameter colorFilter = new ColorRgbParameter
@@ -75,37 +74,39 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
         blue = new UniformSampler(0.6f, 1.0f),    // Always some blue tint
         alpha = new ConstantSampler(1f)
     };
-    
+
     #endregion
-    
+
     #region Sensor Noise Parameters
-    
+
     [Header("Sensor Noise")]
     [Tooltip("Simulates high ISO noise on the camera sensor (0 = clean, 1 = very noisy)")]
     public PerceptionFloatParameter filmGrainIntensity = new PerceptionFloatParameter { value = new UniformSampler(0.0f, 1.0f) };
-    
+
     [Header("Reflections")]
     [Tooltip("Planar Reflection brightness multiplier (0 = no reflections, 2 = very bright)")]
     public PerceptionFloatParameter reflectionMultiplier = new PerceptionFloatParameter { value = new UniformSampler(0f, 2f) };
-    
+
     [Header("Sunlight")]
     [Tooltip("Sun angle (X rotation in degrees). 20-90 = morning to noon")]
     public PerceptionFloatParameter sunAngle = new PerceptionFloatParameter { value = new UniformSampler(20f, 90f) };
-    
+
     [Tooltip("Sun intensity in Lux (0 = overcast, 16000 = bright sun)")]
     public PerceptionFloatParameter sunIntensity = new PerceptionFloatParameter { value = new UniformSampler(0f, 16000f) };
-    
+
     #endregion
-    
+
     #region Private Fields
-    
+
     private ColorAdjustments _colorAdjustments;
     private FilmGrain _filmGrain;
-    
+    // random state must be based on random state of FixedLengthScenario owned by BatchRunner, to ensure consistent reproducibility across all randomizers in the scenario
+    private Unity.Mathematics.Random RandomState;
+
     #endregion
-    
+
     #region Randomizer Lifecycle
-    
+
     protected override void OnAwake()
     {
         // Cache Volume profile overrides
@@ -118,12 +119,14 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
 
     protected override void OnIterationStart()
     {
+        // SamplerState is statically set by FixedLengthScenario through reflection, so we can rely on it to set the seed consistently
+        RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
         // 1. Randomize Physical Water Appearance
         if (waterSurface != null)
         {
             // Changes transparency/murkiness
             waterSurface.absorptionDistance = absorptionDistance.Sample();
-            
+
             // Sync scattering and refraction color for realistic lighting
             Color sampledColor = waterScatterColor.Sample();
             waterSurface.scatteringColor = sampledColor;
@@ -138,31 +141,31 @@ public class UnderwaterEnvironmentRandomizer : Randomizer
             _colorAdjustments.saturation.value = saturation.Sample();
             _colorAdjustments.colorFilter.value = colorFilter.Sample();
         }
-        
+
         // 3. Randomize Film Grain (sensor noise)
         if (_filmGrain != null)
         {
             _filmGrain.intensity.value = filmGrainIntensity.Sample();
         }
-        
+
         // 4. Randomize Planar Reflection Probe multiplier
         if (planarReflectionProbe != null)
         {
             planarReflectionProbe.settingsRaw.lighting.multiplier = reflectionMultiplier.Sample();
         }
-        
+
         // 5. Randomize Sunlight angle and intensity
         if (sunLight != null)
         {
             // Randomize X rotation (sun elevation) and Y rotation (sun direction)
-            float yaw = UnityEngine.Random.Range(0f, 360f);
+            float yaw = RandomState.NextFloat(0f, 360f);
             sunLight.transform.eulerAngles = new Vector3(sunAngle.Sample(), yaw, 0f);
-            
+
             // Randomize intensity in Lux
             sunLight.intensity = sunIntensity.Sample();
         }
     }
-    
+
     #endregion
 }
 

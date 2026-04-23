@@ -56,3 +56,26 @@ To use this module in a new scene or to generate datasets:
   2. Map its values inside `BatchRunner`. Cache it in `Awake()` via `GetRandomizer<MyNewRandomizer>()`.
   3. Change its properties dynamically inside `BatchRunner.UpdateBatchConfig()`.
 * **Changing Object Placement Constraints**: Open `PoolFloorPlacementRandomizer` and configure `spawnHeight` behavior, or move to a non-planar 3D volumetric spawn approach by migrating off of the basic `PoissonDiskSampling` into 3-axis math points.
+
+## Reproducibility and Random State
+
+All randomization is driven by a `Unity.Mathematics.Random` state, which is seeded from the `SamplerState` of the `FixedLengthScenario`. This ensures that all randomizers in the scenario are perfectly in sync and reproducible across runs, as long as the same seed and batch configurations are used. Please respect the following patterns to ensure reproducibility:
+
+1. Avoid reordering public Parameter fields in any Randomizer subclass and reordering Randomizers in the `FixedLengthScenario` stack, as this will change the order of random state consumption and break reproducibility. Reordering is acceptable if a entirely new random dataset generation is desired (i.e. a refactor of the dataset). A similar caveat applies to conditionally consuming the random state (e.g. only generating random values if a checkbox is enabled) — this will also change the ordering of random state and break reproducibility when toggling the checkbox on/off between runs.
+2. **Never** use `UnityEngine.Random` or `System.Random` — use `SamplerState.NextRandomState()` instead to seed a `Unity.Mathematics.Random` instance, and use that for all random value generation:
+
+```csharp
+// ✅ Correct way to generate a random float between 0 and 1, random state should be a class member reinitialized in OnIterationStart()
+Unity.Mathematics.Random RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
+float randomValue = RandomState.NextFloat(0f, 1f);
+// ❌ Incorrect way (breaks reproducibility)
+float randomValue = UnityEngine.Random.Range(0f, 1f);
+```
+
+Since the image capture time is non deterministic (depends on the Unity rendering loop and the hardware), the images themselves will be ever imperceptibly different across runs even with the same random seed. Thus, to verify if seeding worked, one can generate two datasets with the same seed and batch config, then compare the JSON metadata dumps — they should be identical in terms of randomizer parameter values and captured labels. Go to the dataset directory (typical `~/.config/unity3d/McGill\ Robotics/AUV-SIM-UNITY`) and recursively diff the two datasets:
+
+```bash
+diff -r --exclude="*.png" solo solo_1
+```
+
+The only difference between the two directories should be simulation start and end times.
