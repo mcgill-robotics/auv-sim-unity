@@ -3686,6 +3686,7 @@ MonoBehaviour:
   - batchName: Good visibility
     iterations: 6000
     spawnObjects: 1
+    randomizeVisuals: 1
     absorptionDistanceRange: {x: 10, y: 25}
     waterScatterRedRange: {x: 0, y: 0.4}
     waterScatterGreenRange: {x: 0.2, y: 0.8}
@@ -3706,6 +3707,7 @@ MonoBehaviour:
   - batchName: Hard cases
     iterations: 4000
     spawnObjects: 1
+    randomizeVisuals: 1
     absorptionDistanceRange: {x: 3, y: 10}
     waterScatterRedRange: {x: 0, y: 0.4}
     waterScatterGreenRange: {x: 0.2, y: 0.8}
@@ -3726,6 +3728,7 @@ MonoBehaviour:
   - batchName: Background
     iterations: 2000
     spawnObjects: 0
+    randomizeVisuals: 0
     absorptionDistanceRange: {x: 4, y: 25}
     waterScatterRedRange: {x: 0, y: 0.4}
     waterScatterGreenRange: {x: 0.2, y: 0.8}

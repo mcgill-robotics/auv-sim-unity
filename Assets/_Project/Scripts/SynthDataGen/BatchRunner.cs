@@ -93,6 +93,13 @@ public class BatchRunner : MonoBehaviour
         {
             UpdateBatchConfig(batchIndex);
         }
+        if (batchIndex == _schedule.Count - 1 && currentIter == _schedule[batchIndex].endIteration - 1)
+        {
+            float finalBatchElapsed = (watch.ElapsedMilliseconds - lastTime) / 1000f;
+            Debug.Log($"<color=yellow>[BatchRunner]</color> Elapsed time for final batch: {finalBatchElapsed:F6} seconds");
+            Debug.Log($"<color=green>[BatchRunner]</color> Completed all batches! Total iterations: {currentIter + 1}.");
+            Debug.Log($"<color=green>[BatchRunner]</color> Total elapsed time across all batches: {watch.ElapsedMilliseconds / 1000f:F6} seconds");
+        }
     }
 
     private void BuildSchedule()
@@ -152,6 +159,12 @@ public class BatchRunner : MonoBehaviour
         var info = _schedule[index];
         var config = info.config;
 
+        if (index > 0)
+        {
+            float batchElapsed = (watch.ElapsedMilliseconds - lastTime) / 1000f;
+            Debug.Log($"<color=yellow>[BatchRunner]</color> Elapsed time for previous batch: {batchElapsed:F6} seconds");
+        }
+        lastTime = watch.ElapsedMilliseconds;
         Debug.Log($"<color=cyan>[BatchRunner]</color> Switching to Batch {index + 1}/{_schedule.Count}: <b>{config.batchName}</b> (Iters {info.startIteration}-{info.endIteration})");
 
         // --- Apply Configs ---
@@ -212,7 +225,7 @@ public class BatchRunner : MonoBehaviour
         // 4. Visual Target (Appearance)
         if (_visualTargetRandomizer != null)
         {
-            _visualTargetRandomizer.enabled = true;
+            _visualTargetRandomizer.enabled = config.randomizeVisuals;
         }
     }
 

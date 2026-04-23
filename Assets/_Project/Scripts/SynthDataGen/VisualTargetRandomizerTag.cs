@@ -1,8 +1,14 @@
+using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
-using UnityEngine.Perception.Randomization.Scenarios;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
 using UnityEngine.Perception.Randomization.Randomizers.Tags;
-using System.Collections.Generic;
+using UnityEngine.Perception.Randomization.Scenarios;
+using UnityEngine.Perception.Randomization.Utilities;
+using UnityEngine.UIElements;
+
+
+
 
 
 #if UNITY_EDITOR
@@ -15,23 +21,46 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
     /// Used to randomize materials and labels on 1 or 2 quads (e.g., Gate targets or Task Boards) every frame.
     /// Pairs each material with a specific label to ensure ground truth matches the visual.
     /// </summary>
-    [AddComponentMenu("Perception/RandomizerTags/Visual Target Randomizer Tag")]
+    [AddComponentMenu("RoboSub/RandomizerTags/Visual Target Randomizer Tag")]
     public class VisualTargetRandomizerTag : RandomizerTag
     {
-        [System.Serializable]
-        public struct MaterialLabelConfig
+        [Header("Randomization Setup")]
+        [Tooltip("The target objects to randomize, their children will be made to match the reference target's children (configs) with different materials and labels. Can be 1 or 2 targets, if 2 ensures different configs for each.")]
+        public Transform[] targets;
+        [Tooltip("The configuration objects to use for randomization. A random config from this list will be applied to each target every iteration.")]
+        public GameObject[] configs;
+
+        // for each target, parent of all config variants used in cache and in editor, this allows editor to clean up anything inside this container when a new config needs to be spawned
+        public GameObject[] ConfigContainers { private set; get; }
+
+        void Awake()
         {
-            public Material material;
-            public string label;
+            InitializeConfigContainers();
         }
-        [Header("Targets")]
-        [Tooltip("Assign 1 quad (for Board) or 2 quads (for Gate)")]
-        public MeshRenderer[] targets;
-
-        [Header("Configurations")]
-        [Tooltip("List of material/label pairs to pick from.")]
-        public MaterialLabelConfig[] configs;
-
+        public void InitializeConfigContainers()
+        {
+            if (targets == null) return;
+            if (ConfigContainers != null && ConfigContainers.Length == targets.Length) return; // already initialized
+            // initialize config containers for each target
+            ConfigContainers = new GameObject[targets.Length];
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (targets[i] != null)
+                {
+                    // check if already exists
+                    Transform existingContainer = targets[i].Find(targets[i].name + "_Configs");
+                    if (existingContainer != null)
+                    {
+                        ConfigContainers[i] = existingContainer.gameObject;
+                    }
+                    else
+                    {
+                        ConfigContainers[i] = new GameObject(targets[i].name + "_Configs");
+                        ConfigContainers[i].transform.SetParent(targets[i], false); // parent to target so it moves with it and is organized in the hierarchy
+                    }
+                }
+            }
+        }
         public int GetTargetCount()
         {
             int count = 0;
@@ -41,69 +70,33 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             }
             return count;
         }
-
+        /// <summary>
+        /// Returns the number of valid configs (child objects) under this tag. Each child should be a visual variant with a specific Material and Labelling component
+        /// </summary>
+        /// <returns></returns>
         public int GetConfigCount()
         {
+            // assume all targets have the same number of configs (child objects), so we just take first one.
             return configs != null ? configs.Length : 0;
         }
 
-        /// <summary>
-        /// Randomizes materials and labels. Ensures Left != Right if there are two targets.
-        /// </summary>
-        public void RandomizeMaterials(int targetIndex, int configIndex)
+        public void ConfigureSpawnedObject(GameObject SpawnedObject)
         {
-            if (targets == null || configs == null) return;
-            if (targetIndex < 0 || targetIndex >= targets.Length) return;
-            if (configIndex < 0 || configIndex >= configs.Length) return;
-            ApplyConfig(targets[targetIndex], configs[configIndex]);
-        }
+            // reset local transform so that spawned config is positioned correctly relative to the target
+            SpawnedObject.transform.localPosition = Vector3.zero;
+            SpawnedObject.transform.localRotation = Quaternion.identity;
 
-        private void ApplyConfig(MeshRenderer target, MaterialLabelConfig config)
-        {
-            if (target == null) return;
-
-            // Apply Material
-            target.sharedMaterial = config.material;
-
-            // Apply Labeling
-            if (target.TryGetComponent<Labeling>(out var labeling))
+            // Force Perception labeller to update immediately
+            foreach (Labeling l in SpawnedObject.GetComponentsInChildren<Labeling>())
             {
-                labeling.labels.Clear();
-                if (!string.IsNullOrEmpty(config.label))
+                // check if the label's game object is conditionally labeled
+                if (l.gameObject.TryGetComponent<ConditionalLabeling>(out var cl))
                 {
-                    labeling.labels.Add(config.label);
+                    l.enabled = cl.ShouldLabel(); // update the ConditionalLabeling state based on current camera position/angle
                 }
-                labeling.RefreshLabeling();
+                if (l.isActiveAndEnabled) l.RefreshLabeling(); // refresh to ensure ground truth is updated with the new material/visual
             }
-        }
-        /// <summary>
-        /// Generates a list of (targetIndex, configIndex) pairs to randomize materials/labels. Ensures different configs for each target if possible.
-        /// !!! SHOULD ONLY BE USED in editor for testing randomization on demand, the final dataset generation is handled by VisualTargetRandomizer to ensure consistency across runs. !!!!
-        /// </summary>
-        /// <returns>Array of (targetIndex, configIndex) pairs</returns>
-        public (int, int)[] GetRandomConfigIndices()
-        {
-            List<(int, int)> indices = new List<(int, int)>();
-            int firstIndex = Random.Range(0, configs.Length);
-            indices.Add((0, firstIndex));
-            if (targets.Length > 1 && targets[1] != null)
-            {
-                if (configs.Length > 1)
-                {
-                    int secondIndex;
-                    do
-                    {
-                        secondIndex = Random.Range(0, configs.Length);
-                    } while (secondIndex == firstIndex);
-                    indices.Add((1, secondIndex));
-                }
-                else
-                {
-                    // Fallback if only 1 config provided
-                    indices.Add((1, firstIndex));
-                }
-            }
-            return indices.ToArray();
+            SpawnedObject.SetActive(true); // ensure the new config is active after configuring it
         }
     }
 }
@@ -120,38 +113,85 @@ public class VisualTargetRandomizerEditor : Editor
         VisualTargetRandomizerTag script = (VisualTargetRandomizerTag)target;
 
         EditorGUILayout.Space();
+        DrawRandomize(script);
+    }
+
+
+    private void DrawRandomize(VisualTargetRandomizerTag script)
+    {
         GUI.backgroundColor = Color.cyan;
+        EditorGUILayout.HelpBox("Randomize Materials and Labels on demand in the editor. During dataset generation, the VisualTargetRandomizer component will randomize every frame to ensure consistent variety in the data.", MessageType.Info);
         if (GUILayout.Button("Randomize Materials & Labels Now", GUILayout.Height(30)))
         {
-            if (script.targets != null)
-            {
-                // Gather targets and their labeling components for Undo
-                var objectsToUndo = new System.Collections.Generic.List<Object>();
-                foreach (var t in script.targets)
-                {
-                    if (t == null) continue;
-                    objectsToUndo.Add(t);
-                    if (t.TryGetComponent<Labeling>(out var l)) objectsToUndo.Add(l);
-                }
-
-                Undo.RecordObjects(objectsToUndo.ToArray(), "Randomize Visual Targets");
-
-                foreach (var (targetIndex, configIndex) in script.GetRandomConfigIndices())
-                {
-                    script.RandomizeMaterials(targetIndex, configIndex);
-                }
-
-                foreach (var t in script.targets)
-                {
-                    if (t != null)
-                    {
-                        EditorUtility.SetDirty(t);
-                        if (t.TryGetComponent<Labeling>(out var l)) EditorUtility.SetDirty(l);
-                    }
-                }
-            }
+            Undo.RecordObjects(GatherUndoObjects(script), "Randomize Visual Targets");
+            GUIRandomizeMaterials(script);
         }
         GUI.backgroundColor = Color.white;
     }
+
+    private void GUIRandomizeMaterials(VisualTargetRandomizerTag script)
+    {
+        script.InitializeConfigContainers();
+        int[] shuffledIndices = DataSynthRandom.GetShuffledIndices(script.GetConfigCount(), new Unity.Mathematics.Random((uint)Random.Range(1, int.MaxValue))); // shuffle configs to ensure different randomization each time button is pressed
+        for (int targetIndex = 0; targetIndex < script.GetTargetCount(); targetIndex++)
+        {
+            int configIndex = shuffledIndices[targetIndex % script.GetConfigCount()]; // wrap around if there are more targets than configs
+            Transform target = script.targets[targetIndex];
+            if (target == null) continue;
+
+            Transform ConfigContainerT = script.ConfigContainers[targetIndex].transform;
+            while (ConfigContainerT.childCount > 0)
+            {
+                Undo.DestroyObjectImmediate(ConfigContainerT.GetChild(0).gameObject); // destroy old config, if it exists, to clean up before spawning new one. Use Undo to allow undoing in editor.
+            }
+            GameObject prefabToSpawn = script.configs[configIndex];
+
+            GameObject spawnedObject = (GameObject)PrefabUtility.InstantiatePrefab(prefabToSpawn, ConfigContainerT); // spawn the new config as a child of the target so it automatically gets cleaned up and organized in the hierarchy
+            Undo.RegisterCreatedObjectUndo(spawnedObject, "Spawn Config");
+
+            // initialize newly selected config for this target
+            script.ConfigureSpawnedObject(spawnedObject);
+        }
+
+        foreach (var t in script.targets)
+        {
+            if (t != null)
+            {
+                EditorUtility.SetDirty(t);
+                if (t.TryGetComponent<Labeling>(out var l)) EditorUtility.SetDirty(l);
+            }
+        }
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(script.gameObject.scene);
+    }
+    /// <summary>
+    /// Gathers all objects that need to be undone when randomizing materials and labels.
+    /// </summary>
+    /// <returns>Array of objects to undo</returns>
+    private static Object[] GatherUndoObjects(VisualTargetRandomizerTag script)
+    {
+        var objectsToUndo = new HashSet<Object>();
+        if (script.targets == null) return new List<Object>(objectsToUndo).ToArray();
+
+        foreach (var t in script.targets)
+        {
+            if (t == null) continue;
+            objectsToUndo.Add(t);
+
+            // get all descendants of the target to ensure we can undo material and label changes on all configs/variants
+            foreach (var childTransform in t.GetComponentsInChildren<Transform>(true))
+            {
+                objectsToUndo.Add(childTransform.gameObject);
+            }
+
+            foreach (var labeling in t.GetComponentsInChildren<Labeling>(true))
+            {
+                objectsToUndo.Add(labeling);
+            }
+        }
+
+        return new List<Object>(objectsToUndo).ToArray();
+    }
+
+
 }
 #endif
