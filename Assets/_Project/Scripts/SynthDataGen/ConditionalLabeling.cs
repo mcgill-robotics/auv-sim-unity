@@ -29,22 +29,41 @@ public class ConditionalLabeling : MonoBehaviour
     [Range(0, 90)]
     public float maxViewAngle = 60f;
 
-    [Tooltip("If true, also allows seeing the back face.")]
+    [Tooltip("If true, allows labeling when viewing the front face.")]
+    public bool allowFrontFace = true;
+
+    [Tooltip("If true, allows labeling when viewing the back face.")]
     public bool allowBackFace = true;
 
     private Labeling _labeling;
+    private float _maxDistanceSqr;
+    private float _minViewDot;
+
+    void Awake()
+    {
+        _labeling = GetComponent<Labeling>();
+        RecalculateThresholds();
+    }
 
     void Start()
     {
-        _labeling = GetComponent<Labeling>();
+        if (_labeling == null)
+            _labeling = GetComponent<Labeling>();
 
         if (perceptionCamera == null && Camera.main != null)
             perceptionCamera = Camera.main.transform;
     }
 
+    void OnValidate()
+    {
+        RecalculateThresholds();
+    }
+
     void Update()
     {
-        _labeling.enabled = ShouldLabel();
+        bool shouldLabel = ShouldLabel();
+        if (_labeling.enabled != shouldLabel)
+            _labeling.enabled = shouldLabel;
     }
 
     public bool ShouldLabel()
@@ -53,26 +72,34 @@ public class ConditionalLabeling : MonoBehaviour
 
 
         // 1. Distance Check
+        Vector3 cameraToObj = transform.position - perceptionCamera.position;
+        float sqrDistance = cameraToObj.sqrMagnitude;
         if (useDistanceFilter)
         {
-            float distance = Vector3.Distance(transform.position, perceptionCamera.position);
-            if (distance > maxDistance)
+            if (sqrDistance > _maxDistanceSqr)
                 return false; // too far, no need to check angle
         }
 
         // 2. Angle Check (only if still passing)
         if (useAngleFilter)
         {
-            Vector3 cameraToObj = transform.position - perceptionCamera.position;
-            float angle = Vector3.Angle(transform.forward, -cameraToObj);
+            if (sqrDistance <= Mathf.Epsilon)
+                return true;
 
-            bool isValidAngle = angle <= maxViewAngle;
-            if (!isValidAngle && allowBackFace)
-                isValidAngle = angle >= (180f - maxViewAngle);
+            float inverseDistance = 1f / Mathf.Sqrt(sqrDistance);
+            float viewDot = Vector3.Dot(transform.forward, -cameraToObj * inverseDistance);
+            bool isValidAngle = (allowFrontFace && viewDot >= _minViewDot) ||
+                (allowBackFace && viewDot <= -_minViewDot);
 
             if (!isValidAngle)
                 return false;
         }
         return true;
+    }
+
+    private void RecalculateThresholds()
+    {
+        _maxDistanceSqr = maxDistance * maxDistance;
+        _minViewDot = Mathf.Cos(maxViewAngle * Mathf.Deg2Rad);
     }
 }
