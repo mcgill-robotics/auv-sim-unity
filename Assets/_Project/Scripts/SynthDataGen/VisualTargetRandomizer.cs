@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine;
-using UnityEngine.Perception.GroundTruth.LabelManagement;
-using UnityEngine.Perception.GroundTruth.LabelManagement;
 using UnityEngine.Perception.Randomization.Randomizers;
 using UnityEngine.Perception.Randomization.Randomizers.Tags;
 using UnityEngine.Perception.Randomization.Samplers;
-using UnityEngine.Perception.Randomization.Utilities;
 using UnityEngine.Perception.Randomization.Utilities;
 
 /// <summary>
@@ -23,6 +17,7 @@ public class VisualTargetRandomizer : Randomizer
     #region Private Fields
     // Cache to store configs for each possible target, to avoid expensive GetChild calls every iteration. Key is the target Transform, value is a cache of its config GameObjects (child objects).
     private Dictionary<Transform, GameObjectOneWayCache> _caches = new Dictionary<Transform, GameObjectOneWayCache>();
+    private HashSet<Transform> _preparedTargets = new HashSet<Transform>();
     // random state must be based on random state of FixedLengthScenario owned by BatchRunner, to ensure consistent reproducibility across all randomizers in the scenario
     private Unity.Mathematics.Random RandomState;
 
@@ -38,6 +33,13 @@ public class VisualTargetRandomizer : Randomizer
         var tags = tagManager.Query<VisualTargetRandomizerTag>();
         foreach (VisualTargetRandomizerTag tag in tags)
         {
+            tag.InitializeConfigContainers();
+            Transform[] targets = tag.targets;
+            if (targets == null)
+            {
+                continue;
+            }
+
             int targetCount = tag.GetTargetCount();
             int configCount = tag.GetConfigCount();
 
@@ -48,34 +50,48 @@ public class VisualTargetRandomizer : Randomizer
 
             // Get shuffled config indices to ensure different configs for each target
             int[] shuffledIndices = DataSynthRandom.GetShuffledIndices(configCount, RandomState);
+            int validTargetOrdinal = 0;
 
-            for (int i = 0; i < targetCount; i++)
+            for (int targetIndex = 0; targetIndex < targets.Length; targetIndex++)
             {
-                Transform target = tag.targets[i];
-                if (target == null) continue;
+                Transform target = targets[targetIndex];
+                if (target == null)
+                {
+                    continue;
+                }
 
                 // Wrap around if there are fewer configs than targets
-                GameObject prefabToSpawn = tag.configs[shuffledIndices[i % configCount]];
+                GameObject prefabToSpawn = tag.configs[shuffledIndices[validTargetOrdinal % configCount]];
 
                 // Lazy initialize cache for this target if it doesn't exist yet
                 if (!_caches.TryGetValue(target, out var cache))
                 {
+                    if (_preparedTargets.Add(target))
+                    {
+                        tag.ClearConfigContainerAt(targetIndex);
+                    }
+
                     // Cache is parented to the container target so that objects are organized in the hierarchy and automatically cleaned up if target is destroyed
-                    cache = new GameObjectOneWayCache(tag.ConfigContainers[i].transform, tag.configs, this);
+                    cache = new GameObjectOneWayCache(tag.ConfigContainers[targetIndex].transform, tag.configs, this);
                     _caches[target] = cache;
                 }
-
-                // Disable previous config (if any) and return to cache
-                cache.ResetAllObjects();
 
                 // initialize newly selected config for this target
                 GameObject activeVariant = cache.GetOrInstantiate(prefabToSpawn);
 
                 // Configure the spawned config's transform and labeling based on the tag's setup
                 tag.ConfigureSpawnedObject(activeVariant);
-
+                validTargetOrdinal++;
             }
 
+        }
+    }
+
+    protected override void OnIterationEnd()
+    {
+        foreach (var cache in _caches.Values)
+        {
+            cache.ResetAllObjects();
         }
     }
     #endregion
