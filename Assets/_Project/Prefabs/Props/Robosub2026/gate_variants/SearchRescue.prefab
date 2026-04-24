@@ -143,9 +143,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 6
+  maxDistance: 5
   useAngleFilter: 1
   maxViewAngle: 70
+  allowFrontFace: 0
   allowBackFace: 1
 --- !u!1 &3028111203104612146
 GameObject:
@@ -159,6 +160,7 @@ GameObject:
   - component: {fileID: 522589163436226565}
   - component: {fileID: 793407970770849657}
   - component: {fileID: 2381032478387215835}
+  - component: {fileID: 4757558551492647909}
   m_Layer: 0
   m_Name: sos
   m_TagString: Untagged
@@ -250,6 +252,25 @@ MonoBehaviour:
   - sos
   useAutoLabeling: 0
   autoLabelingSchemeType: 
+--- !u!114 &4757558551492647909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3028111203104612146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 1
+  maxDistance: 4
+  useAngleFilter: 1
+  maxViewAngle: 70
+  allowFrontFace: 0
+  allowBackFace: 1
 --- !u!1 &4821087047806905217
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,6 +283,7 @@ GameObject:
   - component: {fileID: 936713261548456385}
   - component: {fileID: 5447749632647971176}
   - component: {fileID: 4333996031343913066}
+  - component: {fileID: 5981334524567756579}
   m_Layer: 0
   m_Name: lifebuoy
   m_TagString: Untagged
@@ -353,3 +375,22 @@ MonoBehaviour:
   - lifebuoy
   useAutoLabeling: 0
   autoLabelingSchemeType: 
+--- !u!114 &5981334524567756579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821087047806905217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 1
+  maxDistance: 4
+  useAngleFilter: 1
+  maxViewAngle: 70
+  allowFrontFace: 0
+  allowBackFace: 1
