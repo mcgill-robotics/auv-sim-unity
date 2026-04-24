@@ -18,6 +18,11 @@ public class YoloConverterWindow : EditorWindow
     
     // UI State
     private Vector2 _scrollPos;
+    private string _lastProcessedDatasetPath = "";
+    private int _lastProcessedFrameCount;
+    private int _lastFilteredLabelCount;
+    private Dictionary<int, string> _lastYoloClassNames = new Dictionary<int, string>();
+    private Dictionary<int, int> _lastClassCounts = new Dictionary<int, int>();
     
     [MenuItem("Tools/RoboSub/YOLO Converter")]
     public static void ShowWindow()
@@ -99,6 +104,30 @@ public class YoloConverterWindow : EditorWindow
             ProcessDataset(_customDatasetPath);
         }
         EditorGUI.EndDisabledGroup();
+
+        if (!string.IsNullOrEmpty(_lastProcessedDatasetPath))
+        {
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            EditorGUILayout.LabelField("Last Conversion Summary", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Dataset:", EditorStyles.miniLabel);
+            EditorGUILayout.SelectableLabel(_lastProcessedDatasetPath, EditorStyles.textField, GUILayout.Height(18));
+            EditorGUILayout.LabelField($"Frames Converted: {_lastProcessedFrameCount}");
+            EditorGUILayout.LabelField($"Labels After Filtering: {_lastFilteredLabelCount}");
+
+            if (_lastClassCounts.Count > 0)
+            {
+                EditorGUILayout.Space(5);
+                EditorGUILayout.LabelField("Class Occurrences After Filtering", EditorStyles.boldLabel);
+                foreach (var pair in _lastClassCounts.OrderByDescending(p => p.Value).ThenBy(p => p.Key))
+                {
+                    string className = _lastYoloClassNames.TryGetValue(pair.Key, out var mappedName)
+                        ? mappedName
+                        : $"Class {pair.Key}";
+                    EditorGUILayout.LabelField($"{pair.Key}: {className}", pair.Value.ToString());
+                }
+            }
+        }
         
         EditorGUILayout.EndScrollView();
     }
@@ -136,6 +165,7 @@ public class YoloConverterWindow : EditorWindow
 
         // Build ID Map
         Dictionary<int, int> idMap = new Dictionary<int, int>();
+        Dictionary<int, string> yoloClassNames = new Dictionary<int, string>();
         string defPath = Path.Combine(datasetPath, "annotation_definitions.json");
         
         if (File.Exists(defPath))
@@ -155,7 +185,9 @@ public class YoloConverterWindow : EditorWindow
                         {
                             int soloId = item["label_id"].Value<int>();
                             idMap[soloId] = yoloIndex;
-                            Debug.Log($"Mapping: {item["label_name"]} (SOLO ID {soloId}) → YOLO {yoloIndex}");
+                            string labelName = item["label_name"]?.ToString() ?? $"Class {yoloIndex}";
+                            yoloClassNames[yoloIndex] = labelName;
+                            Debug.Log($"Mapping: {labelName} (SOLO ID {soloId}) → YOLO {yoloIndex}");
                             yoloIndex++;
                         }
                     }
@@ -165,24 +197,45 @@ public class YoloConverterWindow : EditorWindow
 
         // Process Sequences
         int processedCount = 0;
+        int filteredLabelCount = 0;
+        Dictionary<int, int> classCounts = new Dictionary<int, int>();
         foreach (var seqDir in Directory.GetDirectories(datasetPath, "sequence.*"))
         {
             foreach (var jsonFile in Directory.GetFiles(seqDir, "step*.frame_data.json"))
             {
-                ConvertFrame(jsonFile, yoloImgPath, yoloLblPath, idMap);
+                ConvertFrame(jsonFile, yoloImgPath, yoloLblPath, idMap, classCounts, ref filteredLabelCount);
                 processedCount++;
             }
         }
+
+        _lastProcessedDatasetPath = datasetPath;
+        _lastProcessedFrameCount = processedCount;
+        _lastFilteredLabelCount = filteredLabelCount;
+        _lastYoloClassNames = yoloClassNames;
+        _lastClassCounts = classCounts;
         
         Debug.Log($"<color=green>Success!</color> Converted {processedCount} frames to YOLO format.");
         Debug.Log($"Images: {yoloImgPath}");
         Debug.Log($"Labels: {yoloLblPath}");
+        foreach (var pair in classCounts.OrderByDescending(p => p.Value).ThenBy(p => p.Key))
+        {
+            string className = yoloClassNames.TryGetValue(pair.Key, out var mappedName)
+                ? mappedName
+                : $"Class {pair.Key}";
+            Debug.Log($"Class Count: {pair.Key} ({className}) = {pair.Value}");
+        }
         
         EditorUtility.DisplayDialog("Conversion Complete", 
             $"Converted {processedCount} frames.\n\nOutput:\n{yoloImgPath}", "OK");
     }
 
-    private void ConvertFrame(string jsonPath, string imgOutDir, string lblOutDir, Dictionary<int, int> idMap)
+    private void ConvertFrame(
+        string jsonPath,
+        string imgOutDir,
+        string lblOutDir,
+        Dictionary<int, int> idMap,
+        Dictionary<int, int> classCounts,
+        ref int filteredLabelCount)
     {
         JObject root = JObject.Parse(File.ReadAllText(jsonPath));
 
@@ -259,6 +312,10 @@ public class YoloConverterWindow : EditorWindow
                                 if (idMap.TryGetValue(labelId, out int yoloId))
                                 {
                                     txtContent += $"{yoloId} {centerX:F6} {centerY:F6} {normW:F6} {normH:F6}\n";
+                                    filteredLabelCount++;
+                                    classCounts[yoloId] = classCounts.TryGetValue(yoloId, out int count)
+                                        ? count + 1
+                                        : 1;
                                 }
                             }
                         }
@@ -271,5 +328,4 @@ public class YoloConverterWindow : EditorWindow
         }
     }
 }
-
 
