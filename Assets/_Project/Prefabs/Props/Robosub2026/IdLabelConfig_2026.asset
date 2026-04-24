@@ -33,7 +33,7 @@ MonoBehaviour:
     hierarchyRelation: 0
   - label: bin
     id: 6
-    hierarchyRelation: 0
+    hierarchyRelation: 1
   - label: board
     id: 7
     hierarchyRelation: 0
@@ -55,29 +55,20 @@ MonoBehaviour:
   - label: sos
     id: 13
     hierarchyRelation: 0
-  - label: fire
+  - label: ambulance
     id: 14
     hierarchyRelation: 0
-  - label: blood
+  - label: firetruck
     id: 15
     hierarchyRelation: 0
-  - label: bandaid
+  - label: blood
     id: 16
     hierarchyRelation: 0
-  - label: pill
+  - label: fire
     id: 17
     hierarchyRelation: 0
-  - label: nutbolt
+  - label: bin_structure
     id: 18
-    hierarchyRelation: 0
-  - label: electric
-    id: 19
-    hierarchyRelation: 0
-  - label: redcross_helmet
-    id: 20
-    hierarchyRelation: 0
-  - label: warning
-    id: 21
     hierarchyRelation: 0
   autoAssignIds: 1
   startingLabelId: 0

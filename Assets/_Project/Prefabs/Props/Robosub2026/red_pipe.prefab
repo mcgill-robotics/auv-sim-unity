@@ -8,6 +8,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -3995498330993764985, guid: 166bf329e295a1c35bfa438cb10657ae,
+        type: 3}
+      propertyPath: 'labels.Array.data[0]'
+      value: red_pipe
+      objectReference: {fileID: 0}
     - target: {fileID: 1368194464395263163, guid: 166bf329e295a1c35bfa438cb10657ae,
         type: 3}
       propertyPath: m_LocalPosition.x

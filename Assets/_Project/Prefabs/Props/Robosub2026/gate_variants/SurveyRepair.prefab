@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3605449960592048703}
   - component: {fileID: 7379201934683031150}
   - component: {fileID: 6611675747978913955}
+  - component: {fileID: 7665922855270177853}
   m_Layer: 0
   m_Name: tools
   m_TagString: Untagged
@@ -103,6 +104,25 @@ MonoBehaviour:
   - tools
   useAutoLabeling: 0
   autoLabelingSchemeType: 
+--- !u!114 &7665922855270177853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534350612630991507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 1
+  maxDistance: 4
+  useAngleFilter: 1
+  maxViewAngle: 70
+  allowFrontFace: 0
+  allowBackFace: 1
 --- !u!1 &7526872815252624402
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,6 +135,7 @@ GameObject:
   - component: {fileID: 3973564552190921471}
   - component: {fileID: 9154012219911511092}
   - component: {fileID: 4803186626892632416}
+  - component: {fileID: 8345757474083893965}
   m_Layer: 0
   m_Name: compass
   m_TagString: Untagged
@@ -206,6 +227,25 @@ MonoBehaviour:
   - compass
   useAutoLabeling: 0
   autoLabelingSchemeType: 
+--- !u!114 &8345757474083893965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7526872815252624402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  perceptionCamera: {fileID: 0}
+  useDistanceFilter: 1
+  maxDistance: 4
+  useAngleFilter: 1
+  maxViewAngle: 70
+  allowFrontFace: 0
+  allowBackFace: 1
 --- !u!1 &7830394346347347154
 GameObject:
   m_ObjectHideFlags: 0
@@ -349,7 +389,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 6
+  maxDistance: 5
   useAngleFilter: 1
   maxViewAngle: 70
+  allowFrontFace: 0
   allowBackFace: 1
