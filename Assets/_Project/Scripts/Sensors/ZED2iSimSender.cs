@@ -13,7 +13,7 @@ public class ZED2iSimSender : MonoBehaviour
     public int streamPort = 30000;
 
     [Tooltip("ZED camera serial number identifier")]
-    public int serialNumber = 41116066; // ZED X Serial
+    public int serialNumber = 47890353; // ZED X 4mm Serial
 
     [Tooltip("Target streaming framerate (Hz). Will be clamped by ZED SDK limits")]
     [Range(1, 60)]
