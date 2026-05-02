@@ -30,6 +30,8 @@ namespace RosMessageTypes.Auv
         //  Dimensions (x, y, z)
         public double confidence;
         //  0.0 to 1.0
+        public int frames_since_last_seen;
+        //  0 means actively seen this frame, >0 means from memory
 
         public VisionObjectMsg()
         {
@@ -40,9 +42,10 @@ namespace RosMessageTypes.Auv
             this.has_orientation = false;
             this.size = new Geometry.Vector3Msg();
             this.confidence = 0.0;
+            this.frames_since_last_seen = 0;
         }
 
-        public VisionObjectMsg(Std.HeaderMsg header, string label, int id, Geometry.PoseMsg pose, bool has_orientation, Geometry.Vector3Msg size, double confidence)
+        public VisionObjectMsg(Std.HeaderMsg header, string label, int id, Geometry.PoseMsg pose, bool has_orientation, Geometry.Vector3Msg size, double confidence, int frames_since_last_seen)
         {
             this.header = header;
             this.label = label;
@@ -51,6 +54,7 @@ namespace RosMessageTypes.Auv
             this.has_orientation = has_orientation;
             this.size = size;
             this.confidence = confidence;
+            this.frames_since_last_seen = frames_since_last_seen;
         }
 
         public static VisionObjectMsg Deserialize(MessageDeserializer deserializer) => new VisionObjectMsg(deserializer);
@@ -64,6 +68,7 @@ namespace RosMessageTypes.Auv
             deserializer.Read(out this.has_orientation);
             this.size = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.confidence);
+            deserializer.Read(out this.frames_since_last_seen);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
@@ -75,6 +80,7 @@ namespace RosMessageTypes.Auv
             serializer.Write(this.has_orientation);
             serializer.Write(this.size);
             serializer.Write(this.confidence);
+            serializer.Write(this.frames_since_last_seen);
         }
 
         public override string ToString()
@@ -86,7 +92,8 @@ namespace RosMessageTypes.Auv
             "\npose: " + pose.ToString() +
             "\nhas_orientation: " + has_orientation.ToString() +
             "\nsize: " + size.ToString() +
-            "\nconfidence: " + confidence.ToString();
+            "\nconfidence: " + confidence.ToString() +
+            "\nframes_since_last_seen: " + frames_since_last_seen.ToString();
         }
 
 #if UNITY_EDITOR

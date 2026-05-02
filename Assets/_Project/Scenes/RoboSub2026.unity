@@ -6399,7 +6399,7 @@ MonoBehaviour:
   m_ShowHUD: 1
   m_TFTopics:
   - /tf
-  listenForTFMessages: 1
+  listenForTFMessages: 0
 --- !u!114 &1443981344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6433,7 +6433,7 @@ MonoBehaviour:
   PublishDownCam: 0
   PublishDepthCamera: 0
   StreamZEDCamera: 1
-  VisualizeDVL: 0
+  VisualizeDVL: 1
   VisualizeIMU: 0
   VisualizeDepth: 0
   EnableDVLNoise: 0
@@ -6541,7 +6541,7 @@ MonoBehaviour:
   DownCameraTopic: /down_cam/image_raw
   DepthCameraTopic: /zed/zed_node/depth/depth_registered
   ClockTopic: /clock
-  StateTopic: /auv/state
+  StatePoseTopic: /state/pose
   StateXTopic: /auv/state/x
   StateYTopic: /auv/state/y
   StateZTopic: /auv/state/z
@@ -8247,16 +8247,18 @@ MonoBehaviour:
   outlineWidth: 0.05
   vioPoseColor: {r: 1, g: 0.5, b: 0, a: 1}
   vioPoseSize: 0.3
-  autoFixDrift: 1
+  autoFixDrift: 0
+  statePoseColor: {r: 0, g: 1, b: 0, a: 1}
+  statePoseSize: 0.3
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   classVisualizers:
   - className: gate
     color: {r: 0, g: 1, b: 0, a: 1}
-    prefab: {fileID: 3383246300767830565, guid: 748e9383638f6e24580c5dd29295e718,
+    prefab: {fileID: 3383246300767830565, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
       type: 3}
   - className: lane_marker
     color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    prefab: {fileID: 6836674003132753358, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    prefab: {fileID: 6836674003132753358, guid: c631000e50ba3456f95d1340bfd0bf0d,
       type: 3}
   - className: red_pipe
     color: {r: 1, g: 0, b: 0, a: 1}
@@ -8267,11 +8269,11 @@ MonoBehaviour:
       type: 3}
   - className: octagon
     color: {r: 1, g: 0, b: 1, a: 1}
-    prefab: {fileID: 7140615294393502085, guid: 4d5e143bd70355842a7e253c79b6637e,
+    prefab: {fileID: 7140615294393502085, guid: e1a001adcc379402d8c449d30f539ba1,
       type: 3}
   - className: table
     color: {r: 0.6, g: 0.4, b: 0.2, a: 1}
-    prefab: {fileID: 7602339298612929956, guid: ade684a0c6f48a06f958fab84c6e212c,
+    prefab: {fileID: 7602339298612929956, guid: 6e835f382908e45da90c3ae1593346bf,
       type: 3}
   - className: bin
     color: {r: 0, g: 0, b: 1, a: 1}
@@ -8279,13 +8281,7 @@ MonoBehaviour:
       type: 3}
   - className: board
     color: {r: 0, g: 1, b: 1, a: 1}
-    prefab: {fileID: 976002720483355549, guid: 6879801d142cb97b8af3ca47428c9cce, type: 3}
-  - className: shark
-    color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-    prefab: {fileID: 0}
-  - className: sawfish
-    color: {r: 0.8, g: 0.6, b: 0.2, a: 1}
-    prefab: {fileID: 0}
+    prefab: {fileID: 976002720483355549, guid: 54a671b74869b48249d8cb16ad69e218, type: 3}
 --- !u!4 &1954163045
 Transform:
   m_ObjectHideFlags: 0
