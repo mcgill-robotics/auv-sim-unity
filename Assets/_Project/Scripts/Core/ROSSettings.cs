@@ -62,7 +62,7 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";
 
-    public string StateTopic = "/auv/state";
+    public string StatePoseTopic = "/state/pose";
 
     // State Components
     public string StateXTopic = "/auv/state/x";
