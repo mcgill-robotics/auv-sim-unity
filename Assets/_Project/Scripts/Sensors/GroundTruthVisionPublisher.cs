@@ -119,7 +119,7 @@ namespace Sensors
             msg.header = new RosMessageTypes.Std.HeaderMsg
             {
                 stamp = stampMsg,
-                frame_id = ROSSettings.Instance?.WorldFrameId ?? "world"
+                frame_id = ROSSettings.Instance?.WorldFrameId ?? "pool_link"
             };
             
             var objectsList = new List<VisionObjectMsg>(cachedObjects.Length);
@@ -139,7 +139,9 @@ namespace Sensors
 
                 var visionObj = new VisionObjectMsg
                 {
+                    header = msg.header,
                     label = cachedObj.LabelString,
+                    id = label.gameObject.GetInstanceID(),
                     confidence = defaultConfidence,
                     size = cachedObj.SizeRos,
                     has_orientation = true,
@@ -147,7 +149,8 @@ namespace Sensors
                     {
                         position = cachedObj.PosRos,
                         orientation = cachedObj.RotRos
-                    }
+                    },
+                    frames_since_last_seen = 0
                 };
 
                 objectsList.Add(visionObj);
