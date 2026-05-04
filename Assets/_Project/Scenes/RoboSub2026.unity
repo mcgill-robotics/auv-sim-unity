@@ -4007,7 +4007,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -6418,9 +6418,9 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  PublishGTObjectMap: 0
-  NoWaterMode: 0
-  EnableShadows: 1
+  PublishGTObjectMap: 1
+  NoWaterMode: 1
+  EnableShadows: 0
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
@@ -6432,7 +6432,7 @@ MonoBehaviour:
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 1
+  StreamZEDCamera: 0
   VisualizeDVL: 1
   VisualizeIMU: 0
   VisualizeDepth: 0
@@ -6440,9 +6440,9 @@ MonoBehaviour:
   EnableIMUNoise: 0
   EnableDepthNoise: 0
   DrawerConfigOpen: 0
-  DrawerControlsOpen: 1
+  DrawerControlsOpen: 0
   DrawerTelemetryOpen: 0
-  DrawerSensorsOpen: 1
+  DrawerSensorsOpen: 0
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
@@ -6558,8 +6558,8 @@ MonoBehaviour:
   VisionObjectMapTopic: /vision/object_map
   VIOPoseTopic: /vision/vio_pose
   OdomFrameId: odom
-  WorldFrameId: world
-  BaseLinkFrameId: base_link
+  WorldFrameId: pool_link
+  BaseLinkFrameId: auv_link
   ImuFrameId: imu_link
   DvlFrameId: dvl_link
   FrontCamFrameId: zed_left_camera_optical_frame
