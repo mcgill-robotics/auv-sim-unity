@@ -434,6 +434,13 @@ public class VisionObjectsVisualizer : MonoBehaviour
                         cl.enabled = false;
                     }
                 }
+
+                // Remove all colliders from the spawned prefab to prevent physics interference
+                var colliders = visObj.GetComponentsInChildren<Collider>(true);
+                foreach(var col in colliders)
+                {
+                    Destroy(col);
+                }
             }
         }
 
