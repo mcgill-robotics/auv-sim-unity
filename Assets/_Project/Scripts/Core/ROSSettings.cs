@@ -101,8 +101,8 @@ public class ROSSettings : MonoBehaviour
 
     [Header("Frames")]
     public string OdomFrameId = "odom";
-    public string WorldFrameId = "world";
-    public string BaseLinkFrameId = "base_link";
+    public string WorldFrameId = "pool_link";
+    public string BaseLinkFrameId = "auv_link";
     public string ImuFrameId = "imu_link";
     public string DvlFrameId = "dvl_link";
     public string FrontCamFrameId = "zed_left_camera_optical_frame";
