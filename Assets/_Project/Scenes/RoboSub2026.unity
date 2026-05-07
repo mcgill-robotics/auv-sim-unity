@@ -3500,7 +3500,6 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -4007,7 +4006,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -6419,8 +6418,8 @@ MonoBehaviour:
   PublishROS: 1
   DisplaySimObjects: 0
   PublishGTObjectMap: 1
-  NoWaterMode: 1
-  EnableShadows: 0
+  NoWaterMode: 0
+  EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
@@ -6439,10 +6438,10 @@ MonoBehaviour:
   EnableDVLNoise: 0
   EnableIMUNoise: 0
   EnableDepthNoise: 0
-  DrawerConfigOpen: 0
+  DrawerConfigOpen: 1
   DrawerControlsOpen: 0
   DrawerTelemetryOpen: 0
-  DrawerSensorsOpen: 0
+  DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
@@ -7099,6 +7098,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1849284339}
     m_Modifications:
+    - target: {fileID: 145780365494414191, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 393569793887273085, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -7144,6 +7148,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 2137416907214117948, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2155029704561228687, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 2395709541568057841, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -7155,6 +7169,11 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 2865069548053748949, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3054476688743876850, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
       value: 12
@@ -7314,6 +7333,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 5581238234740319274, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 5598553361501739436, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -7389,6 +7413,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 7283110870220621751, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 7416476660533640328, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -7460,6 +7489,16 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 8652499918029665083, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8844653630253789412, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8862821140964661079, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
       value: 12
