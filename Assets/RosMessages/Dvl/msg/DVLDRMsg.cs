@@ -25,8 +25,6 @@ namespace RosMessageTypes.Dvl
         public double roll;
         public double pitch;
         public double yaw;
-        // Message type
-        public string type;
         // Status message
         public long status;
         // Formatting of json
@@ -41,7 +39,6 @@ namespace RosMessageTypes.Dvl
             this.roll = 0.0;
             this.pitch = 0.0;
             this.yaw = 0.0;
-            this.type = "";
             this.status = 0;
             this.format = "";
         }
@@ -55,7 +52,6 @@ namespace RosMessageTypes.Dvl
             this.roll = roll;
             this.pitch = pitch;
             this.yaw = yaw;
-            this.type = type;
             this.status = status;
             this.format = format;
         }
@@ -71,7 +67,6 @@ namespace RosMessageTypes.Dvl
             deserializer.Read(out this.roll);
             deserializer.Read(out this.pitch);
             deserializer.Read(out this.yaw);
-            deserializer.Read(out this.type);
             deserializer.Read(out this.status);
             deserializer.Read(out this.format);
         }
@@ -85,7 +80,6 @@ namespace RosMessageTypes.Dvl
             serializer.Write(this.roll);
             serializer.Write(this.pitch);
             serializer.Write(this.yaw);
-            serializer.Write(this.type);
             serializer.Write(this.status);
             serializer.Write(this.format);
         }
@@ -100,7 +94,6 @@ namespace RosMessageTypes.Dvl
             "\nroll: " + roll.ToString() +
             "\npitch: " + pitch.ToString() +
             "\nyaw: " + yaw.ToString() +
-            "\ntype: " + type.ToString() +
             "\nstatus: " + status.ToString() +
             "\nformat: " + format.ToString();
         }

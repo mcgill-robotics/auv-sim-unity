@@ -572,6 +572,8 @@ public class DVLPublisher : ROSPublisher
 
         // DR Pose Covariance - just set some defaults
         drMsg.pos_std = 0.1f; // Small uncertainty
+
+        drMsg.format = "simulation";
     }
 
     /// <summary>
