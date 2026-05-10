@@ -152,9 +152,6 @@ public class DVLPublisher : ROSPublisher
     private int sampleCount;
     private float accumulatedTime;
 
-    // DVL JSON Driver
-    private DVLa50SimSender jsonSender;
-
     protected override void Start()
     {
         base.Start();
@@ -200,8 +197,6 @@ public class DVLPublisher : ROSPublisher
         {
             visualizationRoot.SetActive(enableVisualization);
         }
-        // Check for JSON sender component for optional driver fallback
-        TryGetComponent<DVLa50SimSender>(out jsonSender);
     }
 
     private void SetupVisualization()
@@ -281,14 +276,6 @@ public class DVLPublisher : ROSPublisher
             if (SimulationSettings.Instance.PublishDVL && SimulationSettings.Instance.PublishROS)
             {
                 PublishMessage();
-            }
-            else
-            {
-                if (jsonSender != null)
-                {
-                    // If ROS publishing is disabled but JSON sender exists, send JSON message for driver testing
-                    UpdateJSONReports();
-                }
             }
 
             // Calculate next update time
@@ -433,56 +420,6 @@ public class DVLPublisher : ROSPublisher
         }
     }
 
-    private void UpdateJSONReports()
-    {
-        if (jsonSender == null) return;
-        ROSTime time = ROSClock.GetROSTime();
-        // time of validity is the center of the ping, which we approximate as the current time minus half the interval since the last publish (since the velocity is effectively averaged over that interval)
-        long timeOfValidity = time.GetMicroSec() - (lastPublishTime.GetMicroSec() / 1000 / 2);
-        // Update the DVL JSON reports with the latest data for external driver testing
-        DVLJSONProtocol.VelocityReport velReport = new DVLJSONProtocol.VelocityReport
-        {
-            time = lastPublishTime.GetMilliSec(), // Convert back to milliseconds for the report
-            vx = RosVelocity.x,
-            vy = RosVelocity.y,
-            vz = RosVelocity.z,
-            fom = IsValid ? 100 : 0, // Figure of Merit based on validity
-            covariance = new double[][] {
-                new double[] { dvlMsg.covariance[0], dvlMsg.covariance[1], dvlMsg.covariance[2] },
-                new double[] { dvlMsg.covariance[3], dvlMsg.covariance[4], dvlMsg.covariance[5] },
-                new double[] { dvlMsg.covariance[6], dvlMsg.covariance[7], dvlMsg.covariance[8] }
-            },
-            altitude = LastAltitude,
-            transducers = new DVLJSONProtocol.Transducer[]
-            {
-                GetTransducerData(0),
-                GetTransducerData(1),
-                GetTransducerData(2),
-                GetTransducerData(3)
-            },
-            velocity_valid = IsValid,
-            status = 0, // always valid for simplicity, DVL will not overheat in simulation
-            time_of_validity = timeOfValidity,
-            time_of_transmission = time.GetMicroSec(),
-            type = "velocity",
-        };
-        Vector3 DREulerAngles = ROSDeadReckoningOrientation.eulerAngles;
-        DVLJSONProtocol.DeadReckoningReport drReport = new DVLJSONProtocol.DeadReckoningReport
-        {
-            ts = time.GetSec(),
-            x = RosDeadReckoningPosition.x,
-            y = RosDeadReckoningPosition.y,
-            z = RosDeadReckoningPosition.z,
-            std = 0.1f, // Sensible default
-            roll = DREulerAngles.x,
-            pitch = DREulerAngles.y,
-            yaw = DREulerAngles.z,
-            status = 0, // always valid for simplicity, DR will not diverge in simulation
-            type = "position_local"
-        };
-        jsonSender.UpdateReports(velReport, drReport);
-    }
-
     private DVLBeamMsg GetBeamData(int index)
     {
         if (index < 0 || index >= 4) return null;
@@ -498,19 +435,6 @@ public class DVLPublisher : ROSPublisher
         return beam;
     }
 
-    private DVLJSONProtocol.Transducer GetTransducerData(int index)
-    {
-        if (index < 0 || index >= 4) return null;
-        return new DVLJSONProtocol.Transducer
-        {
-            id = index,
-            velocity = Vector3.Dot(LastVelocity, beamDirectionsLocal[index]),
-            distance = Vector3.Distance(transform.position, BeamHitPoints[index]),
-            rssi = BeamValid[index] ? 100 : 0, // Simplified RSSI based on validity
-            nsd = BeamValid[index] ? 1.0 : 10.0, // Normalized Signal Strength (lower is better), simplified
-            beam_valid = BeamValid[index]
-        };
-    }
     /// <summary>
     /// Updates the DR and Odometry messages based on the latest simulation step.
     /// </summary>
