@@ -340,7 +340,7 @@ public class ZED2iSimSender : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start. Please ensure ZED SDK version >= 5.1.x and NVIDIA driver version < 590.x.x are installed.");
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start. Please ensure ZED SDK version >= 5.1.x and NVIDIA driver version == 580.x.x are installed.");
             close_streamer(streamerID);
         }
     }

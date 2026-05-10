@@ -36,6 +36,7 @@
                     <ui:Toggle name="Toggle-SimObjects" label="Debug Viz" value="true" />
                     <ui:Toggle name="Toggle-GTObjectMap" label="GT Object Map" value="true" />
                     <ui:Toggle name="Toggle-StreamZED" label="ZED X Stream" value="false" />
+                    <ui:Toggle name="Toggle-StreamDVL" label="DVL-a50 TCP Server" value="false" />
                     <ui:Toggle name="Toggle-FreeCamera" label="Free Camera" value="false" />
                     
                     

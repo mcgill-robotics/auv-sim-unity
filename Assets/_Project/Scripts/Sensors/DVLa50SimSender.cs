@@ -120,6 +120,11 @@ public class DVLa50SimSender : MonoBehaviour
 
     private void Start()
     {
+        if (!SimulationSettings.Instance.StreamDVL)
+        {
+            Debug.Log("DVLa50SimSender: StreamDVL is disabled in SimulationSettings, not starting DVL simulator server.");
+            return;
+        }
         lastPublishTime = GetTimeMicroseconds(); // Initialize last publish time to current time
         // Start the server in a separate thread to avoid blocking the main Unity thread
         serverThread = new Thread(new ThreadStart(SetupServer))

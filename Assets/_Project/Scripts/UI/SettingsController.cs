@@ -13,6 +13,7 @@ public class SettingsController
     private Toggle toggleSimObjects;
     private Toggle toggleGTObjectMap;
     private Toggle toggleStreamZED;
+    private Toggle toggleStreamDVL;
     private Toggle toggleWater;
     private Toggle toggleShadows;
     private Toggle toggleFreeCamera;
@@ -55,6 +56,7 @@ public class SettingsController
         toggleSimObjects = root.Q<Toggle>("Toggle-SimObjects");
         toggleGTObjectMap = root.Q<Toggle>("Toggle-GTObjectMap");
         toggleStreamZED = root.Q<Toggle>("Toggle-StreamZED");
+        toggleStreamDVL = root.Q<Toggle>("Toggle-StreamDVL");
         toggleWater = root.Q<Toggle>("Toggle-Water");
         toggleShadows = root.Q<Toggle>("Toggle-Shadows");
         toggleFreeCamera = root.Q<Toggle>("Toggle-FreeCamera");
@@ -215,13 +217,18 @@ public class SettingsController
         if (toggleGTObjectMap != null) toggleGTObjectMap.value = SimulationSettings.Instance.PublishGTObjectMap;
         if (toggleStreamZED != null)
         {
-#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
             toggleStreamZED.style.display = DisplayStyle.Flex;
 #else
             toggleStreamZED.value = false;
             toggleStreamZED.style.display = DisplayStyle.None;
 #endif
+        }
+        if (toggleStreamDVL != null)
+        {
+            toggleStreamDVL.value = SimulationSettings.Instance.StreamDVL;
+            toggleStreamDVL.style.display = DisplayStyle.Flex;
         }
         if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
         if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;
@@ -252,6 +259,7 @@ public class SettingsController
         if (toggleSimObjects != null) SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
         if (toggleGTObjectMap != null) SimulationSettings.Instance.PublishGTObjectMap = toggleGTObjectMap.value;
         if (toggleStreamZED != null) SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
+        if (toggleStreamDVL != null) SimulationSettings.Instance.StreamDVL = toggleStreamDVL.value;
         if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
         if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
         if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;

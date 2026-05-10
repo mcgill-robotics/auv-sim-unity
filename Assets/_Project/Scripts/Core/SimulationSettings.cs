@@ -74,6 +74,9 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Stream ZED stereo camera via ZED SDK (disables front camera ROS publishing)")]
     public bool StreamZEDCamera = false;
 
+    [Tooltip("Stream DVL-a50 data via TCP Server")]
+    public bool StreamDVL = false;
+
     [Space(10)]
     [Header("Sensor Visualization")]
     [Tooltip("Show DVL beam visualization")]
@@ -276,6 +279,7 @@ public class SimulationSettings : MonoBehaviour
         PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
         PublishDepthCamera = bool.Parse(PlayerPrefs.GetString("PublishDepthCameraToggle", "false"));
         StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
+        StreamDVL = bool.Parse(PlayerPrefs.GetString("StreamDVLToggle", "false"));
 
         // Force disable ZED streaming on platforms other than Windows or Linux
 #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX && !UNITY_EDITOR_WIN && !UNITY_STANDALONE_WIN
@@ -383,6 +387,7 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCam.ToString());
         PlayerPrefs.SetString("PublishDepthCameraToggle", PublishDepthCamera.ToString());
         PlayerPrefs.SetString("StreamZEDCameraToggle", StreamZEDCamera.ToString());
+        PlayerPrefs.SetString("StreamDVLToggle", StreamDVL.ToString());
 
         PlayerPrefs.SetString("VisualizeDVLToggle", VisualizeDVL.ToString());
         PlayerPrefs.SetString("VisualizeIMUToggle", VisualizeIMU.ToString());

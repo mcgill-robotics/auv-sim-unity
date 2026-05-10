@@ -211,7 +211,10 @@ public class DVLPublisher : ROSPublisher
             visualizationRoot.SetActive(enableVisualization);
         }
         // Check for JSON sender component for optional driver fallback
-        TryGetComponent<DVLa50SimSender>(out jsonSender);
+        if (SimulationSettings.Instance.StreamDVL)
+        {
+            TryGetComponent<DVLa50SimSender>(out jsonSender);
+        }
     }
 
     private void SetupVisualization()
@@ -292,7 +295,7 @@ public class DVLPublisher : ROSPublisher
             {
                 PublishMessage();
             }
-            else
+            if (SimulationSettings.Instance.StreamDVL)
             {
                 if (jsonSender != null)
                 {
@@ -300,6 +303,7 @@ public class DVLPublisher : ROSPublisher
                     UpdateJSONReports();
                 }
             }
+
 
             // Calculate next update time
             lastPublishTime = nextPublishTime;
