@@ -114,7 +114,7 @@ public class DVLPublisher : ROSPublisher
 
     // Internals
     private DVLMsg dvlMsg;
-    private PoseWithCovarianceStampedMsg drMsg;
+    private DVLDRMsg drMsg;
     private OdometryMsg odomMsg;
     
     private Vector3 drPositionNED; // Cached NED position for UI property
@@ -163,7 +163,7 @@ public class DVLPublisher : ROSPublisher
         useBaseRateLimiting = false;
 
         dvlMsg = new DVLMsg();
-        drMsg = new PoseWithCovarianceStampedMsg();
+        drMsg = new DVLDRMsg();
         odomMsg = new OdometryMsg();
 
 
@@ -314,7 +314,7 @@ public class DVLPublisher : ROSPublisher
     protected override void RegisterPublisher()
     {
         ros.RegisterPublisher<DVLMsg>(Topic);
-        ros.RegisterPublisher<PoseWithCovarianceStampedMsg>(ROSSettings.Instance.DVLDeadReckoningTopic);
+        ros.RegisterPublisher<DVLDRMsg>(ROSSettings.Instance.DVLDeadReckoningTopic);
         ros.RegisterPublisher<OdometryMsg>(ROSSettings.Instance.DVLOdometryTopic);
     }
 
@@ -395,6 +395,42 @@ public class DVLPublisher : ROSPublisher
         dvlMsg.time_of_validity = timeOfValidity;
         dvlMsg.time_of_transmission = time.GetMicroSec();
         dvlMsg.form = "simulation";
+
+        // Odometry Twist using DVL velocity (FRD) or Body FLU?
+        // nav_msgs/Odometry twist is usually in child_frame_id (Body/Sensor).
+        // Since child_frame_id is "dvl_link", and user defined DVL as FRD for velocity...
+        // We populate it with the FRD velocity we have in dvlMsg.
+
+        odomMsg.twist.twist.linear.x = dvlMsg.velocity.x;
+        odomMsg.twist.twist.linear.y = dvlMsg.velocity.y;
+        odomMsg.twist.twist.linear.z = dvlMsg.velocity.z;
+        // Angular velocity - unobserved by DVL, zero
+        odomMsg.twist.twist.angular.x = 0;
+        odomMsg.twist.twist.angular.y = 0;
+        odomMsg.twist.twist.angular.z = 0;
+
+        // Covariance
+        // Copy DVL covariance to Odom twist
+        // Pose covariance grows over time - implementing a simple growth model or constant
+        // For now, using identity/constant for pose.
+
+        // Twist covariance (mapping 3x3 diagonal from DvlMsg to 6x6)
+        // DvlMsg has 9 elements (row major 3x3)
+        // Twist has 36 elements (row major 6x6)
+        for (int k = 0; k < 36; k++) odomMsg.twist.covariance[k] = 0;
+
+        if (IsValid)
+        {
+            odomMsg.twist.covariance[0] = dvlMsg.covariance[0]; // xx
+            odomMsg.twist.covariance[7] = dvlMsg.covariance[4]; // yy
+            odomMsg.twist.covariance[14] = dvlMsg.covariance[8]; // zz
+        }
+        else
+        {
+            odomMsg.twist.covariance[0] = 10000;
+            odomMsg.twist.covariance[7] = 10000;
+            odomMsg.twist.covariance[14] = 10000;
+        }
     }
 
     private void UpdateJSONReports()
@@ -500,11 +536,13 @@ public class DVLPublisher : ROSPublisher
         
         // Cache for Public Property
         drPositionNED = new Vector3(relativePos.z, relativePos.x, -relativePos.y);
-        
-        drMsg.pose.pose.position.x = drPositionNED.x;
-        drMsg.pose.pose.position.y = drPositionNED.y;
-        drMsg.pose.pose.position.z = drPositionNED.z;
-        
+
+        drMsg.position = new Vector3Msg
+        {
+            x = drPositionNED.x,
+            y = drPositionNED.y,
+            z = drPositionNED.z
+        };
         // 3. Orientation (Relative to Start)
         Quaternion relativeRot = Quaternion.Inverse(SimulationOrigin.Instance.InitialRotation) * transform.rotation;
         
@@ -517,56 +555,23 @@ public class DVLPublisher : ROSPublisher
         
         Quaternion q = relativeRot;
         drOrientation = new Quaternion(-q.z, -q.x, q.y, q.w);
+        Vector3 drEuler = drOrientation.eulerAngles; // For debugging/UI
 
-        drMsg.pose.pose.orientation.x = drOrientation.x;
-        drMsg.pose.pose.orientation.y = drOrientation.y;
-        drMsg.pose.pose.orientation.z = drOrientation.z;
-        drMsg.pose.pose.orientation.w = drOrientation.w;
+        drMsg.roll = drEuler.x;
+        drMsg.pitch = drEuler.y;
+        drMsg.yaw = drEuler.z;
 
         // 4. Copy to Odometry
-        odomMsg.pose.pose = drMsg.pose.pose; // Share reference or copy? Msg classes are distinct, copy fields.
-        odomMsg.pose.pose.position = drMsg.pose.pose.position; // Reference copy OK for messages if not parallel access
-        odomMsg.pose.pose.orientation = drMsg.pose.pose.orientation;
-        
-        // 5. Odometry Twist using DVL velocity (FRD) or Body FLU?
-        // nav_msgs/Odometry twist is usually in child_frame_id (Body/Sensor).
-        // Since child_frame_id is "dvl_link", and user defined DVL as FRD for velocity...
-        // We populate it with the FRD velocity we have in dvlMsg.
-        
-        odomMsg.twist.twist.linear.x = dvlMsg.velocity.x;
-        odomMsg.twist.twist.linear.y = dvlMsg.velocity.y;
-        odomMsg.twist.twist.linear.z = dvlMsg.velocity.z;
-        // Angular velocity - unobserved by DVL, zero
-        odomMsg.twist.twist.angular.x = 0;
-        odomMsg.twist.twist.angular.y = 0;
-        odomMsg.twist.twist.angular.z = 0;
-        
-        // 6. Covariance
-        // Copy DVL covariance to Odom twist
-        // Pose covariance grows over time - implementing a simple growth model or constant
-        // For now, using identity/constant for pose.
-        
-        // Twist covariance (mapping 3x3 diagonal from DvlMsg to 6x6)
-        // DvlMsg has 9 elements (row major 3x3)
-        // Twist has 36 elements (row major 6x6)
-        for(int k=0; k<36; k++) odomMsg.twist.covariance[k] = 0;
-        
-        if (IsValid)
-        {
-            odomMsg.twist.covariance[0] = dvlMsg.covariance[0]; // xx
-            odomMsg.twist.covariance[7] = dvlMsg.covariance[4]; // yy
-            odomMsg.twist.covariance[14] = dvlMsg.covariance[8]; // zz
-        }
-        else
-        {
-            odomMsg.twist.covariance[0] = 10000;
-            odomMsg.twist.covariance[7] = 10000;
-            odomMsg.twist.covariance[14] = 10000;
-        }
-        
+        odomMsg.pose.pose.position.x = drPositionNED.x;
+        odomMsg.pose.pose.position.y = drPositionNED.y;
+        odomMsg.pose.pose.position.z = drPositionNED.z;
+        odomMsg.pose.pose.orientation.x = drOrientation.x;
+        odomMsg.pose.pose.orientation.y = drOrientation.y;
+        odomMsg.pose.pose.orientation.z = drOrientation.z;
+        odomMsg.pose.pose.orientation.w = drOrientation.w;
+
         // DR Pose Covariance - just set some defaults
-        for(int k=0; k<36; k++) drMsg.pose.covariance[k] = 0.1; // Small uncertainty
-        odomMsg.pose.covariance = drMsg.pose.covariance;
+        drMsg.pos_std = 0.1f; // Small uncertainty
     }
 
     /// <summary>
