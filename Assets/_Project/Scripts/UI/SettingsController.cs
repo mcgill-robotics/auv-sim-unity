@@ -252,7 +252,6 @@ public class SettingsController
         if (toggleSimObjects != null) SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
         if (toggleGTObjectMap != null) SimulationSettings.Instance.PublishGTObjectMap = toggleGTObjectMap.value;
         if (toggleStreamZED != null) SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
-        if (toggleStreamDVL != null) SimulationSettings.Instance.StreamDVL = toggleStreamDVL.value;
         if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
         if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
         if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;

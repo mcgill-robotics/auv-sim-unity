@@ -1,5 +1,5 @@
 using UnityEngine;
-using RosMessageTypes.MarineAcoustic;
+using RosMessageTypes.Dvl;
 using RosMessageTypes.Std;
 using RosMessageTypes.Nav;
 using RosMessageTypes.Geometry;
@@ -113,7 +113,7 @@ public class DVLPublisher : ROSPublisher
     public Quaternion ROSDeadReckoningOrientation => drOrientation;
 
     // Internals
-    private DvlMsg dvlMsg;
+    private DVLMsg dvlMsg;
     private PoseWithCovarianceStampedMsg drMsg;
     private OdometryMsg odomMsg;
     
@@ -161,17 +161,13 @@ public class DVLPublisher : ROSPublisher
         
         // DVL uses its own adaptive timing based on altitude, not base class rate limiting
         useBaseRateLimiting = false;
-        
-        dvlMsg = new DvlMsg();
+
+        dvlMsg = new DVLMsg();
         drMsg = new PoseWithCovarianceStampedMsg();
         odomMsg = new OdometryMsg();
-        
 
-        
-        dvlMsg.beam_unit_vec = new RosMessageTypes.Geometry.Vector3Msg[4];
-        
-        dvlMsg.beam_unit_vec = new RosMessageTypes.Geometry.Vector3Msg[4];
-        
+
+
         initialSensorPosition = transform.position;
         drPositionUnity = Vector3.zero;
         
@@ -192,15 +188,9 @@ public class DVLPublisher : ROSPublisher
             Quaternion tilt = Quaternion.Euler(beamTiltAngle, 0f, 0f);
             Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
             beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
-            
-            // Populate ROS beam unit vectors (Unity RUF -> ROS FRD)
-            // Unity X -> ROS Y
-            // Unity -Y -> ROS Z
-            // Unity Z -> ROS X
-            Vector3 v = beamDirectionsLocal[i];
-            dvlMsg.beam_unit_vec[i] = new RosMessageTypes.Geometry.Vector3Msg(v.z, v.x, -v.y);
+
         }
-        
+
         // Initialize Gauss-Markov bias model with pre-calculated coefficients
         velocityBias = new GaussMarkovVector(biasCorrelationTime, biasSigma, Time.fixedDeltaTime);
         
@@ -323,7 +313,7 @@ public class DVLPublisher : ROSPublisher
 
     protected override void RegisterPublisher()
     {
-        ros.RegisterPublisher<DvlMsg>(Topic);
+        ros.RegisterPublisher<DVLMsg>(Topic);
         ros.RegisterPublisher<PoseWithCovarianceStampedMsg>(ROSSettings.Instance.DVLDeadReckoningTopic);
         ros.RegisterPublisher<OdometryMsg>(ROSSettings.Instance.DVLOdometryTopic);
     }
@@ -348,17 +338,19 @@ public class DVLPublisher : ROSPublisher
     /// </summary>
     private void UpdateDvlMessageData()
     {
-        // 1. Config
-        dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId; // "dvl_link"
-        dvlMsg.velocity_mode = DvlMsg.DVL_MODE_BOTTOM;
-        dvlMsg.dvl_type = DvlMsg.DVL_TYPE_PISTON;
-        
-        // 2. Validity Flags
-        dvlMsg.beam_velocities_valid = IsValid;
-        dvlMsg.beam_ranges_valid = true; 
-        dvlMsg.num_good_beams = (byte)ValidBeamCount;
-        dvlMsg.altitude = IsValid ? LastAltitude : -1.0;
+        ROSTime time = ROSClock.GetROSTime();
+        // time of validity is the center of the ping, which we approximate as the current time minus half the interval since the last publish (since the velocity is effectively averaged over that interval)
+        long timeOfValidity = time.GetMicroSec() - (lastPublishTime.GetMicroSec() / 1000 / 2);
 
+        dvlMsg.time = lastPublishTime.GetMilliSec(); // Convert back to milliseconds for the message
+
+        dvlMsg.velocity = new Vector3Msg
+        {
+            x = RosVelocity.x,
+            y = RosVelocity.y,
+            z = RosVelocity.z
+        };
+        dvlMsg.fom = IsValid ? 100 : 0; // Figure of Merit based on validity
         if (IsValid)
         {
             // 3. Velocity (Sensor Frame: FRD)
@@ -368,10 +360,10 @@ public class DVLPublisher : ROSPublisher
             dvlMsg.velocity.z = -LastVelocity.y;
 
             // 4. Covariance (3x3 Diagonal)
-            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
-            dvlMsg.velocity_covar[0] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var X
-            dvlMsg.velocity_covar[4] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var Y
-            dvlMsg.velocity_covar[8] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var Z
+            for (int i = 0; i < 9; i++) dvlMsg.covariance[i] = 0;
+            dvlMsg.covariance[0] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var X
+            dvlMsg.covariance[4] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var Y
+            dvlMsg.covariance[8] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var Z
         }
         else
         {
@@ -379,19 +371,29 @@ public class DVLPublisher : ROSPublisher
             dvlMsg.velocity.x = 0;
             dvlMsg.velocity.y = 0;
             dvlMsg.velocity.z = 0;
-            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
-            
-            dvlMsg.velocity_covar[0] = 10000;
-            dvlMsg.velocity_covar[4] = 10000;
-            dvlMsg.velocity_covar[8] = 10000;
+            for (int i = 0; i < 9; i++) dvlMsg.covariance[i] = 0;
+
+            dvlMsg.covariance[0] = 10000;
+            dvlMsg.covariance[4] = 10000;
+            dvlMsg.covariance[8] = 10000;
         }
 
-        // 5. Beam Data
-        for (int i = 0; i < 4; i++)
+
+        dvlMsg.altitude = LastAltitude;
+
+
+        dvlMsg.beams = new DVLBeamMsg[]
         {
-            dvlMsg.range[i] = BeamValid[i] ? Vector3.Distance(transform.position, BeamHitPoints[i]) : 0;
-            dvlMsg.beam_quality[i] = BeamValid[i] ? 100f : 0f;
-        }
+            GetBeamData(0),
+            GetBeamData(1),
+            GetBeamData(2),
+            GetBeamData(3)
+        };
+        dvlMsg.velocity_valid = IsValid;
+        dvlMsg.status = 0; // always valid for simplicity, DVL will not overheat in simulation
+        dvlMsg.time_of_validity = timeOfValidity;
+        dvlMsg.time_of_transmission = time.GetMicroSec();
+        dvlMsg.form = "simulation";
     }
 
     private void UpdateJSONReports()
@@ -409,9 +411,9 @@ public class DVLPublisher : ROSPublisher
             vz = RosVelocity.z,
             fom = IsValid ? 100 : 0, // Figure of Merit based on validity
             covariance = new double[][] {
-                new double[] { dvlMsg.velocity_covar[0], dvlMsg.velocity_covar[1], dvlMsg.velocity_covar[2] },
-                new double[] { dvlMsg.velocity_covar[3], dvlMsg.velocity_covar[4], dvlMsg.velocity_covar[5] },
-                new double[] { dvlMsg.velocity_covar[6], dvlMsg.velocity_covar[7], dvlMsg.velocity_covar[8] }
+                new double[] { dvlMsg.covariance[0], dvlMsg.covariance[1], dvlMsg.covariance[2] },
+                new double[] { dvlMsg.covariance[3], dvlMsg.covariance[4], dvlMsg.covariance[5] },
+                new double[] { dvlMsg.covariance[6], dvlMsg.covariance[7], dvlMsg.covariance[8] }
             },
             altitude = LastAltitude,
             transducers = new DVLJSONProtocol.Transducer[]
@@ -442,6 +444,21 @@ public class DVLPublisher : ROSPublisher
             type = "position_local"
         };
         jsonSender.UpdateReports(velReport, drReport);
+    }
+
+    private DVLBeamMsg GetBeamData(int index)
+    {
+        if (index < 0 || index >= 4) return null;
+        DVLBeamMsg beam = new DVLBeamMsg
+        {
+            id = index,
+            velocity = Vector3.Dot(LastVelocity, beamDirectionsLocal[index]),
+            distance = Vector3.Distance(transform.position, BeamHitPoints[index]),
+            rssi = BeamValid[index] ? 100 : 0, // Simplified RSSI based on validity
+            nsd = BeamValid[index] ? 1.0 : 10.0, // Normalized Signal Strength (lower is better), simplified
+            valid = BeamValid[index]
+        };
+        return beam;
     }
 
     private DVLJSONProtocol.Transducer GetTransducerData(int index)
@@ -535,9 +552,9 @@ public class DVLPublisher : ROSPublisher
         
         if (IsValid)
         {
-            odomMsg.twist.covariance[0] = dvlMsg.velocity_covar[0]; // xx
-            odomMsg.twist.covariance[7] = dvlMsg.velocity_covar[4]; // yy
-            odomMsg.twist.covariance[14] = dvlMsg.velocity_covar[8]; // zz
+            odomMsg.twist.covariance[0] = dvlMsg.covariance[0]; // xx
+            odomMsg.twist.covariance[7] = dvlMsg.covariance[4]; // yy
+            odomMsg.twist.covariance[14] = dvlMsg.covariance[8]; // zz
         }
         else
         {
@@ -820,12 +837,6 @@ public class DVLPublisher : ROSPublisher
                 Quaternion tilt = Quaternion.Euler(beamTiltAngle, 0f, 0f);
                 Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
                 beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
-                
-                // Update ROS beam unit vectors
-                Vector3 v = beamDirectionsLocal[i];
-                dvlMsg.beam_unit_vec[i].x = v.z;
-                dvlMsg.beam_unit_vec[i].y = v.x;
-                dvlMsg.beam_unit_vec[i].z = -v.y;
             }
         }
         
