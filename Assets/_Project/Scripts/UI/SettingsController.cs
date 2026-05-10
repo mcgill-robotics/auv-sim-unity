@@ -215,7 +215,7 @@ public class SettingsController
         if (toggleGTObjectMap != null) toggleGTObjectMap.value = SimulationSettings.Instance.PublishGTObjectMap;
         if (toggleStreamZED != null)
         {
-#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
             toggleStreamZED.style.display = DisplayStyle.Flex;
 #else
@@ -252,6 +252,7 @@ public class SettingsController
         if (toggleSimObjects != null) SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
         if (toggleGTObjectMap != null) SimulationSettings.Instance.PublishGTObjectMap = toggleGTObjectMap.value;
         if (toggleStreamZED != null) SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
+        if (toggleStreamDVL != null) SimulationSettings.Instance.StreamDVL = toggleStreamDVL.value;
         if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
         if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
         if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;
