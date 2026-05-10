@@ -45,6 +45,14 @@ public class VisionObjectsVisualizer : MonoBehaviour
     [Tooltip("Continuously align VIO pose with AUV ground truth")]
     public bool autoFixDrift = false;
 
+    [Header("State Pose Visualization")]
+    [Tooltip("Color for the State pose marker")]
+    public Color statePoseColor = new Color(0f, 1f, 0f); // Green
+
+    [Tooltip("Size of the State pose marker")]
+    [Range(0.1f, 1f)]
+    public float statePoseSize = 0.3f;
+
     [Header("Colors by Class")]
     [Tooltip("Default color for unknown classes")]
     public Color defaultColor = Color.white;
@@ -94,12 +102,14 @@ public class VisionObjectsVisualizer : MonoBehaviour
 
     // VIO pose marker
     private GameObject vioPoseMarker;
+    private GameObject statePoseMarker;
 
     private void Start()
     {
         ros = ROSConnection.GetOrCreateInstance();
         ros.Subscribe<VisionObjectArrayMsg>(ROSSettings.Instance.VisionObjectMapTopic, OnVisionObjectsReceived);
         ros.Subscribe<PoseStampedMsg>(ROSSettings.Instance.VIOPoseTopic, OnVIOPoseReceived);
+        ros.Subscribe<PoseStampedMsg>(ROSSettings.Instance.StatePoseTopic, OnStatePoseReceived);
 
         visualizerRoot = new GameObject("VisionObjects_Visualizer").transform;
         visualizerRoot.SetParent(transform);
@@ -131,6 +141,7 @@ public class VisionObjectsVisualizer : MonoBehaviour
 
         // Create VIO pose marker (cube to distinguish from object spheres)
         CreateVIOPoseMarker();
+        CreateStatePoseMarker();
     }
 
     private void CreateVIOPoseMarker()
@@ -138,7 +149,8 @@ public class VisionObjectsVisualizer : MonoBehaviour
         vioPoseMarker = GameObject.CreatePrimitive(PrimitiveType.Cube);
         vioPoseMarker.name = "VIO_Pose_Marker";
         vioPoseMarker.transform.SetParent(visualizerRoot);
-        vioPoseMarker.transform.localScale = Vector3.one * vioPoseSize;
+        // Make it rectangular (longer in Z) to show forward orientation
+        vioPoseMarker.transform.localScale = new Vector3(vioPoseSize * 0.5f, vioPoseSize * 0.5f, vioPoseSize);
 
         var collider = vioPoseMarker.GetComponent<Collider>();
         if (collider != null) Destroy(collider);
@@ -164,6 +176,40 @@ public class VisionObjectsVisualizer : MonoBehaviour
         textMesh.color = vioPoseColor;
 
         vioPoseMarker.SetActive(false); // Hide until we receive data
+    }
+
+    private void CreateStatePoseMarker()
+    {
+        statePoseMarker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        statePoseMarker.name = "State_Pose_Marker";
+        statePoseMarker.transform.SetParent(visualizerRoot);
+        // Make it rectangular (longer in Z) to show forward orientation
+        statePoseMarker.transform.localScale = new Vector3(statePoseSize * 0.5f, statePoseSize * 0.5f, statePoseSize);
+
+        var collider = statePoseMarker.GetComponent<Collider>();
+        if (collider != null) Destroy(collider);
+
+        var renderer = statePoseMarker.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material = new Material(Shader.Find("HDRP/Lit"));
+            renderer.material.color = statePoseColor;
+        }
+
+        // Add label
+        var labelObj = new GameObject("Label");
+        labelObj.transform.SetParent(statePoseMarker.transform);
+        labelObj.transform.localPosition = Vector3.up * (statePoseSize + 0.1f);
+
+        var textMesh = labelObj.AddComponent<TextMesh>();
+        textMesh.text = "Believed Pose";
+        textMesh.fontSize = 24;
+        textMesh.characterSize = 0.05f;
+        textMesh.anchor = TextAnchor.LowerCenter;
+        textMesh.alignment = TextAlignment.Center;
+        textMesh.color = statePoseColor;
+
+        statePoseMarker.SetActive(false); // Hide until we receive data
     }
 
     private void OnVIOPoseReceived(PoseStampedMsg msg)
@@ -195,8 +241,44 @@ public class VisionObjectsVisualizer : MonoBehaviour
         // Apply starting rotation and position offset
         Vector3 unityPos = worldOrigin + (worldRotation * rosToUnity);
 
+        // Convert orientation from ROS FLU to Unity RUDF
+        Quaternion rosRot = new Quaternion(
+            -(float)msg.pose.orientation.y,
+            (float)msg.pose.orientation.z,
+            (float)msg.pose.orientation.x,
+            -(float)msg.pose.orientation.w
+        );
+        Quaternion unityRot = worldRotation * rosRot;
+
         vioPoseMarker.SetActive(true);
         vioPoseMarker.transform.position = unityPos;
+        vioPoseMarker.transform.rotation = unityRot;
+    }
+
+    private void OnStatePoseReceived(PoseStampedMsg msg)
+    {
+        // Convert from ROS (X-Fwd, Y-Left, Z-Up) to Unity (X-Right, Y-Up, Z-Fwd)
+        Vector3 rosToUnity = new Vector3(
+            -(float)msg.pose.position.y,
+            (float)msg.pose.position.z,
+            (float)msg.pose.position.x
+        );
+
+        // Apply starting rotation and position offset
+        Vector3 unityPos = worldOrigin + (worldRotation * rosToUnity);
+
+        // Convert orientation from ROS FLU to Unity RUDF
+        Quaternion rosRot = new Quaternion(
+            -(float)msg.pose.orientation.y,
+            (float)msg.pose.orientation.z,
+            (float)msg.pose.orientation.x,
+            -(float)msg.pose.orientation.w
+        );
+        Quaternion unityRot = worldRotation * rosRot;
+
+        statePoseMarker.SetActive(true);
+        statePoseMarker.transform.position = unityPos;
+        statePoseMarker.transform.rotation = unityRot;
     }
 
     [ContextMenu("Fix Drift")]
@@ -351,6 +433,13 @@ public class VisionObjectsVisualizer : MonoBehaviour
                     {
                         cl.enabled = false;
                     }
+                }
+
+                // Remove all colliders from the spawned prefab to prevent physics interference
+                var colliders = visObj.GetComponentsInChildren<Collider>(true);
+                foreach(var col in colliders)
+                {
+                    Destroy(col);
                 }
             }
         }

@@ -56,3 +56,43 @@ To use this module in a new scene or to generate datasets:
   2. Map its values inside `BatchRunner`. Cache it in `Awake()` via `GetRandomizer<MyNewRandomizer>()`.
   3. Change its properties dynamically inside `BatchRunner.UpdateBatchConfig()`.
 * **Changing Object Placement Constraints**: Open `PoolFloorPlacementRandomizer` and configure `spawnHeight` behavior, or move to a non-planar 3D volumetric spawn approach by migrating off of the basic `PoissonDiskSampling` into 3-axis math points.
+
+## Adding a New Visually Randomized Prop
+
+1. Create a new prefab for the prop (e.g., a new type of gate or bin).
+2. Add a `VisualTargetRandomizerTag` component to the root of prefab.
+3. Determine which parts of the prehab should have randomized configurations (e.g., a gate's image material, or a bin's body color). 
+4. Add each part found above to the `targets` list of the `VisualTargetRandomizerTag`. Ensure the target has the correct world transform (i.e. position/rotation/scale relative to the prop root).
+5. Determine all visual variations that can be applied to the targets.
+6. Make each visual variation as a prehab in a subfolder of the appropriate prop folder. One easy way this can be done is to create the visual variant as a child of one of your targets, and then drag that child into the Unity Project window to create a prefab out of it.
+7. For each variant prefab created, add it to the `configs` list of the `VisualTargetRandomizer Tag` of the prop.
+8. Test your new prop by pressing the "Randomize Materials & Labels Now" button on the `VisualTargetRandomizerTag`. You should see each target being assigned a new config.
+
+Further notes to consider:
+
+- To add labels, add a `Labeling` component to the target game object. It must have a `MeshRenderer` and `Material` component so that the Perception Camera can capture the label in the dataset.
+- Add a `ConditionalLabeling` component to the same target game object if you want to disable the label under certain conditions (e.g., if the camera is too far away or looking at it from an extreme angle).
+- If you want to add a label to a specific portion of the prop without adding a new visible material (i.e. sublabelling an already existing label), add the `Transparent` material to the object along with the `MeshRenderer` and `Labeling` components. This way, the Perception Camera can capture the label without affecting the visual appearance of the prop.
+
+## Reproducibility and Random State
+
+All randomization is driven by a `Unity.Mathematics.Random` state, which is seeded from the `SamplerState` of the `FixedLengthScenario`. This ensures that all randomizers in the scenario are perfectly in sync and reproducible across runs, as long as the same seed and batch configurations are used. Please respect the following patterns to ensure reproducibility:
+
+1. Avoid reordering public Parameter fields in any Randomizer subclass and reordering Randomizers in the `FixedLengthScenario` stack, as this will change the order of random state consumption and break reproducibility. Reordering is acceptable if a entirely new random dataset generation is desired (i.e. a refactor of the dataset). A similar caveat applies to conditionally consuming the random state (e.g. only generating random values if a checkbox is enabled) — this will also change the ordering of random state and break reproducibility when toggling the checkbox on/off between runs.
+2. **Never** use `UnityEngine.Random` or `System.Random` — use `SamplerState.NextRandomState()` instead to seed a `Unity.Mathematics.Random` instance, and use that for all random value generation:
+
+```csharp
+// ✅ Correct way to generate a random float between 0 and 1, random state should be a class member reinitialized in OnIterationStart()
+Unity.Mathematics.Random RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
+float randomValue = RandomState.NextFloat(0f, 1f);
+// ❌ Incorrect way (breaks reproducibility)
+float randomValue = UnityEngine.Random.Range(0f, 1f);
+```
+
+Since the image capture time is non deterministic (depends on the Unity rendering loop and the hardware), the images themselves will be ever imperceptibly different across runs even with the same random seed. Thus, to verify if seeding worked, one can generate two datasets with the same seed and batch config, then compare the JSON metadata dumps — they should be identical in terms of randomizer parameter values and captured labels. Go to the dataset directory (typical `~/.config/unity3d/McGill\ Robotics/AUV-SIM-UNITY`) and recursively diff the two datasets:
+
+```bash
+diff -r --exclude="*.png" solo solo_1
+```
+
+The only difference between the two directories should be simulation start and end times.

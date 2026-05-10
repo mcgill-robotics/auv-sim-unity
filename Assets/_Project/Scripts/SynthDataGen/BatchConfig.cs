@@ -9,30 +9,33 @@ using UnityEngine;
 public class BatchConfig : ISerializationCallbackReceiver
 {
     #region Batch Info
-    
+
     [Header("Batch Info")]
     [Tooltip("Name for this batch (e.g., 'HighVisibility', 'Murky')")]
     public string batchName = "NewBatch";
-    
+
     [Tooltip("Number of iterations to run for this batch")]
     public int iterations = 1000;
-    
+
     #endregion
-    
+
     #region Object Placement
-    
+
     [Header("Object Placement")]
     [Tooltip("If false, no objects are spawned (Background Only batch)")]
     public bool spawnObjects = true;
-    
+    [Header("Visual Randomization")]
+    [Tooltip("If true, randomizes materials and labels on all spawned objects with VisualTargetRandomizerTag.")]
+    public bool randomizeVisuals = true;
+
     #endregion
-    
+
     #region Underwater Environment
-    
+
     [Header("Water Visibility")]
     [Tooltip("Min/Max absorption distance (low = murky)")]
     public Vector2 absorptionDistanceRange = new Vector2(4f, 25f);
-    
+
     [Header("Water Color (Physical)")]
     [Tooltip("Physical water scattering color ranges")]
     public Vector2 waterScatterRedRange = new Vector2(0.0f, 0.4f);
@@ -53,18 +56,18 @@ public class BatchConfig : ISerializationCallbackReceiver
     [Header("Sensor Noise")]
     [Range(0f, 1f)]
     public float filmGrainMax = 1.0f;
-    
+
     #endregion
-    
+
     #region Camera Settings
-    
+
     [Header("Camera Settings")]
     [Tooltip("Whether camera should aim at spawned objects")]
     public bool lookAtSpawnedObject = true;
-    
+
     [Tooltip("Placement distance from target")]
     public Vector2 cameraDistanceRange = new Vector2(2f, 8f);
-    
+
     [Tooltip("Camera pitch (X rotation) range. Negative = Up, Positive = Down.")]
     public Vector2 pitchRange = new Vector2(-10f, 30f);
 
@@ -76,7 +79,7 @@ public class BatchConfig : ISerializationCallbackReceiver
 
     [Tooltip("Yaw jitter around look-at direction (deg)")]
     public float yawJitter = 20f;
-    
+
     #endregion
 
     /// <summary>
@@ -95,9 +98,9 @@ public class BatchConfig : ISerializationCallbackReceiver
         batchName = "NewBatch";
         iterations = 1000;
         spawnObjects = true;
-        
+
         absorptionDistanceRange = new Vector2(4f, 25f);
-        
+
         waterScatterRedRange = new Vector2(0.0f, 0.4f);
         waterScatterGreenRange = new Vector2(0.2f, 0.8f);
         waterScatterBlueRange = new Vector2(0.3f, 1.0f);
@@ -105,12 +108,12 @@ public class BatchConfig : ISerializationCallbackReceiver
         filterRedRange = new Vector2(0.3f, 0.8f);
         filterGreenRange = new Vector2(0.5f, 1.0f);
         filterBlueRange = new Vector2(0.6f, 1.0f);
-        
+
         postExposureRange = new Vector2(-1f, 1f);
         contrastRange = new Vector2(-30f, 25f);
         saturationRange = new Vector2(-80f, 0f);
         filmGrainMax = 1.0f;
-        
+
         lookAtSpawnedObject = true;
         cameraDistanceRange = new Vector2(2f, 8f);
         pitchRange = new Vector2(-10f, 30f);

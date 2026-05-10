@@ -4,10 +4,9 @@ using UnityEngine;
 using UnityEngine.Perception.Randomization.Randomizers;
 using UnityEngine.Perception.Randomization.Samplers;
 using UnityEngine.Perception.Randomization.Scenarios;
-
+using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorRgbParameter;
 // Aliases
 using PerceptionFloatParameter = UnityEngine.Perception.Randomization.Parameters.FloatParameter;
-using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorRgbParameter;
 
 public class BatchRunner : MonoBehaviour
 {
@@ -27,17 +26,23 @@ public class BatchRunner : MonoBehaviour
     public bool testModeEnabled = false;
     [Tooltip("Index of the batch to run in Test Mode.")]
     public int testBatchIndex = 0;
+    [Header("Reproducibility")]
+    public uint seed = 260716;
     #endregion
 
     #region Runtime State
     private FixedLengthScenario _scenario;
     private List<BatchRuntimeInfo> _schedule = new List<BatchRuntimeInfo>();
     private int _currentBatchIndex = -1;
-    
+    private float lastTime = 0f;
+    // Use Stopwatch instead of Time.DeltaTime to compute actual runtime instead of time between frames, so not just game time but actual time taken to execute each batch
+    private System.Diagnostics.Stopwatch watch;
+
     // Randomizers
     private PoolFloorPlacementRandomizer _placementRandomizer;
     private UnderwaterEnvironmentRandomizer _underwaterRandomizer;
     private BoundedCameraRandomizer _cameraRandomizer;
+    private VisualTargetRandomizer _visualTargetRandomizer;
     #endregion
 
     private void Awake()
@@ -56,20 +61,23 @@ public class BatchRunner : MonoBehaviour
         _placementRandomizer = GetRandomizer<PoolFloorPlacementRandomizer>();
         _underwaterRandomizer = GetRandomizer<UnderwaterEnvironmentRandomizer>();
         _cameraRandomizer = GetRandomizer<BoundedCameraRandomizer>();
+        _visualTargetRandomizer = GetRandomizer<VisualTargetRandomizer>();
     }
 
     private void Start()
     {
+        Debug.Log($"[BatchRunner] Initializing BatchRunner with Seed: {seed}");
+        _scenario.constants.randomSeed = seed;
         BuildSchedule();
-        
+
         if (_schedule.Count > 0)
         {
             // Configure the Scenario to run the FULL length of all batches combined
             int totalIterations = _schedule[_schedule.Count - 1].endIteration;
             _scenario.constants.iterationCount = totalIterations;
-            
+
             Debug.Log($"[BatchRunner] Simulation configured for {totalIterations} total iterations across {_schedule.Count} batches.");
-            
+            watch = System.Diagnostics.Stopwatch.StartNew();
             // Apply first batch immediately
             UpdateBatchConfig(0);
         }
@@ -87,6 +95,13 @@ public class BatchRunner : MonoBehaviour
         if (batchIndex != -1 && batchIndex != _currentBatchIndex)
         {
             UpdateBatchConfig(batchIndex);
+        }
+        if (batchIndex == _schedule.Count - 1 && currentIter == _schedule[batchIndex].endIteration - 1)
+        {
+            float finalBatchElapsed = (watch.ElapsedMilliseconds - lastTime) / 1000f;
+            Debug.Log($"<color=yellow>[BatchRunner]</color> Elapsed time for final batch: {finalBatchElapsed:F6} seconds");
+            Debug.Log($"<color=green>[BatchRunner]</color> Completed all batches! Total iterations: {currentIter + 1}.");
+            Debug.Log($"<color=green>[BatchRunner]</color> Total elapsed time across all batches: {watch.ElapsedMilliseconds / 1000f:F6} seconds");
         }
     }
 
@@ -116,7 +131,7 @@ public class BatchRunner : MonoBehaviour
             {
                 int start = currentIterCount;
                 int end = start + config.iterations;
-                
+
                 _schedule.Add(new BatchRuntimeInfo
                 {
                     startIteration = start,
@@ -147,6 +162,12 @@ public class BatchRunner : MonoBehaviour
         var info = _schedule[index];
         var config = info.config;
 
+        if (index > 0)
+        {
+            float batchElapsed = (watch.ElapsedMilliseconds - lastTime) / 1000f;
+            Debug.Log($"<color=yellow>[BatchRunner]</color> Elapsed time for previous batch: {batchElapsed:F6} seconds");
+        }
+        lastTime = watch.ElapsedMilliseconds;
         Debug.Log($"<color=cyan>[BatchRunner]</color> Switching to Batch {index + 1}/{_schedule.Count}: <b>{config.batchName}</b> (Iters {info.startIteration}-{info.endIteration})");
 
         // --- Apply Configs ---
@@ -156,7 +177,7 @@ public class BatchRunner : MonoBehaviour
         {
             _placementRandomizer.enabled = true; // Always stays enabled for cleanup
             _placementRandomizer.shouldSpawn = config.spawnObjects;
-            
+
             if (!config.spawnObjects)
             {
                 _placementRandomizer.ClearObjects();
@@ -202,6 +223,12 @@ public class BatchRunner : MonoBehaviour
             _cameraRandomizer.yaw = new PerceptionFloatParameter { value = new UniformSampler(config.randomYawRange.x, config.randomYawRange.y) };
             _cameraRandomizer.roll = new PerceptionFloatParameter { value = new UniformSampler(config.rollRange.x, config.rollRange.y) };
             _cameraRandomizer.yawJitter = new PerceptionFloatParameter { value = new UniformSampler(-config.yawJitter, config.yawJitter) };
+        }
+
+        // 4. Visual Target (Appearance)
+        if (_visualTargetRandomizer != null)
+        {
+            _visualTargetRandomizer.enabled = config.randomizeVisuals;
         }
     }
 

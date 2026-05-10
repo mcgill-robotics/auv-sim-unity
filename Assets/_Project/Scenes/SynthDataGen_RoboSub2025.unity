@@ -128,62 +128,62 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6836674003132753358, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 6836674003132753358, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_Name
       value: lane_marker
       objectReference: {fileID: 0}
-    - target: {fileID: 6836674003132753358, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 6836674003132753358, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.13
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: -2.1
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 1.727
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.09612219
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalRotation.y
       value: 0.99536955
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalRotation.z
       value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 168.968
       objectReference: {fileID: 0}
-    - target: {fileID: 8849016581420365265, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+    - target: {fileID: 8849016581420365265, guid: 1428f584be855edf2a7c55c4921604ed,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
@@ -192,7 +192,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 509b4a980cf29784e98a3f4b5f4f64cc, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 1428f584be855edf2a7c55c4921604ed, type: 3}
 --- !u!114 &206961072 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6881566400908832541, guid: db73982fab23cbb7d8fcf37cfd9a0854,
@@ -3274,6 +3274,7 @@ MonoBehaviour:
   - rid: 2823715821560529000
   - rid: 2823715821560529048
   - rid: 2823715821560529017
+  - rid: 3031673826218344998
   configuration: {fileID: 0}
   constants:
     randomSeed: 539662031
@@ -3418,7 +3419,7 @@ MonoBehaviour:
         - prefab: {fileID: 4360369998974418432, guid: bef96aaf040ddb949b3ae1345df82e8c,
             type: 3}
           spawnHeight: -2.1
-        - prefab: {fileID: 6836674003132753358, guid: 509b4a980cf29784e98a3f4b5f4f64cc,
+        - prefab: {fileID: 6836674003132753358, guid: 1428f584be855edf2a7c55c4921604ed,
             type: 3}
           spawnHeight: -2.1
         - prefab: {fileID: 1714694009828415581, guid: 826aca7a4eea169cfbce3dcbcccd5443,
@@ -3608,6 +3609,12 @@ MonoBehaviour:
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
+    - rid: 3031673826218344998
+      type: {class: VisualTargetRandomizer, ns: , asm: Assembly-CSharp}
+      data:
+        m_Enabled: 1
+        collapsed: 0
+        <enabledStateCanBeSwitchedByUser>k__BackingField: 1
     - rid: 7836056693691121873
       type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
         asm: Unity.Perception.Runtime}
@@ -3679,6 +3686,7 @@ MonoBehaviour:
   - batchName: Good visibility
     iterations: 6000
     spawnObjects: 1
+    randomizeVisuals: 1
     absorptionDistanceRange: {x: 10, y: 25}
     waterScatterRedRange: {x: 0, y: 0.4}
     waterScatterGreenRange: {x: 0.2, y: 0.8}
@@ -3699,6 +3707,7 @@ MonoBehaviour:
   - batchName: Hard cases
     iterations: 4000
     spawnObjects: 1
+    randomizeVisuals: 1
     absorptionDistanceRange: {x: 3, y: 10}
     waterScatterRedRange: {x: 0, y: 0.4}
     waterScatterGreenRange: {x: 0.2, y: 0.8}
@@ -3719,6 +3728,7 @@ MonoBehaviour:
   - batchName: Background
     iterations: 2000
     spawnObjects: 0
+    randomizeVisuals: 0
     absorptionDistanceRange: {x: 4, y: 25}
     waterScatterRedRange: {x: 0, y: 0.4}
     waterScatterGreenRange: {x: 0.2, y: 0.8}
@@ -3738,6 +3748,7 @@ MonoBehaviour:
     yawJitter: 45
   testModeEnabled: 0
   testBatchIndex: 0
+  seed: 260716
 --- !u!1 &1905536208
 GameObject:
   m_ObjectHideFlags: 3

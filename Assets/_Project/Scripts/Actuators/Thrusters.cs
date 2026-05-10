@@ -58,7 +58,7 @@ public class Thrusters : MonoBehaviour
     public float rampRate = 100f;
 
     [Tooltip("Random efficiency variance (+/- percent) applied to each thruster at startup. 0.1 = +/- 10%")]
-    [Range(0f, 0.1f)]
+    [Range(0f, 1.0f)]
     public float efficiencyVariance = 0.05f;
 
     [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]

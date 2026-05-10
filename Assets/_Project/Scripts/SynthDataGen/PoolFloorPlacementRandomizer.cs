@@ -14,7 +14,7 @@ public class PrefabPlacementConfig
 {
     [Tooltip("The prefab to spawn")]
     public GameObject prefab;
-    
+
     [Tooltip("Y height for this prefab (e.g., -2.1 for floor objects, 0 for hanging objects)")]
     public float spawnHeight = -2.1f;
 }
@@ -32,50 +32,52 @@ public class PrefabPlacementConfig
 public class PoolFloorPlacementRandomizer : Randomizer
 {
     #region Placement Settings
-    
+
     [Header("Placement Area")]
     [Tooltip("The size of the placement area (X = width, Y = depth/length on Z axis)")]
     public Vector2 placementArea = new Vector2(20f, 40f);
-    
+
     [Tooltip("The minimum distance between object centers")]
     public float separationDistance = 2.5f;
-    
+
     [Tooltip("Maximum number of objects to spawn per iteration (0 = unlimited by Poisson)")]
     public int maxObjectCount = 0;
-    
+
     [Tooltip("If false, no objects will be spawned, but the randomizer remains active to ensure cleanup.")]
     public bool shouldSpawn = true;
-    
+
     #endregion
-    
+
     #region Prefab Configuration
-    
+
     [Header("Prefabs with Height")]
     [Tooltip("Configure each prefab with its spawn height")]
     public List<PrefabPlacementConfig> prefabConfigs = new List<PrefabPlacementConfig>();
-    
+
     #endregion
-    
+
     #region Private Fields
-    
+
     private GameObject _container;
     private GameObjectOneWayCache _gameObjectCache;
-    
+    // random state must be based on random state of FixedLengthScenario owned by BatchRunner, to ensure consistent reproducibility across all randomizers in the scenario
+    private Unity.Mathematics.Random RandomState;
+
     #endregion
-    
+
     #region Randomizer Lifecycle
-    
+
     protected override void OnAwake()
     {
         _container = new GameObject("Foreground Objects");
         _container.transform.parent = scenario.transform;
-        
+
         if (prefabConfigs == null || prefabConfigs.Count == 0)
         {
             Debug.LogWarning("[PoolFloorPlacementRandomizer] No prefab configs assigned!");
             return;
         }
-        
+
         // Filter out null prefabs
         var validConfigs = prefabConfigs.Where(c => c != null && c.prefab != null).ToList();
         if (validConfigs.Count == 0)
@@ -83,7 +85,7 @@ public class PoolFloorPlacementRandomizer : Randomizer
             Debug.LogWarning("[PoolFloorPlacementRandomizer] No valid prefabs in config!");
             return;
         }
-        
+
         // Build prefab array for cache
         var prefabArray = validConfigs.Select(c => c.prefab).ToArray();
         _gameObjectCache = new GameObjectOneWayCache(_container.transform, prefabArray, this);
@@ -91,17 +93,19 @@ public class PoolFloorPlacementRandomizer : Randomizer
 
     protected override void OnIterationStart()
     {
+        // SamplerState is statically set by FixedLengthScenario through reflection, so we can rely on it to set the seed consistently
+        RandomState = new Unity.Mathematics.Random(SamplerState.NextRandomState());
         if (!shouldSpawn || _gameObjectCache == null || prefabConfigs == null || prefabConfigs.Count == 0)
         {
             return;
         }
-        
+
         // Generate Poisson Disk samples
         var seed = SamplerState.NextRandomState();
         using (var nativeSamples = PoissonDiskSampling.GenerateSamples(
-            placementArea.x, 
-            placementArea.y, 
-            separationDistance, 
+            placementArea.x,
+            placementArea.y,
+            separationDistance,
             seed
         ))
         {
@@ -112,26 +116,31 @@ public class PoolFloorPlacementRandomizer : Randomizer
 
             for (int i = prefabsToSpawn.Count - 1; i > 0; i--)
             {
-                int k = UnityEngine.Random.Range(0, i + 1);
+                int k = RandomState.NextInt(0, i + 1);
                 var temp = prefabsToSpawn[k];
                 prefabsToSpawn[k] = prefabsToSpawn[i];
                 prefabsToSpawn[i] = temp;
             }
-            
+
             // Center offset so placement area is centered at origin
             var centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
-            
-            // Place unique objects 1-to-1 until we run out of samples or prefabs
-            int spawnCount = Mathf.Min(nativeSamples.Length, prefabsToSpawn.Count);
+
+            // Limit spawn count by available sample positions, and optionally by maxObjectCount
+            int spawnCount = nativeSamples.Length;
             if (maxObjectCount > 0) spawnCount = Mathf.Min(spawnCount, maxObjectCount);
 
             for (int i = 0; i < spawnCount; i++)
             {
                 var sample = nativeSamples[i];
-                var config = prefabsToSpawn[i];
-                
+
+                // Go through all prefabs once to guarantee at least one of each is spawned (if spawnCount permits).
+                // Once we've spawned all of them at least once, pick randomly for the remaining duplicates.
+                var config = i < prefabsToSpawn.Count
+                    ? prefabsToSpawn[i]
+                    : prefabsToSpawn[RandomState.NextInt(0, prefabsToSpawn.Count)];
+
                 var instance = _gameObjectCache.GetOrInstantiate(config.prefab);
-                
+
                 // Place on XZ plane with per-prefab height
                 instance.transform.position = new Vector3(
                     sample.x - centerOffset.x,
@@ -147,7 +156,7 @@ public class PoolFloorPlacementRandomizer : Randomizer
         // Always reset, even if disabled, to ensure objects from previous batch are cleaned up
         _gameObjectCache?.ResetAllObjects();
     }
-    
+
     /// <summary>
     /// Explicitly clear all spawned objects.
     /// </summary>
@@ -155,7 +164,7 @@ public class PoolFloorPlacementRandomizer : Randomizer
     {
         _gameObjectCache?.ResetAllObjects();
     }
-    
+
     #endregion
 }
 
