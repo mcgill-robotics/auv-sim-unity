@@ -44,9 +44,9 @@ namespace RosMessageTypes.Dvl
             this.time = 0.0;
             this.velocity = new Geometry.Vector3Msg();
             this.fom = 0.0;
-            this.covariance = new double[0];
+            this.covariance = new double[9];
             this.altitude = 0.0;
-            this.beams = new DVLBeamMsg[0];
+            this.beams = new DVLBeamMsg[4];
             this.velocity_valid = false;
             this.status = 0;
             this.time_of_validity = 0;
@@ -78,9 +78,9 @@ namespace RosMessageTypes.Dvl
             deserializer.Read(out this.time);
             this.velocity = Geometry.Vector3Msg.Deserialize(deserializer);
             deserializer.Read(out this.fom);
-            deserializer.Read(out this.covariance, sizeof(double), deserializer.ReadLength());
+            deserializer.Read(out this.covariance, sizeof(double), 9);
             deserializer.Read(out this.altitude);
-            deserializer.Read(out this.beams, DVLBeamMsg.Deserialize, deserializer.ReadLength());
+            deserializer.Read(out this.beams, DVLBeamMsg.Deserialize, 4);
             deserializer.Read(out this.velocity_valid);
             deserializer.Read(out this.status);
             deserializer.Read(out this.time_of_validity);
@@ -94,10 +94,8 @@ namespace RosMessageTypes.Dvl
             serializer.Write(this.time);
             serializer.Write(this.velocity);
             serializer.Write(this.fom);
-            serializer.WriteLength(this.covariance);
             serializer.Write(this.covariance);
             serializer.Write(this.altitude);
-            serializer.WriteLength(this.beams);
             serializer.Write(this.beams);
             serializer.Write(this.velocity_valid);
             serializer.Write(this.status);

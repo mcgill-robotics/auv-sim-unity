@@ -727,7 +727,8 @@ public class DVLPublisher : ROSPublisher
             // Loss of lock
             LastVelocity = Vector3.zero;
         }
-        
+        UpdateDvlMessageData(); // Update DVLMsg with the latest velocity and validity for publishing and UI access
+
         // 3. Update ROS Messages (DR and Odom) from new state
         UpdateDeadReckoningInternal();
     }
