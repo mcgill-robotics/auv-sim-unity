@@ -342,6 +342,7 @@ public class DVLPublisher : ROSPublisher
         // time of validity is the center of the ping, which we approximate as the current time minus half the interval since the last publish (since the velocity is effectively averaged over that interval)
         long timeOfValidity = time.GetMicroSec() - (lastPublishTime.GetMicroSec() / 1000 / 2);
 
+        dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId;
         dvlMsg.time = lastPublishTime.GetMilliSec(); // Convert back to milliseconds for the message
 
         dvlMsg.velocity = new Vector3Msg
