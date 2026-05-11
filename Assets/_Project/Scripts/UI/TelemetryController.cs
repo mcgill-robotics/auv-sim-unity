@@ -5,9 +5,8 @@ using RosMessageTypes.Std;
 
 /// <summary>
 /// Handles the Telemetry drawer UI: subscribes to ROS state topics and updates position/rotation labels.
-/// Extracted from SimulatorHUD for better separation of concerns.
 /// </summary>
-public class TelemetryController
+public class TelemetryController : Controller
 {
     // UI Elements - Position & Orientation
     private Label textPosX, textPosY, textPosZ;
@@ -21,8 +20,8 @@ public class TelemetryController
         ros = rosConnection;
         QueryElements(root);
     }
-    
-    private void QueryElements(VisualElement root)
+
+    protected override void QueryElements(VisualElement root)
     {
         textPosX = root.Q<Label>("Text-PosX");
         textPosY = root.Q<Label>("Text-PosY");
@@ -32,7 +31,12 @@ public class TelemetryController
         textRotZ = root.Q<Label>("Text-RotZ");
         textMissionStatus = root.Q<Label>("Text-MissionStatus");
     }
-    
+
+    protected override void RegisterCallbacks()
+    {
+        // No UI callbacks needed for telemetry display
+    }
+
     /// <summary>
     /// Subscribe to ROS state topics for telemetry display.
     /// </summary>

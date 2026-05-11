@@ -6,9 +6,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Handles the Camera drawer UI: camera feed selection, fullscreen toggle, and snapshot saving.
-/// Extracted from SimulatorHUD for better separation of concerns.
 /// </summary>
-public class CameraFeedController
+public class CameraFeedController : Controller
 {
     // UI Elements
     private DropdownField dropdownCamTopic;
@@ -25,18 +24,17 @@ public class CameraFeedController
     // State
     private bool isFullscreenCamera = false;
     private System.Action<string> logCallback;
-    
-    public CameraFeedController(VisualElement root, Camera frontLeft, Camera down, System.Action<string> log)
+
+    public CameraFeedController(VisualElement root, Camera frontLeft, Camera down, Action<string> log)
     {
         frontLeftCamera = frontLeft;
         downCamera = down;
         logCallback = log;
-        
-        QueryElements(root);
-        RegisterCallbacks();
+
+        Initialize(root);
     }
-    
-    private void QueryElements(VisualElement root)
+
+    protected override void QueryElements(VisualElement root)
     {
         dropdownCamTopic = root.Q<DropdownField>("Dropdown-CamTopic");
         cameraFeedImage = root.Q<Image>("CameraFeedImage");
@@ -44,8 +42,8 @@ public class CameraFeedController
         btnFullscreen = root.Q<Button>("Btn-Fullscreen");
         btnSaveImage = root.Q<Button>("Btn-SaveImage");
     }
-    
-    private void RegisterCallbacks()
+
+    protected override void RegisterCallbacks()
     {
         if (btnFullscreen != null)
         {

@@ -4,9 +4,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Handles the Config drawer UI: sensor toggles, camera parameters, quality settings, save button.
-/// Extracted from SimulatorHUD for better separation of concerns.
 /// </summary>
-public class SettingsController
+public class SettingsController : Controller
 {
     // UI Elements - Settings Toggles
     private Toggle togglePublishROS;
@@ -45,10 +44,10 @@ public class SettingsController
         ros = rosConnection;
         logCallback = log;
         QueryElements(root);
-        RegisterCallbacks(root);
+        RegisterCallbacks();
     }
 
-    private void QueryElements(VisualElement root)
+    protected override void QueryElements(VisualElement root)
     {
         // Settings toggles
         togglePublishROS = root.Q<Toggle>("Toggle-PublishROS");
@@ -80,7 +79,7 @@ public class SettingsController
         btnSave = root.Q<Button>("Btn-Save");
     }
 
-    private void RegisterCallbacks(VisualElement root)
+    protected override void RegisterCallbacks()
     {
         // Water toggle - immediate effect (Inverted: Enable Water = true means NoWaterMode = false)
         if (toggleWater != null)

@@ -3,9 +3,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Handles the Sensors drawer UI: DVL/IMU/Pressure data display and visualization toggles.
-/// Extracted from SimulatorHUD for better separation of concerns.
 /// </summary>
-public class SensorDataController
+public class SensorDataController : Controller
 {
     // DVL Labels
     private Label textDVLVx, textDVLVy, textDVLVz;
@@ -43,11 +42,10 @@ public class SensorDataController
     
     public SensorDataController(VisualElement root)
     {
-        QueryElements(root);
-        RegisterCallbacks();
+        Initialize(root);
     }
-    
-    private void QueryElements(VisualElement root)
+
+    protected override void QueryElements(VisualElement root)
     {
         // DVL
         textDVLVx = root.Q<Label>("Text-DVLVx");
@@ -86,8 +84,8 @@ public class SensorDataController
         labelIMU = root.Q<Label>("Label-IMU");
         labelDepth = root.Q<Label>("Label-Depth");
     }
-    
-    private void RegisterCallbacks()
+
+    protected override void RegisterCallbacks()
     {
         if (toggleDVLViz != null)
         {
