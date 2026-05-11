@@ -123,10 +123,6 @@
                             <ui:Label text="Reset Launcher" />
                             <ui:Label text="[Y]" class="data-value" />
                         </ui:VisualElement>
-                        <ui:VisualElement class="keybind-row">
-                            <ui:Label text="Rotate Launcher" />
-                            <ui:Label text="[ ← ] / [ → ]" class="data-value" />
-                        </ui:VisualElement>
                         <ui:VisualElement class="keybind-row" style="margin-bottom: 8px;">
                             <ui:Label text="Drop (Dropper)" />
                             <ui:Label text="[G]" class="data-value" />

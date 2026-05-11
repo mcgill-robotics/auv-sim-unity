@@ -31,9 +31,6 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Topic for torpedo reset command (Bool)")]
     public string TorpedoResetTopic = "/auv/torpedo/reset";
 
-    [Tooltip("Topic for torpedo launcher rotation (Float32)")]
-    public string TorpedoRotationTopic = "/auv/torpedo/rotate";
-
     [Space(10)]
     [Header("Sensor Topics")]
     [Tooltip("DVL velocity and altitude data topic")]
