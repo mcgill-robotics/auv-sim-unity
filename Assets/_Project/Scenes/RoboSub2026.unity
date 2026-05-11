@@ -323,7 +323,7 @@ MonoBehaviour:
   clearDepth: 1
   volumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 17
   volumeAnchorOverride: {fileID: 0}
   antialiasing: 0
   SMAAQuality: 2
@@ -2097,26 +2097,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1901ccfb1d6418c4a9b34bac85b39f13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotatingBase: {fileID: 345055707}
   torpedos:
   - {fileID: 634586412}
   - {fileID: 2083545326}
-  maxRotationAngle: 80
-  rotationSpeed: 30
-  launchForce: 5
-  torpedoMass: 1
-  torpedoDrag: 0.5
-  torpedoAngularDrag: 0.5
+  trajectoryData:
+    forward:
+      c0: 0
+      c1: 1.35
+      c2: -1.44
+      c3: 0.701
+      c4: -0.117
+    vertical:
+      c0: 0
+      c1: -0.0181
+      c2: 0.241
+      c3: -0.172
+      c4: 0.0332
+    lateral:
+      c0: 0
+      c1: 0
+      c2: 0
+      c3: 0
+      c4: 0
+    maxTrajectoryTime: 1
+    stopAtWaterSurface: 1
+    waterSurfaceY: 0
+    stopOnCollision: 1
   excludeLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 144
   showOutlineOnLaunch: 1
   outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   outlineWidth: 0.02
   outlineShader: {fileID: 0}
   manageColliders: 1
   nextTorpedoIndex: 0
-  targetRotation: 0
 --- !u!1 &430683499
 GameObject:
   m_ObjectHideFlags: 0
@@ -2266,7 +2281,7 @@ MonoBehaviour:
   clearDepth: 1
   volumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 17
   volumeAnchorOverride: {fileID: 0}
   antialiasing: 0
   SMAAQuality: 2
@@ -3500,6 +3515,7 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -4944,7 +4960,7 @@ MonoBehaviour:
   clearDepth: 1
   volumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 17
   volumeAnchorOverride: {fileID: 0}
   antialiasing: 1
   SMAAQuality: 2
@@ -5058,7 +5074,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4608
+    m_Bits: 4624
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -6216,7 +6232,7 @@ Transform:
   m_GameObject: {fileID: 1371465005}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.70710707, z: -0, w: 0.70710653}
-  m_LocalPosition: {x: -11.14, y: -0.9942, z: 6.25}
+  m_LocalPosition: {x: -10.928, y: -0.9942, z: 4.843}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6417,7 +6433,7 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  PublishGTObjectMap: 1
+  PublishGTObjectMap: 0
   NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
@@ -6431,14 +6447,14 @@ MonoBehaviour:
   PublishFrontCam: 0
   PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 0
-  VisualizeDVL: 1
+  StreamZEDCamera: 1
+  VisualizeDVL: 0
   VisualizeIMU: 0
   VisualizeDepth: 0
   EnableDVLNoise: 0
   EnableIMUNoise: 0
   EnableDepthNoise: 0
-  DrawerConfigOpen: 1
+  DrawerConfigOpen: 0
   DrawerControlsOpen: 0
   DrawerTelemetryOpen: 0
   DrawerSensorsOpen: 1
@@ -6529,7 +6545,6 @@ MonoBehaviour:
   DropperTopic: /auv/dropper/trigger
   TorpedoLaunchTopic: /auv/torpedo/launch
   TorpedoResetTopic: /auv/torpedo/reset
-  TorpedoRotationTopic: /auv/torpedo/rotate
   DVLTopic: dvl/velocity
   DVLDeadReckoningTopic: dvl/dead_reckoning
   DVLOdometryTopic: dvl/odometry
@@ -7631,7 +7646,7 @@ MonoBehaviour:
   clearDepth: 1
   volumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 17
   volumeAnchorOverride: {fileID: 0}
   antialiasing: 1
   SMAAQuality: 2
@@ -7745,7 +7760,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4608
+    m_Bits: 4624
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -7870,7 +7885,7 @@ MonoBehaviour:
   clearDepth: 1
   volumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 17
   volumeAnchorOverride: {fileID: 0}
   antialiasing: 0
   SMAAQuality: 2
@@ -7984,7 +7999,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4608
+    m_Bits: 4624
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -8387,7 +8402,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.139
+      value: -7.595
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
@@ -8397,7 +8412,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.08
+      value: 10.2
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
@@ -8473,6 +8488,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3383246300767830565, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3765967146489334903, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
@@ -30396,6 +30416,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1492501075}
     m_Modifications:
+    - target: {fileID: 1258587467130263829, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 1344678753890176101, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: m_Mesh
@@ -30508,6 +30533,11 @@ PrefabInstance:
       objectReference: {fileID: 789371016}
     - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3799529634251085281, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
       propertyPath: scriptInteractions
       value: 1
       objectReference: {fileID: 0}
@@ -30526,6 +30556,11 @@ PrefabInstance:
       propertyPath: m_VersionIndex
       value: 123
       objectReference: {fileID: 0}
+    - target: {fileID: 4308366547718711484, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5010075588479457120, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: m_Mesh
@@ -30536,6 +30571,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 789371016}
+    - target: {fileID: 6290846835601977544, guid: 23a56bd1c20c876628004a14ea1b8261,
+        type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 7535013994073405750, guid: 23a56bd1c20c876628004a14ea1b8261,
         type: 3}
       propertyPath: m_Mesh
@@ -31097,7 +31137,7 @@ MeshCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 144
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -36196,7 +36236,7 @@ MeshCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 144
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0

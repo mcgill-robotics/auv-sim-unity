@@ -270,7 +270,6 @@ When the simulator is running, you can manually override ROS commands using the 
 *   **Roll:** U / O
 *   **Emergency Stop:** Spacebar (Toggles Kinematic freeze)
 *   **Drop Marker:** G
-*   **Rotate Torpedo Launcher:** Left and Right Arrow Keys
 *   **Shoot Torpedo/Reset:** T / Y
 *   **Toggle Camera Mode:** C
 
