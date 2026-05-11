@@ -27,7 +27,7 @@ public class PointsManager : MonoBehaviour
         currentScore += points;
         if (SimulatorHUD.Instance != null)
         {
-            SimulatorHUD.Instance.UpdateScore(currentScore.ToString());
+            SimulatorHUD.Instance.UpdateScore(currentScore);
             SimulatorHUD.Instance.Log($"Task Complete: {taskName} (+{points} pts)");
         }
     }
@@ -37,7 +37,7 @@ public class PointsManager : MonoBehaviour
         currentScore = 0;
         if (SimulatorHUD.Instance != null)
         {
-            SimulatorHUD.Instance.UpdateScore("0");
+            SimulatorHUD.Instance.UpdateScore(currentScore);
         }
     }
 }

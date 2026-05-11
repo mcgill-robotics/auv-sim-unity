@@ -51,10 +51,7 @@ public class TimerCompetition : MonoBehaviour
     {
         if (SimulatorHUD.Instance != null)
         {
-            int minutes = Mathf.FloorToInt(currentTime / 60F);
-            int seconds = Mathf.FloorToInt(currentTime % 60F);
-            string timeStr = string.Format("{0:00}:{1:00}", minutes, seconds);
-            SimulatorHUD.Instance.UpdateTimer(timeStr);
+            SimulatorHUD.Instance.UpdateTimer(currentTime);
         }
     }
 }

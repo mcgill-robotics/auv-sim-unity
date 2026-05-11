@@ -38,16 +38,12 @@ public class SimulatorHUD : MonoBehaviour
     private TelemetryController telemetryController;
     private CameraFeedController cameraFeedController;
     private SensorDataController sensorDataController;
-    
+    private CompetitionController competitionController;
+
     // UI Update Throttling (Performance Optimization)
     private float lastUIUpdateTime;
     private const float UI_UPDATE_INTERVAL = 0.1f; // 10Hz
 
-    // UI Elements - Competition
-    private Label textTimer;
-    private Label textScore;
-    private DropdownField dropdownTask;
-    private Button btnStartComp;
 
     // UI Elements - Logging
     private Label textLog;
@@ -147,13 +143,7 @@ public class SimulatorHUD : MonoBehaviour
         telemetryIndicator = root.Q<Label>("TelemetryDrawer-Indicator");
         sensorsIndicator = root.Q<Label>("SensorsDrawer-Indicator");
         cameraIndicator = root.Q<Label>("CameraDrawer-Indicator");
-        
-        // Competition elements
-        textTimer = root.Q<Label>("Text-Timer");
-        textScore = root.Q<Label>("Text-Score");
-        dropdownTask = root.Q<DropdownField>("Dropdown-Task");
-        btnStartComp = root.Q<Button>("Btn-StartComp");
-        
+
         // Logging elements
         textLog = root.Q<Label>("Text-Log");
         logToggle = root.Q<Label>("LogPanel-Toggle");
@@ -347,14 +337,19 @@ public class SimulatorHUD : MonoBehaviour
 
     // --- Competition Logic ---
 
-    public void UpdateTimer(string time)
+    public void UpdateTimer(float secondsElapsed)
     {
-        if (textTimer != null) textTimer.text = time;
+        if (competitionController != null)
+        {
+            competitionController.SetTime(secondsElapsed);
+        }
     }
-
-    public void UpdateScore(string score)
+    public void UpdateScore(int score)
     {
-        if (textScore != null) textScore.text = score;
+        if (competitionController != null)
+        {
+            competitionController.SetScore(score);
+        }
     }
 
     // --- Logging ---
