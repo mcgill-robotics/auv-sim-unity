@@ -67,12 +67,22 @@ public class Buoyancy : MonoBehaviour
         auvRb.centerOfMass = centerOfMass;
         // for now, we simply assume the AUV is one big box that completely displaces water when fully submerged, so the submerged volume (and thus buoyancy force) scales linearly with depth until the AUV is fully submerged, at which point it remains constant. A more accurate implementation would compute the buoyancy force from each component of the AUV
         // for instance, the foam top likely has a much larger impact on buoyancy than the chassis due to its lower density, so once that foam top component emerges, the buoyancy will reduce significantly, leading to equilibrium height as thge bottom of the foam collider. This refactor would require knowing the mass of the foam top and chassis separately, which we don't currently have, but could be added in the future if we want more accurate buoyancy behavior. For now, this simple approximation should be sufficient to get reasonable buoyancy behavior without needing to know the mass breakdown of the AUV components.
-        Bounds combinedBounds = ChassisCollider.bounds;
-        combinedBounds.Encapsulate(FoamTopCollider.bounds);
-        RelativeDepthofAUVBottom = combinedBounds.min.y - transform.position.y;
-        HeightofAUV = combinedBounds.size.y;
+        // Calculate unrotated local bounds to prevent starting rotation (e.g. yaw) 
+        // from artificially inflating the world AABB and causing stronger buoyancy.
+        Bounds chassisLocalBounds = GetColliderLocalBounds(ChassisCollider);
+        Bounds foamLocalBounds = GetColliderLocalBounds(FoamTopCollider);
+        
+        chassisLocalBounds.Encapsulate(foamLocalBounds);
+
+        // Convert local bounds to unrotated world bounds using lossyScale
+        Vector3 unrotatedMin = Vector3.Scale(chassisLocalBounds.min, transform.lossyScale);
+        Vector3 unrotatedMax = Vector3.Scale(chassisLocalBounds.max, transform.lossyScale);
+        Vector3 unrotatedSize = unrotatedMax - unrotatedMin;
+
+        RelativeDepthofAUVBottom = unrotatedMin.y;
+        HeightofAUV = unrotatedSize.y;
         // very crude approximation of area based on bounding box, but should be sufficient for scaling buoyancy force
-        float auvArea = combinedBounds.size.x * combinedBounds.size.z;
+        float auvArea = unrotatedSize.x * unrotatedSize.z;
 
         // Archimedes' principle: Buoyant force = density of fluid * volume of displaced fluid * gravity
         // Underwater, the volume of displaced fluid is equal to the volume of the AUV, so we can use that for our approximation
@@ -135,7 +145,23 @@ public class Buoyancy : MonoBehaviour
         Gizmos.DrawSphere(transform.TransformPoint(centerOfMass), 0.02f);
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(transform.TransformPoint(centerOfBuoyancy), 0.02f);
-        Gizmos.color = Color.cyan;
         Gizmos.DrawLine(transform.TransformPoint(centerOfBuoyancy), waterSurface.transform.position);
+    }
+
+    private Bounds GetColliderLocalBounds(BoxCollider col)
+    {
+        Vector3 center = col.center;
+        Vector3 extents = col.size * 0.5f;
+
+        Bounds bounds = new Bounds(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(extents.x, extents.y, extents.z))), Vector3.zero);
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(extents.x, extents.y, -extents.z))));
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(extents.x, -extents.y, extents.z))));
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(extents.x, -extents.y, -extents.z))));
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(-extents.x, extents.y, extents.z))));
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(-extents.x, extents.y, -extents.z))));
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(-extents.x, -extents.y, extents.z))));
+        bounds.Encapsulate(transform.InverseTransformPoint(col.transform.TransformPoint(center + new Vector3(-extents.x, -extents.y, -extents.z))));
+        
+        return bounds;
     }
 }
