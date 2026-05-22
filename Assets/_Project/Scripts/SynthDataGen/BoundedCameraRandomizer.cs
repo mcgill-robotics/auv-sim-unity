@@ -245,7 +245,7 @@ public class BoundedCameraRandomizer : Randomizer
             float angle_theta = RandomState.NextFloat(0f, 360f) * Mathf.Deg2Rad;
 
             // Random direction relative to height (using spherical coordinates)
-            float angle_phi = RandomState.NextFloat(-30f, 30f) * Mathf.Deg2Rad;
+            float angle_phi = RandomState.NextFloat(-15f, 15f) * Mathf.Deg2Rad;
 
             // Calculate position offset from target
             Vector3 offset = new Vector3(

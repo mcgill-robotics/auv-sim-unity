@@ -1306,6 +1306,7 @@ MonoBehaviour:
   maxDistance: 8
   useAngleFilter: 0
   maxViewAngle: 60
+  allowFrontFace: 1
   allowBackFace: 1
 --- !u!1 &7246666888139142798
 GameObject:
