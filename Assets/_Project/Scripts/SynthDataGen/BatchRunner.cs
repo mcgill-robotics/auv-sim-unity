@@ -216,6 +216,7 @@ public class BatchRunner : MonoBehaviour
         {
             _cameraRandomizer.enabled = true;
             _cameraRandomizer.lookAtSpawnedObject = config.lookAtSpawnedObject;
+            _cameraRandomizer.downCam = config.isDownCam;
             _cameraRandomizer.minDistance = config.cameraDistanceRange.x;
             _cameraRandomizer.maxDistance = config.cameraDistanceRange.y;
 

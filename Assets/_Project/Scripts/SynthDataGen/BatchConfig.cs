@@ -65,6 +65,9 @@ public class BatchConfig : ISerializationCallbackReceiver
     [Tooltip("Whether camera should aim at spawned objects")]
     public bool lookAtSpawnedObject = true;
 
+    [Tooltip("Whether to use a down-facing camera angle (looking down at target from above) instead of random horizontal angle around target")]
+    public bool isDownCam = false;
+
     [Tooltip("Placement distance from target")]
     public Vector2 cameraDistanceRange = new Vector2(2f, 8f);
 
@@ -115,6 +118,7 @@ public class BatchConfig : ISerializationCallbackReceiver
         filmGrainMax = 1.0f;
 
         lookAtSpawnedObject = true;
+        isDownCam = false;
         cameraDistanceRange = new Vector2(2f, 8f);
         pitchRange = new Vector2(-10f, 30f);
         randomYawRange = new Vector2(0f, 360f);
