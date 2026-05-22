@@ -13,7 +13,6 @@ using UnityEngine.Perception.Randomization.Samplers;
 /// Must be ordered AFTER ForegroundObjectPlacementRandomizer in the randomizer stack
 /// so that objects exist when this randomizer runs.
 /// </remarks>
-[Serializable]
 [AddRandomizerMenu("RoboSub/Bounded Camera Randomizer")]
 public class BoundedCameraRandomizer : Randomizer
 {
@@ -55,6 +54,10 @@ public class BoundedCameraRandomizer : Randomizer
     [Header("Camera Aiming")]
     [Tooltip("If true, camera aims at a random spawned object. If false, uses fully random yaw.")]
     public bool lookAtSpawnedObject = true;
+
+    [Header("Down Cam")]
+    [Tooltip("If true, camera is spawned above target looking down. Otherwise, camera is spawned around target at random yaw.")]
+    public bool downCam = false;
 
     [Tooltip("Fallback target if no objects are spawned (pool floor center)")]
     public Vector3 fallbackTarget = new Vector3(0f, -2.1f, 0f);
@@ -114,8 +117,16 @@ public class BoundedCameraRandomizer : Randomizer
 
         if (constrainDistanceToTarget && lookAtSpawnedObject)
         {
-            // Spawn within distance range of target, respecting pool bounds
-            cameraPosition = GeneratePositionNearTarget(targetPosition);
+            if (!downCam)
+            {
+                // Spawn within distance range of target, respecting pool bounds
+                cameraPosition = GeneratePositionNearTarget(targetPosition);
+            }
+            else
+            {
+                // Spawn within distance range of target above it, respecting pool bounds
+                cameraPosition = GeneratePositionAboveTarget(targetPosition);
+            }
         }
         else
         {
@@ -208,6 +219,56 @@ public class BoundedCameraRandomizer : Randomizer
             float actualDistance = Vector3.Distance(
                 new Vector3(candidatePosition.x, 0, candidatePosition.z),
                 new Vector3(targetPosition.x, 0, targetPosition.z)
+            );
+
+            if (actualDistance >= minDistance * 0.5f) // Allow some tolerance after clamping
+            {
+                return candidatePosition;
+            }
+        }
+
+        // Fallback: return random pool position
+        return GenerateRandomPoolPosition();
+    }
+
+    /// <summary>
+    /// Generates a position above target within distance range of target, clamped to pool bounds.
+    /// </summary>
+    private Vector3 GeneratePositionAboveTarget(Vector3 targetPosition)
+    {
+        for (int i = 0; i < MaxPositionAttempts; i++)
+        {
+            // Random distance within range
+            float distance = RandomState.NextFloat(minDistance, maxDistance);
+
+            // Random direction (horizontal)
+            float angle_theta = RandomState.NextFloat(0f, 360f) * Mathf.Deg2Rad;
+
+            // Random direction relative to height (using spherical coordinates)
+            float angle_phi = RandomState.NextFloat(-30f, 30f) * Mathf.Deg2Rad;
+
+            // Calculate position offset from target
+            Vector3 offset = new Vector3(
+                distance * Mathf.Sin(angle_phi) * Mathf.Cos(angle_theta),
+                distance * Mathf.Cos(angle_phi),
+                distance * Mathf.Sin(angle_phi) * Mathf.Sin(angle_theta)
+            );
+
+            Vector3 candidatePosition = new Vector3(
+                targetPosition.x + offset.x,
+                targetPosition.y + offset.y,
+                targetPosition.z + offset.z
+            );
+
+            // Clamp to pool bounds
+            candidatePosition.x = Mathf.Clamp(candidatePosition.x, poolMinBounds.x, poolMaxBounds.x);
+            candidatePosition.y = Mathf.Clamp(candidatePosition.y, poolMinBounds.y, poolMaxBounds.y);
+            candidatePosition.z = Mathf.Clamp(candidatePosition.z, poolMinBounds.z, poolMaxBounds.z);
+
+            // Verify distance is still acceptable after clamping
+            float actualDistance = Vector3.Distance(
+                new Vector3(candidatePosition.x, candidatePosition.y, candidatePosition.z),
+                new Vector3(targetPosition.x, targetPosition.y, targetPosition.z)
             );
 
             if (actualDistance >= minDistance * 0.5f) // Allow some tolerance after clamping
