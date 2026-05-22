@@ -77,8 +77,9 @@ GameObject:
   - component: {fileID: 5163228265004670054}
   - component: {fileID: 3632897353927458651}
   - component: {fileID: 4778426041545423402}
+  - component: {fileID: 6775247446296816684}
   m_Layer: 0
-  m_Name: Image_Config
+  m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -173,6 +174,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6775247446296816684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2603694093235334471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b33f0bc2b78db642a758f07826d0dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  labels:
+  - electric
+  useAutoLabeling: 0
+  autoLabelingSchemeType: 
 --- !u!1 &4935440478316493107
 GameObject:
   m_ObjectHideFlags: 0

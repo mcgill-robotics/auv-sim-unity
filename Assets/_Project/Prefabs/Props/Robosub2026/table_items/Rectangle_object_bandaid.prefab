@@ -185,8 +185,9 @@ GameObject:
   - component: {fileID: 7330803499361575289}
   - component: {fileID: 3718316301810774937}
   - component: {fileID: 6896794031612104647}
+  - component: {fileID: 3150387532778186481}
   m_Layer: 0
-  m_Name: Image_Config
+  m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,3 +282,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3150387532778186481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8498782219098095751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b33f0bc2b78db642a758f07826d0dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  labels:
+  - bandaid
+  useAutoLabeling: 0
+  autoLabelingSchemeType: 
