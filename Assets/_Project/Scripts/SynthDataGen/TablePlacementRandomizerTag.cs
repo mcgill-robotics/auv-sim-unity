@@ -61,6 +61,7 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         public List<GameObject> spawnedObjects;
         #endregion
         private uint currentSeed;
+        private GameObjectOneWayCache _gameObjectCache;
         
         #region Randomizer Lifecycle
 
@@ -69,18 +70,43 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             currentSeed = seed == 0
             ? (uint)UnityEngine.Random.Range(1, int.MaxValue)
             : seed;
-            SpawnObjects();
+
+            if (Application.isPlaying)
+            {
+                // Clean up any null references caused by the user manually deleting objects in the hierarchy
+                if (spawnedObjects != null)
+                {
+                    spawnedObjects.RemoveAll(item => item == null);
+                }
+
+                // Check if we are being driven by a Perception Scenario
+                bool isScenarioActive = UnityEngine.Object.FindAnyObjectByType<UnityEngine.Perception.Randomization.Scenarios.ScenarioBase>() != null;
+
+                if (isScenarioActive)
+                {
+                    // We are generating data. Clean up any objects left over from Edit mode 
+                    // so the TablePlacementRandomizer can take over cleanly.
+                    ClearObjects(forceImmediate: true);
+                    // Do NOT call SpawnObjects() here, let TablePlacementRandomizer do it.
+                }
+                else
+                {
+                    // We are in a normal scene (not synthetic data generation).
+                    // If the user didn't generate objects in Edit Mode, populate the table now
+                    // Otherwise, just keep the objects generated in the Editor
+                    if (spawnedObjects == null || spawnedObjects.Count == 0)
+                    {
+                        SpawnObjects();
+                    }
+                }
+            }
         }
 
         /// <summary>
         /// Spawn objects
         /// </summary>
-        public void SpawnObjects() 
+        public void SpawnObjects(uint seedOverride = 0) 
         {
-            if (currentSeed == 0)
-            {
-                currentSeed = seed;
-            }
             if (referenceTransform == null)
             {
             Debug.LogError("Reference Transform is not set. Cannot spawn objects.");
@@ -101,15 +127,28 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             return;
             }
 
-            uint generationSeed = currentSeed;
+            uint generationSeed;
+            if (seedOverride != 0)
+            {
+                generationSeed = seedOverride;
+            }
+            else
+            {
+                if (currentSeed == 0)
+                {
+                    currentSeed = seed == 0 ? (uint)UnityEngine.Random.Range(1, int.MaxValue) : seed;
+                }
+                generationSeed = currentSeed;
+            }
 
             // Initialize random state
-            // Create deterministic RNG from current seed
-            Unity.Mathematics.Random randomState =
-                new Unity.Mathematics.Random(generationSeed);
+            Unity.Mathematics.Random randomState = new Unity.Mathematics.Random(generationSeed);
 
-            // Generate next seed from the parent seed for future button press
-            currentSeed = (uint)randomState.NextInt(1, int.MaxValue);
+            // Generate next seed from the parent seed for future button press in Edit Mode
+            if (seedOverride == 0)
+            {
+                currentSeed = (uint)randomState.NextInt(1, int.MaxValue);
+            }
 
             // Generate positions using Poisson Disk Sampling
             using (var nativeSamples = PoissonDiskSampling.GenerateSamples(
@@ -158,8 +197,24 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
                 Quaternion rotation = Quaternion.Euler(0f, yaw, 0f);
 
                 // Spawn the object
-                GameObject instance = Instantiate(config.prefab, worldPosition, rotation, transform);
-                spawnedObjects.Add(instance);
+                GameObject instance;
+                if (Application.isPlaying)
+                {
+                    if (_gameObjectCache == null)
+                    {
+                        var prefabs = validConfigs.Select(c => c.prefab).ToArray();
+                        _gameObjectCache = new GameObjectOneWayCache(transform, prefabs, null);
+                    }
+                    instance = _gameObjectCache.GetOrInstantiate(config.prefab);
+                    instance.transform.position = worldPosition;
+                    instance.transform.rotation = rotation;
+                }
+                else
+                {
+                    instance = Instantiate(config.prefab, worldPosition, rotation, transform);
+                    if (spawnedObjects == null) spawnedObjects = new List<GameObject>();
+                    spawnedObjects.Add(instance);
+                }
 
                 // Set the layer of the spawned object and all its children to props so that the camera can pick up on it
                 SetLayerRecursively(instance, LayerMask.NameToLayer("Props"));
@@ -168,14 +223,31 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
     }
 
 
-    public void ClearObjects()
+    public void ClearObjects(bool forceImmediate = false)
     {
-        // Destroy all child objects (spawned prefabs)
-        for (int i = spawnedObjects.Count - 1; i >= 0; i--)
+        if (spawnedObjects != null && spawnedObjects.Count > 0)
         {
-            DestroyImmediate(spawnedObjects[i]);
+            for (int i = spawnedObjects.Count - 1; i >= 0; i--)
+            {
+                if (spawnedObjects[i] != null)
+                {
+                    if (Application.isPlaying && !forceImmediate)
+                    {
+                        Destroy(spawnedObjects[i]);
+                    }
+                    else
+                    {
+                        DestroyImmediate(spawnedObjects[i]);
+                    }
+                }
+            }
+            spawnedObjects.Clear();
         }
-        spawnedObjects.Clear();
+
+        if (Application.isPlaying)
+        {
+            _gameObjectCache?.ResetAllObjects();
+        }
     }
 
     // Utility function to set the layer of a game object and all its children
@@ -223,7 +295,11 @@ public class TablePlacementRandomizerEditor : Editor
             {   
                 script.ClearObjects();
                 script.SpawnObjects();
-                EditorSceneManager.MarkSceneDirty(script.gameObject.scene);
+                if (!Application.isPlaying)
+                {
+                    EditorUtility.SetDirty(script);
+                    EditorSceneManager.MarkSceneDirty(script.gameObject.scene);
+                }
             }
         }
 

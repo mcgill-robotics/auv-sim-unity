@@ -398,74 +398,6 @@ MonoBehaviour:
       data1: 0
       data2: 0
   defaultFrameSettings: 0
---- !u!1001 &21811966
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1849284339}
-    m_Modifications:
-    - target: {fileID: 6774745502011095530, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_Name
-      value: Calibration board ChArUco
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -8.755856
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.564
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -6.498481
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d9e7dbcf85067234bae3c19ef32f4ea4, type: 3}
 --- !u!1 &26586343
 GameObject:
   m_ObjectHideFlags: 0
@@ -1124,12 +1056,6 @@ MonoBehaviour:
   uiDocument: {fileID: 293730101}
   frontLeftCameraOverride: {fileID: 0}
   downCameraOverride: {fileID: 0}
---- !u!4 &316005688 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8827392532245218661, guid: d9e7dbcf85067234bae3c19ef32f4ea4,
-    type: 3}
-  m_PrefabInstance: {fileID: 21811966}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &343577644
 GameObject:
   m_ObjectHideFlags: 1
@@ -1224,16 +1150,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1901ccfb1d6418c4a9b34bac85b39f13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotatingBase: {fileID: 345055707}
   torpedos:
   - {fileID: 634586412}
   - {fileID: 2083545326}
-  maxRotationAngle: 80
-  rotationSpeed: 30
-  launchForce: 5
-  torpedoMass: 1
-  torpedoDrag: 0.5
-  torpedoAngularDrag: 0.5
+  trajectoryData:
+    forward:
+      c0: 0
+      c1: 0
+      c2: 0
+      c3: 0
+      c4: 0
+    vertical:
+      c0: 0
+      c1: 0
+      c2: 0
+      c3: 0
+      c4: 0
+    lateral:
+      c0: 0
+      c1: 0
+      c2: 0
+      c3: 0
+      c4: 0
+    maxTrajectoryTime: 0
+    stopAtWaterSurface: 0
+    waterSurfaceY: 0
+    stopOnCollision: 0
   excludeLayers:
     serializedVersion: 2
     m_Bits: 128
@@ -1243,7 +1185,6 @@ MonoBehaviour:
   outlineShader: {fileID: 0}
   manageColliders: 1
   nextTorpedoIndex: 0
-  targetRotation: 0
 --- !u!43 &409585765
 Mesh:
   m_ObjectHideFlags: 0
@@ -2817,7 +2758,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -3870,8 +3811,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1371465005}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.75, y: -0.511, z: -9.419}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -8.75, y: -0.511, z: 10.853}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3879,7 +3820,7 @@ Transform:
   - {fileID: 431467988}
   - {fileID: 1037403592}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &1371465010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4072,9 +4013,9 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  PublishGTObjectMap: 1
-  NoWaterMode: 1
-  EnableShadows: 0
+  PublishGTObjectMap: 0
+  NoWaterMode: 0
+  EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 0}
   poolPostProcessingVolume: {fileID: 0}
@@ -4082,31 +4023,31 @@ MonoBehaviour:
   PublishDVL: 1
   PublishIMU: 1
   PublishDepth: 1
-  PublishHydrophones: 1
-  PublishFrontCam: 1
+  PublishHydrophones: 0
+  PublishFrontCam: 0
   PublishDownCam: 1
-  PublishDepthCamera: 1
+  PublishDepthCamera: 0
   StreamZEDCamera: 1
   VisualizeDVL: 1
   VisualizeIMU: 0
-  VisualizeDepth: 1
-  EnableDVLNoise: 1
-  EnableIMUNoise: 1
-  EnableDepthNoise: 1
-  DrawerConfigOpen: 1
-  DrawerControlsOpen: 1
-  DrawerTelemetryOpen: 1
-  DrawerSensorsOpen: 1
+  VisualizeDepth: 0
+  EnableDVLNoise: 0
+  EnableIMUNoise: 0
+  EnableDepthNoise: 0
+  DrawerConfigOpen: 0
+  DrawerControlsOpen: 0
+  DrawerTelemetryOpen: 0
+  DrawerSensorsOpen: 0
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 10
+  FrontCamRate: 30
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
-  FrontCamFOV: 77.9
+  FrontCamFOV: 52
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1
@@ -4114,7 +4055,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/willz2205/Desktop/mcgill_robotics/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4184,7 +4125,6 @@ MonoBehaviour:
   DropperTopic: /auv/dropper/trigger
   TorpedoLaunchTopic: /auv/torpedo/launch
   TorpedoResetTopic: /auv/torpedo/reset
-  TorpedoRotationTopic: /auv/torpedo/rotate
   DVLTopic: dvl/velocity
   DVLDeadReckoningTopic: dvl/dead_reckoning
   DVLOdometryTopic: dvl/odometry
@@ -4195,7 +4135,7 @@ MonoBehaviour:
   DownCameraTopic: /down_cam/image_raw
   DepthCameraTopic: /zed/zed_node/depth/depth_registered
   ClockTopic: /clock
-  StateTopic: /auv/state
+  StatePoseTopic: /state/pose
   StateXTopic: /auv/state/x
   StateYTopic: /auv/state/y
   StateZTopic: /auv/state/z
@@ -4464,7 +4404,7 @@ PrefabInstance:
     - target: {fileID: 6692042396244788356, guid: 4c7cd109f0b4edce88d15156c18b15d8,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.75
+      value: -5.94
       objectReference: {fileID: 0}
     - target: {fileID: 6692042396244788356, guid: 4c7cd109f0b4edce88d15156c18b15d8,
         type: 3}
@@ -5037,7 +4977,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 56b1173fd6dcccf9b9cecba5ed99c03c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.75
+      value: -5.94
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 56b1173fd6dcccf9b9cecba5ed99c03c,
         type: 3}
@@ -5123,7 +5063,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 316005688}
   - {fileID: 177432890}
   - {fileID: 1522147476}
   m_Father: {fileID: 1492501075}
@@ -5344,6 +5283,8 @@ MonoBehaviour:
   vioPoseColor: {r: 1, g: 0.5, b: 0, a: 1}
   vioPoseSize: 0.3
   autoFixDrift: 1
+  statePoseColor: {r: 0, g: 1, b: 0, a: 1}
+  statePoseSize: 0.3
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   classVisualizers:
   - className: gate
