@@ -3741,15 +3741,15 @@ MonoBehaviour:
   maxObjectCount: 4
   yawRange: {x: 0, y: 360}
   prefabConfigs:
-  - prefab: {fileID: 6680936553586356778, guid: ebdfd7194a0acd194849c1a4863098ba,
+  - prefab: {fileID: 2733078839668573097, guid: 75746aad650e8b91d8d37028900699cd,
       type: 3}
-    relativeHeight: 0.73
-  - prefab: {fileID: 977563664422272207, guid: b11c249f98021a50e876c011565f0f2c, type: 3}
     relativeHeight: 0.73
   - prefab: {fileID: 2930401904340372607, guid: 4b4f931cbb51c85dcbabb36aa2d69150,
       type: 3}
     relativeHeight: 0.73
-  - prefab: {fileID: 2733078839668573097, guid: 75746aad650e8b91d8d37028900699cd,
+  - prefab: {fileID: 977563664422272207, guid: b11c249f98021a50e876c011565f0f2c, type: 3}
+    relativeHeight: 0.73
+  - prefab: {fileID: 6680936553586356778, guid: ebdfd7194a0acd194849c1a4863098ba,
       type: 3}
     relativeHeight: 0.73
   spawnedObjects:

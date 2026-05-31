@@ -2432,7 +2432,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 70
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -2611,13 +2611,13 @@ MonoBehaviour:
   yMinLimit: -20
   yMaxLimit: 80
   initialYaw: 0
-  initialPitch: 7
+  initialPitch: 10
   resetOnEnable: 0
   movementSmoothing: 10
   rotationSmoothing: 10
   collisionLayerMask:
     serializedVersion: 2
-    m_Bits: 4202367
+    m_Bits: 512
   collisionBuffer: 0.2
 --- !u!1 &431467987
 GameObject:
@@ -9767,7 +9767,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76be5661e8361eae9ab1b90bfd591b69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereRadius: 0.15
+  sphereRadius: 0.1
   showLabels: 1
   minConfidence: 0.3
   objectTransparency: 0.5
@@ -9810,6 +9810,21 @@ MonoBehaviour:
   - className: board
     color: {r: 0, g: 1, b: 1, a: 1}
     prefab: {fileID: 976002720483355549, guid: 54a671b74869b48249d8cb16ad69e218, type: 3}
+  - className: pill
+    color: {r: 1, g: 0.1585162, b: 0, a: 1}
+    prefab: {fileID: 2733078839668573097, guid: 75746aad650e8b91d8d37028900699cd,
+      type: 3}
+  - className: nutbolt
+    color: {r: 0.34729868, g: 0.34729868, b: 0.34729868, a: 1}
+    prefab: {fileID: 2930401904340372607, guid: 4b4f931cbb51c85dcbabb36aa2d69150,
+      type: 3}
+  - className: electric
+    color: {r: 1, g: 0.99998295, b: 0.22680086, a: 1}
+    prefab: {fileID: 977563664422272207, guid: b11c249f98021a50e876c011565f0f2c, type: 3}
+  - className: bandaid
+    color: {r: 0.23849961, g: 0.76646394, b: 0.7092411, a: 1}
+    prefab: {fileID: 6680936553586356778, guid: ebdfd7194a0acd194849c1a4863098ba,
+      type: 3}
 --- !u!4 &1954163045
 Transform:
   m_ObjectHideFlags: 0

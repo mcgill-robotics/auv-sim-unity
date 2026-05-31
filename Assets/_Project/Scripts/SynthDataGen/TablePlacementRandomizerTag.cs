@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
@@ -43,7 +43,7 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         [Header("Placement Area")]
         [Tooltip("The area around the reference transform within which to place objects.")]
         public Vector2 placementArea = new Vector2(1f, 1f);
-        
+
         [Tooltip("The separation between placed objects, in meters.")]
         public float separationDistance = 0.4f;
 
@@ -62,7 +62,7 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         #endregion
         private uint currentSeed;
         private GameObjectOneWayCache _gameObjectCache;
-        
+
         #region Randomizer Lifecycle
 
         public void Awake()
@@ -105,26 +105,26 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         /// <summary>
         /// Spawn objects
         /// </summary>
-        public void SpawnObjects(uint seedOverride = 0) 
+        public void SpawnObjects(uint seedOverride = 0)
         {
             if (referenceTransform == null)
             {
-            Debug.LogError("Reference Transform is not set. Cannot spawn objects.");
-            return;
+                Debug.LogError("Reference Transform is not set. Cannot spawn objects.");
+                return;
             }
 
             if (prefabConfigs == null || prefabConfigs.Count == 0)
             {
-            Debug.LogError("No prefab configurations provided. Cannot spawn objects.");
-            return;
+                Debug.LogError("No prefab configurations provided. Cannot spawn objects.");
+                return;
             }
 
             var validConfigs = prefabConfigs.Where(config => config.prefab != null).ToList();
 
             if (validConfigs.Count == 0)
             {
-            Debug.LogError("All prefab configurations are invalid. Cannot spawn objects.");
-            return;
+                Debug.LogError("All prefab configurations are invalid. Cannot spawn objects.");
+                return;
             }
 
             uint generationSeed;
@@ -158,115 +158,112 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             generationSeed
             ))
             {
-            // Center offset so placement area is cenetered at origin
-            Vector3 centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
+                // Center offset so placement area is cenetered at origin
+                Vector3 centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
 
-            // Determine whether to use the object spawn count limit or the number of valid samples as the upper bound for spawning objects
-            int spawnCount = 0;
-            if (maxObjectCount > 0)
-            {
-                spawnCount = Math.Min(maxObjectCount, nativeSamples.Length);
-            }
-
-            // Spawn objects at generated positions
-            for (int i = 0; i< spawnCount; i++)
-            {
-                var sample = nativeSamples[i];
-
-                // Go through all prefabs at least once to guarantee at least one of 
-                // each is spawned (if spawnCount permits).
-                // Once we've spawned all of them at least once, pick randomly
-                // for the remaining duplicates.
-                var config = i < prefabConfigs.Count 
-                ? validConfigs[i] 
-                : validConfigs[randomState.NextInt(0, validConfigs.Count)];
-
-                // Place on XZ plane with with per prefab height
-                Vector3 localPosition = new Vector3(
-                    sample.x - centerOffset.x, 
-                    config.relativeHeight, 
-                    sample.y - centerOffset.z
-                );
-
-                // Convert to world position from the referenceTransform
-                Vector3 worldPosition = referenceTransform.TransformPoint
-                (localPosition);
-
-                // Randomize yaw within specified range
-                float yaw = randomState.NextFloat(yawRange.x, yawRange.y);
-                Quaternion rotation = Quaternion.Euler(0f, yaw, 0f);
-
-                // Spawn the object
-                GameObject instance;
-                if (Application.isPlaying)
+                // Determine whether to use the object spawn count limit or the number of valid samples as the upper bound for spawning objects
+                int spawnCount = 0;
+                if (maxObjectCount > 0)
                 {
-                    if (_gameObjectCache == null)
-                    {
-                        var prefabs = validConfigs.Select(c => c.prefab).ToArray();
-                        _gameObjectCache = new GameObjectOneWayCache(transform, prefabs, null);
-                    }
-                    instance = _gameObjectCache.GetOrInstantiate(config.prefab);
-                    instance.transform.position = worldPosition;
-                    instance.transform.rotation = rotation;
-                }
-                else
-                {
-                    instance = Instantiate(config.prefab, worldPosition, rotation, transform);
-                    if (spawnedObjects == null) spawnedObjects = new List<GameObject>();
-                    spawnedObjects.Add(instance);
+                    spawnCount = Math.Min(maxObjectCount, nativeSamples.Length);
                 }
 
-                // Set the layer of the spawned object and all its children to props so that the camera can pick up on it
-                SetLayerRecursively(instance, LayerMask.NameToLayer("Props"));
-            }
-        }
-    }
-
-
-    public void ClearObjects(bool forceImmediate = false)
-    {
-        if (spawnedObjects != null && spawnedObjects.Count > 0)
-        {
-            for (int i = spawnedObjects.Count - 1; i >= 0; i--)
-            {
-                if (spawnedObjects[i] != null)
+                // Spawn objects at generated positions
+                for (int i = 0; i < spawnCount; i++)
                 {
-                    if (Application.isPlaying && !forceImmediate)
+                    var sample = nativeSamples[i];
+
+                    // Go through all prefabs at least once to guarantee at least one of 
+                    // each is spawned (if spawnCount permits).
+                    // Once we've spawned all of them at least once, pick randomly
+                    // for the remaining duplicates.
+                    var config = i < prefabConfigs.Count
+                    ? validConfigs[i]
+                    : validConfigs[randomState.NextInt(0, validConfigs.Count)];
+
+                    // Place on XZ plane with with per prefab height
+                    Vector3 localPosition = new Vector3(
+                        sample.x - centerOffset.x,
+                        config.relativeHeight,
+                        sample.y - centerOffset.z
+                    );
+
+                    // Convert to world position from the referenceTransform
+                    Vector3 worldPosition = referenceTransform.TransformPoint
+                    (localPosition);
+
+                    // Randomize yaw within specified range
+                    float yaw = randomState.NextFloat(yawRange.x, yawRange.y);
+                    Quaternion rotation = Quaternion.Euler(0f, yaw, 0f);
+
+                    // Spawn the object
+                    GameObject instance;
+                    if (Application.isPlaying)
                     {
-                        Destroy(spawnedObjects[i]);
+                        if (_gameObjectCache == null)
+                        {
+                            var prefabs = validConfigs.Select(c => c.prefab).ToArray();
+                            _gameObjectCache = new GameObjectOneWayCache(transform, prefabs, null);
+                        }
+                        instance = _gameObjectCache.GetOrInstantiate(config.prefab);
+                        instance.transform.position = worldPosition;
+                        instance.transform.rotation = rotation;
                     }
                     else
                     {
-                        DestroyImmediate(spawnedObjects[i]);
+                        instance = Instantiate(config.prefab, worldPosition, rotation, transform);
+                        if (spawnedObjects == null) spawnedObjects = new List<GameObject>();
+                        spawnedObjects.Add(instance);
                     }
                 }
             }
-            spawnedObjects.Clear();
         }
 
-        if (Application.isPlaying)
+
+        public void ClearObjects(bool forceImmediate = false)
         {
-            _gameObjectCache?.ResetAllObjects();
-        }
-    }
+            if (spawnedObjects != null && spawnedObjects.Count > 0)
+            {
+                for (int i = spawnedObjects.Count - 1; i >= 0; i--)
+                {
+                    if (spawnedObjects[i] != null)
+                    {
+                        if (Application.isPlaying && !forceImmediate)
+                        {
+                            Destroy(spawnedObjects[i]);
+                        }
+                        else
+                        {
+                            DestroyImmediate(spawnedObjects[i]);
+                        }
+                    }
+                }
+                spawnedObjects.Clear();
+            }
 
-    // Utility function to set the layer of a game object and all its children
-    private void SetLayerRecursively(GameObject obj, int layer)
-    {
-        obj.layer = layer;
-        
-        foreach (Transform child in obj.transform)
+            if (Application.isPlaying)
+            {
+                _gameObjectCache?.ResetAllObjects();
+            }
+        }
+
+        // Utility function to set the layer of a game object and all its children
+        private void SetLayerRecursively(GameObject obj, int layer)
         {
-        SetLayerRecursively(child.gameObject, layer);
-        }
-    }
+            obj.layer = layer;
 
-    public int GetConfigCount()
-    {
-        return prefabConfigs != null ? prefabConfigs.Count : 0;
+            foreach (Transform child in obj.transform)
+            {
+                SetLayerRecursively(child.gameObject, layer);
+            }
+        }
+
+        public int GetConfigCount()
+        {
+            return prefabConfigs != null ? prefabConfigs.Count : 0;
+        }
+        #endregion
     }
-    #endregion
-    } 
 }
 
 
