@@ -146,9 +146,9 @@ public class SimulationSettings : MonoBehaviour
     [Range(240, 1200)]
     public int FrontCamHeight = 600;
 
-    [Tooltip("Front camera vertical FOV in degrees (ZED X: 77.9°)")]
+    [Tooltip("Front camera vertical FOV in degrees (ZED X narrow: 52°)")]
     [Range(30f, 120f)]
-    public float FrontCamFOV = 77.9f;
+    public float FrontCamFOV = 52f;
 
     [Space(5)]
     [Tooltip("Down camera resolution width")]
