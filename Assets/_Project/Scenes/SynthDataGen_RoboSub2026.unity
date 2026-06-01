@@ -796,7 +796,7 @@ PrefabInstance:
     - target: {fileID: 2444080669992966401, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.97
+      value: 4.954
       objectReference: {fileID: 0}
     - target: {fileID: 2444080669992966401, guid: 8114239a4cf213b32b5e5242fc5eb4c4,
         type: 3}
@@ -3172,6 +3172,7 @@ MonoBehaviour:
         minDistance: 2
         maxDistance: 8
         lookAtSpawnedObject: 1
+        downCam: 0
         fallbackTarget: {x: 0, y: 0, z: 0}
         yawJitter:
           collapsed: 0
@@ -3554,6 +3555,7 @@ MonoBehaviour:
     saturationRange: {x: -40, y: -10}
     filmGrainMax: 1
     lookAtSpawnedObject: 1
+    isDownCam: 0
     cameraDistanceRange: {x: 1, y: 7}
     pitchRange: {x: -20, y: 30}
     randomYawRange: {x: 0, y: 360}
@@ -3575,6 +3577,7 @@ MonoBehaviour:
     saturationRange: {x: -80, y: 0}
     filmGrainMax: 1
     lookAtSpawnedObject: 1
+    isDownCam: 0
     cameraDistanceRange: {x: 1, y: 12}
     pitchRange: {x: -10, y: 30}
     randomYawRange: {x: 0, y: 360}
@@ -3596,6 +3599,7 @@ MonoBehaviour:
     saturationRange: {x: -80, y: 0}
     filmGrainMax: 1
     lookAtSpawnedObject: 0
+    isDownCam: 0
     cameraDistanceRange: {x: 2, y: 10}
     pitchRange: {x: -20, y: 30}
     randomYawRange: {x: 0, y: 360}

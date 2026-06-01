@@ -5377,7 +5377,7 @@ MonoBehaviour:
       type: {class: TablePlacementRandomizer, ns: , asm: Assembly-CSharp}
       data:
         m_Enabled: 1
-        collapsed: 0
+        collapsed: 1
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
     - rid: 2823715821560529000
       type: {class: RotationRandomizer, ns: UnityEngine.Perception.Randomization.Randomizers,
@@ -5408,7 +5408,7 @@ MonoBehaviour:
       type: {class: BoundedCameraRandomizer, ns: , asm: Assembly-CSharp}
       data:
         m_Enabled: 1
-        collapsed: 1
+        collapsed: 0
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
         cameraTransform: {fileID: 1963140906}
         poolMinBounds: {x: -11, y: -1.5, z: -22}
@@ -5693,7 +5693,7 @@ MonoBehaviour:
       type: {class: VisualTargetRandomizer, ns: , asm: Assembly-CSharp}
       data:
         m_Enabled: 1
-        collapsed: 0
+        collapsed: 1
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
     - rid: 7836056693691121873
       type: {class: UniformSampler, ns: UnityEngine.Perception.Randomization.Samplers,
@@ -6099,7 +6099,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 1000
-  field of view: 44
+  field of view: 38.2
   orthographic: 0
   orthographic size: 5
   m_Depth: -1

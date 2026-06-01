@@ -118,9 +118,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 5
+  maxDistance: 12
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 80
   allowFrontFace: 0
   allowBackFace: 1
 --- !u!1 &1704543952193886296
@@ -241,9 +241,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 5
+  maxDistance: 12
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 80
   allowFrontFace: 0
   allowBackFace: 1
 --- !u!1 &3973128773313021899
@@ -364,9 +364,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 5
+  maxDistance: 12
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 80
   allowFrontFace: 0
   allowBackFace: 1
 --- !u!1 &4175651832894230787
@@ -600,8 +600,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perceptionCamera: {fileID: 0}
   useDistanceFilter: 1
-  maxDistance: 5
+  maxDistance: 12
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 80
   allowFrontFace: 0
   allowBackFace: 1
