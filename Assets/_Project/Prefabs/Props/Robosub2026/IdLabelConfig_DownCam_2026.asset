@@ -46,5 +46,8 @@ MonoBehaviour:
   - label: bin_structure
     id: 10
     hierarchyRelation: 0
+  - label: bin
+    id: 11
+    hierarchyRelation: 1
   autoAssignIds: 1
   startingLabelId: 0

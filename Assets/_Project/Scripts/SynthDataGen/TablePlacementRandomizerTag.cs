@@ -107,6 +107,14 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
         /// </summary>
         public void SpawnObjects(uint seedOverride = 0)
         {
+            if (Application.isPlaying)
+            {
+                // Ensure the cache is reset before spawning new objects for this iteration.
+                // This acts as a failsafe if the parent Randomizer failed to call ClearObjects
+                // (e.g. if the table was dynamically disabled/returned to its own pool before OnIterationEnd).
+                ClearObjects();
+            }
+
             if (referenceTransform == null)
             {
                 Debug.LogError("Reference Transform is not set. Cannot spawn objects.");
@@ -161,11 +169,21 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
                 // Center offset so placement area is cenetered at origin
                 Vector3 centerOffset = new Vector3(placementArea.x * 0.5f, 0f, placementArea.y * 0.5f);
 
-                // Determine whether to use the object spawn count limit or the number of valid samples as the upper bound for spawning objects
-                int spawnCount = 0;
-                if (maxObjectCount > 0)
+                // Determine the upper bound for spawning objects depending on the execution mode
+                int spawnCount;
+                if (seedOverride != 0)
                 {
-                    spawnCount = Math.Min(maxObjectCount, nativeSamples.Length);
+                    // Synthetic Data Gen: use maxObjectCount limit
+                    spawnCount = nativeSamples.Length;
+                    if (maxObjectCount > 0)
+                    {
+                        spawnCount = Math.Min(maxObjectCount, nativeSamples.Length);
+                    }
+                }
+                else
+                {
+                    // Normal play / Editor Button: strictly use the number of available prefabs (e.g. 4)
+                    spawnCount = Math.Min(prefabConfigs.Count, nativeSamples.Length);
                 }
 
                 // Spawn objects at generated positions
