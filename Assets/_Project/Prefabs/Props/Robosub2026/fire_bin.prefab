@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 911115488559001240}
   - component: {fileID: 1067341646632922077}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: fire_quad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -175,6 +175,6 @@ MonoBehaviour:
   useDistanceFilter: 1
   maxDistance: 5
   useAngleFilter: 1
-  maxViewAngle: 60
+  maxViewAngle: 45
   allowFrontFace: 0
   allowBackFace: 1

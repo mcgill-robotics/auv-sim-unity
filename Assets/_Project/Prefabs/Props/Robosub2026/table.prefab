@@ -3738,7 +3738,7 @@ MonoBehaviour:
   referenceTransform: {fileID: 2165465072711031137}
   placementArea: {x: 0.5, y: 0.5}
   separationDistance: 0.14
-  maxObjectCount: 4
+  maxObjectCount: 10
   yawRange: {x: 0, y: 360}
   prefabConfigs:
   - prefab: {fileID: 2733078839668573097, guid: 75746aad650e8b91d8d37028900699cd,
@@ -4371,7 +4371,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 1f4b799866d40c6a6b845302f26bbff1, type: 2}
+      objectReference: {fileID: 2100000, guid: 427d45acd658c7f32950f56494e1c33f, type: 2}
     - target: {fileID: 919132149155446097, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_Name
@@ -4496,22 +4496,22 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071068
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
@@ -4521,7 +4521,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
@@ -4532,7 +4532,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 8e3e0db546fdc294c8928fe5e2abddb5, type: 2}
+      objectReference: {fileID: 2100000, guid: 427d45acd658c7f32950f56494e1c33f, type: 2}
     - target: {fileID: 919132149155446097, guid: e1dd50447facdb0ac815323a918e2f90,
         type: 3}
       propertyPath: m_Name
