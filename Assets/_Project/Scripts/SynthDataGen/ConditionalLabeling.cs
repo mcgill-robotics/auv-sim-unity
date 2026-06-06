@@ -12,7 +12,8 @@ public class ConditionalLabeling : MonoBehaviour
 {
     [Header("Camera Reference")]
     [Tooltip("The perception camera. Auto-finds Camera.main if empty.")]
-    public Transform perceptionCamera;
+    public Transform perceptionCameraOverride;
+    private Transform perceptionCamera => perceptionCameraOverride != null ? perceptionCameraOverride : (Camera.main != null ? Camera.main.transform : null);
 
     [Header("Distance Filter")]
     [Tooltip("Enable distance-based filtering.")]
@@ -50,8 +51,11 @@ public class ConditionalLabeling : MonoBehaviour
         if (_labeling == null)
             _labeling = GetComponent<Labeling>();
 
-        if (perceptionCamera == null && Camera.main != null)
-            perceptionCamera = Camera.main.transform;
+    }
+
+    public void UpdateCameraReference(Transform newCamera)
+    {
+        perceptionCameraOverride = newCamera;
     }
 
     void OnValidate()
