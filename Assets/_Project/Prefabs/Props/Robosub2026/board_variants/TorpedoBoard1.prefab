@@ -120,9 +120,9 @@ MonoBehaviour:
   useDistanceFilter: 1
   maxDistance: 5
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 60
   allowFrontFace: 1
-  allowBackFace: 1
+  allowBackFace: 0
 --- !u!1 &864854601989433034
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,9 +243,9 @@ MonoBehaviour:
   useDistanceFilter: 1
   maxDistance: 5
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 60
   allowFrontFace: 1
-  allowBackFace: 1
+  allowBackFace: 0
 --- !u!1 &2386398084811209533
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,9 +366,9 @@ MonoBehaviour:
   useDistanceFilter: 1
   maxDistance: 5
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 60
   allowFrontFace: 1
-  allowBackFace: 1
+  allowBackFace: 0
 --- !u!1 &6651810776320421589
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,9 +489,9 @@ MonoBehaviour:
   useDistanceFilter: 1
   maxDistance: 5
   useAngleFilter: 1
-  maxViewAngle: 70
+  maxViewAngle: 60
   allowFrontFace: 1
-  allowBackFace: 1
+  allowBackFace: 0
 --- !u!1001 &5759901922643843689
 PrefabInstance:
   m_ObjectHideFlags: 0
