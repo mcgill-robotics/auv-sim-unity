@@ -1065,9 +1065,29 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2839028282403040455, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: maxViewAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 2839028282403040455, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: allowBackFace
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3797848352356180502, guid: 04d75534cd9487b55970b3524cede80b,
         type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5047394343616551645, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: maxViewAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 5047394343616551645, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: allowBackFace
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5959821118541687658, guid: 04d75534cd9487b55970b3524cede80b,
@@ -1130,9 +1150,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7096453276437300996, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: maxViewAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 7096453276437300996, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: allowBackFace
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7181937322516023675, guid: 04d75534cd9487b55970b3524cede80b,
         type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8513638865277521059, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: maxViewAngle
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 8513638865277521059, guid: 04d75534cd9487b55970b3524cede80b,
+        type: 3}
+      propertyPath: allowBackFace
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
