@@ -6402,11 +6402,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1586863406}
     m_Modifications:
+    - target: {fileID: 607741976856007192, guid: d6664a8866754b10db9d51060dc62b35,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 672632699905473513, guid: d6664a8866754b10db9d51060dc62b35,
         type: 3}
       propertyPath: perceptionCameraOverride
       value: 
       objectReference: {fileID: 1371465009}
+    - target: {fileID: 864854601989433034, guid: d6664a8866754b10db9d51060dc62b35,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2386398084811209533, guid: d6664a8866754b10db9d51060dc62b35,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 2590445889305921711, guid: d6664a8866754b10db9d51060dc62b35,
         type: 3}
       propertyPath: m_Enabled
@@ -6431,6 +6446,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TorpedoBoard1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840843594447955768, guid: d6664a8866754b10db9d51060dc62b35,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 5124172282290755500, guid: d6664a8866754b10db9d51060dc62b35,
         type: 3}
@@ -6486,6 +6506,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651810776320421589, guid: d6664a8866754b10db9d51060dc62b35,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 8011186454665453296, guid: d6664a8866754b10db9d51060dc62b35,
         type: 3}
@@ -6552,10 +6577,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: SearchRescue
       objectReference: {fileID: 0}
+    - target: {fileID: 856882362382254231, guid: dfd69276928efe524b6a0c8ced0b159b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 2381032478387215835, guid: dfd69276928efe524b6a0c8ced0b159b,
         type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3028111203104612146, guid: dfd69276928efe524b6a0c8ced0b159b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 4333996031343913066, guid: dfd69276928efe524b6a0c8ced0b159b,
         type: 3}
@@ -6567,6 +6602,11 @@ PrefabInstance:
       propertyPath: perceptionCameraOverride
       value: 
       objectReference: {fileID: 1371465009}
+    - target: {fileID: 4821087047806905217, guid: dfd69276928efe524b6a0c8ced0b159b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 4899089517070015223, guid: dfd69276928efe524b6a0c8ced0b159b,
         type: 3}
       propertyPath: perceptionCameraOverride
@@ -7642,6 +7682,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: lifebuoy
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126017877515949367, guid: dbcb6860d93a126ec82a009607bc5389,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12199,6 +12244,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: sos
       objectReference: {fileID: 0}
+    - target: {fileID: 1219471094823654537, guid: 58b7a0e95ce14024680da2412997ea5b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 1445232855963667500, guid: 58b7a0e95ce14024680da2412997ea5b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -13684,6 +13734,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 87702902}
     m_Modifications:
+    - target: {fileID: 534350612630991507, guid: 6b3e16196069308aca47dc591bb90aa8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 3015003675245385051, guid: 6b3e16196069308aca47dc591bb90aa8,
         type: 3}
       propertyPath: perceptionCameraOverride
@@ -13749,6 +13804,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7526872815252624402, guid: 6b3e16196069308aca47dc591bb90aa8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 7665922855270177853, guid: 6b3e16196069308aca47dc591bb90aa8,
         type: 3}
       propertyPath: perceptionCameraOverride
@@ -13758,6 +13818,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SurveyRepair
+      objectReference: {fileID: 0}
+    - target: {fileID: 7830394346347347154, guid: 6b3e16196069308aca47dc591bb90aa8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 8345757474083893965, guid: 6b3e16196069308aca47dc591bb90aa8,
         type: 3}
@@ -15315,6 +15380,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: compass
       objectReference: {fileID: 0}
+    - target: {fileID: 4341584756997648899, guid: 9c28aaecaddef743bb7419be697cf260,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 6360590700737204038, guid: 9c28aaecaddef743bb7419be697cf260,
         type: 3}
       propertyPath: m_Enabled
@@ -16801,6 +16871,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: tools
       objectReference: {fileID: 0}
+    - target: {fileID: 4883597645129182048, guid: 5ea632f9905ea445b9d9827b531f3177,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 8261440413628093395, guid: 5ea632f9905ea445b9d9827b531f3177,
         type: 3}
       propertyPath: m_Enabled
@@ -17936,8 +18011,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1371465005}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.833, y: -0.794, z: 1.934}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -10, y: -1, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17945,7 +18020,7 @@ Transform:
   - {fileID: 431467988}
   - {fileID: 1037403592}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &1371465010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19363,7 +19438,6 @@ GameObject:
   - component: {fileID: 1443981343}
   - component: {fileID: 1443981351}
   - component: {fileID: 1443981352}
-  - component: {fileID: 1443981339}
   - component: {fileID: 1443981342}
   m_Layer: 0
   m_Name: Managers-Configurations
@@ -19372,18 +19446,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1443981339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1443981338}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fdf54c026133b44cba610a77d50bbea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1443981342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19453,8 +19515,8 @@ MonoBehaviour:
   FrontCamera: {fileID: 1621375949}
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
-  DisplaySimObjects: 1
-  PublishGTObjectMap: 1
+  DisplaySimObjects: 0
+  PublishGTObjectMap: 0
   NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
@@ -19465,30 +19527,30 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 1
+  PublishFrontCam: 0
   PublishDownCam: 1
-  PublishDepthCamera: 1
-  StreamZEDCamera: 0
-  VisualizeDVL: 0
+  PublishDepthCamera: 0
+  StreamZEDCamera: 1
+  VisualizeDVL: 1
   VisualizeIMU: 0
   VisualizeDepth: 0
   EnableDVLNoise: 0
   EnableIMUNoise: 0
-  EnableDepthNoise: 1
-  DrawerConfigOpen: 1
-  DrawerControlsOpen: 1
+  EnableDepthNoise: 0
+  DrawerConfigOpen: 0
+  DrawerControlsOpen: 0
   DrawerTelemetryOpen: 0
-  DrawerSensorsOpen: 1
+  DrawerSensorsOpen: 0
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 10
+  FrontCamRate: 30
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
-  FrontCamFOV: 77.9
+  FrontCamFOV: 52
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1
@@ -19496,7 +19558,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20919,6 +20981,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 489070604181099392, guid: 54a671b74869b48249d8cb16ad69e218,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 754461531951151946, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
       propertyPath: m_Layer
@@ -21150,6 +21217,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 662212818274475603, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 676011007520373866, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -21161,6 +21233,11 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1070461222021653490, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1246094635893012447, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
       value: 12
@@ -21206,6 +21283,11 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 2865069548053748949, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2891658791892038079, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
       value: 12
@@ -21276,6 +21358,11 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 3428775900184138906, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3484272278022510643, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
       value: 12
@@ -21480,6 +21567,11 @@ PrefabInstance:
       propertyPath: perceptionCameraOverride
       value: 
       objectReference: {fileID: 1371465009}
+    - target: {fileID: 7092554536377678670, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 7283110870220621751, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -21525,6 +21617,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 7944909507944460884, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 7958039211523512331, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -21555,6 +21652,11 @@ PrefabInstance:
       propertyPath: perceptionCameraOverride
       value: 
       objectReference: {fileID: 1371465009}
+    - target: {fileID: 8519225472062512088, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 8555902665421667894, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
@@ -21566,6 +21668,11 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 8652499918029665083, guid: f823314a341dc3227ae7ebcacde94926,
+        type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8797346127452672706, guid: f823314a341dc3227ae7ebcacde94926,
         type: 3}
       propertyPath: m_Layer
       value: 12
