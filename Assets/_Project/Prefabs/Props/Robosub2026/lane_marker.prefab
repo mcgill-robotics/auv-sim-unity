@@ -1301,7 +1301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5521e6c21002f7fb3643f3b29aadab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perceptionCamera: {fileID: 0}
+  perceptionCameraOverride: {fileID: 0}
   useDistanceFilter: 0
   maxDistance: 8
   useAngleFilter: 0
