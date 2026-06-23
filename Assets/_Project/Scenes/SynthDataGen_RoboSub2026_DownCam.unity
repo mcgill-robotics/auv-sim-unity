@@ -5763,8 +5763,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   batchConfigs:
-  - batchName: NewBatch
-    iterations: 600
+  - batchName: High visibility cases
+    iterations: 2000
     spawnObjects: 1
     randomizeVisuals: 1
     absorptionDistanceRange: {x: 4, y: 25}
@@ -5786,7 +5786,7 @@ MonoBehaviour:
     rollRange: {x: -10, y: 10}
     yawJitter: 20
   - batchName: Hard cases
-    iterations: 200
+    iterations: 1000
     spawnObjects: 1
     randomizeVisuals: 1
     absorptionDistanceRange: {x: 3, y: 10}
@@ -5807,9 +5807,9 @@ MonoBehaviour:
     randomYawRange: {x: 0, y: 360}
     rollRange: {x: -15, y: 15}
     yawJitter: 45
-  - batchName: NewBatch
-    iterations: 200
-    spawnObjects: 1
+  - batchName: Background
+    iterations: 500
+    spawnObjects: 0
     randomizeVisuals: 0
     absorptionDistanceRange: {x: 4, y: 25}
     waterScatterRedRange: {x: 0, y: 0.4}
@@ -6149,6 +6149,7 @@ MonoBehaviour:
   m_Labelers:
   - rid: 2823715725394837583
   - rid: 2823715839643222093
+  - rid: 584774389145796767
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -6167,6 +6168,14 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 584774389145796767
+      type: {class: InstanceSegmentationLabeler, ns: UnityEngine.Perception.GroundTruth.Labelers,
+        asm: Unity.Perception.Runtime}
+      data:
+        enabled: 1
+        annotationId: instance segmentation
+        idLabelConfig: {fileID: 11400000, guid: 1f5ea7bbaad552af292060afc68e4b67,
+          type: 2}
     - rid: 2823715477457731932
       type: {class: UnityCameraSensor, ns: UnityEngine.Perception.GroundTruth.Sensors,
         asm: Unity.Perception.Runtime}
@@ -6186,7 +6195,7 @@ MonoBehaviour:
       data:
         enabled: 1
         metricId: Occlusion
-        idLabelConfig: {fileID: 11400000, guid: 82eed9a9cbb38a58d95840d98d8742c4,
+        idLabelConfig: {fileID: 11400000, guid: 1f5ea7bbaad552af292060afc68e4b67,
           type: 2}
         outOfFrameResolution: 219
 --- !u!114 &1963140908
