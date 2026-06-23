@@ -259,6 +259,9 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
 3.  The **Simulator HUD** will appear. Use the left panel to toggle specific sensors or adjust camera framerates.
 4.  Click **Apply Configuration** to save changes.
 
+> [!TIP]
+> You can enable the parent object called `OtherProps` under `Environment` in the Hierarchy to simulate having other props around in the other lanes.
+
 ### Manual Control
 When the simulator is running, you can manually override ROS commands using the keyboard:
 
@@ -270,7 +273,6 @@ When the simulator is running, you can manually override ROS commands using the 
 *   **Roll:** U / O
 *   **Emergency Stop:** Spacebar (Toggles Kinematic freeze)
 *   **Drop Marker:** G
-*   **Rotate Torpedo Launcher:** Left and Right Arrow Keys
 *   **Shoot Torpedo/Reset:** T / Y
 *   **Toggle Camera Mode:** C
 

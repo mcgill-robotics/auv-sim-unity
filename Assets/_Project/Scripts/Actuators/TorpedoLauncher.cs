@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
@@ -7,37 +5,20 @@ using RosMessageTypes.Std;
 namespace Actuators
 {
     /// <summary>
-    /// Controls the torpedo launcher mechanism: rotates a base and launches torpedos.
+    /// Controls the torpedo launcher mechanism: launches torpedos using parameterized equations.
     /// Supports both ROS commands and manual keyboard override.
     /// </summary>
     public class TorpedoLauncher : MonoBehaviour
     {
         [Header("Launcher Configuration")]
-        [Tooltip("The base transform that rotates")]
-        public Transform rotatingBase;
-        
         [Tooltip("The two torpedo gameobjects")]
         public GameObject[] torpedos;
-        
-        [Tooltip("Maximum rotation angle from center (80 degrees)")]
-        public float maxRotationAngle = 80f;
-        
-        [Tooltip("Speed of rotation (degrees per second)")]
-        public float rotationSpeed = 30f;
-        
-        [Tooltip("Initial forward velocity when launched")]
-        public float launchForce = 10f;
+
+        [Header("Trajectory Configuration")]
+        [Tooltip("Parameterized equation coefficients for the torpedo trajectory")]
+        public LaunchedTorpedo.TrajectoryData trajectoryData;
 
         [Header("Torpedo Physics Configuration")]
-        [Tooltip("Mass of the torpedo when launched")]
-        public float torpedoMass = 1.0f;
-        
-        [Tooltip("Linear drag of the torpedo")]
-        public float torpedoDrag = 0.5f;
-        
-        [Tooltip("Angular drag of the torpedo")]
-        public float torpedoAngularDrag = 0.5f;
-        
         [Tooltip("Layers to exclude from collision (Unity 6+)")]
         public LayerMask excludeLayers;
 
@@ -60,7 +41,6 @@ namespace Actuators
 
         [Header("Manual Control (Read Only)")]
         [SerializeField] private int nextTorpedoIndex = 0;
-        [SerializeField] private float targetRotation = 0f;
 
         private ROSConnection roscon;
 
@@ -82,7 +62,6 @@ namespace Actuators
             // Subscribe to ROS topics
             roscon.Subscribe<BoolMsg>(ROSSettings.Instance.TorpedoLaunchTopic, OnRosLaunch);
             roscon.Subscribe<BoolMsg>(ROSSettings.Instance.TorpedoResetTopic, OnRosReset);
-            roscon.Subscribe<Float32Msg>(ROSSettings.Instance.TorpedoRotationTopic, OnRosRotate);
 
             // Store initial states
             initialStates = new TorpedoState[torpedos.Length];
@@ -117,7 +96,6 @@ namespace Actuators
         private void Update()
         {
             HandleManualInput();
-            UpdateRotation();
         }
 
         private void HandleManualInput()
@@ -136,26 +114,6 @@ namespace Actuators
             {
                 ResetLauncher();
             }
-
-            // Rotate (Left/Right or [ / ])
-            float rotInput = 0f;
-            if (Input.GetKey(InputManager.Instance.GetKey("torpedoRotateLeftKeybind", KeyCode.LeftArrow))) rotInput -= 1f;
-            if (Input.GetKey(InputManager.Instance.GetKey("torpedoRotateRightKeybind", KeyCode.RightArrow))) rotInput += 1f;
-            
-            if (rotInput != 0)
-            {
-                targetRotation += rotInput * rotationSpeed * Time.deltaTime;
-                targetRotation = Mathf.Clamp(targetRotation, -maxRotationAngle, maxRotationAngle);
-            }
-        }
-
-        private void UpdateRotation()
-        {
-            if (rotatingBase == null) return;
-            
-            // Smoothly rotate towards target
-            Quaternion targetRot = Quaternion.Euler(0, targetRotation, 0);
-            rotatingBase.localRotation = Quaternion.RotateTowards(rotatingBase.localRotation, targetRot, rotationSpeed * Time.deltaTime);
         }
 
         private void OnRosLaunch(BoolMsg msg)
@@ -166,11 +124,6 @@ namespace Actuators
         private void OnRosReset(BoolMsg msg)
         {
             if (msg.data) ResetLauncher();
-        }
-
-        private void OnRosRotate(Float32Msg msg)
-        {
-            targetRotation = Mathf.Clamp(msg.data, -maxRotationAngle, maxRotationAngle);
         }
 
         private Material[][] StoreOriginalMaterials(GameObject obj)
@@ -237,26 +190,23 @@ namespace Actuators
             GameObject torpedo = torpedos[nextTorpedoIndex];
             if (torpedo == null) return;
 
-            // Add Rigidbody on the fly
+            // Add Rigidbody on the fly (for collision detection)
             Rigidbody rb = torpedo.GetComponent<Rigidbody>();
             if (rb == null)
             {
                 rb = torpedo.AddComponent<Rigidbody>();
             }
 
-            // Configure Rigidbody
-            rb.mass = torpedoMass;
-            rb.linearDamping = torpedoDrag;
-            rb.angularDamping = torpedoAngularDrag;
-            rb.excludeLayers = excludeLayers; // Exclude layers from collision (Unity 6 feature)
-            rb.useGravity = false; // Usually true for underwater if buoyancy isn't handled separately, but let's assume neutrally buoyant or handled by other scripts
-            rb.isKinematic = false;
+            // Configure Rigidbody as Kinematic for trajectory control
+            rb.excludeLayers = excludeLayers;
+            rb.useGravity = false;
+            rb.isKinematic = true;
 
             // Handle Collider
             if (manageColliders)
             {
-                Collider col = torpedo.GetComponent<Collider>();
-                if (col != null)
+                Collider[] colliders = torpedo.GetComponentsInChildren<Collider>();
+                foreach (var col in colliders)
                 {
                     col.excludeLayers = excludeLayers;
                     col.enabled = true;
@@ -264,11 +214,14 @@ namespace Actuators
             }
 
             torpedo.transform.parent = null; // Detach
-            rb.linearVelocity = torpedo.transform.forward * launchForce;
+            
+            // Add and initialize the trajectory component
+            LaunchedTorpedo trajectory = torpedo.AddComponent<LaunchedTorpedo>();
+            trajectory.Initialize(trajectoryData);
             
             ApplyOutline(torpedo);
             
-            Debug.Log($"[TorpedoLauncher] Launched torpedo {nextTorpedoIndex + 1}");
+            Debug.Log($"[TorpedoLauncher] Launched torpedo {nextTorpedoIndex + 1} with kinematic trajectory");
             nextTorpedoIndex++;
         }
 
@@ -278,6 +231,10 @@ namespace Actuators
             for (int i = 0; i < torpedos.Length; i++)
             {
                 if (torpedos[i] == null) continue;
+
+                // Remove trajectory component
+                LaunchedTorpedo trajectory = torpedos[i].GetComponent<LaunchedTorpedo>();
+                if (trajectory != null) Destroy(trajectory);
 
                 // Remove Rigidbody if it exists
                 Rigidbody rb = torpedos[i].GetComponent<Rigidbody>();
@@ -304,8 +261,6 @@ namespace Actuators
             }
 
             nextTorpedoIndex = 0;
-            targetRotation = 0f;
-            if (rotatingBase != null) rotatingBase.localRotation = Quaternion.identity;
             
             Debug.Log("[TorpedoLauncher] Launcher reset.");
         }

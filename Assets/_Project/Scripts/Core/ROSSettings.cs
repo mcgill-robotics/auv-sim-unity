@@ -25,14 +25,15 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Topic for dropper trigger command (Bool)")]
     public string DropperTopic = "/auv/dropper/trigger";
 
+    [Tooltip("Topic for gripper command (BooL)")]
+    public string GripperTopic = "/auv/gripper/trigger";
+
     [Tooltip("Topic for torpedo launch command (Bool)")]
     public string TorpedoLaunchTopic = "/auv/torpedo/launch";
 
     [Tooltip("Topic for torpedo reset command (Bool)")]
     public string TorpedoResetTopic = "/auv/torpedo/reset";
 
-    [Tooltip("Topic for torpedo launcher rotation (Float32)")]
-    public string TorpedoRotationTopic = "/auv/torpedo/rotate";
 
     [Space(10)]
     [Header("Sensor Topics")]

@@ -4,6 +4,15 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Auv;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
 using System.Collections.Generic;
+using Sensors;
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 namespace Sensors
 {
@@ -14,18 +23,28 @@ namespace Sensors
     /// </summary>
     public class GroundTruthVisionPublisher : ROSPublisher
     {
+        [Header("Reference")]
+        [Tooltip("Reference used for conditional labeling. Uses AUV Rigidbody if empty.")]
+        [SerializeField] private Transform AUVCameraOverride;
+        public Transform AUVCamera
+        {
+            get => AUVCameraOverride != null ? AUVCameraOverride : (SimulationSettings.Instance?.AUVRigidbody != null ? SimulationSettings.Instance.AUVRigidbody.transform : null);
+            private set => AUVCameraOverride = value;
+        }
+
+
         [Header("Ground Truth Vision Settings")]
-        
+
         [Tooltip("Maximum distance to publish an object. Simulates camera clipping plane.")]
         public float maxDetectionDistance = 20f;
-        
+
         [Tooltip("Simulated confidence value to assign to detections (0 to 1).")]
         [Range(0f, 1f)]
         public float defaultConfidence = 0.95f;
 
         public override string Topic => ROSSettings.Instance != null ? ROSSettings.Instance.VisionObjectMapTopic : "/vision/object_map";
 
-        private struct CachedObjectData
+        public struct CachedObjectData
         {
             public Labeling Labeling;
             public string LabelString;
@@ -33,8 +52,7 @@ namespace Sensors
             public RosMessageTypes.Geometry.PointMsg PosRos;
             public RosMessageTypes.Geometry.QuaternionMsg RotRos;
         }
-
-        private CachedObjectData[] cachedObjects;
+        public CachedObjectData[] cachedObjects { get; private set; }
 
         protected override void Start()
         {
@@ -82,7 +100,7 @@ namespace Sensors
                 // Precalculate relative positions since objects are static
                 Vector3 odomPos = label.transform.position;
                 Quaternion odomRot = label.transform.rotation;
-                
+
                 if (useOrigin)
                 {
                     Vector3 worldDisp = label.transform.position - initialPos;
@@ -108,12 +126,12 @@ namespace Sensors
         {
             if (SimulationSettings.Instance != null && !SimulationSettings.Instance.PublishGTObjectMap) return;
             if (cachedObjects == null || cachedObjects.Length == 0) return;
-            
+
             Transform referenceTransform = SimulationSettings.Instance?.AUVTransform;
             if (referenceTransform == null) return;
 
             var msg = new VisionObjectArrayMsg();
-            
+
             // Generate standard ROS HeaderMsg
             var stampMsg = ROSClock.GetROSTimestamp();
             msg.header = new RosMessageTypes.Std.HeaderMsg
@@ -121,7 +139,7 @@ namespace Sensors
                 stamp = stampMsg,
                 frame_id = ROSSettings.Instance?.WorldFrameId ?? "pool_link"
             };
-            
+
             var objectsList = new List<VisionObjectMsg>(cachedObjects.Length);
 
             foreach (var cachedObj in cachedObjects)
@@ -161,3 +179,45 @@ namespace Sensors
         }
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(GroundTruthVisionPublisher))]
+public class GroundTruthVisionPublisherEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        GroundTruthVisionPublisher script = (GroundTruthVisionPublisher)target;
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Conditional Labeling Camera Reference", EditorStyles.boldLabel);
+        DrawUpdateCameraButton(script);
+    }
+
+    private void DrawUpdateCameraButton(GroundTruthVisionPublisher script)
+    {
+        if (GUILayout.Button("Update Conditional Labeling Camera References"))
+        {
+            Debug.Log("Updating camera references for all ConditionalLabeling components...");
+            if (script.AUVCamera == null)
+            {
+                Debug.LogError("AUVCamera is null on the target script!");
+                return;
+            }
+            // Update camera reference for all conditional labeling in cache
+            ConditionalLabeling[] conditionalLabelers = FindObjectsByType<ConditionalLabeling>(FindObjectsSortMode.None);
+            Debug.Log($"Found {conditionalLabelers.Length} ConditionalLabeling components to update.");
+
+            Undo.RecordObjects(conditionalLabelers, "Update Conditional Labeling Camera Reference");
+            foreach (var labeler in conditionalLabelers)
+            {
+                Debug.Log($"Updating camera reference for {labeler.gameObject.name}");
+                labeler.UpdateCameraReference(script.AUVCamera);
+                EditorUtility.SetDirty(labeler);
+            }
+            EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+        }
+    }
+}
+#endif
