@@ -215,7 +215,7 @@ public class SettingsController
         if (toggleGTObjectMap != null) toggleGTObjectMap.value = SimulationSettings.Instance.PublishGTObjectMap;
         if (toggleStreamZED != null)
         {
-#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+#if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
             toggleStreamZED.style.display = DisplayStyle.Flex;
 #else

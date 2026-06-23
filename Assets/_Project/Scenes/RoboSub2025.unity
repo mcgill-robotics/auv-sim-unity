@@ -2755,7 +2755,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -5394,8 +5394,8 @@ MonoBehaviour:
   PublishROS: 1
   DisplaySimObjects: 0
   PublishGTObjectMap: 0
-  NoWaterMode: 1
-  EnableShadows: 0
+  NoWaterMode: 0
+  EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
@@ -5404,26 +5404,26 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 0
-  PublishDownCam: 0
-  PublishDepthCamera: 0
+  PublishFrontCam: 1
+  PublishDownCam: 1
+  PublishDepthCamera: 1
   StreamZEDCamera: 0
   VisualizeDVL: 0
   VisualizeIMU: 0
   VisualizeDepth: 0
   EnableDVLNoise: 0
   EnableIMUNoise: 0
-  EnableDepthNoise: 0
+  EnableDepthNoise: 1
   DrawerConfigOpen: 1
-  DrawerControlsOpen: 0
+  DrawerControlsOpen: 1
   DrawerTelemetryOpen: 0
-  DrawerSensorsOpen: 0
+  DrawerSensorsOpen: 1
   DrawerCameraOpen: 0
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 30
+  FrontCamRate: 10
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
@@ -5435,7 +5435,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5516,7 +5516,7 @@ MonoBehaviour:
   DownCameraTopic: /down_cam/image_raw
   DepthCameraTopic: /zed/zed_node/depth/depth_registered
   ClockTopic: /clock
-  StateTopic: /auv/state
+  StatePoseTopic: /state/pose
   StateXTopic: /auv/state/x
   StateYTopic: /auv/state/y
   StateZTopic: /auv/state/z
@@ -7818,6 +7818,8 @@ MonoBehaviour:
   vioPoseColor: {r: 1, g: 0.5, b: 0, a: 1}
   vioPoseSize: 0.3
   autoFixDrift: 1
+  statePoseColor: {r: 0, g: 1, b: 0, a: 1}
+  statePoseSize: 0.3
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   classVisualizers:
   - className: gate
