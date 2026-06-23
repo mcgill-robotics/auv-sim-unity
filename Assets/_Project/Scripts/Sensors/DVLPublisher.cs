@@ -1,5 +1,5 @@
 using UnityEngine;
-using RosMessageTypes.MarineAcoustic;
+using RosMessageTypes.Dvl;
 using RosMessageTypes.Std;
 using RosMessageTypes.Nav;
 using RosMessageTypes.Geometry;
@@ -110,15 +110,18 @@ public class DVLPublisher : ROSPublisher
     // ROS-frame accessor for UI (Odom Frame - NED)
     // Uses the calculated relative position (North, East, Down) from UpdateDeadReckoningInternal
     public Vector3 RosDeadReckoningPosition => drPositionNED;
+    public Quaternion ROSDeadReckoningOrientation => drOrientation;
 
     // Internals
-    private DvlMsg dvlMsg;
-    private PoseWithCovarianceStampedMsg drMsg;
+    private DVLMsg dvlMsg;
+    private DVLDRMsg drMsg;
     private OdometryMsg odomMsg;
     
     private Vector3 drPositionNED; // Cached NED position for UI property
+    private Quaternion drOrientation;
 
-    private float nextPublishTime = 0;
+    private ROSTime nextPublishTime = new ROSTime(0);
+    private ROSTime lastPublishTime = new ROSTime(0); // used to compute center of ping
     private GaussMarkovVector velocityBias;
     
     // Dead Reckoning State (Unity Frame)
@@ -155,17 +158,13 @@ public class DVLPublisher : ROSPublisher
         
         // DVL uses its own adaptive timing based on altitude, not base class rate limiting
         useBaseRateLimiting = false;
-        
-        dvlMsg = new DvlMsg();
-        drMsg = new PoseWithCovarianceStampedMsg();
-        odomMsg = new OdometryMsg();
-        
 
-        
-        dvlMsg.beam_unit_vec = new RosMessageTypes.Geometry.Vector3Msg[4];
-        
-        dvlMsg.beam_unit_vec = new RosMessageTypes.Geometry.Vector3Msg[4];
-        
+        dvlMsg = new DVLMsg();
+        drMsg = new DVLDRMsg();
+        odomMsg = new OdometryMsg();
+
+
+
         initialSensorPosition = transform.position;
         drPositionUnity = Vector3.zero;
         
@@ -186,15 +185,9 @@ public class DVLPublisher : ROSPublisher
             Quaternion tilt = Quaternion.Euler(beamTiltAngle, 0f, 0f);
             Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
             beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
-            
-            // Populate ROS beam unit vectors (Unity RUF -> ROS FRD)
-            // Unity X -> ROS Y
-            // Unity -Y -> ROS Z
-            // Unity Z -> ROS X
-            Vector3 v = beamDirectionsLocal[i];
-            dvlMsg.beam_unit_vec[i] = new RosMessageTypes.Geometry.Vector3Msg(v.z, v.x, -v.y);
+
         }
-        
+
         // Initialize Gauss-Markov bias model with pre-calculated coefficients
         velocityBias = new GaussMarkovVector(biasCorrelationTime, biasSigma, Time.fixedDeltaTime);
         
@@ -274,7 +267,8 @@ public class DVLPublisher : ROSPublisher
         }
 
         // 2. Check Publish Trigger (Adaptive Rate)
-        if (Time.time >= nextPublishTime)
+        ROSTime currentTime = ROSClock.GetROSTime();
+        if (currentTime.GetNanoSec() >= nextPublishTime.GetNanoSec())
         {
             ProcessVelocitySample();
 
@@ -283,8 +277,9 @@ public class DVLPublisher : ROSPublisher
             {
                 PublishMessage();
             }
-            
+
             // Calculate next update time
+            lastPublishTime = nextPublishTime;
             float rate = 2.0f; // Default "Search" rate when lock is lost
             
             if (simulateAdaptiveRate && IsValid)
@@ -292,7 +287,8 @@ public class DVLPublisher : ROSPublisher
                 // Linearly interpolate between 15Hz (shallow) and 4Hz (deep) 
                 rate = Mathf.Lerp(15.0f, 4.0f, LastAltitude / maxAltitude);
             }
-            nextPublishTime = Time.time + (1.0f / rate);
+            // update next publish time based on current time + interval from rate
+            nextPublishTime.sec = currentTime.sec + (1.0f / rate);
         }
         
         // Update visualization (always if enabled)
@@ -304,8 +300,8 @@ public class DVLPublisher : ROSPublisher
 
     protected override void RegisterPublisher()
     {
-        ros.RegisterPublisher<DvlMsg>(Topic);
-        ros.RegisterPublisher<PoseWithCovarianceStampedMsg>(ROSSettings.Instance.DVLDeadReckoningTopic);
+        ros.RegisterPublisher<DVLMsg>(Topic);
+        ros.RegisterPublisher<DVLDRMsg>(ROSSettings.Instance.DVLDeadReckoningTopic);
         ros.RegisterPublisher<OdometryMsg>(ROSSettings.Instance.DVLOdometryTopic);
     }
 
@@ -329,17 +325,20 @@ public class DVLPublisher : ROSPublisher
     /// </summary>
     private void UpdateDvlMessageData()
     {
-        // 1. Config
-        dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId; // "dvl_link"
-        dvlMsg.velocity_mode = DvlMsg.DVL_MODE_BOTTOM;
-        dvlMsg.dvl_type = DvlMsg.DVL_TYPE_PISTON;
-        
-        // 2. Validity Flags
-        dvlMsg.beam_velocities_valid = IsValid;
-        dvlMsg.beam_ranges_valid = true; 
-        dvlMsg.num_good_beams = (byte)ValidBeamCount;
-        dvlMsg.altitude = IsValid ? LastAltitude : -1.0;
+        ROSTime time = ROSClock.GetROSTime();
+        // time of validity is the center of the ping, which we approximate as the current time minus half the interval since the last publish (since the velocity is effectively averaged over that interval)
+        long timeOfValidity = time.GetMicroSec() - (lastPublishTime.GetMicroSec() / 1000 / 2);
 
+        dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId;
+        dvlMsg.time = lastPublishTime.GetMilliSec(); // Convert back to milliseconds for the message
+
+        dvlMsg.velocity = new Vector3Msg
+        {
+            x = RosVelocity.x,
+            y = RosVelocity.y,
+            z = RosVelocity.z
+        };
+        dvlMsg.fom = IsValid ? 100 : 0; // Figure of Merit based on validity
         if (IsValid)
         {
             // 3. Velocity (Sensor Frame: FRD)
@@ -349,10 +348,10 @@ public class DVLPublisher : ROSPublisher
             dvlMsg.velocity.z = -LastVelocity.y;
 
             // 4. Covariance (3x3 Diagonal)
-            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
-            dvlMsg.velocity_covar[0] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var X
-            dvlMsg.velocity_covar[4] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var Y
-            dvlMsg.velocity_covar[8] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var Z
+            for (int i = 0; i < 9; i++) dvlMsg.covariance[i] = 0;
+            dvlMsg.covariance[0] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var X
+            dvlMsg.covariance[4] = Mathf.Pow(sigmaVelocityHorizontal, 2); // Var Y
+            dvlMsg.covariance[8] = Mathf.Pow(sigmaVelocityVertical, 2);   // Var Z
         }
         else
         {
@@ -360,22 +359,82 @@ public class DVLPublisher : ROSPublisher
             dvlMsg.velocity.x = 0;
             dvlMsg.velocity.y = 0;
             dvlMsg.velocity.z = 0;
-            for(int i=0; i<9; i++) dvlMsg.velocity_covar[i] = 0; 
-            
-            dvlMsg.velocity_covar[0] = 10000;
-            dvlMsg.velocity_covar[4] = 10000;
-            dvlMsg.velocity_covar[8] = 10000;
+            for (int i = 0; i < 9; i++) dvlMsg.covariance[i] = 0;
+
+            dvlMsg.covariance[0] = 10000;
+            dvlMsg.covariance[4] = 10000;
+            dvlMsg.covariance[8] = 10000;
         }
 
-        // 5. Beam Data
-        for (int i = 0; i < 4; i++)
+
+        dvlMsg.altitude = LastAltitude;
+
+
+        dvlMsg.beams = new DVLBeamMsg[]
         {
-            dvlMsg.range[i] = BeamValid[i] ? Vector3.Distance(transform.position, BeamHitPoints[i]) : 0;
-            dvlMsg.beam_quality[i] = BeamValid[i] ? 100f : 0f;
+            GetBeamData(0),
+            GetBeamData(1),
+            GetBeamData(2),
+            GetBeamData(3)
+        };
+        dvlMsg.velocity_valid = IsValid;
+        dvlMsg.status = 0; // always valid for simplicity, DVL will not overheat in simulation
+        dvlMsg.time_of_validity = timeOfValidity;
+        dvlMsg.time_of_transmission = time.GetMicroSec();
+        dvlMsg.form = "simulation";
+
+        // Odometry Twist using DVL velocity (FRD) or Body FLU?
+        // nav_msgs/Odometry twist is usually in child_frame_id (Body/Sensor).
+        // Since child_frame_id is "dvl_link", and user defined DVL as FRD for velocity...
+        // We populate it with the FRD velocity we have in dvlMsg.
+
+        odomMsg.twist.twist.linear.x = dvlMsg.velocity.x;
+        odomMsg.twist.twist.linear.y = dvlMsg.velocity.y;
+        odomMsg.twist.twist.linear.z = dvlMsg.velocity.z;
+        // Angular velocity - unobserved by DVL, zero
+        odomMsg.twist.twist.angular.x = 0;
+        odomMsg.twist.twist.angular.y = 0;
+        odomMsg.twist.twist.angular.z = 0;
+
+        // Covariance
+        // Copy DVL covariance to Odom twist
+        // Pose covariance grows over time - implementing a simple growth model or constant
+        // For now, using identity/constant for pose.
+
+        // Twist covariance (mapping 3x3 diagonal from DvlMsg to 6x6)
+        // DvlMsg has 9 elements (row major 3x3)
+        // Twist has 36 elements (row major 6x6)
+        for (int k = 0; k < 36; k++) odomMsg.twist.covariance[k] = 0;
+
+        if (IsValid)
+        {
+            odomMsg.twist.covariance[0] = dvlMsg.covariance[0]; // xx
+            odomMsg.twist.covariance[7] = dvlMsg.covariance[4]; // yy
+            odomMsg.twist.covariance[14] = dvlMsg.covariance[8]; // zz
+        }
+        else
+        {
+            odomMsg.twist.covariance[0] = 10000;
+            odomMsg.twist.covariance[7] = 10000;
+            odomMsg.twist.covariance[14] = 10000;
         }
     }
-    
-    
+
+    private DVLBeamMsg GetBeamData(int index)
+    {
+        if (index < 0 || index >= 4) return null;
+        DVLBeamMsg beam = new DVLBeamMsg
+        {
+            id = index,
+            velocity = Vector3.Dot(LastVelocity, beamDirectionsLocal[index]),
+            distance = Vector3.Distance(transform.position, BeamHitPoints[index]),
+            rssi = BeamValid[index] ? 100 : 0, // Simplified RSSI based on validity
+            nsd = BeamValid[index] ? 1.0 : 10.0, // Normalized Signal Strength (lower is better), simplified
+            valid = BeamValid[index]
+        };
+        return beam;
+    }
+
     /// <summary>
     /// Updates the DR and Odometry messages based on the latest simulation step.
     /// </summary>
@@ -401,11 +460,13 @@ public class DVLPublisher : ROSPublisher
         
         // Cache for Public Property
         drPositionNED = new Vector3(relativePos.z, relativePos.x, -relativePos.y);
-        
-        drMsg.pose.pose.position.x = drPositionNED.x;
-        drMsg.pose.pose.position.y = drPositionNED.y;
-        drMsg.pose.pose.position.z = drPositionNED.z;
-        
+
+        drMsg.position = new Vector3Msg
+        {
+            x = drPositionNED.x,
+            y = drPositionNED.y,
+            z = drPositionNED.z
+        };
         // 3. Orientation (Relative to Start)
         Quaternion relativeRot = Quaternion.Inverse(SimulationOrigin.Instance.InitialRotation) * transform.rotation;
         
@@ -417,52 +478,26 @@ public class DVLPublisher : ROSPublisher
         // q.w = q_unity.w
         
         Quaternion q = relativeRot;
-        drMsg.pose.pose.orientation = new QuaternionMsg(-q.z, -q.x, q.y, q.w);
-        
+        drOrientation = new Quaternion(-q.z, -q.x, q.y, q.w);
+        Vector3 drEuler = drOrientation.eulerAngles; // For debugging/UI
+
+        drMsg.roll = drEuler.x;
+        drMsg.pitch = drEuler.y;
+        drMsg.yaw = drEuler.z;
+
         // 4. Copy to Odometry
-        odomMsg.pose.pose = drMsg.pose.pose; // Share reference or copy? Msg classes are distinct, copy fields.
-        odomMsg.pose.pose.position = drMsg.pose.pose.position; // Reference copy OK for messages if not parallel access
-        odomMsg.pose.pose.orientation = drMsg.pose.pose.orientation;
-        
-        // 5. Odometry Twist using DVL velocity (FRD) or Body FLU?
-        // nav_msgs/Odometry twist is usually in child_frame_id (Body/Sensor).
-        // Since child_frame_id is "dvl_link", and user defined DVL as FRD for velocity...
-        // We populate it with the FRD velocity we have in dvlMsg.
-        
-        odomMsg.twist.twist.linear.x = dvlMsg.velocity.x;
-        odomMsg.twist.twist.linear.y = dvlMsg.velocity.y;
-        odomMsg.twist.twist.linear.z = dvlMsg.velocity.z;
-        // Angular velocity - unobserved by DVL, zero
-        odomMsg.twist.twist.angular.x = 0;
-        odomMsg.twist.twist.angular.y = 0;
-        odomMsg.twist.twist.angular.z = 0;
-        
-        // 6. Covariance
-        // Copy DVL covariance to Odom twist
-        // Pose covariance grows over time - implementing a simple growth model or constant
-        // For now, using identity/constant for pose.
-        
-        // Twist covariance (mapping 3x3 diagonal from DvlMsg to 6x6)
-        // DvlMsg has 9 elements (row major 3x3)
-        // Twist has 36 elements (row major 6x6)
-        for(int k=0; k<36; k++) odomMsg.twist.covariance[k] = 0;
-        
-        if (IsValid)
-        {
-            odomMsg.twist.covariance[0] = dvlMsg.velocity_covar[0]; // xx
-            odomMsg.twist.covariance[7] = dvlMsg.velocity_covar[4]; // yy
-            odomMsg.twist.covariance[14] = dvlMsg.velocity_covar[8]; // zz
-        }
-        else
-        {
-            odomMsg.twist.covariance[0] = 10000;
-            odomMsg.twist.covariance[7] = 10000;
-            odomMsg.twist.covariance[14] = 10000;
-        }
-        
+        odomMsg.pose.pose.position.x = drPositionNED.x;
+        odomMsg.pose.pose.position.y = drPositionNED.y;
+        odomMsg.pose.pose.position.z = drPositionNED.z;
+        odomMsg.pose.pose.orientation.x = drOrientation.x;
+        odomMsg.pose.pose.orientation.y = drOrientation.y;
+        odomMsg.pose.pose.orientation.z = drOrientation.z;
+        odomMsg.pose.pose.orientation.w = drOrientation.w;
+
         // DR Pose Covariance - just set some defaults
-        for(int k=0; k<36; k++) drMsg.pose.covariance[k] = 0.1; // Small uncertainty
-        odomMsg.pose.covariance = drMsg.pose.covariance;
+        drMsg.pos_std = 0.1f; // Small uncertainty
+
+        drMsg.format = "simulation";
     }
 
     /// <summary>
@@ -616,7 +651,8 @@ public class DVLPublisher : ROSPublisher
             // Loss of lock
             LastVelocity = Vector3.zero;
         }
-        
+        UpdateDvlMessageData(); // Update DVLMsg with the latest velocity and validity for publishing and UI access
+
         // 3. Update ROS Messages (DR and Odom) from new state
         UpdateDeadReckoningInternal();
     }
@@ -734,12 +770,6 @@ public class DVLPublisher : ROSPublisher
                 Quaternion tilt = Quaternion.Euler(beamTiltAngle, 0f, 0f);
                 Quaternion azimuth = Quaternion.Euler(0f, azimuthAngles[i], 0f);
                 beamDirectionsLocal[i] = azimuth * tilt * Vector3.down;
-                
-                // Update ROS beam unit vectors
-                Vector3 v = beamDirectionsLocal[i];
-                dvlMsg.beam_unit_vec[i].x = v.z;
-                dvlMsg.beam_unit_vec[i].y = v.x;
-                dvlMsg.beam_unit_vec[i].z = -v.y;
             }
         }
         
