@@ -1,6 +1,19 @@
 using UnityEngine;
 using RosMessageTypes.Rosgraph;
 
+public struct ROSTime
+{
+    public double sec;
+    public ROSTime(double seconds)
+    {
+        sec = seconds;
+    }
+    public long GetSec() => (long)sec;
+    public long GetMilliSec() => (long)(sec * 1e3);
+    public long GetMicroSec() => (long)(sec * 1e6);
+    public long GetNanoSec() => (long)(sec * 1e9);
+}
+
 public class ROSClock : ROSPublisher
 {
     public override string Topic => ROSSettings.Instance.ClockTopic;
@@ -28,6 +41,15 @@ public class ROSClock : ROSPublisher
     {
         if (_instance == null) return 0;
         return (long)(_instance.clockTimePassed * 1e9);
+    }
+
+    /// <summary>
+    /// Returns the current ROS clock time in ROSTime, which contains multiple representations (sec, millisec, microsec, nanosec) for convenience.
+    /// </summary>
+    public static ROSTime GetROSTime()
+    {
+        if (_instance == null) return new ROSTime(0);
+        return new ROSTime(_instance.clockTimePassed);
     }
 
     protected override void Start()
