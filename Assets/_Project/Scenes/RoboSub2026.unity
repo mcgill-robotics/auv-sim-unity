@@ -17907,11 +17907,11 @@ MonoBehaviour:
   useSimTime: 0
   leftCamera: {fileID: 1621375949}
   rightCamera: {fileID: 1135839436}
-  invertRotY: 0
   invertRotX: 1
+  invertRotY: 0
   invertRotZ: 1
-  invertAccelY: 0
   invertAccelX: 0
+  invertAccelY: 0
   invertAccelZ: 0
   sendOrientation: 1
   debugLogging: 0
@@ -19540,7 +19540,7 @@ MonoBehaviour:
   DrawerConfigOpen: 0
   DrawerControlsOpen: 0
   DrawerTelemetryOpen: 0
-  DrawerSensorsOpen: 0
+  DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
