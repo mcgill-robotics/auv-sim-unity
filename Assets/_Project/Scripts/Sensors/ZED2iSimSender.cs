@@ -1,382 +1,289 @@
 using System;
 using System.Collections;
-using System.Runtime.InteropServices;
+using System.Threading;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ZED2iSimSender : MonoBehaviour
 {
     [Header("ZED Streaming Configuration")]
-    [Tooltip("Port for ZED SDK local streaming connection")]
-    [Range(1024, 65535)]
-    public int streamPort = 30000;
-
-    [Tooltip("ZED camera serial number identifier")]
-    public int serialNumber = 47890353; // ZED X 4mm Serial
-
-    [Tooltip("Target streaming framerate (Hz). Will be clamped by ZED SDK limits")]
-    [Range(1, 60)]
-    public int targetFPS = 30;
-
-    [Tooltip("Use ROS Clock simulation time instead of system time. If set to true, ZED SDK tools such as ZED Explorer will not work due to timestamp mismatch. Use only if you need synchronized timestamps with ROS messages.")]
+    [Range(1024, 65535)] public int streamPort = 30000;
+    public int serialNumber = 47890353;
+    [Range(1, 60)] public int targetFPS = 30;
     public bool useSimTime = false;
 
-    [Space(10)]
     [Header("Camera References")]
-    [Tooltip("Assign THIS GameObject (Left Camera) here")]
     public Camera leftCamera;
-
-    [Tooltip("Assign the Right Camera GameObject here")]
     public Camera rightCamera;
 
-    [Space(10)]
     [Header("Coordinate System Mapping")]
-    [Tooltip("Invert rotation Y axis to convert Unity LHS to ZED RHS")]
-    public bool invertRotY = false;
-
-    [Tooltip("Invert rotation X axis")]
     public bool invertRotX = true;
-
-    [Tooltip("Invert rotation Z axis")]
+    public bool invertRotY = false;
     public bool invertRotZ = true;
 
-    [Space(5)]
-    [Tooltip("Invert acceleration Y axis. Unity static = +9.81 Y, Bridge flips Y internally, so we send +9.81 (False)")]
-    public bool invertAccelY = false;
-
-    [Tooltip("Invert acceleration X axis")]
     public bool invertAccelX = false;
-
-    [Tooltip("Invert acceleration Z axis")]
+    public bool invertAccelY = false;
     public bool invertAccelZ = false;
 
-    [Space(10)]
     [Header("Debug")]
-    [Tooltip("Send orientation to ZED SDK. Disable to send Identity (helps debug tracking issues)")]
     public bool sendOrientation = true;
-
-    [Tooltip("Enable debug logging of orientation and acceleration values")]
     public bool debugLogging = false;
-
-    [Tooltip("Log every N frames (to reduce spam)")]
-    [Range(1, 300)]
-    public int debugLogInterval = 60;
-
-    // Camera settings are loaded from SimulationSettings
-    private int targetWidth = 960;
-    private int targetHeight = 600;
-
-    // --- Internals ---
-    // Physics State (latched in FixedUpdate, read in CaptureAndSend)
-    private Vector3 lastLinearVelocity;
-    private Vector3 currentProperAccelLocal;
-    private Vector3 currentAngularVelocityLocal;
-
-    private Quaternion initialRotationInv;
-    private RenderTexture leftRT, rightRT, flipRT;
-    private Texture2D texBufferLeft, texBufferRight;
-    private bool isStreaming = false;
-    private int streamerID = 0;
-    private int frameCount = 0;
-    private WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
+    [Range(1, 300)] public int debugLogInterval = 60;
 
     [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
     [SerializeField] private Rigidbody rbOverride;
-
-    /// <summary>Returns the AUV Rigidbody from override or SimulationSettings.</summary>
     private Rigidbody Rb => rbOverride != null ? rbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-    const string DLL_NAME = "sl_zed64";
-#else
-    const string DLL_NAME = "sl_zed";
-#endif
+    // Camera settings
+    private int targetWidth = 960;
+    private int targetHeight = 600;
 
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public struct StreamingParametersFlattened
-    {
-        public int mode;
-        public float q0; public float q1; public float q2; public float q3;
-        public float t0; public float t1; public float t2;
-        public int image_width; public int image_height;
-        public int codec_type;
-        public ushort port; public short padding0;
-        public int fps; public int serial_number;
-        public byte alpha_channel_included;
-        public byte padding1; public byte padding2; public byte padding3;
-        public int input_format;
-        public byte verbose;
-        public byte padding4; public byte padding5; public byte padding6;
-        public int transport_layer_mode;
-    }
+    // Physics State
+    private Vector3 lastLinearVelocity;
+    private Vector3 currentProperAccelLocal;
+    private Vector3 currentAngularVelocityLocal;
+    private Quaternion initialRotationInv;
 
-    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int init_streamer(int id, ref StreamingParametersFlattened params_stream);
+    // Rendering
+    private RenderTexture leftRT, rightRT, flipLeftRT, flipRightRT;
 
-    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int stream_rgb(int id, IntPtr left, IntPtr right, long timestamp_ns,
-        float qw, float qx, float qy, float qz,
-        float ax, float ay, float az);
+    // Threading & Double Buffering
+    private Thread encodingThread;
+    private volatile bool isStreaming = false;
+    private int streamerID = 0;
+    private int frameCount = 0;
+    private static readonly DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int ingest_imu(int id, long timestamp_ns,
-        float vx, float vy, float vz,   // Angular Velocity (deg/s)
-        float ax, float ay, float az,   // Linear Acceleration (m/s²)
-        float qw, float qx, float qy, float qz); // Orientation
+    // Buffers for the background thread
+    private NativeArray<byte>[] leftBuffers = new NativeArray<byte>[2];
+    private NativeArray<byte>[] rightBuffers = new NativeArray<byte>[2];
+    private long[] timestamps = new long[2];
+    private Quaternion[] rotations = new Quaternion[2];
+    private Vector3[] accelerations = new Vector3[2];
 
-    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
-    private static extern void close_streamer(int id);
+    private int encodeIndex = 1;
+    private bool newFrameReady = false;
+    private bool isEncoding = false;
+    private readonly object frameLock = new object();
 
     void Start()
     {
-        // CameraRenderManager handles camera state
-
-        // Check if ZED streaming is enabled in settings
         if (SimulationSettings.Instance != null && !SimulationSettings.Instance.StreamZEDCamera)
         {
             enabled = false;
-            Debug.Log("[ZED Sim] Disabled (StreamZEDCamera = false in settings)");
             return;
         }
 
-        // Safety check: Ensure we are on Linux or Windows (ZED SDK supported platforms)
-#if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX && !UNITY_EDITOR_WIN && !UNITY_STANDALONE_WIN
-        enabled = false;
-        Debug.LogWarning("[ZED Sim] ZED Virtual Streamer is only supported on Linux or Windows. Disabling component.");
-        return;
-#endif
-
-        // Load camera settings from SimulationSettings
         if (SimulationSettings.Instance != null)
         {
             targetWidth = SimulationSettings.Instance.FrontCamWidth;
             targetHeight = SimulationSettings.Instance.FrontCamHeight;
             targetFPS = SimulationSettings.Instance.FrontCamRate;
-            Debug.Log("[ZED Sim] Using settings: " + targetWidth + "x" + targetHeight + " @" + targetFPS + " FPS");
         }
+
         if (Rb != null) Rb.sleepThreshold = 0.0f;
-
-        // Init physics state
-        lastLinearVelocity = Vector3.zero;
-
-        // Zero out start rotation so ZED starts at Identity
         initialRotationInv = Quaternion.Inverse(transform.rotation);
 
-        // Get Rigidbody
-        // rb = GetComponentInParent<Rigidbody>();
-
-        InitializeCameraCapture();
-
+        InitializeMemoryAndCameras();
         StartCoroutine(InitializeNativeStreamer());
     }
 
-    // --- PHYSICS CALCULATION (50Hz) ---
-    // Calculates and sends high-frequency IMU data for stable positional tracking
-    void FixedUpdate()
+    void InitializeMemoryAndCameras()
     {
-        if (Rb == null || !isStreaming) return;
+        leftRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false };
+        rightRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false };
+        flipLeftRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { enableRandomWrite = true };
+        flipRightRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { enableRandomWrite = true };
 
-        if (Rb.IsSleeping()) Rb.WakeUp();
+        leftCamera.targetTexture = leftRT;
+        rightCamera.targetTexture = rightRT;
 
-        float dt = Time.fixedDeltaTime;
-        if (dt <= 0) return;
+        float fov = SimulationSettings.Instance != null ? SimulationSettings.Instance.FrontCamFOV : 52.0f;
+        leftCamera.fieldOfView = fov;
+        rightCamera.fieldOfView = fov;
 
-        // Calculate Proper Acceleration (what the IMU feels)
-        Vector3 currentVelocity = Rb.linearVelocity;
-        Vector3 worldAccel = (currentVelocity - lastLinearVelocity) / dt;
-        Vector3 properAccelWorld = worldAccel - Physics.gravity; // +9.81 UP when static
-
-        // Transform to Local Sensor Frame
-        currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
-
-        // Angular Velocity: World rad/s -> Local deg/s
-        Vector3 angVelLocal = transform.InverseTransformDirection(Rb.angularVelocity);
-        currentAngularVelocityLocal = angVelLocal * Mathf.Rad2Deg;
-
-        lastLinearVelocity = currentVelocity;
-
-        // --- SEND HIGH-FREQUENCY IMU DATA (50Hz) ---
-        SendIMUData();
-    }
-
-    private static readonly DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-    private void SendIMUData()
-    {
-        // Get timestamp (no allocation)
-        long timestamp_ns = useSimTime ? ROSClock.GetROSTimestampNanoseconds() : (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
-
-        // Orientation (Unity LHS -> ZED RHS)
-        float qx, qy, qz, qw;
-        if (sendOrientation)
+        int bufferSize = targetWidth * targetHeight * 3;
+        for (int i = 0; i < 2; i++)
         {
-            Quaternion deltaRot = initialRotationInv * transform.rotation;
-            qx = invertRotX ? -deltaRot.x : deltaRot.x;
-            qy = invertRotY ? -deltaRot.y : deltaRot.y;
-            qz = invertRotZ ? -deltaRot.z : deltaRot.z;
-            qw = deltaRot.w;
-        }
-        else
-        {
-            qx = 0; qy = 0; qz = 0; qw = 1;
-        }
-
-        // Acceleration (m/s²)
-        float ax = invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x;
-        float ay = invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y;
-        float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
-
-        // Angular Velocity (deg/s) - match rotation axis inversions
-        float vx = invertRotX ? -currentAngularVelocityLocal.x : currentAngularVelocityLocal.x;
-        float vy = invertRotY ? -currentAngularVelocityLocal.y : currentAngularVelocityLocal.y;
-        float vz = invertRotZ ? -currentAngularVelocityLocal.z : currentAngularVelocityLocal.z;
-
-        ingest_imu(streamerID, timestamp_ns, vx, vy, vz, ax, ay, az, qw, qx, qy, qz);
-    }
-
-    IEnumerator CaptureAndSend()
-    {
-        while (isStreaming)
-        {
-            yield return new WaitForSeconds(1.0f / targetFPS);
-            yield return waitForEndOfFrame;
-
-            // CameraRenderManager handles camera rendering
-            // We just read from the RenderTextures
-
-            // --- 1. Flip Images ---
-            // Ensure flipRT is created
-            if (flipRT == null || flipRT.width != targetWidth || flipRT.height != targetHeight)
-            {
-                if (flipRT != null) flipRT.Release();
-                flipRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32);
-                flipRT.enableRandomWrite = true;
-                flipRT.Create();
-            }
-
-            Graphics.Blit(leftRT, flipRT, new Vector2(1, -1), new Vector2(0, 1));
-            RenderTexture.active = flipRT;
-            texBufferLeft.ReadPixels(new Rect(0, 0, targetWidth, targetHeight), 0, 0);
-            texBufferLeft.Apply();
-            Graphics.Blit(rightRT, flipRT, new Vector2(1, -1), new Vector2(0, 1));
-            RenderTexture.active = flipRT;
-            texBufferRight.ReadPixels(new Rect(0, 0, targetWidth, targetHeight), 0, 0);
-            texBufferRight.Apply();
-            RenderTexture.active = null;
-
-            // --- 2. Orientation ---
-            float qx, qy, qz, qw;
-            if (sendOrientation)
-            {
-                // Calculate Delta Rotation from startup
-                Quaternion deltaRot = initialRotationInv * transform.rotation;
-
-                // Unity (LHS) -> ZED (RHS)
-                qx = invertRotX ? -deltaRot.x : deltaRot.x;
-                qy = invertRotY ? -deltaRot.y : deltaRot.y;
-                qz = invertRotZ ? -deltaRot.z : deltaRot.z;
-                qw = deltaRot.w;
-            }
-            else
-            {
-                // Send Identity for debugging tracking issues
-                qx = 0; qy = 0; qz = 0; qw = 1;
-            }
-
-            // --- 3. Acceleration (latched from FixedUpdate) ---
-            float ax = invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x;
-            float ay = invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y;
-            float az = invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z;
-
-            // Use System Time for smoother network sync (cached epoch)
-            long timestamp_ns = useSimTime ? ROSClock.GetROSTimestampNanoseconds() : (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
-
-            // Get reference to raw data without creating a new byte[]
-            NativeArray<byte> rawLeft = texBufferLeft.GetRawTextureData<byte>();
-            NativeArray<byte> rawRight = texBufferRight.GetRawTextureData<byte>();
-
-            SendFrameToDLL(rawLeft, rawRight, timestamp_ns, qw, qx, qy, qz, ax, ay, az);
-
-            // Debug logging
-            if (debugLogging && (frameCount % debugLogInterval == 0))
-            {
-                // Format string less spammy than interpolation in loop
-                Debug.LogFormat("[ZED Debug] Frame {0}: Quat({1:F3}, {2:F3}, {3:F3}, {4:F3}) | Accel({5:F2}, {6:F2}, {7:F2}) m/s²",
-                    frameCount, qw, qx, qy, qz, ax, ay, az);
-            }
-            frameCount++;
+            leftBuffers[i] = new NativeArray<byte>(bufferSize, Allocator.Persistent);
+            rightBuffers[i] = new NativeArray<byte>(bufferSize, Allocator.Persistent);
         }
     }
-
-    private unsafe void SendFrameToDLL(NativeArray<byte> rawLeft, NativeArray<byte> rawRight, long timestamp_ns, float qw, float qx, float qy, float qz, float ax, float ay, float az)
-    {
-        // Pass the memory address directly to C++
-        stream_rgb(streamerID,
-            (IntPtr)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(rawLeft),
-            (IntPtr)NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(rawRight),
-            timestamp_ns,
-            qw, qx, qy, qz,
-            ax, ay, az);
-    }
-
 
     IEnumerator InitializeNativeStreamer()
     {
         yield return new WaitForSeconds(1.0f);
         streamerID = UnityEngine.Random.Range(1, 9999);
-        StreamingParametersFlattened p = new StreamingParametersFlattened();
-        p.mode = 1;
-        p.image_width = targetWidth; p.image_height = targetHeight;
-        p.port = (ushort)streamPort; p.fps = targetFPS; p.serial_number = serialNumber;
-        p.codec_type = 0; p.alpha_channel_included = 0; p.input_format = 0; p.verbose = 0;
-        p.q3 = 1; // Identity extrinsics
-        p.transport_layer_mode = 0;
-        if (init_streamer(streamerID, ref p) == 1)
+
+        // Uses our clean wrapper to build the parameters
+        var p = ZedNativeAPI.StreamingParameters.CreateDefault(
+            targetWidth, targetHeight, targetFPS, (ushort)streamPort, serialNumber);
+
+        if (ZedNativeAPI.InitStreamer(streamerID, ref p))
         {
             Debug.Log($"[ZED Sim] Streamer {streamerID} Started.");
             isStreaming = true;
-            StartCoroutine(CaptureAndSend()); // Start the loop
+
+            encodingThread = new Thread(EncodingWorkerThread);
+            encodingThread.Start();
+
+            StartCoroutine(CaptureLoop());
         }
         else
         {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Failed to Start. Please ensure ZED SDK version >= 5.1.x and NVIDIA driver version == 580.x.x are installed.");
-            close_streamer(streamerID);
+            Debug.LogError($"[ZED Sim] Streamer {streamerID} Failed to Start.");
+            ZedNativeAPI.CloseStreamer(streamerID);
         }
     }
 
-    void InitializeCameraCapture()
+    void FixedUpdate()
     {
-        leftRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false, antiAliasing = 1 };
-        rightRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false, antiAliasing = 1 };
+        if (Rb == null || !isStreaming) return;
+        if (Rb.IsSleeping()) Rb.WakeUp();
 
-        leftCamera.targetTexture = leftRT;
-        rightCamera.targetTexture = rightRT;
+        float dt = Time.fixedDeltaTime;
+        if (dt <= 0) return;
 
-        // Set ZED FOV from settings
-        float fov = SimulationSettings.Instance != null ? SimulationSettings.Instance.FrontCamFOV : 77.9f;
-        leftCamera.fieldOfView = fov;
-        rightCamera.fieldOfView = fov;
+        Vector3 currentVelocity = Rb.linearVelocity;
+        Vector3 worldAccel = (currentVelocity - lastLinearVelocity) / dt;
+        Vector3 properAccelWorld = worldAccel - Physics.gravity;
 
-        texBufferLeft = new Texture2D(targetWidth, targetHeight, TextureFormat.RGB24, false);
-        texBufferRight = new Texture2D(targetWidth, targetHeight, TextureFormat.RGB24, false);
+        currentProperAccelLocal = transform.InverseTransformDirection(properAccelWorld);
+        currentAngularVelocityLocal = transform.InverseTransformDirection(Rb.angularVelocity) * Mathf.Rad2Deg;
+        lastLinearVelocity = currentVelocity;
+
+        SendIMUData();
     }
 
-    void LateUpdate()
+    private void SendIMUData()
     {
-        // Coroutine loop handles timing now
+        long ts = useSimTime ? ROSClock.GetROSTimestampNanoseconds() : (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
+
+        Quaternion deltaRot = sendOrientation ? (initialRotationInv * transform.rotation) : Quaternion.identity;
+        Quaternion rot = new Quaternion(
+            invertRotX ? -deltaRot.x : deltaRot.x,
+            invertRotY ? -deltaRot.y : deltaRot.y,
+            invertRotZ ? -deltaRot.z : deltaRot.z,
+            deltaRot.w);
+
+        Vector3 acc = new Vector3(
+            invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x,
+            invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y,
+            invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z);
+
+        Vector3 angVel = new Vector3(
+            invertRotX ? -currentAngularVelocityLocal.x : currentAngularVelocityLocal.x,
+            invertRotY ? -currentAngularVelocityLocal.y : currentAngularVelocityLocal.y,
+            invertRotZ ? -currentAngularVelocityLocal.z : currentAngularVelocityLocal.z);
+
+        // Clean API call
+        ZedNativeAPI.IngestIMU(streamerID, ts, angVel, acc, rot);
     }
+
+    IEnumerator CaptureLoop()
+    {
+        while (isStreaming)
+        {
+            yield return new WaitForEndOfFrame();
+
+            Graphics.Blit(leftRT, flipLeftRT, new Vector2(1, -1), new Vector2(0, 1));
+            Graphics.Blit(rightRT, flipRightRT, new Vector2(1, -1), new Vector2(0, 1));
+
+            long ts = useSimTime ? ROSClock.GetROSTimestampNanoseconds() : (long)((DateTime.UtcNow - epochStart).TotalMilliseconds * 1_000_000);
+
+            Quaternion deltaRot = sendOrientation ? (initialRotationInv * transform.rotation) : Quaternion.identity;
+            Quaternion rot = new Quaternion(
+                invertRotX ? -deltaRot.x : deltaRot.x,
+                invertRotY ? -deltaRot.y : deltaRot.y,
+                invertRotZ ? -deltaRot.z : deltaRot.z,
+                deltaRot.w);
+
+            Vector3 acc = new Vector3(
+                invertAccelX ? -currentProperAccelLocal.x : currentProperAccelLocal.x,
+                invertAccelY ? -currentProperAccelLocal.y : currentProperAccelLocal.y,
+                invertAccelZ ? -currentProperAccelLocal.z : currentProperAccelLocal.z);
+
+            var reqLeft = AsyncGPUReadback.Request(flipLeftRT, 0, TextureFormat.RGB24);
+            var reqRight = AsyncGPUReadback.Request(flipRightRT, 0, TextureFormat.RGB24);
+
+            StartCoroutine(WaitForReadbacks(reqLeft, reqRight, ts, rot, acc));
+
+            yield return new WaitForSeconds(1.0f / targetFPS);
+        }
+    }
+
+    IEnumerator WaitForReadbacks(AsyncGPUReadbackRequest reqL, AsyncGPUReadbackRequest reqR, long ts, Quaternion rot, Vector3 acc)
+    {
+        while (!reqL.done || !reqR.done) yield return null;
+        if (reqL.hasError || reqR.hasError || !isStreaming) yield break;
+
+        lock (frameLock)
+        {
+            int captureIndex = 1 - encodeIndex;
+
+            reqL.GetData<byte>().CopyTo(leftBuffers[captureIndex]);
+            reqR.GetData<byte>().CopyTo(rightBuffers[captureIndex]);
+
+            timestamps[captureIndex] = ts;
+            rotations[captureIndex] = rot;
+            accelerations[captureIndex] = acc;
+
+            newFrameReady = true;
+            if (!isEncoding) Monitor.Pulse(frameLock);
+        }
+
+        if (debugLogging && (frameCount % debugLogInterval == 0))
+            Debug.LogFormat("[ZED Debug] Frame {0}: Quat({1:F3}) | Accel({2:F2}) m/s²", frameCount, rot.w, acc.x);
+
+        frameCount++;
+    }
+
+    private void EncodingWorkerThread()
+    {
+        while (isStreaming)
+        {
+            lock (frameLock)
+            {
+                while (!newFrameReady && isStreaming) Monitor.Wait(frameLock);
+                if (!isStreaming) break;
+
+                encodeIndex = 1 - encodeIndex;
+                newFrameReady = false;
+                isEncoding = true;
+            }
+
+            // Clean API call handles all pointer logic internally
+            ZedNativeAPI.StreamRGB(streamerID,
+                leftBuffers[encodeIndex], rightBuffers[encodeIndex],
+                timestamps[encodeIndex], rotations[encodeIndex], accelerations[encodeIndex]);
+
+            lock (frameLock)
+            {
+                isEncoding = false;
+            }
+        }
+    }
+
     void OnDestroy()
     {
-        if (isStreaming) close_streamer(streamerID);
+        isStreaming = false;
 
-        // Release RenderTextures
+        lock (frameLock) Monitor.Pulse(frameLock);
+        if (encodingThread != null && encodingThread.IsAlive) encodingThread.Join();
+
+        ZedNativeAPI.CloseStreamer(streamerID);
+        ZedNativeAPI.DestroyInstance();
+
+        for (int i = 0; i < 2; i++)
+        {
+            if (leftBuffers[i].IsCreated) leftBuffers[i].Dispose();
+            if (rightBuffers[i].IsCreated) rightBuffers[i].Dispose();
+        }
+
         if (leftRT != null) { leftRT.Release(); Destroy(leftRT); }
         if (rightRT != null) { rightRT.Release(); Destroy(rightRT); }
-        if (flipRT != null) { flipRT.Release(); Destroy(flipRT); }
-
-        // Destroy Texture2D buffers
-        if (texBufferLeft != null) Destroy(texBufferLeft);
-        if (texBufferRight != null) Destroy(texBufferRight);
+        if (flipLeftRT != null) { flipLeftRT.Release(); Destroy(flipLeftRT); }
+        if (flipRightRT != null) { flipRightRT.Release(); Destroy(flipRightRT); }
     }
 }
