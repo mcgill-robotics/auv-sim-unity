@@ -6,12 +6,27 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
 
 ## Table of Contents
 
-- [Current Status](#current-status)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Workflows](#workflows)
-- [ROS Interface](#ros-interface)
+- [McGill Robotics AUV Simulator (Unity)](#mcgill-robotics-auv-simulator-unity)
+  - [Table of Contents](#table-of-contents)
+  - [Current Status](#current-status)
+  - [Architecture](#architecture)
+    - [1. Core Systems (`Scripts/Core`)](#1-core-systems-scriptscore)
+    - [2. Sensor Abstraction (`Scripts/Sensors`)](#2-sensor-abstraction-scriptssensors)
+    - [3. Actuation (`Scripts/Actuators`)](#3-actuation-scriptsactuators)
+    - [4. User Interface (`Scripts/UI`)](#4-user-interface-scriptsui)
+  - [Project Structure](#project-structure)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [⚠️ Important: ZED SDK \& Plugin Setup](#️-important-zed-sdk--plugin-setup)
+    - [Setup Steps](#setup-steps)
+    - [ROS Setup](#ros-setup)
+  - [Workflows](#workflows)
+    - [Running a Simulation](#running-a-simulation)
+    - [Manual Control](#manual-control)
+    - [Competition Logic (TODO)](#competition-logic-todo)
+    - [Synthetic Data Generation](#synthetic-data-generation)
+    - [Unity Editor Tips](#unity-editor-tips)
+  - [ROS Interface](#ros-interface)
 
 ---
 
@@ -21,8 +36,9 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
 **Architecture:** Component-based ROS Bridge with UI Toolkit
 
 **Known Issues:**
-*   **ROS Synchronization:** Ensure the ROS TCP Endpoint matches the IP/Port configurations in the Unity Editor.
-*   **Performance:** There is still some optimization to be done.
+
+- **ROS Synchronization:** Ensure the ROS TCP Endpoint matches the IP/Port configurations in the Unity Editor.
+- **Performance:** There is still some optimization to be done.
 
 ## Architecture
 
@@ -119,34 +135,41 @@ graph TD
     ROSCon -.->|Status & State| HUD
 ```
 
-
 ### 1. Core Systems (`Scripts/Core`)
-*   **SimulationSettings:** A singleton that persists user preferences (resolution, sensor toggles, quality settings) across sessions.
-*   **ROSSettings:** Centralized registry for all ROS topic names and frame IDs.
-*   **ROSClock:** Synchronizes simulation time with ROS time, ensuring timestamp accuracy for sensor fusion.
-*   **CameraManager:** Orchestrates the activation/deactivation of camera publishers to optimize performance.
-*   **InputManager:** Manages manual control overrides and keybindings.
+
+- **SimulationSettings:** A singleton that persists user preferences (resolution, sensor toggles, quality settings) across sessions.
+
+- **ROSSettings:** Centralized registry for all ROS topic names and frame IDs.
+- **ROSClock:** Synchronizes simulation time with ROS time, ensuring timestamp accuracy for sensor fusion.
+- **CameraManager:** Orchestrates the activation/deactivation of camera publishers to optimize performance.
+- **InputManager:** Manages manual control overrides and keybindings.
 
 ### 2. Sensor Abstraction (`Scripts/Sensors`)
+
 All sensors inherit from the abstract `ROSPublisher` class.
 ***Implemented Sensors:**
-*   **DVL:** Simulates 4-beam Janus acoustics with bias/noise. Publishes `TwistWithCovarianceStamped`.
-*   **IMU:** Publishes `sensor_msgs/Imu` (Accel, Gyro, Orientation). Supports EKF orientation covariance.
-*   **Depth:** Publishes `std_msgs/Float64` metric depth (positive-down).
-*   **Ground Truth:** Detailed state publishing (`Twist`, `Accel`, `Orientation`) at the AUV center of mass for validation.
-*   **Hydrophones:** Simulates pinger bearing and time-difference-of-arrival (TDOA).
-*   **Cameras:** Publishes `sensor_msgs/Image` and `CameraInfo` for front and downward views.
-*   **ZED X:** Native bridge support via `ZED2iSimSender` for hardware-in-the-loop testing with the ZED SDK.
+
+- **DVL:** Simulates 4-beam Janus acoustics with bias/noise. Publishes `TwistWithCovarianceStamped`.
+- **IMU:** Publishes `sensor_msgs/Imu` (Accel, Gyro, Orientation). Supports EKF orientation covariance.
+- **Depth:** Publishes `std_msgs/Float64` metric depth (positive-down).
+- **Ground Truth:** Detailed state publishing (`Twist`, `Accel`, `Orientation`) at the AUV center of mass for validation.
+- **Hydrophones:** Simulates pinger bearing and time-difference-of-arrival (TDOA).
+- **Cameras:** Publishes `sensor_msgs/Image` and `CameraInfo` for front and downward views.
+- **ZED X:** Native bridge support via `ZED2iSimSender` for hardware-in-the-loop testing with the ZED SDK.
 
 ### 3. Actuation (`Scripts/Actuators`)
-*   **Thrusters:** Subscribes to `ThrusterForces`. Converts Newton commands into Rigidbody forces applied at specific mount points relative to the CoM.
-*   **Dropper:** Handles the mechanism for releasing markers during competition tasks.
-*   **Torpedo Launcher:** Rotatable base with two-stage launch and reset logic.
+
+- **Thrusters:** Subscribes to `ThrusterForces`. Converts Newton commands into Rigidbody forces applied at specific mount points relative to the CoM.
+
+- **Dropper:** Handles the mechanism for releasing markers during competition tasks.
+- **Torpedo Launcher:** Rotatable base with two-stage launch and reset logic.
 
 ### 4. User Interface (`Scripts/UI`)
+
 The simulator uses **UI Toolkit** (UXML/USS) for the Heads-Up Display.
-*   **SimulatorHUD:** Main coordinator for drawers, logging, and Update loop.
-*   **Moduar Controllers:** Dedicated handlers for `Settings` (Config), `Telemetry` (AUV State), `Camera Feeds`, `Sensor Data`, and `Belief Visualization` (EKF/SLAM markers).
+
+- **SimulatorHUD:** Main coordinator for drawers, logging, and Update loop.
+- **Moduar Controllers:** Dedicated handlers for `Settings` (Config), `Telemetry` (AUV State), `Camera Feeds`, `Sensor Data`, and `Belief Visualization` (EKF/SLAM markers).
 
 ## Project Structure
 
@@ -183,39 +206,44 @@ Assets/
 ## Getting Started
 
 ### Prerequisites
-* **Unity Hub**
-* **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
-* **ROS 2:** (Required for the ROS-TCP-Endpoint).
+
+- **Unity Hub**
+
+- **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
+- **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
 ### ⚠️ Important: ZED SDK & Plugin Setup
+
 *Strict requirement*: NVIDIA drivers must be version **< 590.x.x** for the ZED plugin to work. Ensure you have compatible drivers installed, and downgrade is necessary (newest versions are typically 590).
 
 The simulator relies on the ZED SDK. Due to GitHub file size limits, the required binary files (`.dll` and `.so`) are **NOT** included in the repository.
 
 **You must follow these steps or the project will have compile errors:**
 
-1.  **Install ZED Drivers:**
+1. **Install ZED Drivers:**
     You must install the **ZED SDK (v5.1)** on your computer for the camera drivers to work.
-    * [Download ZED SDK Here](https://www.stereolabs.com/developers/release/)
+    - [Download ZED SDK Here](https://www.stereolabs.com/developers/release/)
 
-2.  **Add Missing Binaries:**
-    1.  Download both `libsl_zed.so` and `sl_zed64.dll` from our Drive: [zed-bridge-plugin folder](https://drive.google.com/drive/folders/1vSMmt-lHEBNJbQY0uOj_WAM2HUnHQQhL?usp=drive_link)
-    2.  Drag the `libsl_zed.so` and `sl_zed64.dll` files into your Unity project at this path:
+2. **Add Missing Binaries:**
+    1. Download both `libsl_zed.so` and `sl_zed64.dll` from our Drive: [zed-bridge-plugin folder](https://drive.google.com/drive/folders/1vSMmt-lHEBNJbQY0uOj_WAM2HUnHQQhL?usp=drive_link)
+    2. Drag the `libsl_zed.so` and `sl_zed64.dll` files into your Unity project at this path:
         `auv-sim-unity/Assets/Plugins/`
-    4.  *Note: If asked, overwrite any existing files.*
+    3. *Note: If asked, overwrite any existing files.*
 
-_The links to download these files were found in the [zed-isaac-sim](https://github.com/stereolabs/zed-isaac-sim) plugin github repo, more specifically in `build.sh` & `build.bat` scripts._
+*The links to download these files were found in the [zed-isaac-sim](https://github.com/stereolabs/zed-isaac-sim) plugin github repo, more specifically in `build.sh` & `build.bat` scripts.*
 
 ### Setup Steps
-1.  Clone the repository.
-2.  **Perform the ZED Plugin Setup (see above).**
-3.  Open the project via Unity Hub.
-4.  Allow Unity to import assets and compile scripts.
-5.  Navigate to the top menu `Robotics -> ROS Settings` and ensure the IP address matches your ROS machine (or `127.0.0.1` if running locally).
+
+1. Clone the repository.
+2. **Perform the ZED Plugin Setup (see above).**
+3. Open the project via Unity Hub.
+4. Allow Unity to import assets and compile scripts.
+5. Navigate to the top menu `Robotics -> ROS Settings` and ensure the IP address matches your ROS machine (or `127.0.0.1` if running locally).
 
 ### ROS Setup
 
-1.  **Launch ROS TCP Endpoint**
+1. **Launch ROS TCP Endpoint**
+
     ```bash
     # Build ROS workspace
     source /opt/ros/humble/setup.bash
@@ -228,16 +256,18 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
     # Launch endpoint
     ros2 launch ros_tcp_endpoint endpoint.py
     ```
-    _Sometimes ros_tcp_endpoint fails on the ros2 end, you just need to run this command again_
 
-2.  **Verify Connection**
+    *Sometimes ros_tcp_endpoint fails on the ros2 end, you just need to run this command again*
+
+2. **Verify Connection**
     - Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
     - In Unity: Press Play. The ROS Settings menu should show a green "Connected" status.
     - In Terminal: You should see logs indicating registration of publishers (e.g., RegisterPublisher(/sensors/dvl/data, ...)).
 
-4.  **Visualize Data**
+3. **Visualize Data**
     To verify data is flowing correctly:
     Check Sensor Data:
+
     ```bash
     ros2 topic list
     ros2 topic echo dvl/velocity --once
@@ -247,6 +277,7 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
 
     View Camera Feeds:
     To view the RGB or Depth streams, use rqt_image_view (requires X11 forwarding enabled in Docker):
+
     ```bash
     ros2 run rqt_image_view rqt_image_view
     ```
@@ -254,36 +285,41 @@ _The links to download these files were found in the [zed-isaac-sim](https://git
 ## Workflows
 
 ### Running a Simulation
-1.  Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
-2.  Press **Play**.
-3.  The **Simulator HUD** will appear. Use the left panel to toggle specific sensors or adjust camera framerates.
-4.  Click **Apply Configuration** to save changes.
+
+1. Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
+2. Press **Play**.
+3. The **Simulator HUD** will appear. Use the left panel to toggle specific sensors or adjust camera framerates.
+4. Click **Apply Configuration** to save changes.
 
 > [!TIP]
 > You can enable the parent object called `OtherProps` under `Environment` in the Hierarchy to simulate having other props around in the other lanes.
 
 ### Manual Control
+
 When the simulator is running, you can manually override ROS commands using the keyboard:
 
-*   **Surge (Forward/Back):** W / S
-*   **Sway (Left/Right):** A / D
-*   **Heave (Up/Down):** E / Q
-*   **Yaw (Turn):** J / L
-*   **Pitch:** I / K
-*   **Roll:** U / O
-*   **Emergency Stop:** Spacebar (Toggles Kinematic freeze)
-*   **Drop Marker:** G
-*   **Shoot Torpedo/Reset:** T / Y
-*   **Toggle Camera Mode:** C
+- **Surge (Forward/Back):** W / S
+- **Sway (Left/Right):** A / D
+- **Heave (Up/Down):** E / Q
+- **Yaw (Turn):** J / L
+- **Pitch:** I / K
+- **Roll:** U / O
+- **Emergency Stop:** Spacebar (Toggles Kinematic freeze)
+- **Drop Marker:** G
+- **Shoot Torpedo/Reset:** T / Y
+- **Toggle Camera Mode:** C
 
 ### Competition Logic (TODO)
+
 The simulator includes a `CompetitionManager` that orchestrates specific tasks (e.g., Gate, Buoy, Bins).
-1.  In the HUD, select the desired task from the dropdown.
-2.  Click **Initiate Run**.
-3.  The simulator will reset the AUV and props to the starting configuration for that task.
+
+1. In the HUD, select the desired task from the dropdown.
+2. Click **Initiate Run**.
+3. The simulator will reset the AUV and props to the starting configuration for that task.
 
 ### Synthetic Data Generation
-The simulator includes a comprehensive programmatic synthetic data generator built on the Unity Perception package for training computer vision models. 
+
+The simulator includes a comprehensive programmatic synthetic data generator built on the Unity Perception package for training computer vision models.
 For detailed instructions on configuring props, running the generator, and converting the dataset, please read the [Synthetic Data Setup Guide](SYNTHETIC_DATA_SETUP.md).
 
 ### Unity Editor Tips
@@ -295,18 +331,21 @@ In the **Game** tab, click the dropdown showing "Free Aspect" and change it to *
 Click on **Stats** in the top-right corner of the **Game** tab to view the current framerate and rendering statistics.
 
 **Modify ROS Topic Names:**
-1.  In the **Hierarchy** panel, click on `Managers-Configurations`.
-2.  In the **Inspector** panel on the right, scroll down to find the `ROS Settings` component.
-3.  Edit the topic name fields directly.
+
+1. In the **Hierarchy** panel, click on `Managers-Configurations`.
+2. In the **Inspector** panel on the right, scroll down to find the `ROS Settings` component.
+3. Edit the topic name fields directly.
 
 **Modify Simulation Settings:**
-1.  Click on `Managers-Configurations` in the **Hierarchy**.
-2.  In the **Inspector**, find the `Simulation Settings` component.
-3.  Toggle sensors, adjust camera resolutions, and configure other options.
-4.  **Note:** Some changes require you to **Stop** the simulation, modify the settings, and **Play** again. Alternatively, use the in-game HUD and click **Save & Restart**.
+
+1. Click on `Managers-Configurations` in the **Hierarchy**.
+2. In the **Inspector**, find the `Simulation Settings` component.
+3. Toggle sensors, adjust camera resolutions, and configure other options.
+4. **Note:** Some changes require you to **Stop** the simulation, modify the settings, and **Play** again. Alternatively, use the in-game HUD and click **Save & Restart**.
 
 **Modify Sensor Parameters:**
 Sensors are located under `Douglas > Sensors` in the **Hierarchy**. Each sensor has its own script attached:
+
 | GameObject | Script |
 | :--- | :--- |
 | `ZED2i (Stereo Camera)` | `CameraPublisher`, `CameraDepthPublisher`, `ZED2iSimSender` |
@@ -318,6 +357,7 @@ Sensors are located under `Douglas > Sensors` in the **Hierarchy**. Each sensor 
 
 **Modify Actuator Parameters:**
 Actuators are located under `Douglas > Actuators` in the **Hierarchy**:
+
 | GameObject | Script |
 | :--- | :--- |
 | `Thrusters` | `Thrusters` |
@@ -326,10 +366,11 @@ Actuators are located under `Douglas > Actuators` in the **Hierarchy**:
 
 **Modify AUV Physics:**
 Select the `Douglas` GameObject in the **Hierarchy** to access physics components:
-*   **Rigidbody:** Mass, drag, and angular drag.
-*   **Buoyancy:** Center of buoyancy offset and buoyancy force.
-*   **Drag:** Hydrodynamic drag coefficients.
-*   **GroundTruthPublisher:** Ground truth state publishing.
+
+- **Rigidbody:** Mass, drag, and angular drag.
+- **Buoyancy:** Center of buoyancy offset and buoyancy force.
+- **Drag:** Hydrodynamic drag coefficients.
+- **GroundTruthPublisher:** Ground truth state publishing.
 
 ## ROS Interface
 
@@ -367,3 +408,16 @@ The simulator communicates over the following default topics (configurable in `R
 | `/auv/torpedo/rotate` | Torpedo launcher rotation angle | `Float32` |
 | `/vision/object_map` | Array of detected objects (YOLO + ZED) | **FLU** (World Frame) | `VisionObjectArray` |
 | `/vision/vio_pose` | Visual Odometry Pose | **FLU** (World Frame) | `PoseStamped` |
+
+**Axis transformatiions**
+
+- Unity uses a **Left-Handed RUF** coordinate system (X right, Y up, Z forward).
+- ROS uses a **Right-Handed FLU** coordinate system (X forward, Y left, Z up).
+- Thus:
+  - Unity X = ROS Y
+  - Unity Y = ROS Z
+  - Unity Z = ROS X
+- Conversely:
+  - ROS X = Unity Z
+  - ROS Y = Unity X
+  - ROS Z = Unity Y
