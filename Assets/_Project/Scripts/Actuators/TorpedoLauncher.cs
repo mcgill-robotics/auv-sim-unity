@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.Std;
@@ -13,6 +14,9 @@ namespace Actuators
         [Header("Launcher Configuration")]
         [Tooltip("The two torpedo gameobjects")]
         public GameObject[] torpedos;
+
+        [Tooltip("Time delay between the ROS command and the actual launch of the torpedo (in seconds)")]
+        public float ROSlaunchDelay = 0.2f;
 
         [Header("Trajectory Configuration")]
         [Tooltip("Parameterized equation coefficients for the torpedo trajectory")]
@@ -44,6 +48,17 @@ namespace Actuators
 
         private ROSConnection roscon;
 
+        private enum ActuatedTorpedoState
+        {
+            Closed = 0,
+            FirstLaunched = 1,
+            BothLaunched = 2
+        }
+
+        private ActuatedTorpedoState ROSState = 0;
+        private ActuatedTorpedoState targetROSState = 0;
+        private Coroutine rosLaunchCoroutine;
+
         // Store initial states for resetting
         private struct TorpedoState
         {
@@ -58,9 +73,9 @@ namespace Actuators
         private void Start()
         {
             roscon = ROSConnection.GetOrCreateInstance();
-            
+
             // Subscribe to ROS topics
-            roscon.Subscribe<BoolMsg>(ROSSettings.Instance.TorpedoLaunchTopic, OnRosLaunch);
+            roscon.Subscribe<UInt8Msg>(ROSSettings.Instance.TorpedoLaunchTopic, OnRosLaunch);
             roscon.Subscribe<BoolMsg>(ROSSettings.Instance.TorpedoResetTopic, OnRosReset);
 
             // Store initial states
@@ -115,10 +130,52 @@ namespace Actuators
                 ResetLauncher();
             }
         }
-
-        private void OnRosLaunch(BoolMsg msg)
+        /// <summary>
+        /// ROS Logic implemented as state machine to mimic embedded code
+        /// 0. Closed, neither torpedo launches
+        /// 1. First torpedo launched, second torpedo closed
+        /// 2. Both torpedos launched, wait for reset
+        /// </summary>
+        /// <param name="msg"></param>
+        private void OnRosLaunch(UInt8Msg msg)
         {
-            if (msg.data) LaunchTorpedo();
+            targetROSState = (ActuatedTorpedoState)msg.data;
+
+            if (rosLaunchCoroutine == null)
+            {
+                rosLaunchCoroutine = StartCoroutine(HandleRosLaunch());
+            }
+        }
+
+        private IEnumerator HandleRosLaunch()
+        {
+            while (ROSState != targetROSState)
+            {
+                ActuatedTorpedoState currentState = ROSState;
+                ActuatedTorpedoState inputState = targetROSState;
+
+                if (currentState == ActuatedTorpedoState.Closed && inputState >= ActuatedTorpedoState.FirstLaunched)
+                {
+                    // wait some time then launch first torpedo
+                    yield return new WaitForSeconds(ROSlaunchDelay);
+                    LaunchTorpedo();
+                    ROSState = ActuatedTorpedoState.FirstLaunched;
+                }
+                else if (currentState == ActuatedTorpedoState.FirstLaunched && inputState >= ActuatedTorpedoState.BothLaunched)
+                {
+                    // wait some time then launch second torpedo
+                    yield return new WaitForSeconds(ROSlaunchDelay);
+                    LaunchTorpedo();
+                    ROSState = ActuatedTorpedoState.BothLaunched;
+                }
+                else
+                {
+                    // other do nothing
+                    break;
+                }
+            }
+
+            rosLaunchCoroutine = null;
         }
 
         private void OnRosReset(BoolMsg msg)
@@ -220,14 +277,20 @@ namespace Actuators
             trajectory.Initialize(trajectoryData);
             
             ApplyOutline(torpedo);
-            
-            Debug.Log($"[TorpedoLauncher] Launched torpedo {nextTorpedoIndex + 1} with kinematic trajectory");
+
+            Debug.Log($"[TorpedoLauncher] Launched torpedo {nextTorpedoIndex + 1} with kinematic trajectory. Position: {torpedo.transform.position:F10}. AUV position: {SimulationSettings.Instance.AUVRigidbody.position:F10}. Vector from AUV to torpedo: {(torpedo.transform.position - SimulationSettings.Instance.AUVRigidbody.position):F10}");
             nextTorpedoIndex++;
         }
 
         [ContextMenu("Reset Launcher")]
         public void ResetLauncher()
         {
+            if (rosLaunchCoroutine != null)
+            {
+                StopCoroutine(rosLaunchCoroutine);
+                rosLaunchCoroutine = null;
+            }
+
             for (int i = 0; i < torpedos.Length; i++)
             {
                 if (torpedos[i] == null) continue;
@@ -261,7 +324,9 @@ namespace Actuators
             }
 
             nextTorpedoIndex = 0;
-            
+            ROSState = ActuatedTorpedoState.Closed;
+            targetROSState = ActuatedTorpedoState.Closed;
+
             Debug.Log("[TorpedoLauncher] Launcher reset.");
         }
 
