@@ -19616,7 +19616,7 @@ MonoBehaviour:
   ThrusterForcesTopic: /propulsion/forces
   DropperTopic: /auv/dropper/trigger
   GripperTopic: /auv/gripper/trigger
-  TorpedoLaunchTopic: /auv/torpedo/launch
+  TorpedoLaunchTopic: /actuators/torpedo
   TorpedoResetTopic: /auv/torpedo/reset
   DVLTopic: dvl/velocity
   DVLDeadReckoningTopic: dvl/dead_reckoning
