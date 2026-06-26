@@ -58,6 +58,7 @@ namespace Actuators
         private ActuatedTorpedoState ROSState = 0;
         private ActuatedTorpedoState targetROSState = 0;
         private Coroutine rosLaunchCoroutine;
+        private bool TorpedoLaunching => rosLaunchCoroutine != null;
 
         // Store initial states for resetting
         private struct TorpedoState
@@ -139,6 +140,8 @@ namespace Actuators
         /// <param name="msg"></param>
         private void OnRosLaunch(UInt8Msg msg)
         {
+            // simulate delays from embedded code before and after launch
+            if (TorpedoLaunching) return;
             targetROSState = (ActuatedTorpedoState)msg.data;
 
             if (rosLaunchCoroutine == null)
@@ -160,6 +163,7 @@ namespace Actuators
                     yield return new WaitForSeconds(ROSlaunchDelay);
                     LaunchTorpedo();
                     ROSState = ActuatedTorpedoState.FirstLaunched;
+                    yield return new WaitForSeconds(ROSlaunchDelay); // wait some time then launch second torpedo
                 }
                 else if (currentState == ActuatedTorpedoState.FirstLaunched && inputState >= ActuatedTorpedoState.BothLaunched)
                 {
@@ -167,6 +171,7 @@ namespace Actuators
                     yield return new WaitForSeconds(ROSlaunchDelay);
                     LaunchTorpedo();
                     ROSState = ActuatedTorpedoState.BothLaunched;
+                    yield return new WaitForSeconds(ROSlaunchDelay);
                 }
                 else
                 {
