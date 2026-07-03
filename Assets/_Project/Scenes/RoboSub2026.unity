@@ -5888,8 +5888,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   torpedos:
-  - {fileID: 634586412}
   - {fileID: 2083545326}
+  - {fileID: 634586412}
   ROSlaunchDelay: 0.2
   trajectoryData:
     forward:
@@ -9480,6 +9480,7 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -19516,7 +19517,7 @@ MonoBehaviour:
   FrontCamera: {fileID: 1621375949}
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
-  DisplaySimObjects: 1
+  DisplaySimObjects: 0
   PublishGTObjectMap: 1
   NoWaterMode: 0
   EnableShadows: 1
@@ -19528,19 +19529,19 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 1
-  PublishDownCam: 1
-  PublishDepthCamera: 1
+  PublishFrontCam: 0
+  PublishDownCam: 0
+  PublishDepthCamera: 0
   StreamZEDCamera: 0
   VisualizeDVL: 0
   VisualizeIMU: 0
   VisualizeDepth: 0
   EnableDVLNoise: 0
   EnableIMUNoise: 0
-  EnableDepthNoise: 1
+  EnableDepthNoise: 0
   DrawerConfigOpen: 1
   DrawerControlsOpen: 1
-  DrawerTelemetryOpen: 0
+  DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
