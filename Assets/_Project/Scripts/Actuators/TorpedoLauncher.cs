@@ -157,7 +157,7 @@ namespace Actuators
                 ActuatedTorpedoState currentState = ROSState;
                 ActuatedTorpedoState inputState = targetROSState;
 
-                if (currentState == ActuatedTorpedoState.Closed && inputState >= ActuatedTorpedoState.FirstLaunched)
+                if (currentState == ActuatedTorpedoState.Closed && inputState == ActuatedTorpedoState.FirstLaunched)
                 {
                     // wait some time then launch first torpedo
                     yield return new WaitForSeconds(ROSlaunchDelay);
@@ -165,7 +165,7 @@ namespace Actuators
                     ROSState = ActuatedTorpedoState.FirstLaunched;
                     yield return new WaitForSeconds(ROSlaunchDelay); // wait some time then launch second torpedo
                 }
-                else if (currentState == ActuatedTorpedoState.FirstLaunched && inputState >= ActuatedTorpedoState.BothLaunched)
+                else if (currentState == ActuatedTorpedoState.FirstLaunched && inputState == ActuatedTorpedoState.BothLaunched)
                 {
                     // wait some time then launch second torpedo
                     yield return new WaitForSeconds(ROSlaunchDelay);
@@ -175,6 +175,7 @@ namespace Actuators
                 }
                 else
                 {
+                    Debug.LogWarning($"[TorpedoLauncher] Invalid state transition from {currentState} to {inputState}. Ignoring.");
                     // other do nothing
                     break;
                 }
