@@ -72,12 +72,12 @@ public class ROSClock : ROSPublisher
 
     protected override void FixedUpdate()
     {
+        clockTimePassed += Time.fixedDeltaTime;
         base.FixedUpdate();
     }
 
     public override void PublishMessage()
     {
-        clockTimePassed += Time.fixedDeltaTime;
         int secs = (int)clockTimePassed;
         uint nsecs = (uint)((clockTimePassed - secs) * 1e9);
         

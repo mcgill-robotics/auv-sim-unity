@@ -120,6 +120,9 @@ public class IMUPublisher : ROSPublisher
     private Vector3 lastPointVelocity;
     private GaussMarkovVector gyroBias;
     private GaussMarkovVector accelBias;
+    private SensorDelayBuffer delayBuffer;
+    private Vector3 localSensorOffset;
+    private Quaternion localRotOffset;
     
     // Visualization (3D mesh arrows)
     private GameObject accelArrow;
@@ -138,6 +141,9 @@ public class IMUPublisher : ROSPublisher
         if (AuvRb != null)
         {
             lastPointVelocity = AuvRb.GetPointVelocity(transform.position);
+            delayBuffer = SensorDelayBuffer.GetOrCreate(AuvRb);
+            localSensorOffset = AuvRb.transform.InverseTransformPoint(transform.position);
+            localRotOffset = Quaternion.Inverse(AuvRb.rotation) * transform.rotation;
         }
         
         // Initialize Gauss-Markov bias models with pre-calculated coefficients
@@ -207,6 +213,25 @@ public class IMUPublisher : ROSPublisher
     }
 
 
+    /// <summary>
+    /// Resets internal state and bias models upon simulation reset.
+    /// Prevents acceleration spikes caused by differentiating velocity across instantaneous teleportation.
+    /// </summary>
+    public void ResetState()
+    {
+        if (AuvRb != null)
+        {
+            if (delayBuffer != null) delayBuffer.ResetState();
+            lastPointVelocity = delayBuffer != null ? delayBuffer.GetUnthrottledDelayedVelocityAtLocalOffset(localSensorOffset, 0.15f) : AuvRb.GetPointVelocity(transform.position);
+        }
+        else
+        {
+            lastPointVelocity = Vector3.zero;
+        }
+        if (gyroBias != null) gyroBias.Reset();
+        if (accelBias != null) accelBias.Reset();
+    }
+
     protected override void FixedUpdate()
     {
         if (AuvRb == null) return;
@@ -247,8 +272,17 @@ public class IMUPublisher : ROSPublisher
     {
         float dt = Time.fixedDeltaTime;
 
+        RigidbodyStateSample state = delayBuffer != null ? delayBuffer.GetDelayedState(0.15f) : new RigidbodyStateSample
+        {
+            position = AuvRb.position,
+            rotation = AuvRb.rotation,
+            linearVelocity = AuvRb.linearVelocity,
+            angularVelocity = AuvRb.angularVelocity,
+            unthrottledVelocity = AuvRb.linearVelocity
+        };
+
         // 1. Angular Velocity (Gyroscope)
-        Vector3 currentAngularVelWorld = AuvRb.angularVelocity;
+        Vector3 currentAngularVelWorld = state.angularVelocity;
         Vector3 sensorAngularVel = transform.InverseTransformDirection(currentAngularVelWorld);
         
         // Apply noise: White noise + Gauss-Markov bias
@@ -263,7 +297,7 @@ public class IMUPublisher : ROSPublisher
         LastAngularVelocity = noisyAngVel;
 
         // 2. Linear Acceleration (Accelerometer)
-        Vector3 currentPointVelocity = AuvRb.GetPointVelocity(transform.position);
+        Vector3 currentPointVelocity = delayBuffer != null ? delayBuffer.GetUnthrottledDelayedVelocityAtLocalOffset(localSensorOffset, 0.15f) : AuvRb.GetPointVelocity(transform.position);
         Vector3 worldAccel = (currentPointVelocity - lastPointVelocity) / dt;
         
         // Proper Acceleration = Kinematic - Gravity (what sensor actually feels)
@@ -283,7 +317,7 @@ public class IMUPublisher : ROSPublisher
         lastPointVelocity = currentPointVelocity;
 
         // 3. Orientation
-        Quaternion trueOrientation = transform.rotation;
+        Quaternion trueOrientation = state.rotation * localRotOffset;
         
         if (publishOrientation)
         {
