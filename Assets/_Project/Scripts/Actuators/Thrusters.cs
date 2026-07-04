@@ -49,9 +49,14 @@ public class Thrusters : MonoBehaviour
 
     [Space(10)]
     [Header("Thruster Limits")]
-    [Tooltip("Maximum force (N) a single thruster can output. T200 ≈ 50N, T500 ≈ 150N")]
-    [Range(10f, 200f)]
-    public float maxThrusterForce = 50f;
+    [Tooltip("Maximum forward force (N) a single thruster can output. T200 ≈ 50N")]
+    public float maxForwardForce = 50f;
+
+    [Tooltip("Maximum reverse force (N) a single thruster can output.")]
+    public float maxReverseForce = 40f; 
+
+    [Tooltip("Force threshold below which the thruster outputs zero force (N)")]
+    public float deadband = 1.0f;
 
     [Space(10)]
     [Tooltip("Rate at which thruster force changes (N/s). Simulates motor inertia.")]
@@ -156,15 +161,21 @@ public class Thrusters : MonoBehaviour
 
             float targetForce = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
 
-            // Apply Ramp-up (Motor Inertia) - command signal ramps toward target
+            // 1. Apply Ramp-up (Motor Inertia) - command signal ramps toward target
             currentThrusterLevels[i] = Mathf.MoveTowards(currentThrusterLevels[i], targetForce, rampRate * Time.fixedDeltaTime);
             float finalForce = currentThrusterLevels[i];
 
-            // Apply Efficiency Variance (per-thruster manufacturing variance)
+            // 2. Apply Deadband (If force is too low, propeller doesn't spin)
+            if (Mathf.Abs(finalForce) < deadband)
+            {
+                finalForce = 0f;
+            }
+
+            // 3. Apply Efficiency Variance (Manufacturing variance / voltage drop)
             finalForce *= thrusterEfficiencyScalars[i];
 
-            // Clamp AFTER efficiency - physical thruster saturation (motor torque/RPM limit)
-            finalForce = Mathf.Clamp(finalForce, -maxThrusterForce, maxThrusterForce);
+            // 4. Clamp asymmetrically based on physical limits!
+            finalForce = Mathf.Clamp(finalForce, -maxReverseForce, maxForwardForce);
 
             Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
             Vector3 thrusterForceVector = worldForceDirection * (finalForce * forceMultiplier);
@@ -301,10 +312,10 @@ public class Thrusters : MonoBehaviour
         }
         if (Input.GetKey(InputManager.Instance.GetKey("swayKeybind", KeyCode.A)))
         {
-            inputThrusterForces[4] += moveForceOver2;
-            inputThrusterForces[3] -= moveForceOver2;
-            inputThrusterForces[7] += moveForceOver2;
-            inputThrusterForces[0] -= moveForceOver2;
+            inputThrusterForces[4] += moveForceOver4;
+            inputThrusterForces[3] -= moveForceOver4;
+            inputThrusterForces[7] += moveForceOver4;
+            inputThrusterForces[0] -= moveForceOver4;
         }
         if (Input.GetKey(InputManager.Instance.GetKey("negSurgeKeybind", KeyCode.S)))
         {
@@ -315,10 +326,10 @@ public class Thrusters : MonoBehaviour
         }
         if (Input.GetKey(InputManager.Instance.GetKey("negSwayKeybind", KeyCode.D)))
         {
-            inputThrusterForces[4] -= moveForceOver2;
-            inputThrusterForces[3] += moveForceOver2;
-            inputThrusterForces[7] -= moveForceOver2;
-            inputThrusterForces[0] += moveForceOver2;
+            inputThrusterForces[4] -= moveForceOver4;
+            inputThrusterForces[3] += moveForceOver4;
+            inputThrusterForces[7] -= moveForceOver4;
+            inputThrusterForces[0] += moveForceOver4;
         }
         if (Input.GetKey(InputManager.Instance.GetKey("negHeaveKeybind", KeyCode.Q)))
         {
@@ -351,7 +362,23 @@ public class Thrusters : MonoBehaviour
         rosThrusterForces[7] = msg.back_left;
     }
 
-    private void InitializeEfficiency()
+    /// <summary>
+    /// Resets internal thruster state and zero-outs force accumulators upon simulation reset.
+    /// </summary>
+    public void ResetState()
+    {
+        Array.Clear(currentThrusterLevels, 0, currentThrusterLevels.Length);
+        Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
+        Array.Clear(rosThrusterForces, 0, rosThrusterForces.Length);
+        Array.Clear(previousForces, 0, previousForces.Length);
+        InitializeEfficiency();
+    }
+
+    /// <summary>
+    /// Re-rolls per-thruster efficiency scalars based on efficiencyVariance.
+    /// Called at startup and by SimulationResetManager on each SITL reset to simulate thruster-to-thruster manufacturing variation.
+    /// </summary>
+    public void InitializeEfficiency()
     {
         for (int i = 0; i < thrusterEfficiencyScalars.Length; i++)
         {
