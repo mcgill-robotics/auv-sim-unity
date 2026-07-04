@@ -50,10 +50,6 @@ public class HydrodynamicDrag : MonoBehaviour
     [Tooltip("Quadratic angular drag in Unity coordinates (X=Pitch, Y=Yaw, Z=Roll). Units: [N·m·s²/rad²]")]
     public Vector3 angularQuadraticDrag = new Vector3(9.4194f, 0.2500f, 0.7538f);
 
-    [Header("Cross-Coupling")]
-    [Tooltip("Torque coupling coefficient from forward surge velocity to pitch torque. Negative values induce pitch-down when surging forward. Units: [N·m/(m/s)²]")]
-    public float surgeToPitchCoupling = -0.4f;
-
     [Header("Added Mass / Inertia")]
     [Tooltip("Translational added mass in Unity coordinates (X=Sway/Lateral, Y=Heave/Vertical, Z=Surge/Forward). Units: [kg]")]
     public Vector3 addedMassTranslational = new Vector3(1.0000f, 1.0000f, 1.0000f);
@@ -134,23 +130,9 @@ public class HydrodynamicDrag : MonoBehaviour
         // 3. Added Mass (Resisting acceleration)
         ApplyAddedMass();
 
-        // 4. Cross-Coupling (Surge to Pitch)
-        ApplyCrossCoupling(relativeVelocity);
-
         // Update state for next frame's acceleration calculation
         prevLocalVelocity = transform.InverseTransformDirection(rb.linearVelocity);
         prevLocalAngularVelocity = transform.InverseTransformDirection(rb.angularVelocity);
-    }
-
-    private void ApplyCrossCoupling(Vector3 relativeVelocity)
-    {
-        Vector3 localVel = transform.InverseTransformDirection(relativeVelocity);
-        float surgeSpeed = localVel.z;
-        
-        // Surge-to-Pitch Coupling: surging forward induces a pitch-down torque around local X axis
-        float pitchTorque = surgeToPitchCoupling * surgeSpeed * Mathf.Abs(surgeSpeed);
-        
-        rb.AddRelativeTorque(new Vector3(pitchTorque, 0f, 0f), ForceMode.Force);
     }
 
     private void ApplyAngularDrag()
