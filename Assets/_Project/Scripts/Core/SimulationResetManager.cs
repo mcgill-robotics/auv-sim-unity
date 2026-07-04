@@ -42,7 +42,7 @@ namespace Core
         public IMUPublisher auvImu;
 
         [Header("Reset Behavior")]
-        [Tooltip("If true, resets the AUV to (0, -1.5, 0) and Quaternion.identity. If false, resets to its initial start pose.")]
+        [Tooltip("If true, resets the AUV to (0,0,0) and Quaternion.identity. If false, resets to its initial start pose.")]
         public bool resetToOrigin = false;
 
         [Tooltip("If true, applies domain randomization to mass and drag on every reset.")]
@@ -55,7 +55,7 @@ namespace Core
 
         [Tooltip("Percentage variation for Hydrodynamic Drag coefficients (e.g., 0.15 for +-15%).")]
         [Range(0f, 0.5f)]
-        public float dragRandomizationRange = 0.10f;
+        public float dragRandomizationRange = 0.15f;
 
         [Tooltip("Percentage variation for Buoyancy Force (e.g., 0.02 for +-2% salinity/temperature variation).")]
         [Range(0f, 0.1f)]
@@ -262,8 +262,8 @@ namespace Core
         {
             if (auvRigidbody == null) return;
 
-            // 1. Kinematic Pose Reset - uses (0, -1.5, 0) if resetToOrigin is true to avoid surface/wave physics, otherwise returns to initial start pose
-            Vector3 targetPos = resetToOrigin ? new Vector3(0f, -1.5f, 0f) : initialPosition;
+            // 1. Kinematic Pose Reset
+            Vector3 targetPos = resetToOrigin ? Vector3.zero : initialPosition;
             Quaternion targetRot = resetToOrigin ? Quaternion.identity : initialRotation;
 
             auvRigidbody.position = targetPos;
@@ -289,15 +289,6 @@ namespace Core
             if (auvImu != null)
             {
                 auvImu.ResetState();
-            }
-            if (auvThrusters != null)
-            {
-                auvThrusters.ResetState();
-            }
-            SensorDelayBuffer delayBuf = auvRigidbody.GetComponent<SensorDelayBuffer>();
-            if (delayBuf != null)
-            {
-                delayBuf.ResetState();
             }
 
             // 3. Domain Randomization (Sim-to-Real regularization)
