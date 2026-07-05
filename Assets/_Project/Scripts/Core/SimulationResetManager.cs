@@ -42,7 +42,7 @@ namespace Core
         public IMUPublisher auvImu;
 
         [Header("Reset Behavior")]
-        [Tooltip("If true, resets the AUV to (0,0,0) and Quaternion.identity. If false, resets to its initial start pose.")]
+        [Tooltip("If true, resets the AUV to (0, -1.5, 0) and Quaternion.identity. If false, resets to its initial start pose.")]
         public bool resetToOrigin = false;
 
         [Tooltip("If true, applies domain randomization to mass and drag on every reset.")]
@@ -55,7 +55,7 @@ namespace Core
 
         [Tooltip("Percentage variation for Hydrodynamic Drag coefficients (e.g., 0.15 for +-15%).")]
         [Range(0f, 0.5f)]
-        public float dragRandomizationRange = 0.15f;
+        public float dragRandomizationRange = 0.10f;
 
         [Tooltip("Percentage variation for Buoyancy Force (e.g., 0.02 for +-2% salinity/temperature variation).")]
         [Range(0f, 0.1f)]
@@ -79,6 +79,17 @@ namespace Core
         [Tooltip("Maximum velocity of random water current disturbance in m/s (e.g., 0.1 for up to 0.1 m/s drift).")]
         [Range(0f, 1f)]
         public float maxWaterCurrentSpeed = 0.1f;
+
+        [Tooltip("If true, randomizes sensor delay buffer latency on every reset.")]
+        public bool randomizeSensorDelay = true;
+
+        [Tooltip("Minimum sensor latency delay in seconds when randomized (e.g., 0.10s for 100ms).")]
+        [Range(0.05f, 0.3f)]
+        public float minSensorDelay = 0.10f;
+
+        [Tooltip("Maximum sensor latency delay in seconds when randomized (e.g., 0.20s for 200ms).")]
+        [Range(0.05f, 0.3f)]
+        public float maxSensorDelay = 0.20f;
 
         [Header("Simulation Speed & Time Sync")]
         [Tooltip("Simulation speed multiplier (e.g., 5.0x or 10.0x for fast-forward tuning).")]
@@ -262,8 +273,8 @@ namespace Core
         {
             if (auvRigidbody == null) return;
 
-            // 1. Kinematic Pose Reset
-            Vector3 targetPos = resetToOrigin ? Vector3.zero : initialPosition;
+            // 1. Kinematic Pose Reset - uses (0, -1.5, 0) if resetToOrigin is true to avoid surface/wave physics, otherwise returns to initial start pose
+            Vector3 targetPos = resetToOrigin ? new Vector3(0f, -1.5f, 0f) : initialPosition;
             Quaternion targetRot = resetToOrigin ? Quaternion.identity : initialRotation;
 
             auvRigidbody.position = targetPos;
@@ -289,6 +300,15 @@ namespace Core
             if (auvImu != null)
             {
                 auvImu.ResetState();
+            }
+            if (auvThrusters != null)
+            {
+                auvThrusters.ResetState();
+            }
+            SensorDelayBuffer delayBuf = auvRigidbody.GetComponent<SensorDelayBuffer>();
+            if (delayBuf != null)
+            {
+                delayBuf.ResetState();
             }
 
             // 3. Domain Randomization (Sim-to-Real regularization)
@@ -375,6 +395,17 @@ namespace Core
 
                 // Global force multiplier (uniform battery voltage sag)
                 auvThrusters.forceMultiplier = nominalForceMultiplier * UnityEngine.Random.Range(1f - forceMultiplierRandomizationRange, 1f + forceMultiplierRandomizationRange);
+            }
+
+            // Randomize Sensor Delay Buffer Latency
+            if (randomizeSensorDelay)
+            {
+                SensorDelayBuffer delayBuf = auvRigidbody.GetComponent<SensorDelayBuffer>();
+                if (delayBuf != null)
+                {
+                    delayBuf.delayTime = UnityEngine.Random.Range(minSensorDelay, maxSensorDelay);
+                    Debug.Log($"[SimulationResetManager] Randomized sensor latency to {delayBuf.delayTime * 1000f:F1}ms.");
+                }
             }
         }
     }
