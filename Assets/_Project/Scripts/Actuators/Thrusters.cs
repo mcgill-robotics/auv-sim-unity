@@ -363,6 +363,18 @@ public class Thrusters : MonoBehaviour
     }
 
     /// <summary>
+    /// Resets internal thruster state and zero-outs force accumulators upon simulation reset.
+    /// </summary>
+    public void ResetState()
+    {
+        Array.Clear(currentThrusterLevels, 0, currentThrusterLevels.Length);
+        Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
+        Array.Clear(rosThrusterForces, 0, rosThrusterForces.Length);
+        Array.Clear(previousForces, 0, previousForces.Length);
+        InitializeEfficiency();
+    }
+
+    /// <summary>
     /// Re-rolls per-thruster efficiency scalars based on efficiencyVariance.
     /// Called at startup and by SimulationResetManager on each SITL reset to simulate thruster-to-thruster manufacturing variation.
     /// </summary>

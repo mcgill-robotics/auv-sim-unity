@@ -151,6 +151,9 @@ public class DVLPublisher : ROSPublisher
     private Vector3 accumulatedVelocity;
     private int sampleCount;
     private float accumulatedTime;
+    private SensorDelayBuffer delayBuffer;
+    private Vector3 localSensorOffset;
+    private Vector3 currentSensorPos;
 
     protected override void Start()
     {
@@ -163,7 +166,12 @@ public class DVLPublisher : ROSPublisher
         drMsg = new DVLDRMsg();
         odomMsg = new OdometryMsg();
 
-
+        if (AuvRb != null)
+        {
+            delayBuffer = SensorDelayBuffer.GetOrCreate(AuvRb);
+            localSensorOffset = AuvRb.transform.InverseTransformPoint(transform.position);
+        }
+        currentSensorPos = transform.position;
 
         initialSensorPosition = transform.position;
         drPositionUnity = Vector3.zero;
@@ -261,8 +269,10 @@ public class DVLPublisher : ROSPublisher
         {
             velocityBias.Reset();
         }
+        if (delayBuffer != null) delayBuffer.ResetState();
         LastVelocity = Vector3.zero;
         initialSensorPosition = transform.position;
+        currentSensorPos = transform.position;
         UpdateDvlMessageData();
         UpdateDeadReckoningInternal();
         if (drPoseRoot != null)
@@ -279,12 +289,14 @@ public class DVLPublisher : ROSPublisher
         // Update bias every physics step (always needed for accurate simulation)
         velocityBias.Step();
 
+        currentSensorPos = delayBuffer != null ? delayBuffer.GetDelayedSensorPosition(localSensorOffset, -1f) : transform.position;
+
         // 1. Accumulate Velocity (Ensemble Processing)
         // A real DVL integrates Doppler shifts over the sample window.
         // We simulate this by accumulating the true physics velocity every frame.
         if (IsValid)
         {
-            Vector3 currentVel = AuvRb.GetPointVelocity(transform.position);
+            Vector3 currentVel = delayBuffer != null ? delayBuffer.GetThrottledDelayedVelocityAtLocalOffset(localSensorOffset, -1f) : AuvRb.GetPointVelocity(transform.position);
             // Convert to sensor frame purely for accumulation if needed, but World is fine 
             // as long as we rotate it later? No, body rotation changes!
             // Crucial: A DVL measures velocity relative to the sensor *at that moment*.
@@ -456,7 +468,7 @@ public class DVLPublisher : ROSPublisher
         {
             id = index,
             velocity = Vector3.Dot(LastVelocity, beamDirectionsLocal[index]),
-            distance = Vector3.Distance(transform.position, BeamHitPoints[index]),
+            distance = Vector3.Distance(currentSensorPos, BeamHitPoints[index]),
             rssi = BeamValid[index] ? 100 : 0, // Simplified RSSI based on validity
             nsd = BeamValid[index] ? 1.0 : 10.0, // Normalized Signal Strength (lower is better), simplified
             valid = BeamValid[index]
@@ -544,7 +556,7 @@ public class DVLPublisher : ROSPublisher
             Vector3 worldBeamDir = transform.TransformDirection(beamDirectionsLocal[i]);
             
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, worldBeamDir, out hit, maxAltitude, acousticLayerMask))
+            if (Physics.Raycast(currentSensorPos, worldBeamDir, out hit, maxAltitude, acousticLayerMask))
             {
                 // Calculate incidence angle (angle between beam and surface normal)
                 // Perfect hit = 0°, grazing hit = 90°
@@ -571,7 +583,7 @@ public class DVLPublisher : ROSPublisher
                 {
                     // Out of range
                     BeamValid[i] = false;
-                    BeamHitPoints[i] = transform.position + worldBeamDir * maxAltitude;
+                    BeamHitPoints[i] = currentSensorPos + worldBeamDir * maxAltitude;
                 }
                 else
                 {
@@ -585,7 +597,7 @@ public class DVLPublisher : ROSPublisher
             else
             {
                 BeamValid[i] = false;
-                BeamHitPoints[i] = transform.position + worldBeamDir * maxAltitude;
+                BeamHitPoints[i] = currentSensorPos + worldBeamDir * maxAltitude;
             }
         }
         
@@ -615,7 +627,7 @@ public class DVLPublisher : ROSPublisher
         else
         {
             // No samples (maybe newly enabled?), just process "instant" current
-             Vector3 currentVel = transform.InverseTransformDirection(AuvRb.GetPointVelocity(transform.position));
+             Vector3 currentVel = transform.InverseTransformDirection(delayBuffer != null ? delayBuffer.GetThrottledDelayedVelocityAtLocalOffset(localSensorOffset, -1f) : AuvRb.GetPointVelocity(transform.position));
              SimulateSensor(currentVel, Time.fixedDeltaTime); 
         }
     }
