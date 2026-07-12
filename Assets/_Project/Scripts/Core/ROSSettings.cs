@@ -34,6 +34,9 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Topic for torpedo reset command (Bool)")]
     public string TorpedoResetTopic = "/auv/torpedo/reset";
 
+    [Tooltip("Topic for triggering simulation reset from ROS 2 (Bool)")]
+    public string SimulationResetTopic = "/simulation/reset";
+
 
     [Space(10)]
     [Header("Sensor Topics")]
