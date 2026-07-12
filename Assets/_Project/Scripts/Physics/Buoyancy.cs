@@ -14,10 +14,17 @@ public class Buoyancy : MonoBehaviour
 {
     [Header("Buoyancy Configuration")]
     [Tooltip("Point where buoyancy force is applied (local coordinates). Should be above COM for stability.")]
-    public Vector3 centerOfBuoyancy;
+    public Vector3 centerOfBuoyancy = new Vector3(0.0005f, 0.0795f, 0.0011f);
 
     [Tooltip("Center of mass offset (local coordinates). Applied to Rigidbody on Start.")]
-    public Vector3 centerOfMass;
+    public Vector3 centerOfMass = new Vector3(-0.0005f, 0.0745f, -0.0011f);
+
+    [Header("Manual Override")]
+    [Tooltip("If enabled, overrides the automatically calculated buoyancy force with manualBuoyancyForce.")]
+    public bool overrideBuoyancyForce = true;
+
+    [Tooltip("Manual maximum upward buoyancy force when fully submerged (in Newtons).")]
+    public float manualBuoyancyForce = 263.17f;
 
 
     [Tooltip("BoxCollider of chassis, used for approximating submerged volume and surface projection. Equilibrium height will be exactly at the top of this collider.")]
@@ -88,6 +95,11 @@ public class Buoyancy : MonoBehaviour
         // Underwater, the volume of displaced fluid is equal to the volume of the AUV, so we can use that for our approximation
         // As the AUV emerges, the displaced volume decreases with the height, we use area for now
         buoyancyScalingFactor = hydrodynamicDrag.waterDensity * auvArea * Physics.gravity.magnitude;
+
+        if (overrideBuoyancyForce && debugLogging)
+        {
+            Debug.Log($"[Buoyancy] Manual override enabled. Using {manualBuoyancyForce} N (fully submerged) instead of calculated {buoyancyScalingFactor * HeightofAUV:F1} N.");
+        }
     }
 
 
@@ -125,8 +137,14 @@ public class Buoyancy : MonoBehaviour
     void ApplyBuoyancyForce(Vector3 floaterPosition, float depth)
     {
         float submergedDepth = Mathf.Clamp(depth, 0, HeightofAUV);
-        // Floater is submerged, apply upward buoyancy force, scale force by how deep the point is submerged
-        Vector3 buoyancyForce = Vector3.up * buoyancyScalingFactor * submergedDepth;
+        float submergedRatio = HeightofAUV > 0 ? (submergedDepth / HeightofAUV) : 1f;
+
+        // When submerged, apply upward buoyancy force. Scale smoothly if emerging from water at the surface.
+        float forceMagnitude = overrideBuoyancyForce
+            ? manualBuoyancyForce * submergedRatio
+            : buoyancyScalingFactor * submergedDepth;
+
+        Vector3 buoyancyForce = Vector3.up * forceMagnitude;
 
         auvRb.AddForceAtPosition(buoyancyForce, floaterPosition, ForceMode.Force);
 
