@@ -56,11 +56,11 @@ public class Dropper : MonoBehaviour
     {
         // Check if there is any object within the grab area
         CheckGrippableObjectWithinArea();
-        Debug.Log(" :");
-        Debug.Log(grabberArea.bounds.center);
-        if (candidateObjects.Count > 0)
-            Debug.Log((candidateObjects[0].GetComponent<Collider>().bounds.center));
-        Debug.Log("Number of candidate objects: " + candidateObjectsReadyForGrab.Count);
+        // Debug.Log(" :");
+        // Debug.Log(grabberArea.bounds.center);
+        // if (candidateObjects.Count > 0)
+        //     Debug.Log((candidateObjects[0].GetComponent<Collider>().bounds.center));
+        // Debug.Log("Number of candidate objects: " + candidateObjectsReadyForGrab.Count);
 
         // Check for dropper trigger input (G key by default) and drop the object if the input is received
         if (Input.GetKeyDown(InputManager.Instance.GetKey("dropperKeybind", KeyCode.G)))
