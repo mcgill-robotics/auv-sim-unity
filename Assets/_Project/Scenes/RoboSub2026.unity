@@ -21807,7 +21807,7 @@ MonoBehaviour:
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
-  FrontCamFOV: 77.9
+  FrontCamFOV: 52
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1
