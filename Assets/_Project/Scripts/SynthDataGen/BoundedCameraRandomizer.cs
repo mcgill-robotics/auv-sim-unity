@@ -247,16 +247,19 @@ public class BoundedCameraRandomizer : Randomizer
             // Random direction relative to height (using spherical coordinates)
             float angle_phi = RandomState.NextFloat(-15f, 15f) * Mathf.Deg2Rad;
 
+            // Random height within pool bounds
+            float height = RandomState.NextFloat(poolMinBounds.y, poolMaxBounds.y);
+
             // Calculate position offset from target
             Vector3 offset = new Vector3(
                 distance * Mathf.Sin(angle_phi) * Mathf.Cos(angle_theta),
-                distance * Mathf.Cos(angle_phi),
+                0f, // Height is set absolutely within pool bounds
                 distance * Mathf.Sin(angle_phi) * Mathf.Sin(angle_theta)
             );
 
             Vector3 candidatePosition = new Vector3(
                 targetPosition.x + offset.x,
-                targetPosition.y + offset.y,
+                height, // Use random height directly
                 targetPosition.z + offset.z
             );
 
@@ -303,7 +306,7 @@ public class BoundedCameraRandomizer : Randomizer
         foreach (Transform child in _foregroundContainer)
         {
             // Filter out pooled objects at X=10000 (GameObjectOneWayCache reset position)
-            if (child.gameObject.activeInHierarchy && child.position.x < 9999f)
+            if (child.gameObject.activeInHierarchy && child.localPosition.magnitude < 9999f && child.position.magnitude < 9999f)
             {
                 activeObjects.Add(child);
             }
@@ -317,7 +320,53 @@ public class BoundedCameraRandomizer : Randomizer
 
         // Pick a random active object
         int randomIndex = RandomState.NextInt(0, activeObjects.Count);
-        return activeObjects[randomIndex].position;
+        Transform chosenObject = activeObjects[randomIndex];
+
+        // Calculate volumetric center using active renderers within valid pool bounds
+        var renderers = chosenObject.GetComponentsInChildren<Renderer>(false);
+        Bounds combinedBounds = new Bounds();
+        bool foundValidRenderer = false;
+
+        foreach (var renderer in renderers)
+        {
+            // Filter out disabled renderers
+            if (!renderer.enabled || !renderer.gameObject.activeInHierarchy)
+                continue;
+
+            // Check if this renderer or any parent in the hierarchy is parked outside the pool (e.g. OneWayCache at localPosition X=10000)
+            bool isParked = false;
+            Transform curr = renderer.transform;
+            while (curr != null)
+            {
+                if (curr.localPosition.magnitude >= 9999f || curr.position.magnitude >= 9999f)
+                {
+                    isParked = true;
+                    break;
+                }
+                if (curr == chosenObject) break;
+                curr = curr.parent;
+            }
+
+            if (isParked) continue;
+
+            if (!foundValidRenderer)
+            {
+                combinedBounds = renderer.bounds;
+                foundValidRenderer = true;
+            }
+            else
+            {
+                combinedBounds.Encapsulate(renderer.bounds);
+            }
+        }
+
+        if (foundValidRenderer)
+        {
+            return combinedBounds.center;
+        }
+
+        // Fallback to transform origin if no renderers exist
+        return chosenObject.position;
     }
 
     #endregion
