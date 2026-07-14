@@ -5515,7 +5515,7 @@ MonoBehaviour:
       type: {class: UnderwaterEnvironmentRandomizer, ns: , asm: Assembly-CSharp}
       data:
         m_Enabled: 1
-        collapsed: 1
+        collapsed: 0
         <enabledStateCanBeSwitchedByUser>k__BackingField: 1
         globalVolume: {fileID: 1111011693}
         waterSurface: {fileID: 1301816085}
@@ -5720,7 +5720,7 @@ MonoBehaviour:
         asm: Unity.Perception.Runtime}
       data:
         range:
-          minimum: 20
+          minimum: 0
           maximum: 90
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
@@ -5731,7 +5731,7 @@ MonoBehaviour:
       data:
         range:
           minimum: 8000
-          maximum: 16000
+          maximum: 100000
         <minAllowed>k__BackingField: 0
         <maxAllowed>k__BackingField: 0
         <shouldCheckValidRange>k__BackingField: 0
@@ -5764,7 +5764,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   batchConfigs:
   - batchName: High visibility cases
-    iterations: 2000
+    iterations: 4000
     spawnObjects: 1
     randomizeVisuals: 1
     absorptionDistanceRange: {x: 4, y: 25}
@@ -5784,9 +5784,9 @@ MonoBehaviour:
     pitchRange: {x: 85, y: 95}
     randomYawRange: {x: 0, y: 360}
     rollRange: {x: -10, y: 10}
-    yawJitter: 20
+    yawJitter: 180
   - batchName: Hard cases
-    iterations: 1000
+    iterations: 2000
     spawnObjects: 1
     randomizeVisuals: 1
     absorptionDistanceRange: {x: 3, y: 10}
@@ -5806,7 +5806,7 @@ MonoBehaviour:
     pitchRange: {x: 80, y: 100}
     randomYawRange: {x: 0, y: 360}
     rollRange: {x: -15, y: 15}
-    yawJitter: 45
+    yawJitter: 180
   - batchName: Background
     iterations: 500
     spawnObjects: 0
@@ -5828,7 +5828,7 @@ MonoBehaviour:
     pitchRange: {x: 80, y: 100}
     randomYawRange: {x: 0, y: 360}
     rollRange: {x: -10, y: 10}
-    yawJitter: 20
+    yawJitter: 180
   testModeEnabled: 0
   testBatchIndex: 2
   seed: 260716
