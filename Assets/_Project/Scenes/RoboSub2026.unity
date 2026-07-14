@@ -13974,7 +13974,7 @@ MonoBehaviour:
   maxForwardForce: 50
   maxReverseForce: 40
   deadband: 0.1
-  rampRate: 100
+  rampRate: 333
   efficiencyVariance: 0
   auvRbOverride: {fileID: 0}
 --- !u!1 &953937952
@@ -21783,19 +21783,19 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 1
+  PublishFrontCam: 0
   PublishDownCam: 1
-  PublishDepthCamera: 1
-  StreamZEDCamera: 0
+  PublishDepthCamera: 0
+  StreamZEDCamera: 1
   VisualizeDVL: 1
   VisualizeIMU: 0
   VisualizeDepth: 1
   EnableDVLNoise: 1
   EnableIMUNoise: 0
-  EnableDepthNoise: 1
-  DrawerConfigOpen: 1
-  DrawerControlsOpen: 1
-  DrawerTelemetryOpen: 1
+  EnableDepthNoise: 0
+  DrawerConfigOpen: 0
+  DrawerControlsOpen: 0
+  DrawerTelemetryOpen: 0
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
