@@ -5967,8 +5967,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   torpedos:
-  - {fileID: 634586412}
   - {fileID: 2083545326}
+  - {fileID: 634586412}
+  ROSlaunchDelay: 0.2
   trajectoryData:
     forward:
       c0: 0
@@ -21806,7 +21807,7 @@ MonoBehaviour:
   DownCamRate: 10
   FrontCamWidth: 960
   FrontCamHeight: 600
-  FrontCamFOV: 77.9
+  FrontCamFOV: 52
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1
@@ -21814,7 +21815,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/willz/Desktop/mcgill/robotics/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21871,7 +21872,7 @@ MonoBehaviour:
   ThrusterForcesTopic: /propulsion/forces
   DropperTopic: /auv/dropper/trigger
   GripperTopic: /auv/gripper/trigger
-  TorpedoLaunchTopic: /auv/torpedo/launch
+  TorpedoLaunchTopic: /actuators/torpedo
   TorpedoResetTopic: /auv/torpedo/reset
   SimulationResetTopic: /simulation/reset
   DVLTopic: dvl/velocity
@@ -23262,7 +23263,7 @@ PrefabInstance:
     - target: {fileID: 2958579989946816274, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.46329603
+      value: 0.09584581
       objectReference: {fileID: 0}
     - target: {fileID: 2958579989946816274, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
@@ -23272,7 +23273,7 @@ PrefabInstance:
     - target: {fileID: 2958579989946816274, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.88620365
+      value: 0.99539626
       objectReference: {fileID: 0}
     - target: {fileID: 2958579989946816274, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
@@ -23287,7 +23288,7 @@ PrefabInstance:
     - target: {fileID: 2958579989946816274, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -124.8
+      value: 169
       objectReference: {fileID: 0}
     - target: {fileID: 2958579989946816274, guid: 54a671b74869b48249d8cb16ad69e218,
         type: 3}
