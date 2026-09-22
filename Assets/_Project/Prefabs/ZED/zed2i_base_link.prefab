@@ -100,7 +100,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 77.9
+  field of view: 40.9
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -131,18 +131,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   streamPort: 30000
-  serialNumber: 41116066
+  serialNumber: 0
   targetFPS: 30
   leftCamera: {fileID: 0}
   rightCamera: {fileID: 0}
-  invertRotY: 1
+  targetWidth: 672
+  targetHeight: 376
+  targetFOV: 40.9
   invertRotX: 1
+  invertRotY: 1
   invertRotZ: 1
-  invertAccelY: 0
   invertAccelX: 0
+  invertAccelY: 0
   invertAccelZ: 0
-  targetWidth: 960
-  targetHeight: 600
 --- !u!1 &8872821743377458430
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,7 +209,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 77.9
+  field of view: 40.9
   orthographic: 0
   orthographic size: 5
   m_Depth: 0

@@ -29,8 +29,8 @@ public class CameraDepthPublisher : ROSPublisher
     public string encoding = "32FC1";
 
     // Runtime-created resources
-    private int publishWidth = 960;
-    private int publishHeight = 600;
+    private int publishWidth = 672;
+    private int publishHeight = 376;
     private RenderTexture depthRT;           // Linear depth in meters (for ROS)
     private RenderTexture visualizationRT;   // Heatmap for UI display
     private Material linearDepthMaterial;
@@ -70,9 +70,12 @@ public class CameraDepthPublisher : ROSPublisher
         Debug.Log("[CameraDepthPublisher] Starting initialization...");
         
         // Get resolution from settings
-        PublishRate = SimulationSettings.Instance.FrontCamRate;
-        publishWidth = SimulationSettings.Instance.FrontCamWidth;
-        publishHeight = SimulationSettings.Instance.FrontCamHeight;
+        if (SimulationSettings.Instance != null)
+        {
+            PublishRate = SimulationSettings.Instance.FrontCamRate;
+            publishWidth = SimulationSettings.Instance.FrontCamWidth;
+            publishHeight = SimulationSettings.Instance.FrontCamHeight;
+        }
         
         Debug.Log($"[CameraDepthPublisher] Resolution: {publishWidth}x{publishHeight}, Rate: {PublishRate}Hz");
 

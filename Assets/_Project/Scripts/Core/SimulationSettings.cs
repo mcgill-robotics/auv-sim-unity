@@ -138,17 +138,17 @@ public class SimulationSettings : MonoBehaviour
     public int DownCamRate = 10;
 
     [Space(5)]
-    [Tooltip("Front camera resolution width (ZED X native: 960)")]
-    [Range(320, 1920)]
-    public int FrontCamWidth = 960;
+    [Tooltip("Front camera resolution width (ZED 2i VGA: 672)")]
+    [Range(320, 2208)]
+    public int FrontCamWidth = 672;
 
-    [Tooltip("Front camera resolution height (ZED X native: 600)")]
-    [Range(240, 1200)]
-    public int FrontCamHeight = 600;
+    [Tooltip("Front camera resolution height (ZED 2i VGA: 376)")]
+    [Range(240, 1242)]
+    public int FrontCamHeight = 376;
 
-    [Tooltip("Front camera vertical FOV in degrees (ZED X narrow: 52°)")]
+    [Tooltip("Front camera vertical FOV in degrees (ZED 2i narrow: 40.9°)")]
     [Range(30f, 120f)]
-    public float FrontCamFOV = 52f;
+    public float FrontCamFOV = 40.9f;
 
     [Space(5)]
     [Tooltip("Down camera resolution width")]
@@ -298,9 +298,9 @@ public class SimulationSettings : MonoBehaviour
 
         FrontCamRate = int.Parse(PlayerPrefs.GetString("frontCamRate", "10"));
         DownCamRate = int.Parse(PlayerPrefs.GetString("downCamRate", "10"));
-        FrontCamWidth = int.Parse(PlayerPrefs.GetString("frontCamWidth", "960"));
-        FrontCamHeight = int.Parse(PlayerPrefs.GetString("frontCamHeight", "600"));
-        FrontCamFOV = float.Parse(PlayerPrefs.GetString("frontCamFOV", "77.9"));
+        FrontCamWidth = int.Parse(PlayerPrefs.GetString("frontCamWidth", "672"));
+        FrontCamHeight = int.Parse(PlayerPrefs.GetString("frontCamHeight", "376"));
+        FrontCamFOV = float.Parse(PlayerPrefs.GetString("frontCamFOV", "40.9"));
         DownCamWidth = int.Parse(PlayerPrefs.GetString("downCamWidth", "640"));
         DownCamHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
         UseJPEGCompression = bool.Parse(PlayerPrefs.GetString("UseJPEGCompression", "true"));

@@ -14,17 +14,17 @@ public class Buoyancy : MonoBehaviour
 {
     [Header("Buoyancy Configuration")]
     [Tooltip("Point where buoyancy force is applied (local coordinates). Should be above COM for stability.")]
-    public Vector3 centerOfBuoyancy = new Vector3(0.0005f, 0.0795f, 0.0011f);
+    public Vector3 centerOfBuoyancy = new Vector3(0.0000f, 0.087354f, 0.0000f);
 
     [Tooltip("Center of mass offset (local coordinates). Applied to Rigidbody on Start.")]
-    public Vector3 centerOfMass = new Vector3(-0.0005f, 0.0745f, -0.0011f);
+    public Vector3 centerOfMass = new Vector3(0.0000f, 0.077354f, 0.0000f);
 
     [Header("Manual Override")]
     [Tooltip("If enabled, overrides the automatically calculated buoyancy force with manualBuoyancyForce.")]
     public bool overrideBuoyancyForce = true;
 
     [Tooltip("Manual maximum upward buoyancy force when fully submerged (in Newtons).")]
-    public float manualBuoyancyForce = 263.17f;
+    public float manualBuoyancyForce = 278.95f;
 
 
     [Tooltip("BoxCollider of chassis, used for approximating submerged volume and surface projection. Equilibrium height will be exactly at the top of this collider.")]
