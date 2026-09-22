@@ -108,8 +108,8 @@ namespace Core
         private Quaternion initialRotation;
         private float nominalMass;
         private Vector3 nominalDragCoefficients;
-        private Vector3 nominalLumpedQuadraticDrag;
-        private Vector3 nominalAngularQuadraticDrag;
+        private Vector3 nominalQuadDragTranslational;
+        private Vector3 nominalQuadDragRotational;
         private Vector3 nominalAddedMassTranslational;
         private Vector3 nominalAddedMassRotational;
         private float nominalBuoyancyForce;
@@ -182,8 +182,8 @@ namespace Core
             if (auvDrag != null)
             {
                 nominalDragCoefficients = auvDrag.dragCoefficients;
-                nominalLumpedQuadraticDrag = auvDrag.lumpedQuadraticDrag;
-                nominalAngularQuadraticDrag = auvDrag.angularQuadraticDrag;
+                nominalQuadDragTranslational = auvDrag.quadDragTranslational;
+                nominalQuadDragRotational = auvDrag.quadDragRotational;
                 nominalAddedMassTranslational = auvDrag.addedMassTranslational;
                 nominalAddedMassRotational = auvDrag.addedMassRotational;
             }
@@ -340,7 +340,7 @@ namespace Core
                 );
 
                 auvDrag.dragCoefficients = Vector3.Scale(nominalDragCoefficients, dragFactor);
-                auvDrag.lumpedQuadraticDrag = Vector3.Scale(nominalLumpedQuadraticDrag, dragFactor);
+                auvDrag.quadDragTranslational = Vector3.Scale(nominalQuadDragTranslational, dragFactor);
 
                 // Randomize Angular Drag across Roll/Pitch/Yaw by +-15% (crucial for Phase 1 Attitude tuning!)
                 Vector3 angDragFactor = new Vector3(
@@ -348,7 +348,7 @@ namespace Core
                     UnityEngine.Random.Range(1f - dragRandomizationRange, 1f + dragRandomizationRange),
                     UnityEngine.Random.Range(1f - dragRandomizationRange, 1f + dragRandomizationRange)
                 );
-                auvDrag.angularQuadraticDrag = Vector3.Scale(nominalAngularQuadraticDrag, angDragFactor);
+                auvDrag.quadDragRotational = Vector3.Scale(nominalQuadDragRotational, angDragFactor);
 
                 // Randomize Added Mass (+-15%) so effective inertia is varied
                 Vector3 addedMassFactor = new Vector3(

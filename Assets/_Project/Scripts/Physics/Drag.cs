@@ -31,8 +31,6 @@ public class HydrodynamicDrag : MonoBehaviour
     [Tooltip("Directional quadratic drag coefficients in Unity coordinates (X=Sway/Lateral, Y=Heave/Vertical, Z=Surge/Forward). Streamlined forward, blunt sides. Units: [dimensionless]")]
     public Vector3 dragCoefficients = new Vector3(0.031f ,2.623f, 2.188f);
 
-    [Tooltip("Lumped quadratic drag from CasADi system identification in Unity coordinates (X=Sway, Y=Heave, Z=Surge). Used when dragAreaMode = LumpedCasADi. Bypasses water density and area. Units: [N/(m/s)²]")]
-    public Vector3 lumpedQuadraticDrag = new Vector3(1.0000f, 127.3154f, 72.3561f);
 
     [Tooltip("Fixed cross-sectional area (used when mode = ConstantArea). Units: [m²]")]
     public float constantArea = 0.25f;
@@ -46,20 +44,42 @@ public class HydrodynamicDrag : MonoBehaviour
     // ---------------------------------------------------------
     // NEW FOSSEN PHYSICS PARAMETERS
     // ---------------------------------------------------------
-    [Header("Angular Drag")]
+    [Header("Quadratic Drag")]
+    [Tooltip("Lumped quadratic drag from CasADi system identification in Unity coordinates (X=Sway, Y=Heave, Z=Surge). Used when dragAreaMode = LumpedCasADi. Bypasses water density and area. Units: [N/(m/s)²]")]
+    public Vector3 quadDragTranslational = new Vector3(75.0000f, 125.0000f, 27.0430f);
+    
     [Tooltip("Quadratic angular drag in Unity coordinates (X=Pitch, Y=Yaw, Z=Roll). Units: [N·m·s²/rad²]")]
-    public Vector3 angularQuadraticDrag = new Vector3(9.4194f, 0.2500f, 0.7538f);
+    public Vector3 quadDragRotational = new Vector3(10.0000f, 10.0000f, 5.0000f);
 
-    [Header("Cross-Coupling")]
-    [Tooltip("Torque coupling coefficient from forward surge velocity to pitch torque. Negative values induce pitch-down when surging forward. Units: [N·m/(m/s)²]")]
-    public float surgeToPitchCoupling = -0.4f;
+    [Header("Linear Drag")]
+    [Tooltip("Linear translational drag in Unity coordinates (X=Sway, Y=Heave, Z=Surge). Units: [N/(m/s)]")]
+    public Vector3 linearDragTranslational = new Vector3(10.0000f, 15.0000f, 16.4163f);
+
+    [Tooltip("Linear angular drag in Unity coordinates (X=Pitch, Y=Yaw, Z=Roll). Units: [N·m/(rad/s)]")]
+    public Vector3 linearDragRotational = new Vector3(1.0000f, 1.0000f, 0.5000f);
+
+    [Header("Linear Cross-Coupling")]
+    [Tooltip("Linear pitch velocity to surge force. Units: [N/(rad/s)]")]
+    public float linSurgePitch = 0.002457f;
+    [Tooltip("Linear yaw velocity to sway force. Units: [N/(rad/s)]")]
+    public float linSwayYaw = -0.002336f;
+    [Tooltip("Linear heave velocity to pitch torque. Units: [N·m/(m/s)]")]
+    public float linPitchHeave = -0.474271f;
+    [Tooltip("Linear sway velocity to yaw torque. Units: [N·m/(m/s)]")]
+    public float linYawSway = -0.013042f;
 
     [Header("Added Mass / Inertia")]
     [Tooltip("Translational added mass in Unity coordinates (X=Sway/Lateral, Y=Heave/Vertical, Z=Surge/Forward). Units: [kg]")]
-    public Vector3 addedMassTranslational = new Vector3(1.0000f, 1.0000f, 1.0000f);
+    public Vector3 addedMassTranslational = new Vector3(14.0000f, 14.0000f, 14.0000f);
      
     [Tooltip("Rotational added inertia in Unity coordinates (X=Pitch, Y=Yaw, Z=Roll). Units: [kg·m²]")]
-    public Vector3 addedMassRotational = new Vector3(0.0200f, 0.0200f, 0.0200f);
+    public Vector3 addedMassRotational = new Vector3(1.5000f, 1.5000f, 1.5000f);
+
+    [Header("Added Mass Cross-Coupling")]
+    [Tooltip("Coupling between surge acceleration and pitch torque, and pitch acceleration to surge force. Units: [kg·m/rad]")]
+    public float amSurgePitch = 0.029023f;
+    [Tooltip("Coupling between sway acceleration and yaw torque, and yaw acceleration to sway force. Units: [kg·m/rad]")]
+    public float amSwayYaw = 0.019259f;
 
     [Tooltip("Low-pass filter alpha for acceleration. Smooths numerical differentiation to prevent PhysX jitter. Units: [dimensionless, 0 to 1]")]
     [Range(0.01f, 1f)]
@@ -145,23 +165,31 @@ public class HydrodynamicDrag : MonoBehaviour
     private void ApplyCrossCoupling(Vector3 relativeVelocity)
     {
         Vector3 localVel = transform.InverseTransformDirection(relativeVelocity);
-        float surgeSpeed = localVel.z;
+        Vector3 localAngVel = transform.InverseTransformDirection(rb.angularVelocity);
         
-        // Surge-to-Pitch Coupling: surging forward induces a pitch-down torque around local X axis
-        float pitchTorque = surgeToPitchCoupling * surgeSpeed * Mathf.Abs(surgeSpeed);
-        
-        rb.AddRelativeTorque(new Vector3(pitchTorque, 0f, 0f), ForceMode.Force);
+        // Linear Cross-Coupling Drag
+        // Fz = X_q * q (Surge force from Pitch vel)
+        float surgeForce = linSurgePitch * localAngVel.x;
+        // Fx = Y_r * r (Sway force from Yaw vel)
+        float swayForce = linSwayYaw * localAngVel.y;
+        // Tx = M_w * w (Pitch torque from Heave vel)
+        float pitchTorque = linPitchHeave * localVel.y;
+        // Ty = N_v * v (Yaw torque from Sway vel)
+        float yawTorque = linYawSway * localVel.x;
+
+        rb.AddRelativeForce(new Vector3(swayForce, 0f, surgeForce), ForceMode.Force);
+        rb.AddRelativeTorque(new Vector3(pitchTorque, yawTorque, 0f), ForceMode.Force);
     }
 
     private void ApplyAngularDrag()
     {
         Vector3 localAngVel = transform.InverseTransformDirection(rb.angularVelocity);
         
-        // Torque = - D_quad * omega * |omega|
+        // Torque = - D_quad * omega * |omega| - D_lin * omega
         Vector3 localTorque = new Vector3(
-            -localAngVel.x * angularQuadraticDrag.x * Mathf.Abs(localAngVel.x),
-            -localAngVel.y * angularQuadraticDrag.y * Mathf.Abs(localAngVel.y),
-            -localAngVel.z * angularQuadraticDrag.z * Mathf.Abs(localAngVel.z)
+            -localAngVel.x * quadDragRotational.x * Mathf.Abs(localAngVel.x) - linearDragRotational.x * localAngVel.x,
+            -localAngVel.y * quadDragRotational.y * Mathf.Abs(localAngVel.y) - linearDragRotational.y * localAngVel.y,
+            -localAngVel.z * quadDragRotational.z * Mathf.Abs(localAngVel.z) - linearDragRotational.z * localAngVel.z
         );
         
         rb.AddRelativeTorque(localTorque, ForceMode.Force);
@@ -196,6 +224,17 @@ public class HydrodynamicDrag : MonoBehaviour
             -addedMassRotational.z * filteredLocalAngAccel.z
         );
 
+        // Added Mass Cross-Coupling
+        // Fz += -X_q_dot * q_dot 
+        // Tx += -M_u_dot * u_dot  (where X_q_dot = M_u_dot = amSurgePitch)
+        addedMassForce.z -= amSurgePitch * filteredLocalAngAccel.x;
+        addedMassTorque.x -= amSurgePitch * filteredLocalAccel.z;
+
+        // Fx += -Y_r_dot * r_dot
+        // Ty += -N_v_dot * v_dot  (where Y_r_dot = N_v_dot = amSwayYaw)
+        addedMassForce.x -= amSwayYaw * filteredLocalAngAccel.y;
+        addedMassTorque.y -= amSwayYaw * filteredLocalAccel.x;
+
         rb.AddRelativeForce(addedMassForce, ForceMode.Force);
         rb.AddRelativeTorque(addedMassTorque, ForceMode.Force);
     }
@@ -221,12 +260,12 @@ public class HydrodynamicDrag : MonoBehaviour
 
         if (dragAreaMode == DragAreaMode.LumpedCasADi)
         {
-            // Convert velocity to AUV local frame and apply lumped CasADi quadratic drag directly without density/area scaling
+            // Convert velocity to AUV local frame and apply lumped CasADi quadratic and linear drag directly without density/area scaling
             Vector3 localVel = transform.InverseTransformDirection(velocity);
             Vector3 localDragForce = new Vector3(
-                -lumpedQuadraticDrag.x * Mathf.Abs(localVel.x) * localVel.x,
-                -lumpedQuadraticDrag.y * Mathf.Abs(localVel.y) * localVel.y,
-                -lumpedQuadraticDrag.z * Mathf.Abs(localVel.z) * localVel.z
+                -quadDragTranslational.x * Mathf.Abs(localVel.x) * localVel.x - linearDragTranslational.x * localVel.x,
+                -quadDragTranslational.y * Mathf.Abs(localVel.y) * localVel.y - linearDragTranslational.y * localVel.y,
+                -quadDragTranslational.z * Mathf.Abs(localVel.z) * localVel.z - linearDragTranslational.z * localVel.z
             );
             dragForce = transform.TransformDirection(localDragForce);
             forceMagnitude = dragForce.magnitude;

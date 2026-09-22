@@ -10972,7 +10972,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -13975,7 +13975,7 @@ MonoBehaviour:
   maxForwardForce: 50
   maxReverseForce: 40
   deadband: 0.1
-  rampRate: 333
+  rampRate: 200
   efficiencyVariance: 0
   auvRbOverride: {fileID: 0}
 --- !u!1 &953937952
@@ -15830,7 +15830,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 52
+  field of view: 40.9
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -19977,11 +19977,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   streamPort: 30000
-  serialNumber: 47890353
+  serialNumber: 0
   targetFPS: 10
   useSimTime: 0
   leftCamera: {fileID: 1621375949}
   rightCamera: {fileID: 1135839436}
+  targetWidth: 672
+  targetHeight: 376
+  targetFOV: 40.9
   invertRotX: 1
   invertRotY: 0
   invertRotZ: 1
@@ -20028,14 +20031,21 @@ MonoBehaviour:
   dragAreaMode: 2
   waterDensity: 1000
   dragCoefficients: {x: 0.031, y: 2.623, z: 2.188}
-  lumpedQuadraticDrag: {x: 72.3561, y: 127.3154, z: 72.3561}
   constantArea: 0.25
-  lookupTableJson: {fileID: 4900000, guid: 4a12fad3c1d7b66519328b5eb8c98ff4, type: 3}
+  lookupTableJson: {fileID: 0}
   useCenterOfPressure: 1
-  angularQuadraticDrag: {x: 9.4194, y: 0.25, z: 0.7538}
-  surgeToPitchCoupling: -0.4
-  addedMassTranslational: {x: 1, y: 1, z: 1}
-  addedMassRotational: {x: 0.02, y: 0.02, z: 0.02}
+  quadDragTranslational: {x: 27.043, y: 125, z: 27.043}
+  quadDragRotational: {x: 10, y: 10, z: 5}
+  linearDragTranslational: {x: 16.4163, y: 15, z: 16.4163}
+  linearDragRotational: {x: 0.5, y: 1, z: 0.5}
+  linSurgePitch: 0.002457
+  linSwayYaw: -0.002336
+  linPitchHeave: -0.474271
+  linYawSway: -0.013042
+  addedMassTranslational: {x: 14, y: 14, z: 14}
+  addedMassRotational: {x: 1.5, y: 1.5, z: 1.5}
+  amSurgePitch: 0.029023
+  amSwayYaw: 0.019259
   addedMassFilterAlpha: 0.5
   debugLogging: 0
   visualize: 0
@@ -20051,10 +20061,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72654cd3b1e01e845881bc182dcc2474, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centerOfBuoyancy: {x: 0, y: 0.0795, z: 0}
-  centerOfMass: {x: 0, y: 0.0745, z: 0}
+  centerOfBuoyancy: {x: 0, y: 0.087354, z: 0}
+  centerOfMass: {x: 0, y: 0.077354, z: 0}
   overrideBuoyancyForce: 1
-  manualBuoyancyForce: 263.17
+  manualBuoyancyForce: 278.95
   ChassisCollider: {fileID: 7649270088102046629}
   FoamTopCollider: {fileID: 7031543448678077273}
   waterSurface: {fileID: 762281602}
@@ -20068,10 +20078,10 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1371465005}
   serializedVersion: 4
-  m_Mass: 26.8
+  m_Mass: 27.9
   m_Drag: 3
   m_AngularDrag: 5
-  m_CenterOfMass: {x: 0, y: 0.0745, z: 0}
+  m_CenterOfMass: {x: 0, y: 0.077354, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -21773,9 +21783,9 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  PublishGTObjectMap: 0
+  PublishGTObjectMap: 1
   NoWaterMode: 0
-  EnableShadows: 0
+  EnableShadows: 1
   sunLight: {fileID: 811298106}
   waterSurfaceObject: {fileID: 762281599}
   poolPostProcessingVolume: {fileID: 871712519}
@@ -21784,30 +21794,30 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 0
+  PublishFrontCam: 1
   PublishDownCam: 1
   PublishDepthCamera: 0
   StreamZEDCamera: 1
   VisualizeDVL: 1
-  VisualizeIMU: 0
+  VisualizeIMU: 1
   VisualizeDepth: 1
-  EnableDVLNoise: 1
+  EnableDVLNoise: 0
   EnableIMUNoise: 0
   EnableDepthNoise: 0
-  DrawerConfigOpen: 0
-  DrawerControlsOpen: 0
-  DrawerTelemetryOpen: 0
+  DrawerConfigOpen: 1
+  DrawerControlsOpen: 1
+  DrawerTelemetryOpen: 1
   DrawerSensorsOpen: 1
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
   VisualizeBearing3: 0
   VisualizeBearing4: 0
-  FrontCamRate: 10
-  DownCamRate: 10
-  FrontCamWidth: 960
-  FrontCamHeight: 600
-  FrontCamFOV: 52
+  FrontCamRate: 30
+  DownCamRate: 30
+  FrontCamWidth: 672
+  FrontCamHeight: 376
+  FrontCamFOV: 40.9
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1
@@ -21815,7 +21825,7 @@ MonoBehaviour:
   PoseRate: 50
   QualityLevel: 3
   SimulationTargetFrameRate: 60
-  SnapshotSavePath: /home/kavy/code/auv-sim-unity/Recordings
+  SnapshotSavePath: /home/sohaib/projects/auv-sim-unity/Recordings
 --- !u!114 &1443981345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24307,7 +24317,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 52
+  field of view: 40.9
   orthographic: 0
   orthographic size: 5
   m_Depth: 0

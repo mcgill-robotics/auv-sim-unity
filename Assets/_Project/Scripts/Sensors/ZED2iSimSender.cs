@@ -8,14 +8,22 @@ using UnityEngine.Rendering;
 public class ZED2iSimSender : MonoBehaviour
 {
     [Header("ZED Streaming Configuration")]
-    [Range(1024, 65535)] public int streamPort = 30000;
-    public int serialNumber = 47890353;
+    [Tooltip("Must be an EVEN port (e.g., 30000, 30002)")]
+    [Range(1024, 65534)] public int streamPort = 30000;
+    public int serialNumber = 0; // Set to 0 to auto-pick the first valid ZED 2i serial
     [Range(1, 60)] public int targetFPS = 30;
     public bool useSimTime = false;
 
     [Header("Camera References")]
     public Camera leftCamera;
     public Camera rightCamera;
+
+    [Header("Resolution (ZED 2i Narrow VGA: 672x376)")]
+    public int targetWidth = 672;
+    public int targetHeight = 376;
+
+    [Tooltip("Vertical Field of View (ZED 2i Narrow 4mm lens is ~40.9 deg)")]
+    public float targetFOV = 40.9f;
 
     [Header("Coordinate System Mapping")]
     public bool invertRotX = true;
@@ -31,31 +39,22 @@ public class ZED2iSimSender : MonoBehaviour
     public bool debugLogging = false;
     [Range(1, 300)] public int debugLogInterval = 60;
 
-    [Tooltip("AUV Rigidbody - leave empty to use SimulationSettings.AUVRigidbody")]
     [SerializeField] private Rigidbody rbOverride;
     private Rigidbody Rb => rbOverride != null ? rbOverride : SimulationSettings.Instance?.AUVRigidbody;
 
-    // Camera settings
-    private int targetWidth = 960;
-    private int targetHeight = 600;
-
-    // Physics State
     private Vector3 lastLinearVelocity;
     private Vector3 currentProperAccelLocal;
     private Vector3 currentAngularVelocityLocal;
     private Quaternion initialRotationInv;
 
-    // Rendering
     private RenderTexture leftRT, rightRT, flipLeftRT, flipRightRT;
 
-    // Threading & Double Buffering
     private Thread encodingThread;
     private volatile bool isStreaming = false;
-    private int streamerID = 0;
+    private const int streamerID = 0; // Streamer ID must start at 0
     private int frameCount = 0;
     private static readonly DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    // Buffers for the background thread
     private NativeArray<byte>[] leftBuffers = new NativeArray<byte>[2];
     private NativeArray<byte>[] rightBuffers = new NativeArray<byte>[2];
     private long[] timestamps = new long[2];
@@ -69,17 +68,31 @@ public class ZED2iSimSender : MonoBehaviour
 
     void Start()
     {
-        if (SimulationSettings.Instance != null && !SimulationSettings.Instance.StreamZEDCamera)
+        if (streamPort % 2 != 0)
         {
-            enabled = false;
-            return;
+            streamPort--;
+            Debug.LogWarning($"[ZED Sim] Port adjusted to even number: {streamPort}");
         }
 
+        // 1. Verify Host ZED SDK Version
+        if (ZedNativeAPI.getZEDSDKRuntimeVersion_C(out int major, out int minor, out int patch) == 0)
+        {
+            Debug.Log($"[ZED Sim] Host ZED SDK Runtime: v{major}.{minor}.{patch}");
+            if (major < 5 || (major == 5 && (minor < 4 || (minor == 4 && patch < 1))))
+            {
+                Debug.LogError($"[ZED Sim] Incompatible ZED SDK! Requires >= 5.4.1, found {major}.{minor}.{patch}");
+                enabled = false;
+                return;
+            }
+        }
+
+        // 2. Resolve Valid Serial Number
+        ResolveSerialNumber();
+
+        // 3. Ensure SimulationSettings knows ZED streaming is active so CameraRenderManager renders both cameras
         if (SimulationSettings.Instance != null)
         {
-            targetWidth = SimulationSettings.Instance.FrontCamWidth;
-            targetHeight = SimulationSettings.Instance.FrontCamHeight;
-            targetFPS = SimulationSettings.Instance.FrontCamRate;
+            SimulationSettings.Instance.StreamZEDCamera = true;
         }
 
         if (Rb != null) Rb.sleepThreshold = 0.0f;
@@ -89,8 +102,54 @@ public class ZED2iSimSender : MonoBehaviour
         StartCoroutine(InitializeNativeStreamer());
     }
 
+    void ResolveSerialNumber()
+    {
+        var virtualCams = ZedNativeAPI.GetVirtualCameras();
+        Debug.Log($"[ZED Sim] Found {virtualCams.Length} virtual cameras in SDK library.");
+
+        if (serialNumber != 0 && ZedNativeAPI.is_sn_valid(serialNumber))
+        {
+            Debug.Log($"[ZED Sim] Using specified serial number: {serialNumber}");
+            return;
+        }
+
+        foreach (var cam in virtualCams)
+        {
+            // model == 3 (ZED 2i) AND lens_type == 1 (Narrow)
+            if (cam.model == 3 && cam.lens_type == 1)
+            {
+                serialNumber = cam.serial_number;
+                Debug.Log($"[ZED Sim] Auto-selected ZED 2i NARROW Serial: {serialNumber}");
+                return;
+            }
+        }
+
+        // Fallback to any model 3 if narrow lens not found
+        foreach (var cam in virtualCams)
+        {
+            if (cam.model == 3)
+            {
+                serialNumber = cam.serial_number;
+                Debug.LogWarning($"[ZED Sim] Fallback to ZED 2i Serial (lens {cam.lens_type}): {serialNumber}");
+                return;
+            }
+        }
+
+        Debug.LogError("[ZED Sim] No virtual ZED 2i NARROW serial number found in library!");
+    }
+
     void InitializeMemoryAndCameras()
     {
+        if (leftCamera == null || rightCamera == null)
+        {
+            Debug.LogError("[ZED Sim] Left or Right Camera reference is missing!");
+            enabled = false;
+            return;
+        }
+
+        leftCamera.fieldOfView = targetFOV;
+        rightCamera.fieldOfView = targetFOV;
+
         leftRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false };
         rightRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false };
         flipLeftRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { enableRandomWrite = true };
@@ -98,10 +157,6 @@ public class ZED2iSimSender : MonoBehaviour
 
         leftCamera.targetTexture = leftRT;
         rightCamera.targetTexture = rightRT;
-
-        float fov = SimulationSettings.Instance != null ? SimulationSettings.Instance.FrontCamFOV : 52.0f;
-        leftCamera.fieldOfView = fov;
-        rightCamera.fieldOfView = fov;
 
         int bufferSize = targetWidth * targetHeight * 3;
         for (int i = 0; i < 2; i++)
@@ -114,15 +169,13 @@ public class ZED2iSimSender : MonoBehaviour
     IEnumerator InitializeNativeStreamer()
     {
         yield return new WaitForSeconds(1.0f);
-        streamerID = UnityEngine.Random.Range(1, 9999);
 
-        // Uses our clean wrapper to build the parameters
         var p = ZedNativeAPI.StreamingParameters.CreateDefault(
             targetWidth, targetHeight, targetFPS, (ushort)streamPort, serialNumber);
 
         if (ZedNativeAPI.InitStreamer(streamerID, ref p))
         {
-            Debug.Log($"[ZED Sim] Streamer {streamerID} Started.");
+            Debug.Log($"[ZED Sim] Streamer {streamerID} Started on port {streamPort} (SN: {serialNumber}, {targetWidth}x{targetHeight} @ {targetFPS} FPS).");
             isStreaming = true;
 
             encodingThread = new Thread(EncodingWorkerThread);
@@ -132,7 +185,7 @@ public class ZED2iSimSender : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"[ZED Sim] Streamer {streamerID} Failed to Start.");
+            Debug.LogError($"[ZED Sim] Streamer {streamerID} Failed to Start on port {streamPort}. Check if port is already bound or serial/resolution is invalid.");
             ZedNativeAPI.CloseStreamer(streamerID);
         }
     }
@@ -177,7 +230,6 @@ public class ZED2iSimSender : MonoBehaviour
             invertRotY ? -currentAngularVelocityLocal.y : currentAngularVelocityLocal.y,
             invertRotZ ? -currentAngularVelocityLocal.z : currentAngularVelocityLocal.z);
 
-        // Clean API call
         ZedNativeAPI.IngestIMU(streamerID, ts, angVel, acc, rot);
     }
 
@@ -253,7 +305,6 @@ public class ZED2iSimSender : MonoBehaviour
                 isEncoding = true;
             }
 
-            // Clean API call handles all pointer logic internally
             ZedNativeAPI.StreamRGB(streamerID,
                 leftBuffers[encodeIndex], rightBuffers[encodeIndex],
                 timestamps[encodeIndex], rotations[encodeIndex], accelerations[encodeIndex]);

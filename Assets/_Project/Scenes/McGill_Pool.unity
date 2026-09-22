@@ -3702,7 +3702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   streamPort: 30000
-  serialNumber: 41116066
+  serialNumber: 0
   targetFPS: 10
   useSimTime: 0
   leftCamera: {fileID: 1621375949}
@@ -4045,9 +4045,9 @@ MonoBehaviour:
   VisualizeBearing4: 0
   FrontCamRate: 30
   DownCamRate: 10
-  FrontCamWidth: 960
-  FrontCamHeight: 600
-  FrontCamFOV: 52
+  FrontCamWidth: 672
+  FrontCamHeight: 376
+  FrontCamFOV: 40.9
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1
