@@ -65,7 +65,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement style="height: 10px;" />
                 </ui:ScrollView>
-                <ui:Button name="Btn-Save" text="SAVE &amp; RESTART" class="mcgill-button" style="margin: 10px; margin-top: 0; align-self: flex-end; width: 140px;" />
+                <ui:Button name="Btn-Save" text="SAVE SETTINGS" class="mcgill-button" style="margin: 10px; margin-top: 0; align-self: flex-end; width: 140px;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="ControlsDrawer" class="drawer-container drawer-open" style="left: 0; bottom: auto; top: 760px;">

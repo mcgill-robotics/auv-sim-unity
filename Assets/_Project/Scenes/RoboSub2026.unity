@@ -21788,7 +21788,7 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  PublishGTObjectMap: 0
+  PublishGTObjectMap: 1
   NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
@@ -21799,10 +21799,10 @@ MonoBehaviour:
   PublishIMU: 1
   PublishDepth: 1
   PublishHydrophones: 0
-  PublishFrontCam: 1
-  PublishDownCam: 1
+  PublishFrontCam: 0
+  PublishDownCam: 0
   PublishDepthCamera: 0
-  StreamZEDCamera: 1
+  StreamZEDCamera: 0
   VisualizeDVL: 1
   VisualizeIMU: 1
   VisualizeDepth: 1

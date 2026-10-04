@@ -116,6 +116,13 @@ public class ZED2iSimSender : MonoBehaviour
 
     void Start()
     {
+        if (SimulationSettings.Instance != null && !SimulationSettings.Instance.StreamZEDCamera)
+        {
+            Debug.Log("[ZED Sim] ZED streaming is disabled in SimulationSettings. Native streamer not started.");
+            enabled = false;
+            return;
+        }
+
         InitializeMemoryAndCameras();
 
         if (streamPort % 2 != 0)

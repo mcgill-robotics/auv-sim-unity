@@ -4,11 +4,6 @@ using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Auv;
 using UnityEngine.Perception.GroundTruth.LabelManagement;
 using System.Collections.Generic;
-using Sensors;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.SceneManagement;
-
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -178,46 +173,46 @@ namespace Sensors
             ros.Publish(Topic, msg);
         }
     }
-}
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(GroundTruthVisionPublisher))]
-public class GroundTruthVisionPublisherEditor : Editor
-{
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(GroundTruthVisionPublisher))]
+    public class GroundTruthVisionPublisherEditor : Editor
     {
-        DrawDefaultInspector();
-
-        GroundTruthVisionPublisher script = (GroundTruthVisionPublisher)target;
-
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Conditional Labeling Camera Reference", EditorStyles.boldLabel);
-        DrawUpdateCameraButton(script);
-    }
-
-    private void DrawUpdateCameraButton(GroundTruthVisionPublisher script)
-    {
-        if (GUILayout.Button("Update Conditional Labeling Camera References"))
+        public override void OnInspectorGUI()
         {
-            Debug.Log("Updating camera references for all ConditionalLabeling components...");
-            if (script.AUVCamera == null)
-            {
-                Debug.LogError("AUVCamera is null on the target script!");
-                return;
-            }
-            // Update camera reference for all conditional labeling in cache
-            ConditionalLabeling[] conditionalLabelers = FindObjectsByType<ConditionalLabeling>(FindObjectsSortMode.None);
-            Debug.Log($"Found {conditionalLabelers.Length} ConditionalLabeling components to update.");
+            DrawDefaultInspector();
 
-            Undo.RecordObjects(conditionalLabelers, "Update Conditional Labeling Camera Reference");
-            foreach (var labeler in conditionalLabelers)
+            GroundTruthVisionPublisher script = (GroundTruthVisionPublisher)target;
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Conditional Labeling Camera Reference", EditorStyles.boldLabel);
+            DrawUpdateCameraButton(script);
+        }
+
+        private void DrawUpdateCameraButton(GroundTruthVisionPublisher script)
+        {
+            if (GUILayout.Button("Update Conditional Labeling Camera References"))
             {
-                Debug.Log($"Updating camera reference for {labeler.gameObject.name}");
-                labeler.UpdateCameraReference(script.AUVCamera);
-                EditorUtility.SetDirty(labeler);
+                Debug.Log("Updating camera references for all ConditionalLabeling components...");
+                if (script.AUVCamera == null)
+                {
+                    Debug.LogError("AUVCamera is null on the target script!");
+                    return;
+                }
+                // Update camera reference for all conditional labeling in cache
+                ConditionalLabeling[] conditionalLabelers = FindObjectsByType<ConditionalLabeling>(FindObjectsSortMode.None);
+                Debug.Log($"Found {conditionalLabelers.Length} ConditionalLabeling components to update.");
+
+                Undo.RecordObjects(conditionalLabelers, "Update Conditional Labeling Camera Reference");
+                foreach (var labeler in conditionalLabelers)
+                {
+                    Debug.Log($"Updating camera reference for {labeler.gameObject.name}");
+                    labeler.UpdateCameraReference(script.AUVCamera);
+                    EditorUtility.SetDirty(labeler);
+                }
+                EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
             }
-            EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
         }
     }
-}
 #endif
+}
