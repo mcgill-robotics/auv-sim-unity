@@ -10154,6 +10154,7 @@ MonoBehaviour:
   m_Script: {fileID: 1613045127}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Entries: []
 --- !u!4 &785343304
 Transform:
   m_ObjectHideFlags: 19
@@ -19978,13 +19979,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   streamPort: 30000
   serialNumber: 0
-  targetFPS: 10
+  targetFPS: 30
   useSimTime: 0
   leftCamera: {fileID: 1621375949}
   rightCamera: {fileID: 1135839436}
   targetWidth: 672
   targetHeight: 376
   targetFOV: 40.9
+  simulateRefraction: 1
+  refractionIndex: 1.33333
+  refractionShader: {fileID: 4800000, guid: 2a0253a5b49e4283845b90c64f343080, type: 3}
   invertRotX: 1
   invertRotY: 0
   invertRotZ: 1
@@ -21783,7 +21787,7 @@ MonoBehaviour:
   DownCamera: {fileID: 1671108404}
   PublishROS: 1
   DisplaySimObjects: 0
-  PublishGTObjectMap: 1
+  PublishGTObjectMap: 0
   NoWaterMode: 0
   EnableShadows: 1
   sunLight: {fileID: 811298106}
@@ -21805,9 +21809,9 @@ MonoBehaviour:
   EnableIMUNoise: 0
   EnableDepthNoise: 0
   DrawerConfigOpen: 1
-  DrawerControlsOpen: 1
-  DrawerTelemetryOpen: 1
-  DrawerSensorsOpen: 1
+  DrawerControlsOpen: 0
+  DrawerTelemetryOpen: 0
+  DrawerSensorsOpen: 0
   DrawerCameraOpen: 1
   VisualizeBearing1: 0
   VisualizeBearing2: 0
@@ -21818,6 +21822,8 @@ MonoBehaviour:
   FrontCamWidth: 672
   FrontCamHeight: 376
   FrontCamFOV: 40.9
+  SimulateWaterRefraction: 1
+  WaterRefractionIndex: 1.33333
   DownCamWidth: 640
   DownCamHeight: 480
   UseJPEGCompression: 1

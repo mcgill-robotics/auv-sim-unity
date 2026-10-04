@@ -120,7 +120,15 @@ public class CameraFeedController
         
         if (selection == "Front Left" && frontLeftCamera != null)
         {
-            selectedTexture = frontLeftCamera.targetTexture;
+            var zedSender = frontLeftCamera.GetComponent<ZED2iSimSender>();
+            if (zedSender != null && zedSender.RefractedLeftTexture != null)
+            {
+                selectedTexture = zedSender.RefractedLeftTexture;
+            }
+            else
+            {
+                selectedTexture = frontLeftCamera.targetTexture;
+            }
         }
         else if (selection == "Down" && downCamera != null)
         {
