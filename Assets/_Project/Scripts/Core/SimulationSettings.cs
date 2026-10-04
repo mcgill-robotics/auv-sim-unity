@@ -151,6 +151,15 @@ public class SimulationSettings : MonoBehaviour
     public float FrontCamFOV = 40.9f;
 
     [Space(5)]
+    [Header("Underwater Optics")]
+    [Tooltip("Simulate flat-port water refraction (Snell's Law) on ZED 2i stereo cameras")]
+    public bool SimulateWaterRefraction = true;
+
+    [Tooltip("Index of refraction for water (standard water is ~1.33333)")]
+    [Range(1.0f, 1.6f)]
+    public float WaterRefractionIndex = 1.33333f;
+
+    [Space(5)]
     [Tooltip("Down camera resolution width")]
     [Range(320, 1920)]
     public int DownCamWidth = 640;
@@ -301,6 +310,8 @@ public class SimulationSettings : MonoBehaviour
         FrontCamWidth = int.Parse(PlayerPrefs.GetString("frontCamWidth", "672"));
         FrontCamHeight = int.Parse(PlayerPrefs.GetString("frontCamHeight", "376"));
         FrontCamFOV = float.Parse(PlayerPrefs.GetString("frontCamFOV", "40.9"));
+        SimulateWaterRefraction = bool.Parse(PlayerPrefs.GetString("SimulateWaterRefraction", "true"));
+        WaterRefractionIndex = float.Parse(PlayerPrefs.GetString("WaterRefractionIndex", "1.33333"));
         DownCamWidth = int.Parse(PlayerPrefs.GetString("downCamWidth", "640"));
         DownCamHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
         UseJPEGCompression = bool.Parse(PlayerPrefs.GetString("UseJPEGCompression", "true"));
@@ -403,6 +414,8 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("frontCamWidth", FrontCamWidth.ToString());
         PlayerPrefs.SetString("frontCamHeight", FrontCamHeight.ToString());
         PlayerPrefs.SetString("frontCamFOV", FrontCamFOV.ToString());
+        PlayerPrefs.SetString("SimulateWaterRefraction", SimulateWaterRefraction.ToString());
+        PlayerPrefs.SetString("WaterRefractionIndex", WaterRefractionIndex.ToString());
         PlayerPrefs.SetString("downCamWidth", DownCamWidth.ToString());
         PlayerPrefs.SetString("downCamHeight", DownCamHeight.ToString());
         PlayerPrefs.SetString("UseJPEGCompression", UseJPEGCompression.ToString());

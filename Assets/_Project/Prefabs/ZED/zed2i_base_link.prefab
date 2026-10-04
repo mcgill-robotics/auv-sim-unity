@@ -138,6 +138,9 @@ MonoBehaviour:
   targetWidth: 672
   targetHeight: 376
   targetFOV: 40.9
+  simulateRefraction: 1
+  refractionIndex: 1.33333
+  refractionShader: {fileID: 4800000, guid: 2a0253a5b49e4283845b90c64f343080, type: 3}
   invertRotX: 1
   invertRotY: 1
   invertRotZ: 1

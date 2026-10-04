@@ -25,6 +25,18 @@ public class ZED2iSimSender : MonoBehaviour
     [Tooltip("Vertical Field of View (ZED 2i Narrow 4mm lens is ~40.9 deg)")]
     public float targetFOV = 40.9f;
 
+    [Header("Underwater Optics & Refraction")]
+    [Tooltip("Simulate flat-port water refraction (Snell's Law) on both stereo cameras")]
+    public bool simulateRefraction = true;
+
+    [Tooltip("Refractive index of water (standard water is ~1.33333)")]
+    [Range(1.0f, 1.6f)]
+    public float refractionIndex = 1.33333f;
+
+    [Tooltip("Custom shader for flat-port Snell's law refraction warp")]
+    public Shader refractionShader;
+    private Material refractionMaterial;
+
     [Header("Coordinate System Mapping")]
     public bool invertRotX = true;
     public bool invertRotY = false;
@@ -47,7 +59,10 @@ public class ZED2iSimSender : MonoBehaviour
     private Vector3 currentAngularVelocityLocal;
     private Quaternion initialRotationInv;
 
-    private RenderTexture leftRT, rightRT, flipLeftRT, flipRightRT;
+    public RenderTexture RefractedLeftTexture => leftRT;
+    public RenderTexture RefractedRightTexture => rightRT;
+
+    private RenderTexture leftRT, rightRT, rawLeftRT, rawRightRT, flipLeftRT, flipRightRT;
 
     private Thread encodingThread;
     private volatile bool isStreaming = false;
@@ -66,8 +81,43 @@ public class ZED2iSimSender : MonoBehaviour
     private bool isEncoding = false;
     private readonly object frameLock = new object();
 
+    private void OnEnable()
+    {
+        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+    }
+
+    private void OnDisable()
+    {
+        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+    }
+
+    private void OnEndCameraRendering(ScriptableRenderContext context, Camera cam)
+    {
+        ApplyRefraction(cam);
+    }
+
+    public void ApplyRefraction(Camera cam)
+    {
+        if (!simulateRefraction || refractionMaterial == null) return;
+
+        if (cam == leftCamera && leftRT != null && rawLeftRT != null)
+        {
+            UpdateRefractionMaterial(flipY: false);
+            Graphics.Blit(leftRT, rawLeftRT);
+            Graphics.Blit(rawLeftRT, leftRT, refractionMaterial);
+        }
+        else if (cam == rightCamera && rightRT != null && rawRightRT != null)
+        {
+            UpdateRefractionMaterial(flipY: false);
+            Graphics.Blit(rightRT, rawRightRT);
+            Graphics.Blit(rawRightRT, rightRT, refractionMaterial);
+        }
+    }
+
     void Start()
     {
+        InitializeMemoryAndCameras();
+
         if (streamPort % 2 != 0)
         {
             streamPort--;
@@ -80,8 +130,7 @@ public class ZED2iSimSender : MonoBehaviour
             Debug.Log($"[ZED Sim] Host ZED SDK Runtime: v{major}.{minor}.{patch}");
             if (major < 5 || (major == 5 && (minor < 4 || (minor == 4 && patch < 1))))
             {
-                Debug.LogError($"[ZED Sim] Incompatible ZED SDK! Requires >= 5.4.1, found {major}.{minor}.{patch}");
-                enabled = false;
+                Debug.LogError($"[ZED Sim] Incompatible ZED SDK! Requires >= 5.4.1, found {major}.{minor}.{patch}. Native streaming disabled.");
                 return;
             }
         }
@@ -98,7 +147,6 @@ public class ZED2iSimSender : MonoBehaviour
         if (Rb != null) Rb.sleepThreshold = 0.0f;
         initialRotationInv = Quaternion.Inverse(transform.rotation);
 
-        InitializeMemoryAndCameras();
         StartCoroutine(InitializeNativeStreamer());
     }
 
@@ -140,6 +188,13 @@ public class ZED2iSimSender : MonoBehaviour
 
     void InitializeMemoryAndCameras()
     {
+        if (leftCamera == null) leftCamera = GetComponent<Camera>();
+        if (rightCamera == null && transform.parent != null)
+        {
+            var rc = transform.parent.Find("Right_Camera");
+            if (rc != null) rightCamera = rc.GetComponent<Camera>();
+        }
+
         if (leftCamera == null || rightCamera == null)
         {
             Debug.LogError("[ZED Sim] Left or Right Camera reference is missing!");
@@ -152,6 +207,8 @@ public class ZED2iSimSender : MonoBehaviour
 
         leftRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false };
         rightRT = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32) { useMipMap = false };
+        rawLeftRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { useMipMap = false };
+        rawRightRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { useMipMap = false };
         flipLeftRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { enableRandomWrite = true };
         flipRightRT = new RenderTexture(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32) { enableRandomWrite = true };
 
@@ -164,6 +221,54 @@ public class ZED2iSimSender : MonoBehaviour
             leftBuffers[i] = new NativeArray<byte>(bufferSize, Allocator.Persistent);
             rightBuffers[i] = new NativeArray<byte>(bufferSize, Allocator.Persistent);
         }
+
+        InitializeRefraction();
+    }
+
+    private void InitializeRefraction()
+    {
+        if (SimulationSettings.Instance != null)
+        {
+            simulateRefraction = SimulationSettings.Instance.SimulateWaterRefraction;
+            refractionIndex = SimulationSettings.Instance.WaterRefractionIndex;
+        }
+
+        if (refractionShader == null)
+        {
+            refractionShader = Shader.Find("Hidden/UnderwaterRefraction");
+        }
+
+        if (refractionShader != null)
+        {
+            refractionMaterial = new Material(refractionShader);
+            Debug.Log($"[ZED Sim] Underwater refraction initialized (n={refractionIndex:F4}, enabled={simulateRefraction}).");
+        }
+        else
+        {
+            Debug.LogWarning("[ZED Sim] Hidden/UnderwaterRefraction shader not found! Fallback to standard blit.");
+        }
+    }
+
+    private void UpdateRefractionMaterial(bool flipY = false)
+    {
+        if (refractionMaterial == null) return;
+
+        if (SimulationSettings.Instance != null)
+        {
+            simulateRefraction = SimulationSettings.Instance.SimulateWaterRefraction;
+            refractionIndex = SimulationSettings.Instance.WaterRefractionIndex;
+        }
+
+        // Focal length derived from vertical FOV and targetHeight: f = (H/2) / tan(FOV/2)
+        float fy = (targetHeight * 0.5f) / Mathf.Tan(targetFOV * 0.5f * Mathf.Deg2Rad);
+        float fx = fy; // Square pixels
+
+        refractionMaterial.SetVector("_Resolution", new Vector4(targetWidth, targetHeight, 0, 0));
+        refractionMaterial.SetVector("_FocalLength", new Vector4(fx, fy, 0, 0));
+        refractionMaterial.SetVector("_PrincipalPoint", new Vector4(0.5f, 0.5f, 0, 0));
+        refractionMaterial.SetFloat("_RefractionIndex", refractionIndex);
+        refractionMaterial.SetFloat("_Enabled", simulateRefraction ? 1.0f : 0.0f);
+        refractionMaterial.SetFloat("_FlipY", flipY ? 1.0f : 0.0f);
     }
 
     IEnumerator InitializeNativeStreamer()
@@ -334,7 +439,10 @@ public class ZED2iSimSender : MonoBehaviour
 
         if (leftRT != null) { leftRT.Release(); Destroy(leftRT); }
         if (rightRT != null) { rightRT.Release(); Destroy(rightRT); }
+        if (rawLeftRT != null) { rawLeftRT.Release(); Destroy(rawLeftRT); }
+        if (rawRightRT != null) { rawRightRT.Release(); Destroy(rawRightRT); }
         if (flipLeftRT != null) { flipLeftRT.Release(); Destroy(flipLeftRT); }
         if (flipRightRT != null) { flipRightRT.Release(); Destroy(flipRightRT); }
+        if (refractionMaterial != null) Destroy(refractionMaterial);
     }
 }
