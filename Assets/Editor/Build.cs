@@ -1,12 +1,25 @@
+using System.Linq;
 using UnityEditor;
-using UnityEngine;
-using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-
-// Output the build size or a failure depending on BuildPlayer.
+using UnityEngine;
 
 public class BuildPlayerExample
 {
+    private static string[] GetEnabledScenes()
+    {
+        string[] scenes = EditorBuildSettings.scenes
+            .Where(s => s.enabled)
+            .Select(s => s.path)
+            .ToArray();
+
+        if (scenes.Length == 0)
+        {
+            scenes = new string[] { "Assets/_Project/Scenes/RoboSub2026.unity" };
+        }
+
+        return scenes;
+    }
+
     public static void Build(string[] scenes, string path, BuildTarget target)
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
@@ -25,28 +38,26 @@ public class BuildPlayerExample
 
         if (summary.result == BuildResult.Failed)
         {
-            Debug.Log("Build failed");
+            Debug.LogError("Build failed");
         }
     }
+
     [MenuItem("Build/Build Linux")]
     public static void BuildLinux()
     {
-        string[] scenes = { "Assets/Scenes/MainMenu.unity", "Assets/Scenes/SquarePool.unity" };
-        Build(scenes, "Builds/Linux/sim.x86_64", BuildTarget.StandaloneLinux64);
+        Build(GetEnabledScenes(), "Builds/Linux/sim.x86_64", BuildTarget.StandaloneLinux64);
     }
 
     [MenuItem("Build/Build Windows")]
     public static void BuildWindows()
     {
-        string[] scenes = { "Assets/Scenes/MainMenu.unity", "Assets/Scenes/SquarePool.unity" };
-        Build(scenes, "Builds/Windows/sim.exe", BuildTarget.StandaloneWindows64);
+        Build(GetEnabledScenes(), "Builds/Windows/sim.exe", BuildTarget.StandaloneWindows64);
     }
 
     [MenuItem("Build/Build Mac")]
     public static void BuildMac()
     {
-        string[] scenes = { "Assets/Scenes/MainMenu.unity", "Assets/Scenes/SquarePool.unity" };
-        Build(scenes, "Builds/Mac/sim.app", BuildTarget.StandaloneOSX);
+        Build(GetEnabledScenes(), "Builds/Mac/sim.app", BuildTarget.StandaloneOSX);
     }
 
     [MenuItem("Build/Build All")]

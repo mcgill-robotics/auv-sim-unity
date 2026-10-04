@@ -1,0 +1,140 @@
+name: Build Simulator
+
+on:
+  workflow_dispatch:
+    inputs:
+      targetPlatform:
+        description: 'Target platform to build'
+        required: true
+        default: 'StandaloneLinux64'
+        type: choice
+        options:
+          - StandaloneLinux64
+          - StandaloneWindows64
+          - StandaloneOSX
+          - All
+  push:
+    tags:
+      - 'v*'
+
+# Ensure only one Unity job runs at a time to prevent license seat conflicts
+concurrency:
+  group: unity-license
+  cancel-in-progress: false
+
+jobs:
+  configure:
+    name: Configure Build Matrix
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.targetPlatform }}" != "All" ]; then
+            echo 'matrix=["${{ github.event.inputs.targetPlatform }}"]' >> "$GITHUB_OUTPUT"
+          else
+            echo 'matrix=["StandaloneLinux64", "StandaloneWindows64", "StandaloneOSX"]' >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    name: Build ${{ matrix.targetPlatform }}
+    needs: configure
+    runs-on: ubuntu-24.04
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        targetPlatform: ${{ fromJson(needs.configure.outputs.matrix) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          lfs: true
+
+      - name: Restore Library Cache
+        uses: actions/cache@v6
+        with:
+          path: Library
+          key: Library-Build-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Build-${{ matrix.targetPlatform }}-
+            Library-
+
+      - name: Build Standalone Player
+        uses: game-ci/unity-builder@v6
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_USERNAME: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          unityVersion: 6000.0.62f1
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: auv-sim
+          buildsPath: build/${{ matrix.targetPlatform }}
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: auv-sim-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Package Release Archives
+        run: |
+          RELEASE_DIR="$GITHUB_WORKSPACE/release-assets"
+          mkdir -p "$RELEASE_DIR"
+          for dir in "$GITHUB_WORKSPACE/artifacts"/*; do
+            if [ -d "$dir" ]; then
+              base=$(basename "$dir")
+              echo "Compressing $base into $RELEASE_DIR/${base}.zip..."
+              (cd "$dir" && zip -r -9 "$RELEASE_DIR/${base}.zip" .)
+            fi
+          done
+          echo "Release assets ready:"
+          ls -lh "$RELEASE_DIR"
+
+      - name: Publish Draft GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: release-assets/*.zip
+          name: AUV Simulator ${{ github.ref_name }}
+          draft: true
+          generate_release_notes: true
+          body: |
+            ## Quick Start & Execution Guide
+
+            ### 🐧 Linux (x86_64)
+            ```bash
+            unzip auv-sim-StandaloneLinux64.zip -d auv-sim-linux
+            cd auv-sim-linux
+            chmod +x auv-sim.x86_64
+            ./auv-sim.x86_64
+            ```
+
+            ### 🍎 macOS
+            ```bash
+            unzip auv-sim-StandaloneOSX.zip -d auv-sim-mac
+            cd auv-sim-mac
+            # Remove quarantine attribute so Gatekeeper allows opening:
+            xattr -cr auv-sim.app
+            open auv-sim.app
+            ```
+
+            ### 🪟 Windows (x64)
+            1. Extract `auv-sim-StandaloneWindows64.zip`.
+            2. Double-click `auv-sim.exe` to run.
+

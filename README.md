@@ -25,6 +25,7 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
     - [Manual Control](#manual-control)
     - [Competition Logic (TODO)](#competition-logic-todo)
     - [Synthetic Data Generation](#synthetic-data-generation)
+    - [CI/CD & Build Pipeline](#cicd--build-pipeline)
     - [Unity Editor Tips](#unity-editor-tips)
   - [ROS Interface](#ros-interface)
 
@@ -321,6 +322,14 @@ The simulator includes a `CompetitionManager` that orchestrates specific tasks (
 
 The simulator includes a comprehensive programmatic synthetic data generator built on the Unity Perception package for training computer vision models.
 For detailed instructions on configuring props, running the generator, and converting the dataset, please read the [Synthetic Data Setup Guide](SYNTHETIC_DATA_SETUP.md).
+
+### CI/CD & Build Pipeline
+
+Automated standalone player builds are powered by [GameCI](https://game.ci/) and GitHub Actions:
+- **Build Pipeline (`.github/workflows/build.yml`):** Builds standalone Linux, Windows, and macOS players on release tags or manual trigger.
+- **Artifact Downloads:** Built executables are automatically packaged and downloadable directly from GitHub Actions run artifacts.
+
+For instructions on configuring the Unity Student license (serial from [id.unity.com](https://id.unity.com/)), repository secrets, and how to add automated tests, see the [CI/CD Guide](docs/CI_CD.md).
 
 ### Unity Editor Tips
 

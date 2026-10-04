@@ -98,10 +98,14 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
-repomix-output.xml
+repomix-output.xml*
 Assets/Plugins/libsl_zed.so
 Assets/Plugins/sl_zed64.dll
 
 Assets/Plugins/libsl_zed.so.meta
-
 Assets/Plugins/sl_zed64.dll.meta
+
+# Perception package runtime/test metadata
+Assets/Resources/PerceptionPackageVersion.json*
+Assets/Resources/PerformanceTestRunInfo.json*
+Assets/Resources/PerformanceTestRunSettings.json*

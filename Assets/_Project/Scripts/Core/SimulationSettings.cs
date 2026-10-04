@@ -21,7 +21,7 @@ public class SimulationSettings : MonoBehaviour
 
     [Header("Global Toggles")]
     [Tooltip("Enable ROS TCP connection and publishing")]
-    public bool PublishROS = false;
+    public bool PublishROS = true;
 
     [Tooltip("Show simulation objects (gates, buoys, etc.) in scene")]
     public bool DisplaySimObjects = false;
@@ -51,13 +51,13 @@ public class SimulationSettings : MonoBehaviour
     [Space(10)]
     [Header("Sensor Publisher Toggles")]
     [Tooltip("Publish DVL velocity and altitude data")]
-    public bool PublishDVL = false;
+    public bool PublishDVL = true;
 
     [Tooltip("Publish IMU orientation, gyroscope, and accelerometer data")]
-    public bool PublishIMU = false;
+    public bool PublishIMU = true;
 
     [Tooltip("Publish depth sensor data")]
-    public bool PublishDepth = false;
+    public bool PublishDepth = true;
 
     [Tooltip("Publish hydrophone bearing data")]
     public bool PublishHydrophones = false;
@@ -278,16 +278,16 @@ public class SimulationSettings : MonoBehaviour
 
     public void LoadSettings()
     {
-        PublishROS = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "false"));
+        PublishROS = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
         DisplaySimObjects = bool.Parse(PlayerPrefs.GetString("DisplaySimToggle", "false"));
         PublishGTObjectMap = bool.Parse(PlayerPrefs.GetString("PublishGTObjectMap", "true"));
         NoWaterMode = bool.Parse(PlayerPrefs.GetString("NoWaterModeToggle", "false"));
         EnableShadows = bool.Parse(PlayerPrefs.GetString("EnableShadowsToggle", "true"));
         HydrophonesNumberOption = PlayerPrefs.GetInt("HydrophonesNumberOption", 0);
 
-        PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "false"));
-        PublishIMU = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "false"));
-        PublishDepth = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "false"));
+        PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
+        PublishIMU = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
+        PublishDepth = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
         PublishHydrophones = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "false"));
         PublishFrontCam = bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "false"));
         PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
