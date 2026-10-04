@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using RosMessageTypes.Sensor;
 using RosMessageTypes.Std;
 
@@ -13,7 +14,30 @@ public class CameraPublisher : ROSPublisher
     [Tooltip("Unity Camera component to capture from. Must have a target RenderTexture")]
     public Camera cam;
 
+    [Header("Underwater Optics & Refraction")]
+    [Tooltip("Simulate flat-port water refraction (Snell's Law)")]
+    public bool simulateRefraction = true;
 
+    [Tooltip("Refraction scale / index for Snell's law (typically ~1.333 for water, 1.0 = disabled)")]
+    [Range(1.0f, 2.0f)]
+    public float refractionScale = 1.33333f;
+
+    [Tooltip("Custom shader for flat-port Snell's law refraction warp")]
+    public Shader refractionShader;
+    private Material refractionMaterial;
+    private RenderTexture rawRT;
+
+    public RenderTexture RefractedTexture => renderTexture;
+
+    public float RefractionScale
+    {
+        get => refractionScale;
+        set
+        {
+            refractionScale = Mathf.Clamp(value, 1.0f, 2.0f);
+            if (refractionMaterial != null && cam != null) UpdateRefractionMaterial();
+        }
+    }
 
     public override string Topic => cameraType == CameraType.Front ? ROSSettings.Instance.FrontCameraTopic : ROSSettings.Instance.DownCameraTopic;
 
@@ -33,8 +57,26 @@ public class CameraPublisher : ROSPublisher
     private CameraInfoMsg cameraInfoMsg;
     private string cameraInfoTopic;
 
+    private void OnEnable()
+    {
+        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+    }
+
+    private void OnDisable()
+    {
+        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+    }
+
+    private void OnEndCameraRendering(ScriptableRenderContext context, Camera renderedCam)
+    {
+        if (renderedCam != cam) return;
+        ApplyRefraction();
+    }
+
     protected override void Start()
     {
+        if (cam == null) cam = GetComponent<Camera>();
+
         // Disable front camera ROS publishing if ZED streaming is active
         if (cameraType == CameraType.Front && 
             SimulationSettings.Instance != null && 
@@ -51,6 +93,7 @@ public class CameraPublisher : ROSPublisher
         useBaseRateLimiting = false;
         
         InitializeTexture();
+        InitializeRefraction();
         InitializeCameraInfo();
     }
 
@@ -104,39 +147,58 @@ public class CameraPublisher : ROSPublisher
     {
         if (cameraType == CameraType.Front)
         {
-            resolutionWidth = SimulationSettings.Instance.FrontCamWidth;
-            resolutionHeight = SimulationSettings.Instance.FrontCamHeight;
-            PublishRate = SimulationSettings.Instance.FrontCamRate;
-            cam.fieldOfView = SimulationSettings.Instance.FrontCamFOV;
-        }
-        else
-        {
-            resolutionWidth = SimulationSettings.Instance.DownCamWidth;
-            resolutionHeight = SimulationSettings.Instance.DownCamHeight;
-            PublishRate = SimulationSettings.Instance.DownCamRate;
-        }
-
-
-        // Texture Safety: Reuse existing if valid, otherwise create new
-        if (cam.targetTexture != null && 
-            cam.targetTexture.width == resolutionWidth && 
-            cam.targetTexture.height == resolutionHeight)
-        {
-            // Reuse existing texture (likely created by SimulatorHUD or previous run)
-            renderTexture = cam.targetTexture;
-        }
-        else
-        {
-            // Create new
-            if (cam.targetTexture != null)
+            if (SimulationSettings.Instance != null)
             {
-                cam.targetTexture.Release();
+                resolutionWidth = SimulationSettings.Instance.FrontCamWidth;
+                resolutionHeight = SimulationSettings.Instance.FrontCamHeight;
+                PublishRate = SimulationSettings.Instance.FrontCamRate;
+                if (cam != null) cam.fieldOfView = SimulationSettings.Instance.FrontCamFOV;
             }
-            renderTexture = new RenderTexture(resolutionWidth, resolutionHeight, 24);
-            renderTexture.enableRandomWrite = true;
-            renderTexture.Create();
-            cam.targetTexture = renderTexture;
+            else
+            {
+                resolutionWidth = 672;
+                resolutionHeight = 376;
+                PublishRate = 10;
+                if (cam != null) cam.fieldOfView = 40.9f;
+            }
         }
+        else
+        {
+            if (SimulationSettings.Instance != null)
+            {
+                resolutionWidth = SimulationSettings.Instance.DownCamWidth;
+                resolutionHeight = SimulationSettings.Instance.DownCamHeight;
+                PublishRate = SimulationSettings.Instance.DownCamRate;
+                if (cam != null) cam.fieldOfView = SimulationSettings.Instance.DownCamFOV;
+            }
+            else
+            {
+                resolutionWidth = 640;
+                resolutionHeight = 480;
+                PublishRate = 10;
+                if (cam != null) cam.fieldOfView = 38.2f;
+            }
+        }
+
+
+        // 1. Raw camera target texture (with depth 24 for 3D camera rendering)
+        if (rawRT != null) rawRT.Release();
+        rawRT = new RenderTexture(resolutionWidth, resolutionHeight, 24, RenderTextureFormat.ARGB32)
+        {
+            useMipMap = false,
+            enableRandomWrite = true
+        };
+        rawRT.Create();
+        if (cam != null) cam.targetTexture = rawRT;
+
+        // 2. Refracted / output texture (color buffer for ROS readback and UI feed)
+        if (renderTexture != null) renderTexture.Release();
+        renderTexture = new RenderTexture(resolutionWidth, resolutionHeight, 0, RenderTextureFormat.ARGB32)
+        {
+            useMipMap = false,
+            enableRandomWrite = true
+        };
+        renderTexture.Create();
 
         message = new ImageMsg();
         string currentFrameId = cameraType == CameraType.Front ? ROSSettings.Instance.FrontCamFrameId : ROSSettings.Instance.DownCamFrameId;
@@ -248,15 +310,153 @@ public class CameraPublisher : ROSPublisher
         // No-op: Publishing is now handled asynchronously in OnReadbackComplete
     }
 
+    private int lastRefractionFrame = -1;
+
+    private void OnValidate()
+    {
+        refractionScale = Mathf.Clamp(refractionScale, 1.0f, 2.0f);
+        if (refractionMaterial != null && cam != null)
+        {
+            UpdateRefractionMaterial();
+        }
+    }
+
+    private void EnsureRefractionResources()
+    {
+        if (refractionShader == null)
+        {
+            refractionShader = Shader.Find("Hidden/UnderwaterRefraction");
+        }
+
+        if (refractionMaterial == null && refractionShader != null)
+        {
+            refractionMaterial = new Material(refractionShader);
+        }
+
+        if (rawRT == null || rawRT.width != resolutionWidth || rawRT.height != resolutionHeight || !rawRT.IsCreated())
+        {
+            if (rawRT != null) rawRT.Release();
+            rawRT = new RenderTexture(resolutionWidth, resolutionHeight, 24, RenderTextureFormat.ARGB32)
+            {
+                useMipMap = false,
+                enableRandomWrite = true
+            };
+            rawRT.Create();
+            if (cam != null) cam.targetTexture = rawRT;
+        }
+
+        if (renderTexture == null || renderTexture.width != resolutionWidth || renderTexture.height != resolutionHeight || !renderTexture.IsCreated())
+        {
+            if (renderTexture != null) renderTexture.Release();
+            renderTexture = new RenderTexture(resolutionWidth, resolutionHeight, 0, RenderTextureFormat.ARGB32)
+            {
+                useMipMap = false,
+                enableRandomWrite = true
+            };
+            renderTexture.Create();
+        }
+    }
+
+    private void InitializeRefraction()
+    {
+        if (SimulationSettings.Instance != null)
+        {
+            simulateRefraction = SimulationSettings.Instance.SimulateWaterRefraction;
+            if (cameraType == CameraType.Down)
+            {
+                refractionScale = SimulationSettings.Instance.DownCamRefractionScale;
+            }
+            else
+            {
+                refractionScale = SimulationSettings.Instance.WaterRefractionIndex;
+            }
+        }
+
+        EnsureRefractionResources();
+
+        if (refractionMaterial != null)
+        {
+            UpdateRefractionMaterial();
+            Debug.Log($"[CameraPublisher] {cameraType} camera refraction initialized (scale={refractionScale:F4}, enabled={simulateRefraction}).");
+        }
+        else
+        {
+            Debug.LogWarning($"[CameraPublisher] Hidden/UnderwaterRefraction shader not found for {cameraType} camera!");
+        }
+    }
+
+    public void ApplyRefraction()
+    {
+        if (Application.isPlaying && Time.frameCount == lastRefractionFrame) return;
+        lastRefractionFrame = Time.frameCount;
+
+        EnsureRefractionResources();
+        if (cam == null || rawRT == null || renderTexture == null) return;
+
+        bool simulate = simulateRefraction;
+        if (SimulationSettings.Instance != null && !SimulationSettings.Instance.SimulateWaterRefraction)
+        {
+            simulate = false;
+        }
+
+        if (simulate && refractionScale > 1.0001f && refractionMaterial != null)
+        {
+            UpdateRefractionMaterial();
+            Graphics.Blit(rawRT, renderTexture, refractionMaterial);
+        }
+        else
+        {
+            Graphics.Blit(rawRT, renderTexture);
+        }
+    }
+
+    private void UpdateRefractionMaterial()
+    {
+        if (refractionMaterial == null || cam == null) return;
+
+        bool simulate = simulateRefraction;
+        if (SimulationSettings.Instance != null && !SimulationSettings.Instance.SimulateWaterRefraction)
+        {
+            simulate = false;
+        }
+
+        float fy = (resolutionHeight * 0.5f) / Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float fx = fy;
+
+        refractionMaterial.SetVector("_Resolution", new Vector4(resolutionWidth, resolutionHeight, 0, 0));
+        refractionMaterial.SetVector("_FocalLength", new Vector4(fx, fy, 0, 0));
+        refractionMaterial.SetVector("_PrincipalPoint", new Vector4(0.5f, 0.5f, 0, 0));
+        refractionMaterial.SetFloat("_RefractionIndex", refractionScale);
+        refractionMaterial.SetFloat("_Enabled", simulate ? 1.0f : 0.0f);
+        refractionMaterial.SetFloat("_FlipY", 0.0f);
+    }
 
     protected virtual void OnDestroy()
     {
+        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+
+        if (cam != null && cam.targetTexture == rawRT)
+        {
+            cam.targetTexture = null;
+        }
+
+        if (rawRT != null)
+        {
+            rawRT.Release();
+            Destroy(rawRT);
+        }
+
         if (renderTexture != null)
         {
             renderTexture.Release();
             Destroy(renderTexture);
         }
-        
+
+        if (refractionMaterial != null)
+        {
+            Destroy(refractionMaterial);
+        }
+
         if (encodingTexture != null)
         {
             Destroy(encodingTexture);

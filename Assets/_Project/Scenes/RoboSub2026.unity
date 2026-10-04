@@ -19965,6 +19965,7 @@ MonoBehaviour:
   _publishRate: 10
   cameraType: 0
   cam: {fileID: 1621375949}
+  refractionShader: {fileID: 0}
 --- !u!114 &1370920609
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21826,6 +21827,7 @@ MonoBehaviour:
   WaterRefractionIndex: 1.33333
   DownCamWidth: 640
   DownCamHeight: 480
+  DownCamFOV: 38.2
   UseJPEGCompression: 1
   JPEGQuality: 75
   PoseRate: 50
@@ -24555,6 +24557,7 @@ MonoBehaviour:
   _publishRate: 10
   cameraType: 1
   cam: {fileID: 1671108404}
+  refractionShader: {fileID: 4800000, guid: 2a0253a5b49e4283845b90c64f343080, type: 3}
 --- !u!114 &1671108403
 MonoBehaviour:
   m_ObjectHideFlags: 0

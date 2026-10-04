@@ -152,7 +152,7 @@ public class SimulationSettings : MonoBehaviour
 
     [Space(5)]
     [Header("Underwater Optics")]
-    [Tooltip("Simulate flat-port water refraction (Snell's Law) on ZED 2i stereo cameras")]
+    [Tooltip("Simulate flat-port water refraction (Snell's Law) on ZED 2i and down cameras")]
     public bool SimulateWaterRefraction = true;
 
     [Tooltip("Index of refraction for water (standard water is ~1.33333)")]
@@ -167,6 +167,14 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Down camera resolution height")]
     [Range(240, 1080)]
     public int DownCamHeight = 480;
+
+    [Tooltip("Down camera vertical FOV in degrees (ELP OV5640 60° diagonal lens: ~38.2°)")]
+    [Range(20f, 120f)]
+    public float DownCamFOV = 38.2f;
+
+    [Tooltip("Down camera refraction scale / index for Snell's law (typically ~1.333, 1.0 = disabled)")]
+    [Range(1.0f, 2.0f)]
+    public float DownCamRefractionScale = 1.33333f;
 
     [Space(5)]
     [Tooltip("Use JPEG compression for camera images (reduces bandwidth ~10x)")]
@@ -314,6 +322,8 @@ public class SimulationSettings : MonoBehaviour
         WaterRefractionIndex = float.Parse(PlayerPrefs.GetString("WaterRefractionIndex", "1.33333"));
         DownCamWidth = int.Parse(PlayerPrefs.GetString("downCamWidth", "640"));
         DownCamHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
+        DownCamFOV = float.Parse(PlayerPrefs.GetString("downCamFOV", "38.2"));
+        DownCamRefractionScale = float.Parse(PlayerPrefs.GetString("downCamRefractionScale", "1.33333"));
         UseJPEGCompression = bool.Parse(PlayerPrefs.GetString("UseJPEGCompression", "true"));
         JPEGQuality = int.Parse(PlayerPrefs.GetString("JPEGQuality", "75"));
 
@@ -418,6 +428,8 @@ public class SimulationSettings : MonoBehaviour
         PlayerPrefs.SetString("WaterRefractionIndex", WaterRefractionIndex.ToString());
         PlayerPrefs.SetString("downCamWidth", DownCamWidth.ToString());
         PlayerPrefs.SetString("downCamHeight", DownCamHeight.ToString());
+        PlayerPrefs.SetString("downCamFOV", DownCamFOV.ToString());
+        PlayerPrefs.SetString("downCamRefractionScale", DownCamRefractionScale.ToString());
         PlayerPrefs.SetString("UseJPEGCompression", UseJPEGCompression.ToString());
         PlayerPrefs.SetString("JPEGQuality", JPEGQuality.ToString());
 
