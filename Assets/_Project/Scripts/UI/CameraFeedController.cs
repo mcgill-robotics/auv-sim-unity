@@ -132,7 +132,15 @@ public class CameraFeedController
         }
         else if (selection == "Down" && downCamera != null)
         {
-            selectedTexture = downCamera.targetTexture;
+            var publisher = downCamera.GetComponent<CameraPublisher>();
+            if (publisher != null && publisher.RefractedTexture != null)
+            {
+                selectedTexture = publisher.RefractedTexture;
+            }
+            else
+            {
+                selectedTexture = downCamera.targetTexture;
+            }
         }
         else if (selection == "Front Depth" && depthPublisher != null)
         {

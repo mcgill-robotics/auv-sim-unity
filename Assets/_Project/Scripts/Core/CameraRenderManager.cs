@@ -148,6 +148,11 @@ public class CameraRenderManager : MonoBehaviour
         if (downCamera != null)
         {
             downCamera.Render();
+            var publisher = downCamera.GetComponent<CameraPublisher>();
+            if (publisher != null)
+            {
+                publisher.ApplyRefraction();
+            }
         }
     }
 }
