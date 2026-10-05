@@ -34,6 +34,10 @@ GraphicsSettings:
   - {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10770, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10783, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 4800000, guid: 0c2cb8f7e4b0c0f28a3d7a2f16c201fc, type: 3}
+  - {fileID: 4800000, guid: 2a0253a5b49e4283845b90c64f343080, type: 3}
+  - {fileID: 4800000, guid: 4bed681638857dbc59637c01b50b247f, type: 3}
+  - {fileID: 4800000, guid: acbf5b5d5a4fe3296868c736839d1a52, type: 3}
   m_PreloadedShaders: []
   m_PreloadShadersBatchTimeLimit: -1
   m_SpritesDefaultMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000,
@@ -61,8 +65,6 @@ GraphicsSettings:
   m_AlbedoSwatchInfos: []
   m_RenderPipelineGlobalSettingsMap:
     UnityEngine.Rendering.HighDefinition.HDRenderPipeline: {fileID: 11400000, guid: e6312161ff918b96db63598ba65236ef,
-      type: 2}
-    UnityEngine.Rendering.Universal.UniversalRenderPipeline: {fileID: 11400000, guid: d57e5d8b627b09d0b802112b88f97101,
       type: 2}
   m_LightsUseLinearIntensity: 1
   m_LightsUseColorTemperature: 1

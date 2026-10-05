@@ -14,7 +14,7 @@ public class BuildPlayerExample
 
         if (scenes.Length == 0)
         {
-            scenes = new string[] { "Assets/_Project/Scenes/RoboSub2026.unity" };
+            scenes = new string[] { "Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity" };
         }
 
         return scenes;

@@ -95,13 +95,34 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
             }
         }
         /// <summary>
-        /// Returns the number of valid configs (child objects) under this tag. Each child should be a visual variant with a specific Material and Labelling component
+        /// Returns the valid non-null, distinct configs under this tag.
         /// </summary>
-        /// <returns></returns>
+        public GameObject[] GetValidConfigs()
+        {
+            if (configs == null) return System.Array.Empty<GameObject>();
+            var list = new List<GameObject>();
+            for (int i = 0; i < configs.Length; i++)
+            {
+                if (configs[i] != null && !list.Contains(configs[i]))
+                {
+                    list.Add(configs[i]);
+                }
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the number of valid configs (child objects) under this tag.
+        /// </summary>
         public int GetConfigCount()
         {
-            // assume all targets have the same number of configs (child objects), so we just take first one.
-            return configs != null ? configs.Length : 0;
+            if (configs == null) return 0;
+            int count = 0;
+            for (int i = 0; i < configs.Length; i++)
+            {
+                if (configs[i] != null) count++;
+            }
+            return count;
         }
 
         public void ConfigureSpawnedObject(GameObject SpawnedObject)
