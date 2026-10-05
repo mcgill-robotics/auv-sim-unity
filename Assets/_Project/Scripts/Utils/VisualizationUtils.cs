@@ -40,6 +40,15 @@ namespace Utils
         /// </summary>
         public static Material CreateXRayMaterial(Color color, float opacity = 0.5f)
         {
+            Material template = Resources.Load<Material>("XRayGhostMaterial");
+            if (template != null)
+            {
+                Material instance = new Material(template);
+                instance.SetColor("_BaseColor", color);
+                instance.SetFloat("_Opacity", opacity);
+                return instance;
+            }
+
             Shader shader = Shader.Find("Hidden/XRayGhost");
             if (shader == null) return CreateMaterial(color); // Fallback to standard
 

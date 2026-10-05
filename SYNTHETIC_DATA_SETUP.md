@@ -19,7 +19,11 @@ If your prop has distinct faces (like a task board or gate poster) that change, 
 
 ## 2. Configuring the Scenario
 
-Once your props are labeled, you must configure the environment and camera.
+Once your props are labeled, open the appropriate data generation scene:
+- **Forward Camera:** `Assets/_Project/Scenes/Synthetic_Data_Generation_Scenes/SynthDataGen_RoboSub2026.unity`
+- **Downward Camera:** `Assets/_Project/Scenes/Synthetic_Data_Generation_Scenes/SynthDataGen_RoboSub2026_DownCam.unity`
+
+You must then configure the environment and camera.
 
 1. **Resolution Configuration:**
    It is crucial that the synthetic images match the dimensions of the real-world cameras used on the AUV.

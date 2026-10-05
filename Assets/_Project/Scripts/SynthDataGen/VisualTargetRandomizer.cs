@@ -41,7 +41,8 @@ public class VisualTargetRandomizer : Randomizer
             }
 
             int targetCount = tag.GetTargetCount();
-            int configCount = tag.GetConfigCount();
+            GameObject[] validConfigs = tag.GetValidConfigs();
+            int configCount = validConfigs.Length;
 
             if (targetCount == 0 || configCount == 0)
             {
@@ -61,7 +62,7 @@ public class VisualTargetRandomizer : Randomizer
                 }
 
                 // Wrap around if there are fewer configs than targets
-                GameObject prefabToSpawn = tag.configs[shuffledIndices[validTargetOrdinal % configCount]];
+                GameObject prefabToSpawn = validConfigs[shuffledIndices[validTargetOrdinal % configCount]];
 
                 // Lazy initialize cache for this target if it doesn't exist yet
                 if (!_caches.TryGetValue(target, out var cache))
@@ -72,7 +73,7 @@ public class VisualTargetRandomizer : Randomizer
                     }
 
                     // Cache is parented to the container target so that objects are organized in the hierarchy and automatically cleaned up if target is destroyed
-                    cache = new GameObjectOneWayCache(tag.ConfigContainers[targetIndex].transform, tag.configs, this);
+                    cache = new GameObjectOneWayCache(tag.ConfigContainers[targetIndex].transform, validConfigs, this);
                     _caches[target] = cache;
                 }
 

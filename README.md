@@ -190,7 +190,11 @@ Assets/
 │   │   ├── AudioSettings/       # Audio configuration
 │   │   └── PointsSettings/      # Scoring & points logic
 │   ├── UI/                      # UI Toolkit Assets (.uxml, .uss)
-│   ├── Scenes/                  # Unity Scenes (Pools, Tests)
+│   ├── Scenes/                  # Unity Scenes
+│   │   ├── Main_Scenes/         # Primary simulation scenes (RoboSub2026, McGill_Pool, PreQual)
+│   │   ├── Synthetic_Data_Generation_Scenes/ # Perception ML data generation scenes
+│   │   ├── ConfigScene_NormalPool/ # Lighting & volume settings for main pools
+│   │   └── ConfigScene_SynthDataGen/ # Lighting & volume settings for data gen
 │   ├── Prefabs/                 # AUV parts, Props, Gates
 │   ├── Models/                  # 3D Models & imports
 │   ├── Materials/               # Custom materials
@@ -208,8 +212,8 @@ Assets/
 
 ### Prerequisites
 
+- **Git & Git LFS:** Large binary assets (sky cubemaps, HDRIs) are tracked with [Git LFS](https://git-lfs.com/). Git LFS must be installed and initialized (`git lfs install`) before cloning, or textures will only download as lightweight text pointers.
 - **Unity Hub**
-
 - **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
 - **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
@@ -235,11 +239,22 @@ The simulator relies on the ZED SDK. Due to GitHub file size limits, the require
 
 ### Setup Steps
 
-1. Clone the repository.
-2. **Perform the ZED Plugin Setup (see above).**
-3. Open the project via Unity Hub.
-4. Allow Unity to import assets and compile scripts.
-5. Navigate to the top menu `Robotics -> ROS Settings` and ensure the IP address matches your ROS machine (or `127.0.0.1` if running locally).
+1. **Install Git LFS** (if not already installed) and initialize it once:
+    ```bash
+    git lfs install
+    ```
+2. **Clone the repository:**
+    ```bash
+    git clone https://github.com/mcgill-robotics/auv-sim-unity.git
+    cd auv-sim-unity
+    ```
+    > [!TIP]
+    > If you already cloned without Git LFS installed, run `git lfs pull` inside the repository to fetch the actual binary assets.
+3. **Perform the ZED Plugin Setup (see above).**
+4. Open the project via Unity Hub.
+5. Allow Unity to import assets and compile scripts.
+6. In the Project window, open the primary scene at `Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity`.
+7. Navigate to the top menu `Robotics -> ROS Settings` and ensure the IP address matches your ROS machine (or `127.0.0.1` if running locally).
 
 ### ROS Setup
 
@@ -261,7 +276,7 @@ The simulator relies on the ZED SDK. Due to GitHub file size limits, the require
     *Sometimes ros_tcp_endpoint fails on the ros2 end, you just need to run this command again*
 
 2. **Verify Connection**
-    - Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
+    - Open the main scene `Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity`.
     - In Unity: Press Play. The ROS Settings menu should show a green "Connected" status.
     - In Terminal: You should see logs indicating registration of publishers (e.g., RegisterPublisher(/sensors/dvl/data, ...)).
 
@@ -287,7 +302,7 @@ The simulator relies on the ZED SDK. Due to GitHub file size limits, the require
 
 ### Running a Simulation
 
-1. Open the scene `Assets/_Project/Scenes/25x50Pool.unity`.
+1. Open the primary competition scene `Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity` (or `McGill_Pool.unity` for testing in the McGill pool environment).
 2. Press **Play**.
 3. The **Simulator HUD** will appear. Use the left panel to toggle specific sensors or adjust camera framerates.
 4. Click **Apply Configuration** to save changes.
@@ -320,7 +335,10 @@ The simulator includes a `CompetitionManager` that orchestrates specific tasks (
 
 ### Synthetic Data Generation
 
-The simulator includes a comprehensive programmatic synthetic data generator built on the Unity Perception package for training computer vision models.
+The simulator includes a comprehensive programmatic synthetic data generator built on the Unity Perception package for training computer vision models. Synthetic data generation scenes are located in `Assets/_Project/Scenes/Synthetic_Data_Generation_Scenes/`:
+- **Forward Camera Scene:** `Assets/_Project/Scenes/Synthetic_Data_Generation_Scenes/SynthDataGen_RoboSub2026.unity`
+- **Downward Camera Scene:** `Assets/_Project/Scenes/Synthetic_Data_Generation_Scenes/SynthDataGen_RoboSub2026_DownCam.unity`
+
 For detailed instructions on configuring props, running the generator, and converting the dataset, please read the [Synthetic Data Setup Guide](SYNTHETIC_DATA_SETUP.md).
 
 ### CI/CD & Build Pipeline

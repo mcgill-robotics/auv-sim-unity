@@ -6,7 +6,7 @@ Shader "Hidden/LinearDepthResampler"
     }
     SubShader
     {
-        Tags { "RenderPipeline"="HDRP" }
+        Tags { "RenderPipeline"="HDRenderPipeline" }
         Pass
         {
             ZWrite Off ZTest Always Cull Off Blend Off

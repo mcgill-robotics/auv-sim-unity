@@ -8,11 +8,12 @@ Shader "Custom/TorpedoOutline"
 
     SubShader
     {
-        Tags { "RenderPipeline"="HDRP" "RenderType"="Opaque" "Queue"="Transparent" }
+        Tags { "RenderPipeline"="HDRenderPipeline" "RenderType"="Opaque" "Queue"="Transparent" }
         
         Pass
         {
-            Name "OutlinePass"
+            Name "ForwardOnly"
+            Tags { "LightMode" = "ForwardOnly" }
             Cull Front // Render back faces
             ZWrite On
             ZTest LEqual

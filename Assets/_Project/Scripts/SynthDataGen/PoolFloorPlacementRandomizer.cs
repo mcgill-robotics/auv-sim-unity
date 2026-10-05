@@ -86,8 +86,8 @@ public class PoolFloorPlacementRandomizer : Randomizer
             return;
         }
 
-        // Build prefab array for cache
-        var prefabArray = validConfigs.Select(c => c.prefab).ToArray();
+        // Build prefab array for cache (must be distinct to prevent cache duplicate exceptions)
+        var prefabArray = validConfigs.Select(c => c.prefab).Distinct().ToArray();
         _gameObjectCache = new GameObjectOneWayCache(_container.transform, prefabArray, this);
     }
 

@@ -18,22 +18,33 @@ namespace Utils
         {
             if (ghostMaterial == null)
             {
-                // Fallback: try to find the shader and create a material
-                Shader xRayShader = Shader.Find("Hidden/XRayGhost");
-                if (xRayShader != null)
+                // 1. Try to load from Resources
+                ghostMaterial = Resources.Load<Material>("XRayGhostMaterial");
+
+                // 2. Fallback: try to find the shader and create an engine material
+                if (ghostMaterial == null)
                 {
-                    ghostMaterial = CoreUtils.CreateEngineMaterial(xRayShader);
-                }
-                else
-                {
-                    return;
+                    Shader xRayShader = Shader.Find("Hidden/XRayGhost");
+                    if (xRayShader != null)
+                    {
+                        ghostMaterial = CoreUtils.CreateEngineMaterial(xRayShader);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[XRayCustomPass] XRayGhost material or shader could not be found! Skipping pass.");
+                        return;
+                    }
                 }
             }
 
             // Draw Ghost part (Occluded)
             // This pass overrides with our XRay material (which has ZTest Greater).
-            // We use the 'ghostMaterial' which will respect Per-Renderer MaterialPropertyBlocks for color.
-            CustomPassUtils.DrawRenderers(ctx, targetLayer, RenderQueueType.All, ghostMaterial, 0, new RenderStateBlock(RenderStateMask.Nothing), SortingCriteria.None);
+            // Explicitly override depth state to CompareFunction.Greater and depth write false.
+            var stateBlock = new RenderStateBlock(RenderStateMask.Depth)
+            {
+                depthState = new DepthState(false, CompareFunction.Greater)
+            };
+            CustomPassUtils.DrawRenderers(ctx, targetLayer, RenderQueueType.All, ghostMaterial, 0, stateBlock, SortingCriteria.None);
         }
 
         protected override void Cleanup()
