@@ -226,7 +226,7 @@ The simulator relies on the ZED SDK. Due to GitHub file size limits, the require
 **You must follow these steps or the project will have compile errors:**
 
 1. **Install ZED Drivers:**
-    You must install the **ZED SDK (v5.1)** on your computer for the camera drivers to work.
+    You must install the **ZED SDK (v5.4)** on your computer for the camera drivers to work.
     - [Download ZED SDK Here](https://www.stereolabs.com/developers/release/)
 
 2. **Add Missing Binaries:**
