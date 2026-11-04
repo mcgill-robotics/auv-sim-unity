@@ -42,7 +42,7 @@ namespace Utils
                             element.resolvedStyle.borderTopWidth > 0 ||
                             element is Button || element is Toggle || element is TextField ||
                             element is ScrollView || element is DropdownField ||
-                            element.name.StartsWith("Drawer") || element.name.StartsWith("TopBar"))
+                            element.name.StartsWith("Drawer"))
                         {
                             return true;
                         }

@@ -23,7 +23,6 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
   - [Workflows](#workflows)
     - [Running a Simulation](#running-a-simulation)
     - [Manual Control](#manual-control)
-    - [Competition Logic (TODO)](#competition-logic-todo)
     - [Synthetic Data Generation](#synthetic-data-generation)
     - [CI/CD & Build Pipeline](#cicd--build-pipeline)
     - [Unity Editor Tips](#unity-editor-tips)
@@ -108,11 +107,8 @@ graph TD
         subgraph User_Interaction [UI & Logic]
             style User_Interaction fill:#1c1c1c,stroke:#666,color:#fff
             HUD[Simulator HUD]:::logic
-            CompMgr[Competition Manager]:::logic
-            Tasks[Task Logic]:::logic
-            
+
             HUD --> Settings
-            CompMgr --> Tasks
         end
     end
 
@@ -184,11 +180,9 @@ Assets/
 │   │   ├── Physics/             # Buoyancy & Hydrodynamics
 │   │   ├── UI/                  # HUD Controllers & Logic
 │   │   ├── Utils/               # Helpers (Visualization, Math)
-│   │   ├── CompetitionSettings/ # Task-specific logic & scoring
 │   │   ├── SynthDataGen/        # Synthetic data generation for ML
 │   │   ├── UserCamera/          # Freecam & Orbit controls
-│   │   ├── AudioSettings/       # Audio configuration
-│   │   └── PointsSettings/      # Scoring & points logic
+│   │   └── AudioSettings/       # Audio configuration
 │   ├── UI/                      # UI Toolkit Assets (.uxml, .uss)
 │   ├── Scenes/                  # Unity Scenes
 │   │   ├── Main_Scenes/         # Primary simulation scenes (RoboSub2026, McGill_Pool, PreQual)
@@ -262,7 +256,7 @@ The simulator relies on the ZED SDK. Due to GitHub file size limits, the require
 
     ```bash
     # Build ROS workspace
-    source /opt/ros/humble/setup.bash
+    source /opt/ros/jazzy/setup.bash
     cd <AUV-2026>/
     ./build.sh
     
@@ -324,14 +318,6 @@ When the simulator is running, you can manually override ROS commands using the 
 - **Drop Marker:** G
 - **Shoot Torpedo/Reset:** T / Y
 - **Toggle Camera Mode:** C
-
-### Competition Logic (TODO)
-
-The simulator includes a `CompetitionManager` that orchestrates specific tasks (e.g., Gate, Buoy, Bins).
-
-1. In the HUD, select the desired task from the dropdown.
-2. Click **Initiate Run**.
-3. The simulator will reset the AUV and props to the starting configuration for that task.
 
 ### Synthetic Data Generation
 
