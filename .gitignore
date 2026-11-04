@@ -31,8 +31,9 @@
 # Jetbrains Rider personal-layer settings
 *.DotSettings.user
 
-# Visual Studio cache directory
+# Visual Studio / VS Code
 .vs/
+.vscode/
 
 # Gradle cache directory
 .gradle/
@@ -43,6 +44,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
@@ -109,3 +111,6 @@ Assets/Plugins/sl_zed64.dll.meta
 Assets/Resources/PerceptionPackageVersion.json*
 Assets/Resources/PerformanceTestRunInfo.json*
 Assets/Resources/PerformanceTestRunSettings.json*
+
+# Temporary compile-check projects
+.simcheck-*.csproj
