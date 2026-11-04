@@ -41,7 +41,7 @@ namespace UnityEngine.Perception.Analytics
 
         static void OnSimulationShutdown()
         {
-            var perceptionCameras = Object.FindObjectsOfType<PerceptionCamera>();
+            var perceptionCameras = Object.FindObjectsByType<PerceptionCamera>(FindObjectsSortMode.InstanceID);
             ReportScenarioInformation(
                 perceptionCameras,
                 ScenarioBase.activeScenario

@@ -362,7 +362,7 @@ namespace UnityEngine.Perception.GroundTruth.Labelers
                 };
 
                 m_CachedInstanceIds[m_CurrentFrame] = new NativeArray<uint>(
-                    LabelManager.singleton.instanceIds, Allocator.Persistent);
+                    LabelManager.singleton.instanceIds.AsArray(), Allocator.Persistent);
 
                 if (keypointEntries.Count != 0)
                     DoDepthCheck(scriptableRenderContext, keypointEntries, checkLocations);
@@ -554,7 +554,7 @@ namespace UnityEngine.Perception.GroundTruth.Labelers
                 var listStart = checkLocations.Length;
                 checkLocations.Resize(checkLocations.Length + activeTemplate.keypoints.Length, NativeArrayOptions.ClearMemory);
                 //grab the slice of the list for the current object to assign positions in
-                var checkLocationsSlice = new NativeSlice<float3>(checkLocations, listStart);
+                var checkLocationsSlice = new NativeSlice<float3>(checkLocations.AsArray(), listStart);
 
                 var transform = perceptionCamera.transform;
                 var cameraPosition = transform.position;

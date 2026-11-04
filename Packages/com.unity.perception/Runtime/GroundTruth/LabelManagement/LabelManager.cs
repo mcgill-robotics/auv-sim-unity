@@ -82,7 +82,7 @@ namespace UnityEngine.Perception.GroundTruth.LabelManagement
             instanceSegmentationColors = new NativeList<Color32>(16, Allocator.Persistent);
             instanceSegmentationColors.Add(new Color32(0, 0, 0, 255));
 
-            RenderPipelineManager.beginFrameRendering += BeginFrameRendering;
+            RenderPipelineManager.beginContextRendering += BeginFrameRendering;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace UnityEngine.Perception.GroundTruth.LabelManagement
         /// </summary>
         void Cleanup()
         {
-            RenderPipelineManager.beginFrameRendering -= BeginFrameRendering;
+            RenderPipelineManager.beginContextRendering -= BeginFrameRendering;
             if (instanceIds.IsCreated)
                 instanceIds.Dispose();
             if (instanceSegmentationColors.IsCreated)
@@ -281,7 +281,7 @@ namespace UnityEngine.Perception.GroundTruth.LabelManagement
             }
         }
 
-        void BeginFrameRendering(ScriptableRenderContext ctx, Camera[] cameras)
+        void BeginFrameRendering(ScriptableRenderContext ctx, List<Camera> cameras)
         {
             if (m_PreviousFrameIndex == Time.frameCount)
                 return;

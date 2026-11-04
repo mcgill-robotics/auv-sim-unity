@@ -53,7 +53,7 @@ namespace RandomizerTests
             m_Tag.specifyColorAsList = true;
             m_Tag.colorList = new CategoricalParameter<Color>();
 
-            lightData.intensity = chosenIntensity;
+            light.intensity = chosenIntensity;
             light.useColorTemperature = true;
             light.colorTemperature = chosenTemperature;
             light.color = chosenColor;
@@ -61,7 +61,7 @@ namespace RandomizerTests
             yield return null;
             yield return null;
 
-            Assert.AreEqual(chosenIntensity, lightData.intensity);
+            Assert.AreEqual(chosenIntensity, light.intensity);
             Assert.AreEqual(chosenTemperature, light.colorTemperature);
             Assert.AreEqual(chosenColor, light.color);
         }
@@ -78,7 +78,7 @@ namespace RandomizerTests
             var chosenTemperature = Random.Range(1500f, 6500f);
             var chosenColor = Random.ColorHSV();
 
-            lightData.intensity = chosenIntensity;
+            light.intensity = chosenIntensity;
             light.colorTemperature = chosenTemperature;
             lightData.color = chosenColor;
 
@@ -98,7 +98,7 @@ namespace RandomizerTests
 
             // Do they remain the same (i.e. are not randomized)
             light.enabled = true;
-            Assert.AreEqual(chosenIntensity, lightData.intensity);
+            Assert.AreEqual(chosenIntensity, light.intensity);
             Assert.AreEqual(chosenTemperature, light.colorTemperature);
             Assert.AreEqual(chosenColor, light.color);
         }
@@ -132,7 +132,7 @@ namespace RandomizerTests
             yield return null;
             yield return null;
 
-            Assert.IsTrue(intensities.Contains(lightData.intensity));
+            Assert.IsTrue(intensities.Contains(light.intensity));
             Assert.IsTrue(temperatures.Contains(light.colorTemperature));
             Assert.IsTrue(colors.Contains(light.color));
         }
@@ -146,7 +146,7 @@ namespace RandomizerTests
 
             // Make sure values do not start off valid
             light.colorTemperature = 1000f;
-            lightData.intensity = 9000f;
+            light.intensity = 9000f;
             light.color = Color.green;
 
             // Setup tag
@@ -175,7 +175,7 @@ namespace RandomizerTests
             yield return null;
             yield return null;
 
-            Assert.IsTrue(lightData.intensity >= 3001f && lightData.intensity <= 4001f);
+            Assert.IsTrue(light.intensity >= 3001f && light.intensity <= 4001f);
             Assert.IsTrue(light.colorTemperature >= 3002f && light.colorTemperature <= 4002f);
             Assert.AreEqual("RGBA(0.500, 0.500, 0.500, 1.000)", light.color.ToString());
         }

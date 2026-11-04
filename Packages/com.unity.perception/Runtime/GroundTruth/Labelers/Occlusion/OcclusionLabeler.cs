@@ -484,7 +484,7 @@ namespace UnityEngine.Perception.GroundTruth.Labelers
             }
 
             // Alert this labeler's subscribers that the occlusion metrics have been calculated for this frame.
-            occlusionMetricsComputed?.Invoke(frameCount, messages);
+            occlusionMetricsComputed?.Invoke(frameCount, messages.AsArray());
 
             // Convert native metric data to a managed list of generic messages for dataset reporting.
             var genericMessages = new IMessageProducer[messages.Length];
@@ -498,7 +498,7 @@ namespace UnityEngine.Perception.GroundTruth.Labelers
             metric.Report(payload);
 
             // Visualize the calculated occlusion metrics.
-            VisualizeMetrics(messages);
+            VisualizeMetrics(messages.AsArray());
 
             messages.Dispose();
         }

@@ -119,8 +119,8 @@ namespace UnityEditor.Perception.GroundTruth
             {
                 if (serializedObject.FindProperty(nameof(perceptionCamera.useAccumulation)).boolValue && (DateTime.Now - m_SceneStatusUpdateTime).TotalMilliseconds > k_UpdateInterval)
                 {
-                    m_OtherPerceptionCameras = FindObjectsOfType<PerceptionCamera>();
-                    m_Scenario = FindObjectOfType<ScenarioBase>();
+                    m_OtherPerceptionCameras = FindObjectsByType<PerceptionCamera>(FindObjectsSortMode.InstanceID);
+                    m_Scenario = FindFirstObjectByType<ScenarioBase>();
                     m_SceneStatusUpdateTime = DateTime.Now;
                 }
 

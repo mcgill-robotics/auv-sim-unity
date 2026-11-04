@@ -495,7 +495,7 @@ namespace GroundTruthTests
             AddSceneForCleanup("AnimatedSkinnedMeshRenderer");
             //wait a frame for the scene to load
             yield return null;
-            var labeling = Object.FindObjectOfType<Labeling>();
+            var labeling = Object.FindFirstObjectByType<Labeling>();
             labeling.labels = new List<string>() { "label" };
             labeling.RefreshLabeling();
             var cameraPosition = new Vector3(0, 0, -10);

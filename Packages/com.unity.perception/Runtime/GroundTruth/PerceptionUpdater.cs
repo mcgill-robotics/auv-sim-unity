@@ -5,6 +5,9 @@ using UnityEngine.Perception.GroundTruth.LabelManagement;
 using UnityEngine.Perception.GroundTruth.Sensors.Channels;
 using UnityEngine.Perception.GroundTruth.Utilities;
 using UnityEngine.Rendering;
+#if HDRP_PRESENT
+using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace UnityEngine.Perception.GroundTruth
 {
@@ -91,7 +94,7 @@ namespace UnityEngine.Perception.GroundTruth
             if (PerceptionCamera.visualizedPerceptionCamera != null)
                 AsyncGPUReadback.WaitAllRequests();
 
-            // BlitVisualizedPerceptionCameraToScreen(ctx);
+            BlitVisualizedPerceptionCameraToScreen(ctx);
         }
 
         /// <summary>
@@ -131,12 +134,46 @@ namespace UnityEngine.Perception.GroundTruth
                         highestPriorityCamera = camera;
             }
 
-            var rgbChannel = highestPriorityCamera.GetChannel<RGBChannel>();
+            if (!NeedsBlitToScreen(highestPriorityCamera))
+                return;
+
+            // The RGB channel is enabled in PerceptionCamera.Start, which can run after the first frame renders.
+            if (!highestPriorityCamera.TryGetChannel<RGBChannel>(out var rgbChannel) || rgbChannel.outputTexture == null)
+                return;
+
             var cmd = CommandBufferPool.Get("Blit Visualized Perception Camera To Screen");
             cmd.Blit(rgbChannel.outputTexture, (RenderTexture)null);
             ctx.ExecuteCommandBuffer(cmd);
             ctx.Submit();
             CommandBufferPool.Release(cmd);
+        }
+
+        /// <summary>
+        /// Returns true only when the screen would otherwise not show this camera's image.
+        /// </summary>
+        /// <remarks>
+        /// The blit copies the RGB channel, which is captured by an AfterPostProcess custom pass, over the back
+        /// buffer. That is only needed when a sensor has turned the attached camera into an HDRP fullscreen
+        /// passthrough camera (super sampling, or the cubemap/fisheye sensor), because then HDRP draws nothing for
+        /// it and the real image lives in an offscreen texture.
+        ///
+        /// In every other case HDRP has already drawn the camera to the screen, so the blit is redundant at best.
+        /// On HDRP 17 (Unity 6) it is also harmful: HDRP sets SupportedRenderingFeatures.rendersUIOverlay and draws
+        /// Screen Space Overlay canvases itself at the end of the camera render, after post processing. The blit runs
+        /// after that, so it paints over every overlay canvas, including Perception's own segmentation overlay.
+        /// If the PerceptionCamera renders into a targetTexture, the blit also replaces whatever the game view camera
+        /// drew with the sensor image.
+        /// </remarks>
+        static bool NeedsBlitToScreen(PerceptionCamera perceptionCamera)
+        {
+            var camera = perceptionCamera.attachedCamera;
+            if (camera == null || camera.targetTexture != null)
+                return false;
+#if HDRP_PRESENT
+            return camera.TryGetComponent<HDAdditionalCameraData>(out var cameraData) && cameraData.fullscreenPassthrough;
+#else
+            return false;
+#endif
         }
     }
 }

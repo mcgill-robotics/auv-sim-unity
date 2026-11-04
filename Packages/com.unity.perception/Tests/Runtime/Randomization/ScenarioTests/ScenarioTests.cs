@@ -329,7 +329,7 @@ namespace RandomizationTests.ScenarioTests
             yield return null;
             yield return null;
 
-            var cameras = Object.FindObjectsOfType<PerceptionCamera>();
+            var cameras = Object.FindObjectsByType<PerceptionCamera>(FindObjectsSortMode.InstanceID);
             var scenarioCompletedData = ScenarioCompletedData.FromCamerasAndRandomizers(cameras, m_Scenario);
             var actualRandomizerJson = RemoveWhitespace(JsonConvert.SerializeObject(scenarioCompletedData));
             actualRandomizerJson = actualRandomizerJson.Replace(".00", ".0");

@@ -55,7 +55,7 @@ namespace UnityEngine.Perception.GroundTruth
             using (new ProfilingScope(cmd, new ProfilingSampler("Rendered Object Info Computer")))
             {
                 // Make a copy of the current list of instance ids from the LabelManager.
-                var instanceIds = new NativeArray<uint>(LabelManager.singleton.instanceIds, Allocator.Persistent);
+                var instanceIds = new NativeArray<uint>(LabelManager.singleton.instanceIds.AsArray(), Allocator.Persistent);
 
                 // Allocate a new compute buffer to store the bounding box data calculated for each rendered object.
                 var instanceBoundingBoxBuffer = new ComputeBuffer(Math.Max(256, instanceIds.Length), sizeof(uint) * 5);
@@ -106,7 +106,7 @@ namespace UnityEngine.Perception.GroundTruth
                     var savedHierarchy = PerceptionCamera.savedHierarchies[frame];
                     // Invoke the RenderedObjectInfo callbacks.
                     callback(
-                        frame, renderedObjectInfos,
+                        frame, renderedObjectInfos.AsArray(),
                         // from the full hierarchy, only keeps the instance ids which are visible for
                         // the current perception camera
                         savedHierarchy.FilteredClone(instanceIdSet)

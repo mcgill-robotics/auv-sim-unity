@@ -82,7 +82,7 @@ namespace UnityEngine.Perception.Randomization.Utilities
             public void Execute()
             {
                 var newSamples = Sample(width, height, minimumRadius, seed, samplingResolution, Allocator.Temp);
-                samples.AddRange(newSamples);
+                samples.AddRange(newSamples.AsArray());
                 newSamples.Dispose();
             }
         }

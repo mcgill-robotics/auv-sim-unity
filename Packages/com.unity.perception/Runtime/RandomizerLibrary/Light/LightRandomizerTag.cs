@@ -157,13 +157,13 @@ namespace UnityEngine.Perception.Randomization.Randomizers
             // Randomize intensity
             if (!specifyIntensityAsList)
             {
-                LightData.SetIntensity(intensity.Sample(), LightData.lightUnit);
+                SetIntensityInCurrentUnit(intensity.Sample());
             }
             else
             {
                 if (intensityList.Count > 0)
                 {
-                    LightData.SetIntensity(intensityList.Sample(), LightData.lightUnit);
+                    SetIntensityInCurrentUnit(intensityList.Sample());
                 }
             }
 #endif
@@ -197,5 +197,17 @@ namespace UnityEngine.Perception.Randomization.Randomizers
                 }
             }
         }
+#if HDRP_PRESENT
+
+        // Same conversion HDAdditionalLightData.SetIntensity(value, lightUnit) does in HDRP 17, where that
+        // method is obsolete. Light.intensity is stored in the light type's native unit, while the sampled
+        // value is in the unit chosen on the Light component (Light.lightUnit).
+        void SetIntensityInCurrentUnit(float value)
+        {
+            // Fully qualified: UnityEngine.Rendering also has a FloatParameter that clashes with Perception's.
+            Light.intensity = UnityEngine.Rendering.LightUnitUtils.ConvertIntensity(
+                Light, value, Light.lightUnit, UnityEngine.Rendering.LightUnitUtils.GetNativeLightUnit(Light.type));
+        }
+#endif
     }
 }

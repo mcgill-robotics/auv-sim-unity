@@ -268,7 +268,7 @@ namespace UnityEngine.Perception.GroundTruth.Utilities
 
             public void ExecuteCallback()
             {
-                callback?.Invoke(encodedData);
+                callback?.Invoke(encodedData.AsArray());
                 encodedData.Dispose();
             }
         }
@@ -291,7 +291,7 @@ namespace UnityEngine.Perception.GroundTruth.Utilities
                 NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref output, AtomicSafetyHandle.Create());
 #endif
                 encodedData.Resize(output.Length, NativeArrayOptions.UninitializedMemory);
-                output.CopyTo(encodedData);
+                output.CopyTo(encodedData.AsArray());
                 output.Dispose();
             }
         }

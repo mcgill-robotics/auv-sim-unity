@@ -742,7 +742,7 @@ namespace UnityEngine.Perception.GroundTruth
         }
 
 #if HDRP_PRESENT
-        void PrepareSubFrameCallBack(ScriptableRenderContext cntx, Camera[] cams)
+        void PrepareSubFrameCallBack(ScriptableRenderContext cntx, List<Camera> cams)
         {
             // required for accumulation
             m_RenderPipeline?.PrepareNewSubFrame();
@@ -754,8 +754,8 @@ namespace UnityEngine.Perception.GroundTruth
         {
 #if HDRP_PRESENT
             // Makes sure it is only added once
-            RenderPipelineManager.beginFrameRendering -= PrepareSubFrameCallBack;
-            RenderPipelineManager.beginFrameRendering += PrepareSubFrameCallBack;
+            RenderPipelineManager.beginContextRendering -= PrepareSubFrameCallBack;
+            RenderPipelineManager.beginContextRendering += PrepareSubFrameCallBack;
             var acc = PerceptionSettings.instance.accumulationSettings;
 
             // We use +1 on accumulation samples because the last frame of accumulation can be the denoised frame which doesn't include actual accumulation samples, for this reason it is best to add an extra frame
@@ -767,7 +767,7 @@ namespace UnityEngine.Perception.GroundTruth
         {
 #if HDRP_PRESENT
             // Needed in order to change back Time variables before continuing with normal simulation
-            RenderPipelineManager.beginFrameRendering -= PrepareSubFrameCallBack;
+            RenderPipelineManager.beginContextRendering -= PrepareSubFrameCallBack;
             m_RenderPipeline?.EndRecording();
 #endif
             m_AccumulatingSensorsCapturedOrNot = null;
@@ -790,7 +790,7 @@ namespace UnityEngine.Perception.GroundTruth
 #if HDRP_PRESENT
             // Time variables change within PrepareSubFrameCallBack, without this the time variables keep changing
             // Even when exiting play mode
-            RenderPipelineManager.beginFrameRendering -= PrepareSubFrameCallBack;
+            RenderPipelineManager.beginContextRendering -= PrepareSubFrameCallBack;
             m_RenderPipeline?.EndRecording();
 #endif
         }
