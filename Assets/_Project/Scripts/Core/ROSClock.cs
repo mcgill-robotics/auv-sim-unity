@@ -58,11 +58,11 @@ public class ROSClock : ROSPublisher
         base.Start();
         clockMsg = new ClockMsg();
         clockMsg.clock = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
-        
-        if (PlayerPrefs.HasKey("clockTimePassed"))
-        {
-            clockTimePassed = double.Parse(PlayerPrefs.GetString("clockTimePassed"));
-        }
+
+        // Sim time starts at 0 every play session. It used to be persisted in PlayerPrefs,
+        // which made /clock continue from wherever the last session (on that machine) stopped.
+        PlayerPrefs.DeleteKey("clockTimePassed");
+        clockTimePassed = 0;
     }
 
     protected override void RegisterPublisher()
@@ -87,9 +87,4 @@ public class ROSClock : ROSPublisher
         ros.Publish(Topic, clockMsg);
     }
 
-    private void OnApplicationQuit()
-    {
-        PlayerPrefs.SetString("clockTimePassed", clockTimePassed.ToString());
-        PlayerPrefs.Save();
-    }
 }

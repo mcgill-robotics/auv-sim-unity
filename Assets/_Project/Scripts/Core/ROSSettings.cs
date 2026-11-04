@@ -22,6 +22,9 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Topic for individual thruster force commands (8 thrusters)")]
     public string ThrusterForcesTopic = "/propulsion/forces";
 
+    [Tooltip("Grabber/dropper opening command (UInt8, 0 = closed, 255 = fully open). Matches the AUV planner's /actuators/grabber")]
+    public string GrabberTopic = "/actuators/grabber";
+
     [Tooltip("Topic for dropper trigger command (Bool)")]
     public string DropperTopic = "/auv/dropper/trigger";
 
@@ -29,7 +32,7 @@ public class ROSSettings : MonoBehaviour
     public string GripperTopic = "/auv/gripper/trigger";
 
     [Tooltip("Topic for torpedo launch command (Bool)")]
-    public string TorpedoLaunchTopic = "/auv/torpedo/launch";
+    public string TorpedoLaunchTopic = "/actuators/torpedo";
 
     [Tooltip("Topic for torpedo reset command (Bool)")]
     public string TorpedoResetTopic = "/auv/torpedo/reset";
@@ -109,9 +112,9 @@ public class ROSSettings : MonoBehaviour
     public string BaseLinkFrameId = "auv_link";
     public string ImuFrameId = "imu_link";
     public string DvlFrameId = "dvl_link";
-    public string FrontCamFrameId = "zed_left_camera_optical_frame";
+    public string FrontCamFrameId = "zed_left_camera_frame_optical";
     public string DownCamFrameId = "down_camera_optical_frame";
-    public string DepthCamFrameId = "zed_left_camera_optical_frame";
+    public string DepthCamFrameId = "zed_left_camera_frame_optical";
     public string PressureFrameId = "pressure_link";
 
     private void Awake()
