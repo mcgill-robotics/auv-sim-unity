@@ -134,8 +134,11 @@ public class CameraRenderManager : MonoBehaviour
         if (frontCamera != null)
         {
             frontCamera.Render();
+            // ApplyRefraction is guarded to run once per frame, so this is safe even
+            // if the endCameraRendering callback already applied it.
+            CameraPublisher.ForCamera(frontCamera)?.ApplyRefraction();
         }
-        
+
         // Also render right camera for ZED stereo streaming
         if (frontRightCamera != null && SimulationSettings.Instance.StreamZEDCamera)
         {
@@ -148,11 +151,7 @@ public class CameraRenderManager : MonoBehaviour
         if (downCamera != null)
         {
             downCamera.Render();
-            var publisher = downCamera.GetComponent<CameraPublisher>();
-            if (publisher != null)
-            {
-                publisher.ApplyRefraction();
-            }
+            CameraPublisher.ForCamera(downCamera)?.ApplyRefraction();
         }
     }
 }

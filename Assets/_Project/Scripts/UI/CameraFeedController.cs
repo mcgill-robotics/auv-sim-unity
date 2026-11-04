@@ -120,10 +120,18 @@ public class CameraFeedController
         
         if (selection == "Front Left" && frontLeftCamera != null)
         {
+            // ZED streaming on: show the ZED refracted texture. ZED streaming off: show the
+            // front CameraPublisher's refracted texture. camera.targetTexture is the raw
+            // render from before refraction, so it is only a last resort.
             var zedSender = frontLeftCamera.GetComponent<ZED2iSimSender>();
-            if (zedSender != null && zedSender.RefractedLeftTexture != null)
+            var publisher = CameraPublisher.ForCamera(frontLeftCamera);
+            if (zedSender != null && zedSender.enabled && zedSender.RefractedLeftTexture != null)
             {
                 selectedTexture = zedSender.RefractedLeftTexture;
+            }
+            else if (publisher != null && publisher.RefractedTexture != null)
+            {
+                selectedTexture = publisher.RefractedTexture;
             }
             else
             {
@@ -132,7 +140,7 @@ public class CameraFeedController
         }
         else if (selection == "Down" && downCamera != null)
         {
-            var publisher = downCamera.GetComponent<CameraPublisher>();
+            var publisher = CameraPublisher.ForCamera(downCamera);
             if (publisher != null && publisher.RefractedTexture != null)
             {
                 selectedTexture = publisher.RefractedTexture;

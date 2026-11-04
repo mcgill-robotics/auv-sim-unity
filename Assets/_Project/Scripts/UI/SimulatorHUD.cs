@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 using Unity.Robotics.ROSTCPConnector;
 using System.Collections.Generic;
 /// <summary>
-/// Main HUD coordinator. Manages drawer system, logging, competition UI, and delegates
+/// Main HUD coordinator. Manages drawer system, logging, and delegates
 /// specific functionality to specialized controllers.
 /// </summary>
 public class SimulatorHUD : MonoBehaviour
@@ -42,12 +42,6 @@ public class SimulatorHUD : MonoBehaviour
     // UI Update Throttling (Performance Optimization)
     private float lastUIUpdateTime;
     private const float UI_UPDATE_INTERVAL = 0.1f; // 10Hz
-
-    // UI Elements - Competition
-    private Label textTimer;
-    private Label textScore;
-    private DropdownField dropdownTask;
-    private Button btnStartComp;
 
     // UI Elements - Logging
     private Label textLog;
@@ -147,12 +141,6 @@ public class SimulatorHUD : MonoBehaviour
         telemetryIndicator = root.Q<Label>("TelemetryDrawer-Indicator");
         sensorsIndicator = root.Q<Label>("SensorsDrawer-Indicator");
         cameraIndicator = root.Q<Label>("CameraDrawer-Indicator");
-        
-        // Competition elements
-        textTimer = root.Q<Label>("Text-Timer");
-        textScore = root.Q<Label>("Text-Score");
-        dropdownTask = root.Q<DropdownField>("Dropdown-Task");
-        btnStartComp = root.Q<Button>("Btn-StartComp");
         
         // Logging elements
         textLog = root.Q<Label>("Text-Log");
@@ -343,18 +331,6 @@ public class SimulatorHUD : MonoBehaviour
         cameraFeedController.InitializeCameraDropdown(sensorDataController.GetDepthPublisher());
         
         Log("HUD initialized successfully.");
-    }
-
-    // --- Competition Logic ---
-
-    public void UpdateTimer(string time)
-    {
-        if (textTimer != null) textTimer.text = time;
-    }
-
-    public void UpdateScore(string score)
-    {
-        if (textScore != null) textScore.text = score;
     }
 
     // --- Logging ---

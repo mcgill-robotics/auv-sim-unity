@@ -57,13 +57,32 @@ public class CameraPublisher : ROSPublisher
     private CameraInfoMsg cameraInfoMsg;
     private string cameraInfoTopic;
 
+    private static readonly System.Collections.Generic.List<CameraPublisher> activePublishers = new System.Collections.Generic.List<CameraPublisher>();
+
+    /// <summary>
+    /// Returns the enabled publisher that captures from the given camera, or null.
+    /// The publisher usually lives on a different GameObject than its camera, so
+    /// camera.GetComponent&lt;CameraPublisher&gt;() is not reliable.
+    /// </summary>
+    public static CameraPublisher ForCamera(Camera camera)
+    {
+        if (camera == null) return null;
+        foreach (var publisher in activePublishers)
+        {
+            if (publisher.cam == camera) return publisher;
+        }
+        return null;
+    }
+
     private void OnEnable()
     {
+        activePublishers.Add(this);
         RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
     }
 
     private void OnDisable()
     {
+        activePublishers.Remove(this);
         RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
     }
 

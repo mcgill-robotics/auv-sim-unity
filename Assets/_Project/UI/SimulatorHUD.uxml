@@ -2,20 +2,6 @@
     <Style src="project://database/Assets/_Project/UI/SimulatorTheme.uss?fileID=7433441132597879392&amp;guid=d590fc99fd36436b19016e9833644c8f&amp;type=3#SimulatorTheme" />
     <ui:VisualElement name="Root" class="root-container">
         <ui:Image name="FullscreenCameraBackground" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none;" />
-        <ui:VisualElement name="TopBar" class="top-bar">
-            <ui:VisualElement class="top-bar-section">
-                <ui:Label text="TIMER" class="top-bar-label" />
-                <ui:Label name="Text-Timer" text="00:00" class="top-bar-value" />
-            </ui:VisualElement>
-            <ui:VisualElement class="top-bar-divider" />
-            <ui:DropdownField name="Dropdown-Task" style="min-width: 120px;" />
-            <ui:Button name="Btn-StartComp" text="START" class="top-bar-button" style="margin-left: 10px;" />
-            <ui:VisualElement class="top-bar-divider" />
-            <ui:VisualElement class="top-bar-section">
-                <ui:Label text="SCORE" class="top-bar-label" />
-                <ui:Label name="Text-Score" text="0" class="top-bar-value" />
-            </ui:VisualElement>
-        </ui:VisualElement>
         <ui:VisualElement name="ConfigDrawer" class="drawer-container drawer-open" style="left: 0; top: 80px;">
             <ui:VisualElement name="ConfigDrawer-Tab" class="drawer-tab drawer-tab-left" style="height: 180px;">
                 <ui:Label text="⚙" class="drawer-tab-icon" />
