@@ -26,7 +26,7 @@ public abstract class ROSPublisher : MonoBehaviour, IROSPublisher
         get => _publishRate;
         set
         {
-            _publishRate = Mathf.Clamp(value, 0.1f, 100f);
+            _publishRate = Mathf.Clamp(value, 0.1f, 1000f);
             timeBetweenPublishes = 1f / _publishRate;
         }
     }
@@ -60,10 +60,18 @@ public abstract class ROSPublisher : MonoBehaviour, IROSPublisher
         if (!useBaseRateLimiting) return;
         
         timeSinceLastPublish += Time.fixedDeltaTime;
-        if (shouldPublish && SimulationSettings.Instance.PublishROS && timeSinceLastPublish >= timeBetweenPublishes)
+        if (timeSinceLastPublish < timeBetweenPublishes) return;
+
+        // Subtract the period instead of resetting to 0, otherwise every publisher runs
+        // slower than asked (e.g. 30 Hz on a 50 Hz physics step came out as 25 Hz).
+        // If we fell more than one period behind (rate above the physics rate), drop the backlog.
+        timeSinceLastPublish -= timeBetweenPublishes;
+        if (timeSinceLastPublish >= timeBetweenPublishes) timeSinceLastPublish = 0f;
+
+        bool rosEnabled = SimulationSettings.Instance == null || SimulationSettings.Instance.PublishROS;
+        if (shouldPublish && rosEnabled)
         {
             PublishMessage();
-            timeSinceLastPublish = 0;
         }
     }
 
