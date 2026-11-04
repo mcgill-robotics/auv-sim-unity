@@ -51,3 +51,6 @@
 # ML weights
 *.pt    filter=lfs diff=lfs merge=lfs -text
 *.onnx  filter=lfs diff=lfs merge=lfs -text
+
+# Vendored package: keep files byte-identical to the fork (no line-ending conversion).
+Packages/com.unity.perception/** -text
