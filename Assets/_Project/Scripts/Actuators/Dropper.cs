@@ -33,16 +33,19 @@ public class Dropper : MonoBehaviour
     void Start()
     {
         roscon = ROSConnection.GetOrCreateInstance();
+        roscon.Subscribe<UInt8Msg>(ROSSettings.Instance.GrabberTopic, OnGrabberCommand);
+#pragma warning disable CS0618
         roscon.Subscribe<BoolMsg>(ROSSettings.Instance.DropperTopic, DropDropper);
         roscon.Subscribe<BoolMsg>(ROSSettings.Instance.GripperTopic, GripObject);
+#pragma warning restore CS0618
         sphereRb = sphere.GetComponent<Rigidbody>();
         
         // Store initial state
         initialParent = sphere.transform.parent;
         initialLocalPos = sphere.transform.localPosition;
         initialLocalRot = sphere.transform.localRotation;
-        sphereRb.isKinematic = true; // Start with the dropper sphere kinematic so it doesn't fall before being dropped
-        grippedObjects.Add(sphereRb); // Add the dropper sphere to the gripped objects list so it can be dropped when the drop command is received
+        sphereRb.isKinematic = true;
+        grippedObjects.Add(sphereRb);
 
         // Get the collider defining the grab area for object detection
         if (grabberArea == null)
@@ -52,28 +55,38 @@ public class Dropper : MonoBehaviour
         }
     }
 
+    private void OnGrabberCommand(UInt8Msg msg)
+    {
+        // 0 = close/grab, >0 = open/release/drop
+        if (msg.data > 0)
+        {
+            DropDropper(new BoolMsg(true));
+        }
+        else
+        {
+            GripObject(new BoolMsg(true));
+        }
+    }
+
     void Update()
     {
         // Check if there is any object within the grab area
         CheckGrippableObjectWithinArea();
-        // Debug.Log(" :");
-        // Debug.Log(grabberArea.bounds.center);
-        // if (candidateObjects.Count > 0)
-        //     Debug.Log((candidateObjects[0].GetComponent<Collider>().bounds.center));
-        // Debug.Log("Number of candidate objects: " + candidateObjectsReadyForGrab.Count);
 
-        // Check for dropper trigger input (G key by default) and drop the object if the input is received
+        if (!InputGate.GameKeysEnabled) return;
+        if (SimulatorHUD.Instance != null && SimulatorHUD.Instance.IsInputFocused) return;
+
+        // Check for dropper trigger input (G key by default)
         if (Input.GetKeyDown(InputManager.Instance.GetKey("dropperKeybind", KeyCode.G)))
         {   
             DropDropper(new BoolMsg(true));
         }
 
-        // Check for gripping input and if there is an object in the grab area
+        // Check for gripping input (H key by default)
         if (Input.GetKeyDown(InputManager.Instance.GetKey("gripperKeybind", KeyCode.H)))
         {
             GripObject(new BoolMsg(true));
         }
-        
     }
 
     public void ResetDropper()
@@ -84,8 +97,9 @@ public class Dropper : MonoBehaviour
         sphere.transform.localRotation = initialLocalRot;
         sphereRb.linearVelocity = Vector3.zero;
         sphereRb.angularVelocity = Vector3.zero;
+        grippedObjects.Clear();
+        grippedObjects.Add(sphereRb);
     }
-
 
     void DropDropper(BoolMsg msg)
     {
@@ -97,14 +111,15 @@ public class Dropper : MonoBehaviour
                 return;
             }
 
-            // Drop every object currently gripped (should only be one for the dropper, but allows for future expansion)
-            // Could make the grabber be ordered so that the most recently gripped object is dropped first if multiple objects are gripped, 
-            // but for now just drop all gripped objects when the drop command is received
             for (int i = 0; i < grippedObjects.Count; i++)
             {
-                grippedObjects[i].isKinematic = false;
-                grippedObjects[i].transform.parent = null;
+                if (grippedObjects[i] != null)
+                {
+                    grippedObjects[i].isKinematic = false;
+                    grippedObjects[i].transform.parent = null;
+                }
             }
+            grippedObjects.Clear();
         }
     }
 
@@ -127,22 +142,20 @@ public class Dropper : MonoBehaviour
 
     private void CheckGrippableObjectWithinArea()
     {
-        Physics.SyncTransforms();
-        candidateObjectsReadyForGrab.Clear(); // Clear the list of objects ready for grab
+        if (grabberArea == null) return;
+
+        candidateObjectsReadyForGrab.Clear();
+        Bounds areaBounds = grabberArea.bounds;
+
         for (int i = 0; i < candidateObjects.Count; i++)
         {
-            Bounds objectBounds = candidateObjects[i].GetComponent<Collider>().bounds;
-            Bounds areaBounds = grabberArea.bounds;
+            if (candidateObjects[i] == null) continue;
+            Collider col = candidateObjects[i].GetComponent<Collider>();
+            if (col == null) continue;
 
-            // Check if the objects center is within the grab area bounds, 
-            // this is a simplification and not a perfect simulation of a gripper closing mechanism
-            bool fullyInside = areaBounds.Contains(objectBounds.center);
-            Debug.Log("Object center: " + objectBounds.center + ", Grab area center: " + areaBounds.center);
-            if (fullyInside)
+            if (areaBounds.Contains(col.bounds.center))
             {
-                // If the object is within the grab area, add it to the ready for grab list, 
-                // which will be used to determine which object to grip when the grip command is received
-                candidateObjectsReadyForGrab.Add(candidateObjects[i]); 
+                candidateObjectsReadyForGrab.Add(candidateObjects[i]);
             }
         }
     }

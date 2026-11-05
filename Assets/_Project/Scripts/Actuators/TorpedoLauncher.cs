@@ -116,7 +116,7 @@ namespace Actuators
 
         private void HandleManualInput()
         {
-            // Ignore if typing in HUD
+            if (!InputGate.GameKeysEnabled) return;
             if (SimulatorHUD.Instance != null && SimulatorHUD.Instance.IsInputFocused) return;
 
             // Launch (T key)

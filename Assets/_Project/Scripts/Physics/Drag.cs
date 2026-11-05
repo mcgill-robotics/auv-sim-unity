@@ -139,8 +139,16 @@ public class HydrodynamicDrag : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Vector3 currentLocalVel = transform.InverseTransformDirection(rb.linearVelocity);
+        Vector3 currentLocalAngVel = transform.InverseTransformDirection(rb.angularVelocity);
+
         // Only apply hydrodynamics when underwater
-        if (transform.position.y > 0) return;
+        if (transform.position.y > 0)
+        {
+            prevLocalVelocity = currentLocalVel;
+            prevLocalAngularVelocity = currentLocalAngVel;
+            return;
+        }
         
         // CALCULATE RELATIVE VELOCITY
         Vector3 relativeVelocity = rb.linearVelocity - waterCurrent;
@@ -158,8 +166,8 @@ public class HydrodynamicDrag : MonoBehaviour
         ApplyCrossCoupling(relativeVelocity);
 
         // Update state for next frame's acceleration calculation
-        prevLocalVelocity = transform.InverseTransformDirection(rb.linearVelocity);
-        prevLocalAngularVelocity = transform.InverseTransformDirection(rb.angularVelocity);
+        prevLocalVelocity = currentLocalVel;
+        prevLocalAngularVelocity = currentLocalAngVel;
     }
 
     private void ApplyCrossCoupling(Vector3 relativeVelocity)

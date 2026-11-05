@@ -66,6 +66,8 @@ namespace Actuators
         private Vector3 posAtMaxTime;
         private Vector3 velAtMaxTime;
 
+        private Rigidbody rb;
+
         public void Initialize(TrajectoryData data)
         {
             trajectory = data;
@@ -108,14 +110,14 @@ namespace Actuators
             isInitialized = true;
             
             // Ensure we are kinematic to follow the trajectory exactly
-            Rigidbody rb = GetComponent<Rigidbody>();
+            rb = GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = true;
             }
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (!isInitialized || hasStopped) return;
 
@@ -127,16 +129,18 @@ namespace Actuators
             }
 
             float t = Time.time - startTime;
+            Vector3 targetPos;
+            Quaternion targetRot = transform.rotation;
 
             if (trajectory.maxTrajectoryTime > 0 && t > trajectory.maxTrajectoryTime)
             {
                 // Constant velocity phase
                 float overtime = t - trajectory.maxTrajectoryTime;
-                transform.position = posAtMaxTime + (velAtMaxTime * overtime);
+                targetPos = posAtMaxTime + (velAtMaxTime * overtime);
                 
                 if (velAtMaxTime.sqrMagnitude > 0.001f)
                 {
-                    transform.rotation = Quaternion.LookRotation(velAtMaxTime.normalized);
+                    targetRot = Quaternion.LookRotation(velAtMaxTime.normalized);
                 }
             }
             else
@@ -148,8 +152,29 @@ namespace Actuators
                     trajectory.forward.Evaluate(t)
                 );
 
-                transform.position = startPosition + (startRotation * localDisplacement);
-                UpdateOrientation(t);
+                targetPos = startPosition + (startRotation * localDisplacement);
+                
+                Vector3 localVelocity = new Vector3(
+                    trajectory.lateral.EvaluateDerivative(t),
+                    trajectory.vertical.EvaluateDerivative(t),
+                    trajectory.forward.EvaluateDerivative(t)
+                );
+
+                if (localVelocity.sqrMagnitude > 0.001f)
+                {
+                    targetRot = startRotation * Quaternion.LookRotation(localVelocity.normalized);
+                }
+            }
+
+            if (rb != null)
+            {
+                rb.MovePosition(targetPos);
+                rb.MoveRotation(targetRot);
+            }
+            else
+            {
+                transform.position = targetPos;
+                transform.rotation = targetRot;
             }
         }
 
@@ -178,26 +203,10 @@ namespace Actuators
             }
 
             // Optionally: enable gravity and non-kinematic to let it fall/bounce
-            Rigidbody rb = GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = false;
                 rb.useGravity = false; 
-            }
-        }
-
-        private void UpdateOrientation(float t)
-        {
-            Vector3 localVelocity = new Vector3(
-                trajectory.lateral.EvaluateDerivative(t),
-                trajectory.vertical.EvaluateDerivative(t),
-                trajectory.forward.EvaluateDerivative(t)
-            );
-
-            if (localVelocity.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRot = startRotation * Quaternion.LookRotation(localVelocity.normalized);
-                transform.rotation = targetRot;
             }
         }
     }
