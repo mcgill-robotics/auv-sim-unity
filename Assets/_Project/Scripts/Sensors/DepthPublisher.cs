@@ -158,10 +158,20 @@ public class DepthPublisher : ROSPublisher
         depthMsg.data = noisyDepth;
     }
 
+    private readonly Float32Msg[] depthMsgPool = new Float32Msg[3]
+    {
+        new Float32Msg(),
+        new Float32Msg(),
+        new Float32Msg()
+    };
+    private int depthPoolIdx = 0;
+
     public override void PublishMessage()
     {
-        // Publish fresh message instance for thread-safe serialization
-        ros.Publish(Topic, new Float32Msg(LastDepth));
+        var msg = depthMsgPool[depthPoolIdx];
+        depthPoolIdx = (depthPoolIdx + 1) % depthMsgPool.Length;
+        msg.data = LastDepth;
+        ros.Publish(Topic, msg);
     }
     
     private void UpdateVisualization()

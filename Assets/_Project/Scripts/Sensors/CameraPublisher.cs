@@ -50,12 +50,22 @@ public class CameraPublisher : ROSPublisher
     // JPEG encoding
     private Texture2D encodingTexture;
     private byte[] cachedRawBuffer;
-    private CompressedImageMsg compressedMessage;
+    private byte[] cachedFlippedBuffer;
+    private CompressedImageMsg[] compressedMsgPool;
+    private int compressedPoolIdx = 0;
+    private ImageMsg[] rawImgMsgPool;
+    private int rawImgPoolIdx = 0;
     private string compressedTopic;
 
     // Camera Info
     private CameraInfoMsg cameraInfoMsg;
+    private CameraInfoMsg[] infoMsgPool;
+    private int infoPoolIdx = 0;
     private string cameraInfoTopic;
+
+    // Cached AsyncGPUReadback delegate & timestamp
+    private System.Action<UnityEngine.Rendering.AsyncGPUReadbackRequest> readbackCallback;
+    private RosMessageTypes.BuiltinInterfaces.TimeMsg pendingStamp;
 
     private static readonly System.Collections.Generic.List<CameraPublisher> activePublishers = new System.Collections.Generic.List<CameraPublisher>();
 
@@ -111,6 +121,9 @@ public class CameraPublisher : ROSPublisher
         // Camera uses custom rendering logic, not base class rate limiting
         useBaseRateLimiting = false;
         
+        readbackCallback = OnReadbackComplete;
+        pendingStamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
+
         InitializeTexture();
         InitializeRefraction();
         InitializeCameraInfo();
@@ -164,6 +177,22 @@ public class CameraPublisher : ROSPublisher
         cameraInfoMsg.P = new double[] { f, 0, cx, 0,  0, f, cy, 0,  0, 0, 1, 0 };
         // R Matrix
         cameraInfoMsg.R = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+
+        infoMsgPool = new CameraInfoMsg[2];
+        for (int i = 0; i < 2; i++)
+        {
+            infoMsgPool[i] = new CameraInfoMsg
+            {
+                header = new HeaderMsg { frame_id = currentFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+                width = (uint)resolutionWidth,
+                height = (uint)resolutionHeight,
+                distortion_model = "plumb_bob",
+                D = cameraInfoMsg.D,
+                K = cameraInfoMsg.K,
+                P = cameraInfoMsg.P,
+                R = cameraInfoMsg.R
+            };
+        }
     }
 
     private void InitializeTexture()
@@ -223,18 +252,22 @@ public class CameraPublisher : ROSPublisher
         };
         renderTexture.Create();
 
-        message = new ImageMsg();
         string currentFrameId = cameraType == CameraType.Front ? ROSSettings.Instance.FrontCamFrameId : ROSSettings.Instance.DownCamFrameId;
-        message.header = new HeaderMsg { frame_id = currentFrameId };
-        message.encoding = "rgb8";
-        message.width = (uint)resolutionWidth;
-        message.height = (uint)resolutionHeight;
-        message.step = (uint)(resolutionWidth * 3);
+
+        // Initialize pooled raw ImageMsg
+        rawImgMsgPool = new ImageMsg[2]
+        {
+            new ImageMsg { header = new HeaderMsg { frame_id = currentFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() }, encoding = "rgb8", width = (uint)resolutionWidth, height = (uint)resolutionHeight, step = (uint)(resolutionWidth * 3) },
+            new ImageMsg { header = new HeaderMsg { frame_id = currentFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() }, encoding = "rgb8", width = (uint)resolutionWidth, height = (uint)resolutionHeight, step = (uint)(resolutionWidth * 3) }
+        };
+        message = rawImgMsgPool[0];
         
-        // Initialize compressed message
-        compressedMessage = new CompressedImageMsg();
-        compressedMessage.header = new HeaderMsg { frame_id = currentFrameId };
-        compressedMessage.format = "jpeg";
+        // Initialize pooled compressed message
+        compressedMsgPool = new CompressedImageMsg[2]
+        {
+            new CompressedImageMsg { header = new HeaderMsg { frame_id = currentFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() }, format = "jpeg" },
+            new CompressedImageMsg { header = new HeaderMsg { frame_id = currentFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() }, format = "jpeg" }
+        };
         
         // Create encoding texture for JPEG compression
         encodingTexture = new Texture2D(resolutionWidth, resolutionHeight, TextureFormat.RGB24, false);
@@ -264,17 +297,16 @@ public class CameraPublisher : ROSPublisher
             if (cam == null || renderTexture == null || !renderTexture.IsCreated()) return;
             
             // Capture timestamp NOW (when frame was rendered), not when readback completes
-            var stamp = ROSClock.GetROSTimestamp();
+            ROSClock.PopulateROSTimestamp(pendingStamp);
             
             isReading = true;
             
             // Async GPU Readback - doesn't stall CPU waiting for GPU
-            UnityEngine.Rendering.AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGB24, 
-                req => OnReadbackComplete(req, stamp));
+            UnityEngine.Rendering.AsyncGPUReadback.Request(renderTexture, 0, TextureFormat.RGB24, readbackCallback);
         }
     }
     
-    private void OnReadbackComplete(UnityEngine.Rendering.AsyncGPUReadbackRequest req, RosMessageTypes.BuiltinInterfaces.TimeMsg stamp)
+    private void OnReadbackComplete(UnityEngine.Rendering.AsyncGPUReadbackRequest req)
     {
         isReading = false;
         
@@ -308,12 +340,15 @@ public class CameraPublisher : ROSPublisher
                 encodingTexture.Apply();
                 
                 int quality = SimulationSettings.Instance.JPEGQuality;
-                var compMsg = new CompressedImageMsg
-                {
-                    header = new HeaderMsg { stamp = stamp, frame_id = currentFrameId },
-                    format = "jpeg",
-                    data = encodingTexture.EncodeToJPG(quality)
-                };
+                var compMsg = compressedMsgPool[compressedPoolIdx];
+                compressedPoolIdx = 1 - compressedPoolIdx;
+
+                compMsg.header.stamp.sec = pendingStamp.sec;
+                compMsg.header.stamp.nanosec = pendingStamp.nanosec;
+                compMsg.header.frame_id = currentFrameId;
+                compMsg.format = "jpeg";
+                compMsg.data = encodingTexture.EncodeToJPG(quality);
+
                 ros.Publish(compressedTopic, compMsg);
             }
         }
@@ -322,39 +357,40 @@ public class CameraPublisher : ROSPublisher
             // Raw RGB8 path - publish to main topic using ImageMsg
             // Unity readback buffer is bottom-up; ROS REP 118 requires row 0 at the top
             int rowBytes = resolutionWidth * 3;
-            byte[] flippedData = new byte[rawData.Length];
+            if (cachedFlippedBuffer == null || cachedFlippedBuffer.Length != rawData.Length)
+            {
+                cachedFlippedBuffer = new byte[rawData.Length];
+            }
             for (int y = 0; y < resolutionHeight; y++)
             {
                 int srcOffset = y * rowBytes;
                 int dstOffset = (resolutionHeight - 1 - y) * rowBytes;
-                Unity.Collections.NativeArray<byte>.Copy(rawData, srcOffset, flippedData, dstOffset, rowBytes);
+                Unity.Collections.NativeArray<byte>.Copy(rawData, srcOffset, cachedFlippedBuffer, dstOffset, rowBytes);
             }
 
-            var imgMsg = new ImageMsg
-            {
-                header = new HeaderMsg { stamp = stamp, frame_id = currentFrameId },
-                encoding = "rgb8",
-                width = (uint)resolutionWidth,
-                height = (uint)resolutionHeight,
-                step = (uint)rowBytes,
-                data = flippedData
-            };
+            var imgMsg = rawImgMsgPool[rawImgPoolIdx];
+            rawImgPoolIdx = 1 - rawImgPoolIdx;
+
+            imgMsg.header.stamp.sec = pendingStamp.sec;
+            imgMsg.header.stamp.nanosec = pendingStamp.nanosec;
+            imgMsg.header.frame_id = currentFrameId;
+            imgMsg.data = cachedFlippedBuffer;
+
             ros.Publish(Topic, imgMsg);
         }
 
         // Publish Camera Info with synced timestamp
-        var infoMsg = new CameraInfoMsg
+        if (infoMsgPool != null)
         {
-            header = new HeaderMsg { stamp = stamp, frame_id = currentFrameId },
-            width = (uint)resolutionWidth,
-            height = (uint)resolutionHeight,
-            distortion_model = cameraInfoMsg.distortion_model,
-            D = (double[])cameraInfoMsg.D.Clone(),
-            K = (double[])cameraInfoMsg.K.Clone(),
-            R = (double[])cameraInfoMsg.R.Clone(),
-            P = (double[])cameraInfoMsg.P.Clone()
-        };
-        ros.Publish(cameraInfoTopic, infoMsg);
+            var infoMsg = infoMsgPool[infoPoolIdx];
+            infoPoolIdx = 1 - infoPoolIdx;
+
+            infoMsg.header.stamp.sec = pendingStamp.sec;
+            infoMsg.header.stamp.nanosec = pendingStamp.nanosec;
+            infoMsg.header.frame_id = currentFrameId;
+
+            ros.Publish(cameraInfoTopic, infoMsg);
+        }
     }
 
     public override void PublishMessage()

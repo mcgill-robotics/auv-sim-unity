@@ -22,17 +22,20 @@ namespace Utils
             }
         }
 
+        private static MaterialPropertyBlock s_SharedMpb;
+
         /// <summary>
         /// Sets the _BaseColor and _Color properties on a Renderer using a MaterialPropertyBlock.
         /// This is the best way to handle per-object colors when using material overrides (like X-Ray pass).
         /// </summary>
         public static void SetColorProperty(Renderer ren, Color color)
         {
-            MaterialPropertyBlock mpb = new MaterialPropertyBlock();
-            ren.GetPropertyBlock(mpb);
-            mpb.SetColor("_BaseColor", color);
-            mpb.SetColor("_Color", color); // Fallback for standard shaders
-            ren.SetPropertyBlock(mpb);
+            if (ren == null) return;
+            if (s_SharedMpb == null) s_SharedMpb = new MaterialPropertyBlock();
+            ren.GetPropertyBlock(s_SharedMpb);
+            s_SharedMpb.SetColor("_BaseColor", color);
+            s_SharedMpb.SetColor("_Color", color); // Fallback for standard shaders
+            ren.SetPropertyBlock(s_SharedMpb);
         }
 
         /// <summary>
