@@ -1,10 +1,49 @@
+using System;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 
-[ExecuteAlways]
+/// <summary>
+/// Scene-wide simulation settings (sensor toggles, camera parameters, graphics options) plus the
+/// main scene references (AUV, cameras) that other scripts read through <see cref="Instance"/>.
+///
+/// Where the values come from:
+/// - Defaults are whatever is serialized on this component in the scene, so they live in git.
+/// - A user can override them from the HUD. Pressing SAVE writes only the values that differ from
+///   the defaults to <see cref="SettingsFilePath"/> (sim_settings.json in persistentDataPath).
+/// - At startup (play mode only) the file is read and the keys it contains are applied on top of
+///   the defaults. Nothing is loaded or saved in edit mode, so the scene file never drifts.
+/// - "Reset to defaults" deletes the file and restores the values captured at startup.
+/// </summary>
 [DefaultExecutionOrder(-100)]
 public class SimulationSettings : MonoBehaviour
 {
-    public static SimulationSettings Instance { get; private set; }
+    /// <summary>Value of <see cref="ScreenResolution"/> that means "use the display's resolution".</summary>
+    public const string NativeResolution = "Native";
+
+    private static SimulationSettings instance;
+
+    /// <summary>
+    /// The active settings. Set in Awake during play. In the editor outside play mode it falls back
+    /// to the first SimulationSettings in the open scene, so editor tools can still read its values.
+    /// </summary>
+    public static SimulationSettings Instance
+    {
+        get
+        {
+#if UNITY_EDITOR
+            if (instance == null && !Application.isPlaying)
+            {
+                return FindFirstObjectByType<SimulationSettings>();
+            }
+#endif
+            return instance;
+        }
+        private set => instance = value;
+    }
+
+    /// <summary>Full path of the user overrides file.</summary>
+    public static string SettingsFilePath => Path.Combine(Application.persistentDataPath, "sim_settings.json");
 
     [Header("AUV References")]
     [Tooltip("The AUV's Rigidbody - used by physics and sensor scripts")]
@@ -23,10 +62,11 @@ public class SimulationSettings : MonoBehaviour
     [Tooltip("Enable ROS TCP connection and publishing")]
     public bool PublishROS = true;
 
-    [Tooltip("Show simulation objects (gates, buoys, etc.) in scene")]
+    // Nothing reads this any more; it is kept so existing scenes and scripts still compile and load.
+    [HideInInspector]
     public bool DisplaySimObjects = false;
 
-    [Tooltip("Publish ground truth vision object map over ROS")]
+    [Tooltip("Publish the ground-truth object map on the vision object map topic. Turn this off when running the real vision stack, which publishes the same topic")]
     public bool PublishGTObjectMap = true;
 
     [Tooltip("Disable water volume and rendering for performance (when vision isn't needed)")]
@@ -95,23 +135,6 @@ public class SimulationSettings : MonoBehaviour
 
     [Tooltip("Enable simulated noise/bias for Depth sensor")]
     public bool EnableDepthNoise = true;
-
-    [Space(10)]
-    [Header("UI Drawer States")]
-    [Tooltip("Config drawer open state")]
-    public bool DrawerConfigOpen = true;
-
-    [Tooltip("Controls drawer open state")]
-    public bool DrawerControlsOpen = true;
-
-    [Tooltip("Telemetry drawer open state")]
-    public bool DrawerTelemetryOpen = true;
-
-    [Tooltip("Sensors drawer open state")]
-    public bool DrawerSensorsOpen = true;
-
-    [Tooltip("Camera drawer open state")]
-    public bool DrawerCameraOpen = true;
 
     [Space(10)]
     [Header("Pinger Bearing Visualization")]
@@ -190,53 +213,86 @@ public class SimulationSettings : MonoBehaviour
     [Range(10, 100)]
     public int PoseRate = 50;
 
-    [Tooltip("Unity quality level (0=Very Low, 5=Very High)")]
-    [Range(0, 5)]
+    [Tooltip("Index into Project Settings > Quality (QualitySettings.names). 0 is the first, highest-fidelity level; clamped to the levels that exist")]
+    [Min(0)]
     public int QualityLevel = 3;
 
-    [Tooltip("Target framerate for physics simulation")]
+    [Tooltip("Application.targetFrameRate, applied at startup")]
     [Range(30, 300)]
     public int SimulationTargetFrameRate = 60;
 
+    [Tooltip("Window resolution as WIDTHxHEIGHT (for example 1920x1080), or Native for the display's own resolution")]
+    public string ScreenResolution = NativeResolution;
+
     [Space(10)]
     [Header("Snapshot Settings")]
-    [Tooltip("Path to save camera snapshots")]
+    [Tooltip("Folder for camera snapshots. Empty means <project>/Recordings; falls back to persistentDataPath if it is not writable")]
     public string SnapshotSavePath;
 
-    private bool isLoaded = false;
+    // Copy of the scene values taken in Awake, before any user overrides were applied.
+    private SimulationSettingsData sceneDefaults;
+
+    /// <summary>True when a HUD change has been applied but not yet saved with SAVE.</summary>
+    public bool HasUnsavedChanges { get; private set; }
+
+    /// <summary>Raised when <see cref="HasUnsavedChanges"/> flips.</summary>
+    public event Action<bool> UnsavedChangesChanged;
+
+    /// <summary>Raised after the values were replaced wholesale (load or reset), so the HUD can refresh.</summary>
+    public event Action SettingsReloaded;
+
+    /// <summary>Config drawer open state. Drawer state now lives in <see cref="HudLayoutState"/>.</summary>
+    [Obsolete("Drawer state moved to HudLayoutState.Current.ConfigOpen")]
+    public bool DrawerConfigOpen { get => HudLayoutState.Current.ConfigOpen; set => HudLayoutState.Current.ConfigOpen = value; }
+
+    /// <summary>Controls drawer open state. Drawer state now lives in <see cref="HudLayoutState"/>.</summary>
+    [Obsolete("Drawer state moved to HudLayoutState.Current.ControlsOpen")]
+    public bool DrawerControlsOpen { get => HudLayoutState.Current.ControlsOpen; set => HudLayoutState.Current.ControlsOpen = value; }
+
+    /// <summary>Telemetry drawer open state. Drawer state now lives in <see cref="HudLayoutState"/>.</summary>
+    [Obsolete("Drawer state moved to HudLayoutState.Current.TelemetryOpen")]
+    public bool DrawerTelemetryOpen { get => HudLayoutState.Current.TelemetryOpen; set => HudLayoutState.Current.TelemetryOpen = value; }
+
+    /// <summary>Sensors drawer open state. Drawer state now lives in <see cref="HudLayoutState"/>.</summary>
+    [Obsolete("Drawer state moved to HudLayoutState.Current.SensorsOpen")]
+    public bool DrawerSensorsOpen { get => HudLayoutState.Current.SensorsOpen; set => HudLayoutState.Current.SensorsOpen = value; }
+
+    /// <summary>Camera drawer open state. Drawer state now lives in <see cref="HudLayoutState"/>.</summary>
+    [Obsolete("Drawer state moved to HudLayoutState.Current.CameraOpen")]
+    public bool DrawerCameraOpen { get => HudLayoutState.Current.CameraOpen; set => HudLayoutState.Current.CameraOpen = value; }
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance != null && instance != this)
         {
-            Instance = this;
-            if (Application.isPlaying)
-            {
-                DontDestroyOnLoad(gameObject);
-            }
+            // Only remove this component: the GameObject also carries ROSSettings, InputManager, etc.
+            Debug.LogWarning("[SimulationSettings] A second SimulationSettings was found; removing the duplicate component.");
+            Destroy(this);
+            return;
+        }
+        Instance = this;
 
-            // Always load settings to ensure we have valid data
-            // In Edit Mode, this syncs Inspector with PlayerPrefs
-            LoadSettings();
-            isLoaded = true;
-        }
-        else
-        {
-            if (Application.isPlaying)
-            {
-                Destroy(gameObject);
-            }
-        }
+        sceneDefaults = SimulationSettingsData.Capture(this);
 
-        if (Application.isPlaying)
+        MigrateLegacyPlayerPrefs();
+        LoadSettings();
+
+        Application.targetFrameRate = SimulationTargetFrameRate;
+        // At startup only an explicit size is applied; "Native" leaves the player's window alone.
+        if (TryParseResolution(ScreenResolution, out _, out _))
         {
-            Application.targetFrameRate = SimulationTargetFrameRate;
+            ApplyScreenResolution();
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this) Instance = null;
     }
 
     private void Start()
     {
-        if (Application.isPlaying && NoWaterMode)
+        if (NoWaterMode)
         {
             ApplyNoWaterMode();
         }
@@ -247,13 +303,11 @@ public class SimulationSettings : MonoBehaviour
     /// </summary>
     public void ApplyNoWaterMode()
     {
-        // Disable/Enable assigned water surface object
         if (waterSurfaceObject != null)
         {
             waterSurfaceObject.SetActive(!NoWaterMode);
         }
 
-        // Disable/Enable pool post-processing volume
         if (poolPostProcessingVolume != null)
         {
             poolPostProcessingVolume.SetActive(!NoWaterMode);
@@ -276,70 +330,190 @@ public class SimulationSettings : MonoBehaviour
         }
     }
 
+    /// <summary>Clamps <see cref="QualityLevel"/> to the existing quality levels and applies it.</summary>
+    public void ApplyQualityLevel()
+    {
+        QualityLevel = ClampQualityLevel(QualityLevel);
+        QualitySettings.SetQualityLevel(QualityLevel);
+    }
+
+    /// <summary>
+    /// Applies <see cref="ScreenResolution"/>. "Native" restores the display's own resolution.
+    /// </summary>
+    public void ApplyScreenResolution()
+    {
+        if (TryParseResolution(ScreenResolution, out int width, out int height))
+        {
+            Screen.SetResolution(width, height, Screen.fullScreenMode);
+        }
+        else if (Screen.width != Display.main.systemWidth || Screen.height != Display.main.systemHeight)
+        {
+            Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, Screen.fullScreenMode);
+        }
+    }
+
+    /// <summary>Parses "WIDTHxHEIGHT". Returns false for "Native" or anything malformed.</summary>
+    public static bool TryParseResolution(string text, out int width, out int height)
+    {
+        width = height = 0;
+        if (string.IsNullOrEmpty(text)) return false;
+        string[] parts = text.Split('x');
+        return parts.Length == 2
+            && SettingsJson.TryParseInt(parts[0], out width)
+            && SettingsJson.TryParseInt(parts[1], out height)
+            && width > 0 && height > 0;
+    }
+
+    /// <summary>Records that a value was changed from the HUD and not saved yet.</summary>
+    public void MarkUnsaved()
+    {
+        SetUnsaved(true);
+    }
+
+    private void SetUnsaved(bool unsaved)
+    {
+        if (HasUnsavedChanges == unsaved) return;
+        HasUnsavedChanges = unsaved;
+        UnsavedChangesChanged?.Invoke(unsaved);
+    }
+
+    /// <summary>
+    /// Restores the scene defaults, then applies the keys present in the user overrides file.
+    /// Called once in Awake; only does anything in play mode.
+    /// </summary>
     public void LoadSettings()
     {
-        PublishROS = bool.Parse(PlayerPrefs.GetString("PublishROSToggle", "true"));
-        DisplaySimObjects = bool.Parse(PlayerPrefs.GetString("DisplaySimToggle", "false"));
-        PublishGTObjectMap = bool.Parse(PlayerPrefs.GetString("PublishGTObjectMap", "true"));
-        NoWaterMode = bool.Parse(PlayerPrefs.GetString("NoWaterModeToggle", "false"));
-        EnableShadows = bool.Parse(PlayerPrefs.GetString("EnableShadowsToggle", "true"));
-        HydrophonesNumberOption = PlayerPrefs.GetInt("HydrophonesNumberOption", 0);
+        if (!Application.isPlaying || sceneDefaults == null) return;
 
-        PublishDVL = bool.Parse(PlayerPrefs.GetString("PublishDVLToggle", "true"));
-        PublishIMU = bool.Parse(PlayerPrefs.GetString("PublishIMUToggle", "true"));
-        PublishDepth = bool.Parse(PlayerPrefs.GetString("PublishDepthToggle", "true"));
-        PublishHydrophones = bool.Parse(PlayerPrefs.GetString("PublishHydrophonesToggle", "false"));
-        PublishFrontCam = bool.Parse(PlayerPrefs.GetString("PublishFrontCamToggle", "false"));
-        PublishDownCam = bool.Parse(PlayerPrefs.GetString("PublishDownCamToggle", "false"));
-        PublishDepthCamera = bool.Parse(PlayerPrefs.GetString("PublishDepthCameraToggle", "false"));
-        StreamZEDCamera = bool.Parse(PlayerPrefs.GetString("StreamZEDCameraToggle", "false"));
+        SimulationSettingsData data = sceneDefaults.Clone();
+        string path = SettingsFilePath;
+        if (File.Exists(path))
+        {
+            try
+            {
+                // FromJsonOverwrite only touches the keys that are in the file.
+                JsonUtility.FromJsonOverwrite(File.ReadAllText(path), data);
+                Debug.Log($"[SimulationSettings] Loaded user settings from {path}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SimulationSettings] Could not read '{path}': {e.Message}. Using scene defaults.");
+                data = sceneDefaults.Clone();
+            }
+        }
+        data.ApplyTo(this);
 
-        // Force disable ZED streaming on platforms other than Windows or Linux
+        ApplyLoadedValues();
+        SetUnsaved(false);
+        SettingsReloaded?.Invoke();
+    }
+
+    /// <summary>
+    /// Writes the values that differ from the scene defaults to <see cref="SettingsFilePath"/>.
+    /// Only the HUD's SAVE button should call this.
+    /// </summary>
+    public void SaveSettings()
+    {
+        if (!Application.isPlaying || sceneDefaults == null) return;
+
+        string path = SettingsFilePath;
+        try
+        {
+            string json = SettingsJson.ToOverridesJson(SimulationSettingsData.Capture(this), sceneDefaults);
+            File.WriteAllText(path, json);
+            SetUnsaved(false);
+            Debug.Log($"[SimulationSettings] Saved user settings to {path}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SimulationSettings] Could not write '{path}': {e.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Deletes the user overrides file and restores the values serialized in the scene.
+    /// </summary>
+    public void ResetToDefaults()
+    {
+        if (!Application.isPlaying || sceneDefaults == null) return;
+
+        string path = SettingsFilePath;
+        try
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SimulationSettings] Could not delete '{path}': {e.Message}");
+        }
+
+        sceneDefaults.Clone().ApplyTo(this);
+        ApplyLoadedValues();
+        ApplyNoWaterMode();
+        ApplyScreenResolution();
+        SetUnsaved(false);
+        SettingsReloaded?.Invoke();
+    }
+
+    /// <summary>
+    /// Returns the [Range] limits declared on a settings field, so the HUD can validate input
+    /// against the same numbers the Inspector uses.
+    /// </summary>
+    public static bool TryGetRange(string fieldName, out float min, out float max)
+    {
+        min = float.MinValue;
+        max = float.MaxValue;
+        FieldInfo field = typeof(SimulationSettings).GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
+        var range = field?.GetCustomAttribute<RangeAttribute>();
+        if (range == null) return false;
+        min = range.min;
+        max = range.max;
+        return true;
+    }
+
+    private void ApplyLoadedValues()
+    {
+        // ZED streaming needs the ZED SDK, which only exists on Windows and Linux.
 #if !UNITY_EDITOR_LINUX && !UNITY_STANDALONE_LINUX && !UNITY_EDITOR_WIN && !UNITY_STANDALONE_WIN
         StreamZEDCamera = false;
 #endif
-
-        VisualizeDVL = bool.Parse(PlayerPrefs.GetString("VisualizeDVLToggle", "true"));
-        VisualizeIMU = bool.Parse(PlayerPrefs.GetString("VisualizeIMUToggle", "true"));
-        VisualizeDepth = bool.Parse(PlayerPrefs.GetString("VisualizeDepthToggle", "true"));
-
-        EnableDVLNoise = bool.Parse(PlayerPrefs.GetString("EnableDVLNoiseToggle", "true"));
-        EnableIMUNoise = bool.Parse(PlayerPrefs.GetString("EnableIMUNoiseToggle", "true"));
-        EnableDepthNoise = bool.Parse(PlayerPrefs.GetString("EnableDepthNoiseToggle", "true"));
-
-        DrawerConfigOpen = bool.Parse(PlayerPrefs.GetString("DrawerConfigOpen", "true"));
-        DrawerControlsOpen = bool.Parse(PlayerPrefs.GetString("DrawerControlsOpen", "true"));
-        DrawerTelemetryOpen = bool.Parse(PlayerPrefs.GetString("DrawerTelemetryOpen", "true"));
-        DrawerSensorsOpen = bool.Parse(PlayerPrefs.GetString("DrawerSensorsOpen", "true"));
-        DrawerCameraOpen = bool.Parse(PlayerPrefs.GetString("DrawerCameraOpen", "true"));
-
-        FrontCamRate = int.Parse(PlayerPrefs.GetString("frontCamRate", "10"));
-        DownCamRate = int.Parse(PlayerPrefs.GetString("downCamRate", "10"));
-        FrontCamWidth = int.Parse(PlayerPrefs.GetString("frontCamWidth", "672"));
-        FrontCamHeight = int.Parse(PlayerPrefs.GetString("frontCamHeight", "376"));
-        FrontCamFOV = float.Parse(PlayerPrefs.GetString("frontCamFOV", "40.9"));
-        SimulateWaterRefraction = bool.Parse(PlayerPrefs.GetString("SimulateWaterRefraction", "true"));
-        WaterRefractionIndex = float.Parse(PlayerPrefs.GetString("WaterRefractionIndex", "1.33333"));
-        DownCamWidth = int.Parse(PlayerPrefs.GetString("downCamWidth", "640"));
-        DownCamHeight = int.Parse(PlayerPrefs.GetString("downCamHeight", "480"));
-        DownCamFOV = float.Parse(PlayerPrefs.GetString("downCamFOV", "38.2"));
-        DownCamRefractionScale = float.Parse(PlayerPrefs.GetString("downCamRefractionScale", "1.33333"));
-        UseJPEGCompression = bool.Parse(PlayerPrefs.GetString("UseJPEGCompression", "true"));
-        JPEGQuality = int.Parse(PlayerPrefs.GetString("JPEGQuality", "75"));
-
-        PoseRate = int.Parse(PlayerPrefs.GetString("poseRate", "50"));
-        QualityLevel = int.Parse(PlayerPrefs.GetString("qualityLevel", "3"));
-
-        string defaultPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "../Recordings"));
-        SnapshotSavePath = PlayerPrefs.GetString("SnapshotSavePath", defaultPath);
-
-        // Validate and possibly correct the path
         SnapshotSavePath = ValidateAndGetSavePath(SnapshotSavePath);
-
-        QualitySettings.SetQualityLevel(QualityLevel);
+        ApplyQualityLevel();
         ApplyShadows();
     }
 
+    private void MigrateLegacyPlayerPrefs()
+    {
+        if (File.Exists(SettingsFilePath) || !LegacySettingsMigration.HasLegacyKeys()) return;
+
+        SimulationSettingsData data = sceneDefaults.Clone();
+        HudLayoutState layout = HudLayoutState.FileExists ? null : HudLayoutState.Current;
+        LegacySettingsMigration.Import(data, layout);
+
+        try
+        {
+            File.WriteAllText(SettingsFilePath, SettingsJson.ToOverridesJson(data, sceneDefaults));
+            if (layout != null) HudLayoutState.Save();
+            LegacySettingsMigration.DeleteLegacyKeys();
+            Debug.Log($"[SimulationSettings] Imported old PlayerPrefs settings into {SettingsFilePath}");
+        }
+        catch (Exception e)
+        {
+            // Keep the old keys so the import can be retried next time.
+            Debug.LogError($"[SimulationSettings] Could not import old settings: {e.Message}");
+        }
+    }
+
+    private static int ClampQualityLevel(int level)
+    {
+        int count = QualitySettings.names.Length;
+        return count == 0 ? 0 : Mathf.Clamp(level, 0, count - 1);
+    }
+
+    /// <summary>
+    /// Returns <paramref name="path"/> if it can be created and written to, otherwise a folder
+    /// under persistentDataPath. An empty path means &lt;project&gt;/Recordings.
+    /// </summary>
     public string ValidateAndGetSavePath(string path)
     {
         string validPath = path;
@@ -347,22 +521,22 @@ public class SimulationSettings : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(validPath))
         {
-            validPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "../Recordings"));
+            validPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../Recordings"));
         }
 
         try
         {
-            if (!System.IO.Directory.Exists(validPath))
+            if (!Directory.Exists(validPath))
             {
-                System.IO.Directory.CreateDirectory(validPath);
+                Directory.CreateDirectory(validPath);
             }
 
             // Test write permission by creating a temporary file
-            string testFile = System.IO.Path.Combine(validPath, ".test_write_perm");
-            System.IO.File.WriteAllText(testFile, "test");
-            System.IO.File.Delete(testFile);
+            string testFile = Path.Combine(validPath, ".test_write_perm");
+            File.WriteAllText(testFile, "test");
+            File.Delete(testFile);
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogWarning($"[SimulationSettings] Cannot write to configured path '{validPath}': {e.Message}. Falling back to persistentDataPath.");
             useFallback = true;
@@ -370,15 +544,15 @@ public class SimulationSettings : MonoBehaviour
 
         if (useFallback)
         {
-            validPath = System.IO.Path.Combine(Application.persistentDataPath, "Recordings");
+            validPath = Path.Combine(Application.persistentDataPath, "Recordings");
             try
             {
-                if (!System.IO.Directory.Exists(validPath))
+                if (!Directory.Exists(validPath))
                 {
-                    System.IO.Directory.CreateDirectory(validPath);
+                    Directory.CreateDirectory(validPath);
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogError($"[SimulationSettings] Failed to create fallback directory '{validPath}': {e.Message}");
             }
@@ -387,70 +561,11 @@ public class SimulationSettings : MonoBehaviour
         return validPath;
     }
 
-    public void SaveSettings()
-    {
-        PlayerPrefs.SetString("PublishROSToggle", PublishROS.ToString());
-        PlayerPrefs.SetString("DisplaySimToggle", DisplaySimObjects.ToString());
-        PlayerPrefs.SetString("PublishGTObjectMap", PublishGTObjectMap.ToString());
-        PlayerPrefs.SetString("NoWaterModeToggle", NoWaterMode.ToString());
-        PlayerPrefs.SetString("EnableShadowsToggle", EnableShadows.ToString());
-        PlayerPrefs.SetInt("HydrophonesNumberOption", HydrophonesNumberOption);
-
-        PlayerPrefs.SetString("PublishDVLToggle", PublishDVL.ToString());
-        PlayerPrefs.SetString("PublishIMUToggle", PublishIMU.ToString());
-        PlayerPrefs.SetString("PublishDepthToggle", PublishDepth.ToString());
-        PlayerPrefs.SetString("PublishHydrophonesToggle", PublishHydrophones.ToString());
-        PlayerPrefs.SetString("PublishFrontCamToggle", PublishFrontCam.ToString());
-        PlayerPrefs.SetString("PublishDownCamToggle", PublishDownCam.ToString());
-        PlayerPrefs.SetString("PublishDepthCameraToggle", PublishDepthCamera.ToString());
-        PlayerPrefs.SetString("StreamZEDCameraToggle", StreamZEDCamera.ToString());
-
-        PlayerPrefs.SetString("VisualizeDVLToggle", VisualizeDVL.ToString());
-        PlayerPrefs.SetString("VisualizeIMUToggle", VisualizeIMU.ToString());
-        PlayerPrefs.SetString("VisualizeDepthToggle", VisualizeDepth.ToString());
-
-        PlayerPrefs.SetString("EnableDVLNoiseToggle", EnableDVLNoise.ToString());
-        PlayerPrefs.SetString("EnableIMUNoiseToggle", EnableIMUNoise.ToString());
-        PlayerPrefs.SetString("EnableDepthNoiseToggle", EnableDepthNoise.ToString());
-
-        PlayerPrefs.SetString("DrawerConfigOpen", DrawerConfigOpen.ToString());
-        PlayerPrefs.SetString("DrawerControlsOpen", DrawerControlsOpen.ToString());
-        PlayerPrefs.SetString("DrawerTelemetryOpen", DrawerTelemetryOpen.ToString());
-        PlayerPrefs.SetString("DrawerSensorsOpen", DrawerSensorsOpen.ToString());
-        PlayerPrefs.SetString("DrawerCameraOpen", DrawerCameraOpen.ToString());
-
-        PlayerPrefs.SetString("frontCamRate", FrontCamRate.ToString());
-        PlayerPrefs.SetString("downCamRate", DownCamRate.ToString());
-        PlayerPrefs.SetString("frontCamWidth", FrontCamWidth.ToString());
-        PlayerPrefs.SetString("frontCamHeight", FrontCamHeight.ToString());
-        PlayerPrefs.SetString("frontCamFOV", FrontCamFOV.ToString());
-        PlayerPrefs.SetString("SimulateWaterRefraction", SimulateWaterRefraction.ToString());
-        PlayerPrefs.SetString("WaterRefractionIndex", WaterRefractionIndex.ToString());
-        PlayerPrefs.SetString("downCamWidth", DownCamWidth.ToString());
-        PlayerPrefs.SetString("downCamHeight", DownCamHeight.ToString());
-        PlayerPrefs.SetString("downCamFOV", DownCamFOV.ToString());
-        PlayerPrefs.SetString("downCamRefractionScale", DownCamRefractionScale.ToString());
-        PlayerPrefs.SetString("UseJPEGCompression", UseJPEGCompression.ToString());
-        PlayerPrefs.SetString("JPEGQuality", JPEGQuality.ToString());
-
-        PlayerPrefs.SetString("poseRate", PoseRate.ToString());
-        PlayerPrefs.SetString("qualityLevel", QualityLevel.ToString());
-        PlayerPrefs.SetString("SnapshotSavePath", SnapshotSavePath);
-
-        PlayerPrefs.Save();
-    }
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        // Automatically save settings to PlayerPrefs when changed in Inspector
-        // This ensures that when we press Play, the LoadSettings() call in Awake
-        // loads the values we just set in the Inspector.
-        if (isLoaded)
-        {
-            SaveSettings();
-            ApplyShadows();
-        }
+        // Only keeps the Inspector value in range; nothing is saved from edit mode.
+        QualityLevel = ClampQualityLevel(QualityLevel);
     }
 #endif
 }

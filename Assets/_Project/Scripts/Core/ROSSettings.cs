@@ -1,17 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// Centralized registry for all ROS topic names and frame IDs.
-/// 
-/// COORDINATE FRAME CONVENTIONS:
-/// - DVL (FRD): +X Forward, +Y Right, +Z Down
-/// - IMU (FLU): +X Forward, +Y Left, +Z Up
-/// - Depth: + Down (Positive value increasing with depth)
-/// - Ground Truth (FLU): +X Forward, +Y Left, +Z Up
-/// 
-/// HANDEDNESS:
-/// All angular data (velocities/accelerations) across all sensors follows the 
-/// RIGHT-HAND RULE (positive = CCW when viewed along the axis).
+/// Central list of the ROS topic names and frame IDs the sim uses. The values serialized in each
+/// scene are the ones that count; the defaults below match the AUV software.
+///
+/// FRAME CONVENTIONS (what each publisher actually sends):
+/// - Body and world data use ROS FLU: +X forward, +Y left, +Z up. This covers the IMU
+///   (imu_link), the ground-truth twist/accel/orientation (auv_link) and the ground-truth pose
+///   and object map (pool_link, relative to the AUV's start pose projected to the surface).
+/// - DVL velocity is in the DVL's own FRD frame (dvl_link): +X forward, +Y right, +Z down.
+///   DVL dead reckoning and odometry positions are NED relative to the start pose.
+/// - Depth is a positive number that grows as the AUV goes deeper.
+/// - Camera images use optical frames: +Z out of the lens, +X right, +Y down in the image.
+/// - Angular rates follow the right-hand rule about the axes of the frame they are expressed in.
 /// </summary>
 [DefaultExecutionOrder(-100)]
 public class ROSSettings : MonoBehaviour
@@ -25,10 +26,12 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Grabber/dropper opening command (UInt8, 0 = closed, 255 = fully open). Matches the AUV planner's /actuators/grabber")]
     public string GrabberTopic = "/actuators/grabber";
 
-    [Tooltip("Topic for dropper trigger command (Bool)")]
+    [Tooltip("Old dropper trigger topic (Bool). The AUV uses GrabberTopic instead")]
+    [System.Obsolete("use GrabberTopic")]
     public string DropperTopic = "/auv/dropper/trigger";
 
-    [Tooltip("Topic for gripper command (BooL)")]
+    [Tooltip("Old gripper trigger topic (Bool). The AUV uses GrabberTopic instead")]
+    [System.Obsolete("use GrabberTopic")]
     public string GripperTopic = "/auv/gripper/trigger";
 
     [Tooltip("Topic for torpedo launch command (Bool)")]
@@ -54,9 +57,6 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Depth sensor data topic")]
     public string DepthTopic = "/sensors/depth/z";
 
-    [Tooltip("Hydrophone bearing data topic")]
-    public string HydrophonesTopic = "/sensors/hydrophones/data";
-
     [Tooltip("Front camera image topic")]
     public string FrontCameraTopic = "/zed/zed_node/rgb/color/rect/image";
 
@@ -69,15 +69,8 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("ROS clock topic for time synchronization")]
     public string ClockTopic = "/clock";
 
+    [Tooltip("The AUV's state estimate (PoseStamped). Shown in the HUD telemetry and as the believed-pose marker")]
     public string StatePoseTopic = "/state/pose";
-
-    // State Components
-    public string StateXTopic = "/auv/state/x";
-    public string StateYTopic = "/auv/state/y";
-    public string StateZTopic = "/auv/state/z";
-    public string StateThetaXTopic = "/auv/state/theta_x";
-    public string StateThetaYTopic = "/auv/state/theta_y";
-    public string StateThetaZTopic = "/auv/state/theta_z";
 
     [Space(10)]
     [Header("Ground Truth")]
@@ -96,9 +89,11 @@ public class ROSSettings : MonoBehaviour
     [Tooltip("Ground truth pose (relative to start)")]
     public string GroundTruthPoseTopic = "/auv/ground_truth/pose";
 
-    [Header("Competition")]
+    [Header("Vision and Pingers")]
+    [Tooltip("Pinger bearing topic used by the pinger bearing visualizer")]
     public string PingerBearingTopic = "/sensors/hydrophones/pinger_bearing";
-    public string VisionDetectionFrameTopic = "/vision/detection_frame";
+
+    [Tooltip("Object map topic. The sim publishes ground truth here when SimulationSettings.PublishGTObjectMap is on")]
     public string VisionObjectMapTopic = "/vision/object_map";
 
     [Tooltip("VIO camera pose from ZED positional tracking")]
@@ -115,18 +110,21 @@ public class ROSSettings : MonoBehaviour
     public string FrontCamFrameId = "zed_left_camera_frame_optical";
     public string DownCamFrameId = "down_camera_optical_frame";
     public string DepthCamFrameId = "zed_left_camera_frame_optical";
-    public string PressureFrameId = "pressure_link";
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // Only remove this component: the GameObject also carries SimulationSettings and others.
+            Debug.LogWarning("[ROSSettings] A second ROSSettings was found; removing the duplicate component.");
+            Destroy(this);
+            return;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 }

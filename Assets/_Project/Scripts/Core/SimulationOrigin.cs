@@ -10,21 +10,30 @@ using Utils;
 public class SimulationOrigin : MonoBehaviour
 {
     private static SimulationOrigin _instance;
-    public static SimulationOrigin Instance 
+    private static bool reportedMissing;
+
+    /// <summary>
+    /// The scene's origin. If the scene has no SimulationOrigin, this logs an error once and adds
+    /// one to the SimulationSettings GameObject so the sensors keep working; add it to the scene
+    /// to silence the error. Returns null only if there is no SimulationSettings either.
+    /// </summary>
+    public static SimulationOrigin Instance
     {
         get
         {
-            if (_instance == null)
+            if (_instance != null) return _instance;
+
+            _instance = FindFirstObjectByType<SimulationOrigin>();
+            if (_instance == null && Application.isPlaying && SimulationSettings.Instance != null)
             {
-                _instance = FindFirstObjectByType<SimulationOrigin>();
-                if (_instance == null)
+                if (!reportedMissing)
                 {
-                    GameObject go = new GameObject("SimulationOrigin_AutoCreated");
-                    _instance = go.AddComponent<SimulationOrigin>();
-                    Debug.Log("[SimulationOrigin] Auto-created singleton instance.");
-                    // Force initialization immediately upon creation
-                    _instance.InitializeOrigin();
+                    Debug.LogError("[SimulationOrigin] No SimulationOrigin in the scene. Add one next to SimulationSettings. " +
+                                   "Using a temporary one on the SimulationSettings GameObject for now.");
+                    reportedMissing = true;
                 }
+                // Awake runs inside AddComponent and registers the instance.
+                SimulationSettings.Instance.gameObject.AddComponent<SimulationOrigin>();
             }
             return _instance;
         }
@@ -50,11 +59,17 @@ public class SimulationOrigin : MonoBehaviour
     {
         if (_instance != null && _instance != this)
         {
-            Destroy(gameObject);
+            Debug.LogWarning("[SimulationOrigin] A second SimulationOrigin was found; removing the duplicate component.");
+            Destroy(this);
             return;
         }
         _instance = this;
         InitializeOrigin();
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this) _instance = null;
     }
 
     private void Start()
@@ -97,9 +112,7 @@ public class SimulationOrigin : MonoBehaviour
             
             if (cam != null)
             {
-                // Billboard: Face the camera
-                // standard billboard: transform.LookAt(transform.position + cam.transform.rotation * Vector3.back, cam.transform.rotation * Vector3.up);
-                // Simple LookRotation:
+                // Billboard: keep the label facing the camera.
                 originLabelObj.transform.rotation = Quaternion.LookRotation(originLabelObj.transform.position - cam.transform.position);
             }
         }

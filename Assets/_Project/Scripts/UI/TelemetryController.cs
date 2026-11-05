@@ -1,70 +1,74 @@
+using System;
+using RosMessageTypes.Geometry;
+using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Unity.Robotics.ROSTCPConnector;
-using RosMessageTypes.Std;
 
 /// <summary>
-/// Handles the Telemetry drawer UI: subscribes to ROS state topics and updates position/rotation labels.
-/// Extracted from SimulatorHUD for better separation of concerns.
+/// Handles the Telemetry drawer: shows the AUV's own state estimate from the state pose topic
+/// (position in metres, roll/pitch/yaw in degrees, ROS FLU).
+/// ROS-TCP-Connector runs subscriber callbacks from its Update on the main thread, so the labels
+/// can be written directly.
 /// </summary>
-public class TelemetryController
+public class TelemetryController : IDisposable
 {
-    // UI Elements - Position & Orientation
     private Label textPosX, textPosY, textPosZ;
     private Label textRotX, textRotY, textRotZ;
-    private Label textMissionStatus;
-    
-    private ROSConnection ros;
-    
+
+    private readonly ROSConnection ros;
+    private string subscribedTopic;
+
     public TelemetryController(VisualElement root, ROSConnection rosConnection)
     {
         ros = rosConnection;
         QueryElements(root);
     }
-    
+
     private void QueryElements(VisualElement root)
     {
-        textPosX = root.Q<Label>("Text-PosX");
-        textPosY = root.Q<Label>("Text-PosY");
-        textPosZ = root.Q<Label>("Text-PosZ");
-        textRotX = root.Q<Label>("Text-RotX");
-        textRotY = root.Q<Label>("Text-RotY");
-        textRotZ = root.Q<Label>("Text-RotZ");
-        textMissionStatus = root.Q<Label>("Text-MissionStatus");
+        textPosX = root.Q<Label>(HudIds.TextPosX);
+        textPosY = root.Q<Label>(HudIds.TextPosY);
+        textPosZ = root.Q<Label>(HudIds.TextPosZ);
+        textRotX = root.Q<Label>(HudIds.TextRotX);
+        textRotY = root.Q<Label>(HudIds.TextRotY);
+        textRotZ = root.Q<Label>(HudIds.TextRotZ);
     }
-    
+
     /// <summary>
-    /// Subscribe to ROS state topics for telemetry display.
+    /// Subscribe to the AUV's state pose for telemetry display.
     /// </summary>
     public void SubscribeToTelemetry()
     {
-        if (ros == null) return;
-        
-        ros.Subscribe<Float64Msg>(ROSSettings.Instance.StateXTopic, msg => UpdateLabel(textPosX, $"{msg.data:F2} m"));
-        ros.Subscribe<Float64Msg>(ROSSettings.Instance.StateYTopic, msg => UpdateLabel(textPosY, $"{msg.data:F2} m"));
-        ros.Subscribe<Float64Msg>(ROSSettings.Instance.StateZTopic, msg => UpdateLabel(textPosZ, $"{msg.data:F2} m"));
-        
-        ros.Subscribe<Float64Msg>(ROSSettings.Instance.StateThetaXTopic, msg => UpdateLabel(textRotX, $"{msg.data:F1}°"));
-        ros.Subscribe<Float64Msg>(ROSSettings.Instance.StateThetaYTopic, msg => UpdateLabel(textRotY, $"{msg.data:F1}°"));
-        ros.Subscribe<Float64Msg>(ROSSettings.Instance.StateThetaZTopic, msg => UpdateLabel(textRotZ, $"{msg.data:F1}°"));
+        if (ros == null || ROSSettings.Instance == null || subscribedTopic != null) return;
+
+        subscribedTopic = ROSSettings.Instance.StatePoseTopic;
+        SharedRosSubscription.Add<PoseStampedMsg>(ros, subscribedTopic, OnStatePose);
     }
-    
-    private void UpdateLabel(Label label, string text)
+
+    private void OnStatePose(PoseStampedMsg msg)
     {
-        // UI Toolkit is not thread safe, must run on main thread
-        UnityMainThreadDispatcher.Instance().Enqueue(() => {
-            if (label != null) label.text = text;
-        });
+        var p = msg.pose.position;
+        SetText(textPosX, HudFormat.Num(p.x, "F2") + " m");
+        SetText(textPosY, HudFormat.Num(p.y, "F2") + " m");
+        SetText(textPosZ, HudFormat.Num(p.z, "F2") + " m");
+
+        var o = msg.pose.orientation;
+        Vector3 rpy = HudFormat.RollPitchYawDegrees(new Quaternion((float)o.x, (float)o.y, (float)o.z, (float)o.w));
+        SetText(textRotX, HudFormat.Num(rpy.x, "F1") + "°");
+        SetText(textRotY, HudFormat.Num(rpy.y, "F1") + "°");
+        SetText(textRotZ, HudFormat.Num(rpy.z, "F1") + "°");
     }
-    
-    /// <summary>
-    /// Update mission status text.
-    /// </summary>
-    public void SetMissionStatus(string status)
+
+    private static void SetText(Label label, string text)
     {
-        if (textMissionStatus != null)
-        {
-            textMissionStatus.text = status;
-        }
+        if (label != null) label.text = text;
+    }
+
+    /// <summary>Stops listening to the state pose topic.</summary>
+    public void Dispose()
+    {
+        if (subscribedTopic == null) return;
+        SharedRosSubscription.Remove<PoseStampedMsg>(subscribedTopic, OnStatePose);
+        subscribedTopic = null;
     }
 }

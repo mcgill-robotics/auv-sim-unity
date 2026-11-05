@@ -865,7 +865,7 @@ PlayerSettings:
   webWasm2023: 0
   scriptingDefineSymbols:
     Server: 
-    Standalone: ROS2;CREST_OCEAN
+    Standalone: ROS2
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
