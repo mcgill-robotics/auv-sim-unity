@@ -200,7 +200,6 @@ public class Dropper : MonoBehaviour
     // Function to detect if there is an object within the dropper's grab area
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Object entered dropper grab area: " + other.gameObject.name);
         // Check if the object has a Rigidbody and is not already kinematic
         Rigidbody candidateObject = other.GetComponent<Rigidbody>();
 
@@ -216,6 +215,7 @@ public class Dropper : MonoBehaviour
             return;
         }
 
+        Debug.Log("Object entered dropper grab area: " + other.gameObject.name);
         candidateObjects.Add(candidateObject);
     }
 
