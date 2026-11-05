@@ -4608,7 +4608,7 @@ MonoBehaviour:
   ThrusterForcesTopic: /propulsion/forces
   DropperTopic: /auv/dropper/trigger
   GripperTopic: /auv/gripper/trigger
-  TorpedoLaunchTopic: /auv/torpedo/launch
+  TorpedoLaunchTopic: /actuators/torpedo
   TorpedoResetTopic: /auv/torpedo/reset
   DVLTopic: dvl/velocity
   DVLDeadReckoningTopic: dvl/dead_reckoning
@@ -4637,8 +4637,8 @@ MonoBehaviour:
   VisionObjectMapTopic: /vision/object_map
   VIOPoseTopic: /vision/vio_pose
   OdomFrameId: odom
-  WorldFrameId: world
-  BaseLinkFrameId: base_link
+  WorldFrameId: pool_link
+  BaseLinkFrameId: auv_link
   ImuFrameId: imu_link
   DvlFrameId: dvl_link
   FrontCamFrameId: zed_left_camera_optical_frame
