@@ -1,16 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Robotics.ROSTCPConnector;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Handles the Config drawer UI: sensor toggles, camera parameters, quality settings, save button.
-/// Extracted from SimulatorHUD for better separation of concerns.
+/// Handles the Config drawer: sensor toggles, camera parameters, graphics options and the
+/// SAVE / RESET buttons.
+///
+/// Every control writes its value into <see cref="SimulationSettings"/> as soon as it changes
+/// (applying it live where the sim supports that) and marks the settings unsaved. Nothing is
+/// written to disk until SAVE is pressed. Fields labelled "(restart)" are only read when the
+/// scene starts, so they need SAVE and a restart.
 /// </summary>
-public class SettingsController
+public class SettingsController : IDisposable
 {
-    // UI Elements - Settings Toggles
+    private const string SaveLabel = "SAVE SETTINGS";
+    private const string SaveLabelUnsaved = "SAVE SETTINGS *";
+
+    // Settings toggles
     private Toggle togglePublishROS;
-    private Toggle toggleSimObjects;
     private Toggle toggleGTObjectMap;
     private Toggle toggleStreamZED;
     private Toggle toggleWater;
@@ -24,7 +34,7 @@ public class SettingsController
     private Toggle toggleDownCam;
     private Toggle toggleDepthCamera;
 
-    // UI Elements - Camera Parameters
+    // Camera parameters
     private IntegerField inputFrontRate;
     private IntegerField inputDownRate;
     private IntegerField inputFrontW;
@@ -32,272 +42,311 @@ public class SettingsController
     private IntegerField inputDownW;
     private IntegerField inputDownH;
 
-    // UI Elements - Dropdowns & Buttons
+    // Dropdowns and buttons
     private DropdownField dropdownQuality;
     private DropdownField dropdownScreenRes;
     private Button btnSave;
+    private Button btnReset;
 
-    private ROSConnection ros;
-    private System.Action<string> logCallback;
+    private readonly ROSConnection ros;
+    private readonly Action<string> logCallback;
 
-    public SettingsController(VisualElement root, ROSConnection rosConnection, System.Action<string> log)
+    // Undo actions for every callback registered on the UI or on other objects, run in Dispose.
+    private readonly List<Action> unregister = new List<Action>();
+
+    public SettingsController(VisualElement root, ROSConnection rosConnection, Action<string> log)
     {
         ros = rosConnection;
         logCallback = log;
         QueryElements(root);
-        RegisterCallbacks(root);
+        PopulateDropdowns();
+        RegisterCallbacks();
     }
 
     private void QueryElements(VisualElement root)
     {
-        // Settings toggles
-        togglePublishROS = root.Q<Toggle>("Toggle-PublishROS");
-        toggleSimObjects = root.Q<Toggle>("Toggle-SimObjects");
-        toggleGTObjectMap = root.Q<Toggle>("Toggle-GTObjectMap");
-        toggleStreamZED = root.Q<Toggle>("Toggle-StreamZED");
-        toggleWater = root.Q<Toggle>("Toggle-Water");
-        toggleShadows = root.Q<Toggle>("Toggle-Shadows");
-        toggleFreeCamera = root.Q<Toggle>("Toggle-FreeCamera");
-        toggleDVL = root.Q<Toggle>("Toggle-DVL");
-        toggleIMU = root.Q<Toggle>("Toggle-IMU");
-        toggleDepth = root.Q<Toggle>("Toggle-Depth");
-        toggleHydro = root.Q<Toggle>("Toggle-Hydro");
-        toggleFrontCam = root.Q<Toggle>("Toggle-FrontCam");
-        toggleDownCam = root.Q<Toggle>("Toggle-DownCam");
-        toggleDepthCamera = root.Q<Toggle>("Toggle-DepthCamera");
+        togglePublishROS = root.Q<Toggle>(HudIds.TogglePublishROS);
+        toggleGTObjectMap = root.Q<Toggle>(HudIds.ToggleGTObjectMap);
+        toggleStreamZED = root.Q<Toggle>(HudIds.ToggleStreamZED);
+        toggleWater = root.Q<Toggle>(HudIds.ToggleWater);
+        toggleShadows = root.Q<Toggle>(HudIds.ToggleShadows);
+        toggleFreeCamera = root.Q<Toggle>(HudIds.ToggleFreeCamera);
+        toggleDVL = root.Q<Toggle>(HudIds.ToggleDVL);
+        toggleIMU = root.Q<Toggle>(HudIds.ToggleIMU);
+        toggleDepth = root.Q<Toggle>(HudIds.ToggleDepth);
+        toggleHydro = root.Q<Toggle>(HudIds.ToggleHydro);
+        toggleFrontCam = root.Q<Toggle>(HudIds.ToggleFrontCam);
+        toggleDownCam = root.Q<Toggle>(HudIds.ToggleDownCam);
+        toggleDepthCamera = root.Q<Toggle>(HudIds.ToggleDepthCamera);
 
-        // Camera parameters
-        inputFrontRate = root.Q<IntegerField>("Input-FrontRate");
-        inputDownRate = root.Q<IntegerField>("Input-DownRate");
-        inputFrontW = root.Q<IntegerField>("Input-FrontW");
-        inputFrontH = root.Q<IntegerField>("Input-FrontH");
-        inputDownW = root.Q<IntegerField>("Input-DownW");
-        inputDownH = root.Q<IntegerField>("Input-DownH");
+        inputFrontRate = root.Q<IntegerField>(HudIds.InputFrontRate);
+        inputDownRate = root.Q<IntegerField>(HudIds.InputDownRate);
+        inputFrontW = root.Q<IntegerField>(HudIds.InputFrontW);
+        inputFrontH = root.Q<IntegerField>(HudIds.InputFrontH);
+        inputDownW = root.Q<IntegerField>(HudIds.InputDownW);
+        inputDownH = root.Q<IntegerField>(HudIds.InputDownH);
 
-        // Dropdowns and buttons
-        dropdownQuality = root.Q<DropdownField>("Dropdown-Quality");
-        dropdownScreenRes = root.Q<DropdownField>("Dropdown-ScreenRes");
-        btnSave = root.Q<Button>("Btn-Save");
+        dropdownQuality = root.Q<DropdownField>(HudIds.DropdownQuality);
+        dropdownScreenRes = root.Q<DropdownField>(HudIds.DropdownScreenRes);
+        btnSave = root.Q<Button>(HudIds.BtnSave);
+        btnReset = root.Q<Button>(HudIds.BtnResetDefaults);
     }
 
-    private void RegisterCallbacks(VisualElement root)
+    private void PopulateDropdowns()
     {
-        // Water toggle - immediate effect (Inverted: Enable Water = true means NoWaterMode = false)
-        if (toggleWater != null)
+        if (dropdownQuality != null)
         {
-            toggleWater.RegisterValueChangedCallback(evt =>
-            {
-                if (SimulationSettings.Instance != null)
-                {
-                    SimulationSettings.Instance.NoWaterMode = !evt.newValue;
-                    SimulationSettings.Instance.ApplyNoWaterMode();
-                }
-            });
+            dropdownQuality.choices = QualitySettings.names.ToList();
+        }
+    }
+
+    private void RegisterCallbacks()
+    {
+        // "Enable Water" is the inverse of NoWaterMode.
+        BindToggle(toggleWater, (s, v) => { s.NoWaterMode = !v; s.ApplyNoWaterMode(); });
+        BindToggle(toggleShadows, (s, v) => { s.EnableShadows = v; s.ApplyShadows(); });
+        BindToggle(togglePublishROS, (s, v) => { s.PublishROS = v; UpdateROSConnectionState(); });
+        BindToggle(toggleGTObjectMap, (s, v) => s.PublishGTObjectMap = v);
+        BindToggle(toggleStreamZED, (s, v) => s.StreamZEDCamera = v);
+        BindToggle(toggleDVL, (s, v) => s.PublishDVL = v);
+        BindToggle(toggleIMU, (s, v) => s.PublishIMU = v);
+        BindToggle(toggleDepth, (s, v) => s.PublishDepth = v);
+        BindToggle(toggleHydro, (s, v) => s.PublishHydrophones = v);
+        BindToggle(toggleFrontCam, (s, v) => s.PublishFrontCam = v);
+        BindToggle(toggleDownCam, (s, v) => s.PublishDownCam = v);
+        BindToggle(toggleDepthCamera, (s, v) => s.PublishDepthCamera = v);
+
+        BindInt(inputFrontRate, nameof(SimulationSettings.FrontCamRate), (s, v) => s.FrontCamRate = v);
+        BindInt(inputDownRate, nameof(SimulationSettings.DownCamRate), (s, v) => s.DownCamRate = v);
+        BindInt(inputFrontW, nameof(SimulationSettings.FrontCamWidth), (s, v) => s.FrontCamWidth = v);
+        BindInt(inputFrontH, nameof(SimulationSettings.FrontCamHeight), (s, v) => s.FrontCamHeight = v);
+        BindInt(inputDownW, nameof(SimulationSettings.DownCamWidth), (s, v) => s.DownCamWidth = v);
+        BindInt(inputDownH, nameof(SimulationSettings.DownCamHeight), (s, v) => s.DownCamHeight = v);
+
+        if (dropdownQuality != null)
+        {
+            EventCallback<ChangeEvent<string>> cb = evt => OnQualityChanged();
+            dropdownQuality.RegisterValueChangedCallback(cb);
+            unregister.Add(() => dropdownQuality.UnregisterValueChangedCallback(cb));
         }
 
-        // Shadows toggle - immediate effect
-        if (toggleShadows != null)
+        if (dropdownScreenRes != null)
         {
-            toggleShadows.RegisterValueChangedCallback(evt =>
-            {
-                if (SimulationSettings.Instance != null)
-                {
-                    SimulationSettings.Instance.EnableShadows = evt.newValue;
-                    SimulationSettings.Instance.ApplyShadows();
-                }
-            });
+            EventCallback<ChangeEvent<string>> cb = evt => OnScreenResolutionChanged(evt.newValue);
+            dropdownScreenRes.RegisterValueChangedCallback(cb);
+            unregister.Add(() => dropdownScreenRes.UnregisterValueChangedCallback(cb));
         }
 
-        // Free Camera toggle - immediate effect
+        // The free camera is a view choice, not a setting: it switches live and is not saved.
         if (toggleFreeCamera != null)
         {
-            toggleFreeCamera.RegisterValueChangedCallback(evt =>
+            EventCallback<ChangeEvent<bool>> cb = evt =>
             {
-                if (CameraManager.Instance != null)
-                {
-                    if (evt.newValue)
-                        CameraManager.Instance.ActivateFreeCam();
-                    else
-                        CameraManager.Instance.ActivateFollowCam();
-                }
-            });
+                if (CameraManager.Instance == null) return;
+                if (evt.newValue) CameraManager.Instance.ActivateFreeCam();
+                else CameraManager.Instance.ActivateFollowCam();
+            };
+            toggleFreeCamera.RegisterValueChangedCallback(cb);
+            unregister.Add(() => toggleFreeCamera.UnregisterValueChangedCallback(cb));
         }
 
-        // Sensor publishing toggles - immediate effect (no restart needed)
-        if (togglePublishROS != null)
+        CameraManager cameraManager = CameraManager.Instance;
+        if (cameraManager != null)
         {
-            togglePublishROS.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishROS = evt.newValue;
-            });
+            // Keeps the toggle in sync when the camera is switched with the keyboard.
+            Action<bool> onCameraChanged = isFree => toggleFreeCamera?.SetValueWithoutNotify(isFree);
+            cameraManager.FreeCameraChanged += onCameraChanged;
+            unregister.Add(() => { if (cameraManager != null) cameraManager.FreeCameraChanged -= onCameraChanged; });
         }
 
-        if (toggleGTObjectMap != null)
+        SimulationSettings settings = SimulationSettings.Instance;
+        if (settings != null)
         {
-            toggleGTObjectMap.RegisterValueChangedCallback(evt =>
+            Action<bool> onUnsaved = RefreshSaveButton;
+            Action onReloaded = LoadSettingsToUI;
+            settings.UnsavedChangesChanged += onUnsaved;
+            settings.SettingsReloaded += onReloaded;
+            unregister.Add(() =>
             {
-                SimulationSettings.Instance.PublishGTObjectMap = evt.newValue;
+                if (settings == null) return;
+                settings.UnsavedChangesChanged -= onUnsaved;
+                settings.SettingsReloaded -= onReloaded;
             });
         }
 
-        if (toggleDVL != null)
-        {
-            toggleDVL.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishDVL = evt.newValue;
-            });
-        }
-
-        if (toggleIMU != null)
-        {
-            toggleIMU.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishIMU = evt.newValue;
-            });
-        }
-
-        if (toggleDepth != null)
-        {
-            toggleDepth.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishDepth = evt.newValue;
-            });
-        }
-
-        if (toggleHydro != null)
-        {
-            toggleHydro.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishHydrophones = evt.newValue;
-            });
-        }
-
-        if (toggleFrontCam != null)
-        {
-            toggleFrontCam.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishFrontCam = evt.newValue;
-            });
-        }
-
-        if (toggleDownCam != null)
-        {
-            toggleDownCam.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishDownCam = evt.newValue;
-            });
-        }
-
-        if (toggleDepthCamera != null)
-        {
-            toggleDepthCamera.RegisterValueChangedCallback(evt =>
-            {
-                SimulationSettings.Instance.PublishDepthCamera = evt.newValue;
-            });
-        }
-
-        // Save button
         if (btnSave != null)
         {
             btnSave.clicked += OnSaveSettings;
+            unregister.Add(() => btnSave.clicked -= OnSaveSettings);
+        }
+
+        if (btnReset != null)
+        {
+            btnReset.clicked += OnResetToDefaults;
+            unregister.Add(() => btnReset.clicked -= OnResetToDefaults);
+        }
+    }
+
+    private void BindToggle(Toggle toggle, Action<SimulationSettings, bool> apply)
+    {
+        if (toggle == null) return;
+        EventCallback<ChangeEvent<bool>> cb = evt =>
+        {
+            var s = SimulationSettings.Instance;
+            if (s == null) return;
+            apply(s, evt.newValue);
+            s.MarkUnsaved();
+        };
+        toggle.RegisterValueChangedCallback(cb);
+        unregister.Add(() => toggle.UnregisterValueChangedCallback(cb));
+    }
+
+    /// <summary>
+    /// Binds a number field to a settings field and keeps it inside that field's [Range].
+    /// The field only reports a value when the user presses Enter or leaves it, so the check
+    /// does not fight half-typed numbers.
+    /// </summary>
+    private void BindInt(IntegerField field, string settingName, Action<SimulationSettings, int> apply)
+    {
+        if (field == null) return;
+        field.isDelayed = true;
+
+        bool hasRange = SimulationSettings.TryGetRange(settingName, out float min, out float max);
+        int lo = hasRange ? Mathf.CeilToInt(min) : 1;
+        int hi = hasRange ? Mathf.FloorToInt(max) : int.MaxValue;
+        field.tooltip = hasRange ? $"{lo} to {hi}" : "Must be greater than 0";
+
+        EventCallback<ChangeEvent<int>> cb = evt =>
+        {
+            var s = SimulationSettings.Instance;
+            if (s == null) return;
+
+            int value = Mathf.Clamp(evt.newValue, Mathf.Max(lo, 1), hi);
+            if (value != evt.newValue)
+            {
+                field.SetValueWithoutNotify(value);
+                logCallback?.Invoke($"{settingName} must be between {Mathf.Max(lo, 1)} and {hi}; using {value}.");
+            }
+            apply(s, value);
+            s.MarkUnsaved();
+        };
+        field.RegisterValueChangedCallback(cb);
+        unregister.Add(() => field.UnregisterValueChangedCallback(cb));
+    }
+
+    private void OnQualityChanged()
+    {
+        var s = SimulationSettings.Instance;
+        if (s == null || dropdownQuality == null || dropdownQuality.index < 0) return;
+
+        s.QualityLevel = dropdownQuality.index;
+        s.ApplyQualityLevel();
+        UpdateThrusterQuality(s.QualityLevel);
+        s.MarkUnsaved();
+    }
+
+    private void OnScreenResolutionChanged(string value)
+    {
+        var s = SimulationSettings.Instance;
+        if (s == null || string.IsNullOrEmpty(value)) return;
+
+        s.ScreenResolution = value;
+        s.ApplyScreenResolution();
+        s.MarkUnsaved();
+    }
+
+    private static void UpdateThrusterQuality(int level)
+    {
+        // Thrusters caches the quality level to decide whether to play motor sounds.
+        var thrusters = UnityEngine.Object.FindFirstObjectByType<Thrusters>();
+        if (thrusters != null)
+        {
+            thrusters.UpdateQualityLevel(level);
         }
     }
 
     /// <summary>
-    /// Load current settings values to UI elements.
+    /// Copies the current settings into the UI without triggering the change callbacks.
     /// </summary>
     public void LoadSettingsToUI()
     {
-        if (SimulationSettings.Instance == null) return;
+        var s = SimulationSettings.Instance;
+        if (s == null) return;
 
-        if (togglePublishROS != null) togglePublishROS.value = SimulationSettings.Instance.PublishROS;
-        if (toggleSimObjects != null) toggleSimObjects.value = SimulationSettings.Instance.DisplaySimObjects;
-        if (toggleGTObjectMap != null) toggleGTObjectMap.value = SimulationSettings.Instance.PublishGTObjectMap;
+        togglePublishROS?.SetValueWithoutNotify(s.PublishROS);
+        toggleGTObjectMap?.SetValueWithoutNotify(s.PublishGTObjectMap);
         if (toggleStreamZED != null)
         {
 #if UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX || UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            toggleStreamZED.value = SimulationSettings.Instance.StreamZEDCamera;
+            toggleStreamZED.SetValueWithoutNotify(s.StreamZEDCamera);
             toggleStreamZED.style.display = DisplayStyle.Flex;
 #else
-            toggleStreamZED.value = false;
+            toggleStreamZED.SetValueWithoutNotify(false);
             toggleStreamZED.style.display = DisplayStyle.None;
 #endif
         }
-        if (toggleWater != null) toggleWater.value = !SimulationSettings.Instance.NoWaterMode;
-        if (toggleShadows != null) toggleShadows.value = SimulationSettings.Instance.EnableShadows;
-        if (toggleDVL != null) toggleDVL.value = SimulationSettings.Instance.PublishDVL;
-        if (toggleIMU != null) toggleIMU.value = SimulationSettings.Instance.PublishIMU;
-        if (toggleDepth != null) toggleDepth.value = SimulationSettings.Instance.PublishDepth;
-        if (toggleHydro != null) toggleHydro.value = SimulationSettings.Instance.PublishHydrophones;
-        if (toggleFrontCam != null) toggleFrontCam.value = SimulationSettings.Instance.PublishFrontCam;
-        if (toggleDownCam != null) toggleDownCam.value = SimulationSettings.Instance.PublishDownCam;
-        if (toggleDepthCamera != null) toggleDepthCamera.value = SimulationSettings.Instance.PublishDepthCamera;
+        toggleWater?.SetValueWithoutNotify(!s.NoWaterMode);
+        toggleShadows?.SetValueWithoutNotify(s.EnableShadows);
+        toggleDVL?.SetValueWithoutNotify(s.PublishDVL);
+        toggleIMU?.SetValueWithoutNotify(s.PublishIMU);
+        toggleDepth?.SetValueWithoutNotify(s.PublishDepth);
+        toggleHydro?.SetValueWithoutNotify(s.PublishHydrophones);
+        toggleFrontCam?.SetValueWithoutNotify(s.PublishFrontCam);
+        toggleDownCam?.SetValueWithoutNotify(s.PublishDownCam);
+        toggleDepthCamera?.SetValueWithoutNotify(s.PublishDepthCamera);
+        toggleFreeCamera?.SetValueWithoutNotify(CameraManager.Instance != null && CameraManager.Instance.IsFreeCameraActive);
 
-        if (inputFrontRate != null) inputFrontRate.value = SimulationSettings.Instance.FrontCamRate;
-        if (inputDownRate != null) inputDownRate.value = SimulationSettings.Instance.DownCamRate;
-        if (inputFrontW != null) inputFrontW.value = SimulationSettings.Instance.FrontCamWidth;
-        if (inputFrontH != null) inputFrontH.value = SimulationSettings.Instance.FrontCamHeight;
-        if (inputDownW != null) inputDownW.value = SimulationSettings.Instance.DownCamWidth;
-        if (inputDownH != null) inputDownH.value = SimulationSettings.Instance.DownCamHeight;
+        inputFrontRate?.SetValueWithoutNotify(s.FrontCamRate);
+        inputDownRate?.SetValueWithoutNotify(s.DownCamRate);
+        inputFrontW?.SetValueWithoutNotify(s.FrontCamWidth);
+        inputFrontH?.SetValueWithoutNotify(s.FrontCamHeight);
+        inputDownW?.SetValueWithoutNotify(s.DownCamWidth);
+        inputDownH?.SetValueWithoutNotify(s.DownCamHeight);
 
-        if (dropdownQuality != null) dropdownQuality.index = SimulationSettings.Instance.QualityLevel;
+        if (dropdownQuality != null && s.QualityLevel >= 0 && s.QualityLevel < dropdownQuality.choices.Count)
+        {
+            dropdownQuality.SetValueWithoutNotify(dropdownQuality.choices[s.QualityLevel]);
+        }
+
+        if (dropdownScreenRes != null)
+        {
+            string res = string.IsNullOrEmpty(s.ScreenResolution) ? SimulationSettings.NativeResolution : s.ScreenResolution;
+            if (!dropdownScreenRes.choices.Contains(res))
+            {
+                // A size typed into the settings file that is not in the list still shows up.
+                var choices = new List<string>(dropdownScreenRes.choices) { res };
+                dropdownScreenRes.choices = choices;
+            }
+            dropdownScreenRes.SetValueWithoutNotify(res);
+        }
+
+        RefreshSaveButton(s.HasUnsavedChanges);
+    }
+
+    private void RefreshSaveButton(bool unsaved)
+    {
+        if (btnSave != null) btnSave.text = unsaved ? SaveLabelUnsaved : SaveLabel;
     }
 
     private void OnSaveSettings()
     {
-        if (SimulationSettings.Instance == null) return;
+        var s = SimulationSettings.Instance;
+        if (s == null) return;
 
-        // Transfer UI values to settings
-        if (togglePublishROS != null) SimulationSettings.Instance.PublishROS = togglePublishROS.value;
-        if (toggleSimObjects != null) SimulationSettings.Instance.DisplaySimObjects = toggleSimObjects.value;
-        if (toggleGTObjectMap != null) SimulationSettings.Instance.PublishGTObjectMap = toggleGTObjectMap.value;
-        if (toggleStreamZED != null) SimulationSettings.Instance.StreamZEDCamera = toggleStreamZED.value;
-        if (toggleWater != null) SimulationSettings.Instance.NoWaterMode = !toggleWater.value;
-        if (toggleShadows != null) SimulationSettings.Instance.EnableShadows = toggleShadows.value;
-        if (toggleDVL != null) SimulationSettings.Instance.PublishDVL = toggleDVL.value;
-        if (toggleIMU != null) SimulationSettings.Instance.PublishIMU = toggleIMU.value;
-        if (toggleDepth != null) SimulationSettings.Instance.PublishDepth = toggleDepth.value;
-        if (toggleHydro != null) SimulationSettings.Instance.PublishHydrophones = toggleHydro.value;
-        if (toggleFrontCam != null) SimulationSettings.Instance.PublishFrontCam = toggleFrontCam.value;
-        if (toggleDownCam != null) SimulationSettings.Instance.PublishDownCam = toggleDownCam.value;
-        if (toggleDepthCamera != null) SimulationSettings.Instance.PublishDepthCamera = toggleDepthCamera.value;
+        s.SaveSettings();
+        logCallback?.Invoke($"Settings saved to {SimulationSettings.SettingsFilePath}. Fields marked (restart) apply next time the scene starts.");
+    }
 
-        if (inputFrontRate != null) SimulationSettings.Instance.FrontCamRate = inputFrontRate.value;
-        if (inputDownRate != null) SimulationSettings.Instance.DownCamRate = inputDownRate.value;
-        if (inputFrontW != null) SimulationSettings.Instance.FrontCamWidth = inputFrontW.value;
-        if (inputFrontH != null) SimulationSettings.Instance.FrontCamHeight = inputFrontH.value;
-        if (inputDownW != null) SimulationSettings.Instance.DownCamWidth = inputDownW.value;
-        if (inputDownH != null) SimulationSettings.Instance.DownCamHeight = inputDownH.value;
+    private void OnResetToDefaults()
+    {
+        var s = SimulationSettings.Instance;
+        if (s == null) return;
 
-        if (dropdownQuality != null)
-        {
-            SimulationSettings.Instance.QualityLevel = dropdownQuality.index;
-            QualitySettings.SetQualityLevel(SimulationSettings.Instance.QualityLevel);
-        }
-
-        // Apply screen resolution
-        if (dropdownScreenRes != null)
-        {
-            string resSelection = dropdownScreenRes.value;
-            if (resSelection != "Native")
-            {
-                string[] parts = resSelection.Split('x');
-                if (parts.Length == 2 && int.TryParse(parts[0], out int width) && int.TryParse(parts[1], out int height))
-                {
-                    Screen.SetResolution(width, height, Screen.fullScreenMode);
-                }
-            }
-        }
-
-        // Update Thrusters cached quality level
-        var thrusters = Object.FindFirstObjectByType<Thrusters>();
-        if (thrusters != null)
-        {
-            thrusters.UpdateQualityLevel(SimulationSettings.Instance.QualityLevel);
-        }
-
-        SimulationSettings.Instance.SaveSettings();
-        logCallback?.Invoke("Settings saved. Restart may be required for some changes.");
+        // ResetToDefaults raises SettingsReloaded, which refreshes the UI through LoadSettingsToUI.
+        s.ResetToDefaults();
+        UpdateThrusterQuality(s.QualityLevel);
+        UpdateROSConnectionState();
+        logCallback?.Invoke("Settings reset to the scene defaults. Fields marked (restart) apply next time the scene starts.");
     }
 
     /// <summary>
@@ -305,7 +354,7 @@ public class SettingsController
     /// </summary>
     public void UpdateROSConnectionState()
     {
-        if (ros == null) return;
+        if (ros == null || SimulationSettings.Instance == null) return;
 
         if (SimulationSettings.Instance.PublishROS)
         {
@@ -323,5 +372,12 @@ public class SettingsController
                 logCallback?.Invoke("Disconnected from ROS.");
             }
         }
+    }
+
+    /// <summary>Removes every callback this controller registered.</summary>
+    public void Dispose()
+    {
+        foreach (Action a in unregister) a();
+        unregister.Clear();
     }
 }

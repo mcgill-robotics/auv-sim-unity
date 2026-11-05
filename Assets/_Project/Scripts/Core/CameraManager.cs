@@ -1,7 +1,8 @@
+using System;
 using UnityEngine;
 
 /// <summary>
-/// Singleton that toggles between free-roam and follow cameras (press C key).
+/// Singleton that toggles between free-roam and follow cameras (C key by default).
 /// </summary>
 public class CameraManager : MonoBehaviour
 {
@@ -10,31 +11,44 @@ public class CameraManager : MonoBehaviour
     [Header("User Cameras")]
     [Tooltip("Free roam camera GameObject (toggle with C key)")]
     public GameObject freeCam;
-    
+
     [Tooltip("Follow camera GameObject that tracks the AUV (toggle with C key)")]
     public GameObject followCam;
 
+    /// <summary>Raised whenever the active camera changes; the argument is true for the free camera.</summary>
+    public event Action<bool> FreeCameraChanged;
+
+    /// <summary>True while the free-roam camera is the active one.</summary>
+    public bool IsFreeCameraActive => freeCam != null && freeCam.activeSelf;
+
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
+            // Only remove this component: the GameObject also carries the settings components.
+            Debug.LogWarning("[CameraManager] A second CameraManager was found; removing the duplicate component.");
+            Destroy(this);
+            return;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     private void Start()
     {
-        ActivateFollowCam(); // Default
+        ActivateFollowCam();
     }
 
     private void Update()
     {
-        // Toggle Camera on 'C' press
-        if (Input.GetKeyDown(InputManager.Instance != null ? InputManager.Instance.GetKey("ToggleCamera", KeyCode.C) : KeyCode.C))
+        KeyCode toggleKey = InputManager.Instance != null
+            ? InputManager.Instance.GetKey(InputBindings.CameraToggle, KeyCode.C)
+            : KeyCode.C;
+        if (InputGate.GetKeyDown(toggleKey))
         {
             ToggleCamera();
         }
@@ -59,5 +73,6 @@ public class CameraManager : MonoBehaviour
     {
         if (freeCam) freeCam.SetActive(freeCam == activeCam);
         if (followCam) followCam.SetActive(followCam == activeCam);
+        FreeCameraChanged?.Invoke(IsFreeCameraActive);
     }
 }

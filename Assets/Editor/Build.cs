@@ -3,8 +3,15 @@ using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-public class BuildPlayerExample
+/// <summary>
+/// Build menu for local player builds (Build > ...). CI does not use this; it builds through GameCI
+/// with the same scene list (File > Build Profiles) and the same output name.
+/// </summary>
+public static class BuildMenu
 {
+    private const string OutputName = "auv-sim";
+    private const string FallbackScene = "Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity";
+
     private static string[] GetEnabledScenes()
     {
         string[] scenes = EditorBuildSettings.scenes
@@ -12,53 +19,40 @@ public class BuildPlayerExample
             .Select(s => s.path)
             .ToArray();
 
-        if (scenes.Length == 0)
-        {
-            scenes = new string[] { "Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity" };
-        }
-
-        return scenes;
+        return scenes.Length > 0 ? scenes : new[] { FallbackScene };
     }
 
-    public static void Build(string[] scenes, string path, BuildTarget target)
+    public static void Build(string path, BuildTarget target)
     {
-        BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-        buildPlayerOptions.scenes = scenes;
-        buildPlayerOptions.locationPathName = path;
-        buildPlayerOptions.target = target;
-        buildPlayerOptions.options = BuildOptions.None;
+        var options = new BuildPlayerOptions
+        {
+            scenes = GetEnabledScenes(),
+            locationPathName = path,
+            target = target,
+            options = BuildOptions.None
+        };
 
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
+        BuildReport report = BuildPipeline.BuildPlayer(options);
         BuildSummary summary = report.summary;
 
         if (summary.result == BuildResult.Succeeded)
         {
-            Debug.Log("Build succeeded: " + summary.totalSize + " bytes");
+            Debug.Log($"[BuildMenu] Build succeeded: {path} ({summary.totalSize / (1024 * 1024)} MB)");
         }
-
-        if (summary.result == BuildResult.Failed)
+        else
         {
-            Debug.LogError("Build failed");
+            Debug.LogError($"[BuildMenu] Build {summary.result}: {path}");
         }
     }
 
     [MenuItem("Build/Build Linux")]
-    public static void BuildLinux()
-    {
-        Build(GetEnabledScenes(), "Builds/Linux/sim.x86_64", BuildTarget.StandaloneLinux64);
-    }
+    public static void BuildLinux() => Build($"Builds/StandaloneLinux64/{OutputName}.x86_64", BuildTarget.StandaloneLinux64);
 
     [MenuItem("Build/Build Windows")]
-    public static void BuildWindows()
-    {
-        Build(GetEnabledScenes(), "Builds/Windows/sim.exe", BuildTarget.StandaloneWindows64);
-    }
+    public static void BuildWindows() => Build($"Builds/StandaloneWindows64/{OutputName}.exe", BuildTarget.StandaloneWindows64);
 
     [MenuItem("Build/Build Mac")]
-    public static void BuildMac()
-    {
-        Build(GetEnabledScenes(), "Builds/Mac/sim.app", BuildTarget.StandaloneOSX);
-    }
+    public static void BuildMac() => Build($"Builds/StandaloneOSX/{OutputName}.app", BuildTarget.StandaloneOSX);
 
     [MenuItem("Build/Build All")]
     public static void BuildAll()

@@ -1,11 +1,14 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
 /// Handles the Sensors drawer UI: DVL/IMU/Pressure data display and visualization toggles.
-/// Extracted from SimulatorHUD for better separation of concerns.
+/// Toggles apply immediately and mark the settings unsaved; only the Config drawer's SAVE button
+/// writes them to disk.
 /// </summary>
-public class SensorDataController
+public class SensorDataController : IDisposable
 {
     // DVL Labels
     private Label textDVLVx, textDVLVy, textDVLVz;
@@ -41,6 +44,9 @@ public class SensorDataController
     private IMUPublisher imuPublisher;
     private DepthPublisher depthPublisher;
     
+    // Undo actions for every callback registered on the UI, run in Dispose.
+    private readonly List<Action> unregister = new List<Action>();
+
     public SensorDataController(VisualElement root)
     {
         QueryElements(root);
@@ -50,119 +56,108 @@ public class SensorDataController
     private void QueryElements(VisualElement root)
     {
         // DVL
-        textDVLVx = root.Q<Label>("Text-DVLVx");
-        textDVLVy = root.Q<Label>("Text-DVLVy");
-        textDVLVz = root.Q<Label>("Text-DVLVz");
-        textDVLAlt = root.Q<Label>("Text-DVLAlt");
-        textDVLLock = root.Q<Label>("Text-DVLLock");
+        textDVLVx = root.Q<Label>(HudIds.TextDVLVx);
+        textDVLVy = root.Q<Label>(HudIds.TextDVLVy);
+        textDVLVz = root.Q<Label>(HudIds.TextDVLVz);
+        textDVLAlt = root.Q<Label>(HudIds.TextDVLAlt);
+        textDVLLock = root.Q<Label>(HudIds.TextDVLLock);
         
         // DR Pos Labels - allow them to be null if not in UXML yet
-        textDVLPosX = root.Q<Label>("Text-DVLPosX");
-        textDVLPosY = root.Q<Label>("Text-DVLPosY");
-        textDVLPosZ = root.Q<Label>("Text-DVLPosZ");
+        textDVLPosX = root.Q<Label>(HudIds.TextDVLPosX);
+        textDVLPosY = root.Q<Label>(HudIds.TextDVLPosY);
+        textDVLPosZ = root.Q<Label>(HudIds.TextDVLPosZ);
         
-        toggleDVLViz = root.Q<Toggle>("Toggle-DVLViz");
-        toggleDVLNoise = root.Q<Toggle>("Toggle-DVLNoise");
+        toggleDVLViz = root.Q<Toggle>(HudIds.ToggleDVLViz);
+        toggleDVLNoise = root.Q<Toggle>(HudIds.ToggleDVLNoise);
         
         // IMU
-        textIMUAx = root.Q<Label>("Text-IMUAx");
-        textIMUAy = root.Q<Label>("Text-IMUAy");
-        textIMUAz = root.Q<Label>("Text-IMUAz");
-        textIMUWx = root.Q<Label>("Text-IMUWx");
-        textIMUWy = root.Q<Label>("Text-IMUWy");
-        textIMUWz = root.Q<Label>("Text-IMUWz");
-        textIMURoll = root.Q<Label>("Text-IMURoll");
-        textIMUPitch = root.Q<Label>("Text-IMUPitch");
-        textIMUYaw = root.Q<Label>("Text-IMUYaw");
-        toggleIMUViz = root.Q<Toggle>("Toggle-IMUViz");
-        toggleIMUNoise = root.Q<Toggle>("Toggle-IMUNoise");
+        textIMUAx = root.Q<Label>(HudIds.TextIMUAx);
+        textIMUAy = root.Q<Label>(HudIds.TextIMUAy);
+        textIMUAz = root.Q<Label>(HudIds.TextIMUAz);
+        textIMUWx = root.Q<Label>(HudIds.TextIMUWx);
+        textIMUWy = root.Q<Label>(HudIds.TextIMUWy);
+        textIMUWz = root.Q<Label>(HudIds.TextIMUWz);
+        textIMURoll = root.Q<Label>(HudIds.TextIMURoll);
+        textIMUPitch = root.Q<Label>(HudIds.TextIMUPitch);
+        textIMUYaw = root.Q<Label>(HudIds.TextIMUYaw);
+        toggleIMUViz = root.Q<Toggle>(HudIds.ToggleIMUViz);
+        toggleIMUNoise = root.Q<Toggle>(HudIds.ToggleIMUNoise);
         
         // Depth
-        textDepthValue = root.Q<Label>("Text-DepthValue");
-        toggleDepthViz = root.Q<Toggle>("Toggle-DepthViz");
-        toggleDepthNoise = root.Q<Toggle>("Toggle-DepthNoise");
+        textDepthValue = root.Q<Label>(HudIds.TextDepthValue);
+        toggleDepthViz = root.Q<Toggle>(HudIds.ToggleDepthViz);
+        toggleDepthNoise = root.Q<Toggle>(HudIds.ToggleDepthNoise);
         
-        labelDVL = root.Q<Label>("Label-DVL");
-        labelIMU = root.Q<Label>("Label-IMU");
-        labelDepth = root.Q<Label>("Label-Depth");
+        labelDVL = root.Q<Label>(HudIds.LabelDVL);
+        labelIMU = root.Q<Label>(HudIds.LabelIMU);
+        labelDepth = root.Q<Label>(HudIds.LabelDepth);
     }
     
     private void RegisterCallbacks()
     {
-        if (toggleDVLViz != null)
+        Bind(toggleDVLViz, v =>
         {
-            toggleDVLViz.RegisterValueChangedCallback(evt => {
-                if (dvlPublisher != null)
-                {
-                    dvlPublisher.SetVisualizationActive(evt.newValue);
-                }
-                SimulationSettings.Instance.VisualizeDVL = evt.newValue;
-                SimulationSettings.Instance.SaveSettings();
-            });
-        }
-        
-        if (toggleIMUViz != null)
+            if (dvlPublisher != null) dvlPublisher.SetVisualizationActive(v);
+            SimulationSettings.Instance.VisualizeDVL = v;
+        });
+        Bind(toggleIMUViz, v =>
         {
-            toggleIMUViz.RegisterValueChangedCallback(evt => {
-                if (imuPublisher != null)
-                {
-                    imuPublisher.SetVisualizationActive(evt.newValue);
-                }
-                SimulationSettings.Instance.VisualizeIMU = evt.newValue;
-                SimulationSettings.Instance.SaveSettings();
-            });
-        }
-        
-        if (toggleDepthViz != null)
+            if (imuPublisher != null) imuPublisher.SetVisualizationActive(v);
+            SimulationSettings.Instance.VisualizeIMU = v;
+        });
+        Bind(toggleDepthViz, v =>
         {
-            toggleDepthViz.RegisterValueChangedCallback(evt => {
-                if (depthPublisher != null)
-                {
-                    depthPublisher.SetVisualizationActive(evt.newValue);
-                }
-                SimulationSettings.Instance.VisualizeDepth = evt.newValue;
-                SimulationSettings.Instance.SaveSettings();
-            });
-        }
+            if (depthPublisher != null) depthPublisher.SetVisualizationActive(v);
+            SimulationSettings.Instance.VisualizeDepth = v;
+        });
 
-        
-        // Noise Toggle Callbacks
-        if (toggleDVLNoise != null)
+        Bind(toggleDVLNoise, v =>
         {
-            toggleDVLNoise.RegisterValueChangedCallback(evt => {
-                if (dvlPublisher != null) dvlPublisher.enableNoise = evt.newValue;
-                SimulationSettings.Instance.EnableDVLNoise = evt.newValue;
-                SimulationSettings.Instance.SaveSettings();
-            });
-        }
-        
-        if (toggleIMUNoise != null)
+            if (dvlPublisher != null) dvlPublisher.enableNoise = v;
+            SimulationSettings.Instance.EnableDVLNoise = v;
+        });
+        Bind(toggleIMUNoise, v =>
         {
-            toggleIMUNoise.RegisterValueChangedCallback(evt => {
-                if (imuPublisher != null) imuPublisher.enableNoise = evt.newValue;
-                SimulationSettings.Instance.EnableIMUNoise = evt.newValue;
-                SimulationSettings.Instance.SaveSettings();
-            });
-        }
-        
-        if (toggleDepthNoise != null)
+            if (imuPublisher != null) imuPublisher.enableNoise = v;
+            SimulationSettings.Instance.EnableIMUNoise = v;
+        });
+        Bind(toggleDepthNoise, v =>
         {
-            toggleDepthNoise.RegisterValueChangedCallback(evt => {
-                if (depthPublisher != null) depthPublisher.enableNoise = evt.newValue;
-                SimulationSettings.Instance.EnableDepthNoise = evt.newValue;
-                SimulationSettings.Instance.SaveSettings();
-            });
-        }
+            if (depthPublisher != null) depthPublisher.enableNoise = v;
+            SimulationSettings.Instance.EnableDepthNoise = v;
+        });
     }
-    
+
+    private void Bind(Toggle toggle, Action<bool> apply)
+    {
+        if (toggle == null) return;
+        EventCallback<ChangeEvent<bool>> cb = evt =>
+        {
+            if (SimulationSettings.Instance == null) return;
+            apply(evt.newValue);
+            SimulationSettings.Instance.MarkUnsaved();
+        };
+        toggle.RegisterValueChangedCallback(cb);
+        unregister.Add(() => toggle.UnregisterValueChangedCallback(cb));
+    }
+
+    /// <summary>Removes every UI callback this controller registered.</summary>
+    public void Dispose()
+    {
+        foreach (Action a in unregister) a();
+        unregister.Clear();
+    }
+
     /// <summary>
     /// Find sensor publishers in the scene and apply saved visualization settings.
     /// </summary>
     public void FindPublishers()
     {
-        dvlPublisher = Object.FindFirstObjectByType<DVLPublisher>();
-        imuPublisher = Object.FindFirstObjectByType<IMUPublisher>();
-        depthPublisher = Object.FindFirstObjectByType<DepthPublisher>();
+        if (SimulationSettings.Instance == null) return;
+
+        dvlPublisher = UnityEngine.Object.FindFirstObjectByType<DVLPublisher>();
+        imuPublisher = UnityEngine.Object.FindFirstObjectByType<IMUPublisher>();
+        depthPublisher = UnityEngine.Object.FindFirstObjectByType<DepthPublisher>();
         
         // Apply saved visualization settings
         if (dvlPublisher != null)
@@ -233,12 +228,12 @@ public class SensorDataController
         {
             var vel = dvlPublisher.RosVelocity;
             
-            if (textDVLVx != null) textDVLVx.text = $"{vel.x:+0.00;-0.00}";
-            if (textDVLVy != null) textDVLVy.text = $"{vel.y:+0.00;-0.00}";
-            if (textDVLVz != null) textDVLVz.text = $"{vel.z:+0.00;-0.00}";
+            if (textDVLVx != null) textDVLVx.text = HudFormat.Num(vel.x, "+0.00;-0.00");
+            if (textDVLVy != null) textDVLVy.text = HudFormat.Num(vel.y, "+0.00;-0.00");
+            if (textDVLVz != null) textDVLVz.text = HudFormat.Num(vel.z, "+0.00;-0.00");
             
             if (textDVLAlt != null)
-                textDVLAlt.text = dvlPublisher.IsValid ? $"{dvlPublisher.LastAltitude:0.00} m" : "--- m";
+                textDVLAlt.text = dvlPublisher.IsValid ? HudFormat.Num(dvlPublisher.LastAltitude, "0.00") + " m" : "--- m";
             
             if (textDVLLock != null)
             {
@@ -250,9 +245,9 @@ public class SensorDataController
             
             // DVL Dead Reckoning Position (Odom Frame)
             var pose = dvlPublisher.RosDeadReckoningPosition;
-            if (textDVLPosX != null) textDVLPosX.text = $"{pose.x:+0.00;-0.00}";
-            if (textDVLPosY != null) textDVLPosY.text = $"{pose.y:+0.00;-0.00}";
-            if (textDVLPosZ != null) textDVLPosZ.text = $"{pose.z:+0.00;-0.00}";
+            if (textDVLPosX != null) textDVLPosX.text = HudFormat.Num(pose.x, "+0.00;-0.00");
+            if (textDVLPosY != null) textDVLPosY.text = HudFormat.Num(pose.y, "+0.00;-0.00");
+            if (textDVLPosZ != null) textDVLPosZ.text = HudFormat.Num(pose.z, "+0.00;-0.00");
         }
         
         // IMU Data - Using ROS accessors (FLU frame: X=Forward, Y=Left, Z=Up)
@@ -261,24 +256,29 @@ public class SensorDataController
             var accel = imuPublisher.RosAcceleration;
             var angVel = imuPublisher.RosAngularVelocity;
             
-            if (textIMUAx != null) textIMUAx.text = $"{accel.x:+0.0;-0.0}";
-            if (textIMUAy != null) textIMUAy.text = $"{accel.y:+0.0;-0.0}";
-            if (textIMUAz != null) textIMUAz.text = $"{accel.z:+0.0;-0.0}";
+            if (textIMUAx != null) textIMUAx.text = HudFormat.Num(accel.x, "+0.0;-0.0");
+            if (textIMUAy != null) textIMUAy.text = HudFormat.Num(accel.y, "+0.0;-0.0");
+            if (textIMUAz != null) textIMUAz.text = HudFormat.Num(accel.z, "+0.0;-0.0");
             
-            if (textIMUWx != null) textIMUWx.text = $"{angVel.x:+0.00;-0.00}";
-            if (textIMUWy != null) textIMUWy.text = $"{angVel.y:+0.00;-0.00}";
-            if (textIMUWz != null) textIMUWz.text = $"{angVel.z:+0.00;-0.00}";
+            if (textIMUWx != null) textIMUWx.text = HudFormat.Num(angVel.x, "+0.00;-0.00");
+            if (textIMUWy != null) textIMUWy.text = HudFormat.Num(angVel.y, "+0.00;-0.00");
+            if (textIMUWz != null) textIMUWz.text = HudFormat.Num(angVel.z, "+0.00;-0.00");
             
-            if (textIMURoll != null) textIMURoll.text = imuPublisher.publishOrientation ? $"{WrapAngle(imuPublisher.RosOrientation.eulerAngles.x):F1}°" : "---";
-            if (textIMUPitch != null) textIMUPitch.text = imuPublisher.publishOrientation ? $"{WrapAngle(imuPublisher.RosOrientation.eulerAngles.y):F1}°" : "---";
-            if (textIMUYaw != null) textIMUYaw.text = imuPublisher.publishOrientation ? $"{WrapAngle(imuPublisher.RosOrientation.eulerAngles.z):F1}°" : "---";
+            if (textIMURoll != null || textIMUPitch != null || textIMUYaw != null)
+            {
+                bool hasOrientation = imuPublisher.publishOrientation;
+                Vector3 rpy = hasOrientation ? HudFormat.RollPitchYawDegrees(imuPublisher.RosOrientation) : Vector3.zero;
+                if (textIMURoll != null) textIMURoll.text = hasOrientation ? HudFormat.Num(rpy.x, "F1") + "°" : "---";
+                if (textIMUPitch != null) textIMUPitch.text = hasOrientation ? HudFormat.Num(rpy.y, "F1") + "°" : "---";
+                if (textIMUYaw != null) textIMUYaw.text = hasOrientation ? HudFormat.Num(rpy.z, "F1") + "°" : "---";
+            }
         }
         
         // Depth Data
         if (depthPublisher != null)
         {
             if (textDepthValue != null)
-                textDepthValue.text = $"{depthPublisher.LastDepth:0.00} m";
+                textDepthValue.text = HudFormat.Num(depthPublisher.LastDepth, "0.00") + " m";
         }
     }
     
@@ -287,14 +287,6 @@ public class SensorDataController
     /// </summary>
     public CameraDepthPublisher GetDepthPublisher()
     {
-        return Object.FindFirstObjectByType<CameraDepthPublisher>();
-    }
-
-    private float WrapAngle(float angle)
-    {
-        angle %= 360f;
-        if (angle > 180f) angle -= 360f;
-        if (angle < -180f) angle += 360f;
-        return angle;
+        return UnityEngine.Object.FindFirstObjectByType<CameraDepthPublisher>();
     }
 }

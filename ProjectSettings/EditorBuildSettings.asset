@@ -8,5 +8,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity
     guid: b7b62cb7c21568c5cb1f8d6aba472491
+  - enabled: 1
+    path: Assets/_Project/Scenes/Main_Scenes/McGill_Pool.unity
+    guid: f380a05da44c15a5c8a09e0c3b79dda5
+  - enabled: 1
+    path: Assets/_Project/Scenes/Main_Scenes/PreQual.unity
+    guid: 3cfb097113b02299d89f7c7d6c2c43e7
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
