@@ -32,13 +32,8 @@ It communicates with the ROS software stack via TCP, simulating sensors (IMU, DV
 
 ## Current Status
 
-**Release:** v1.5
-**Engine Version:** Unity 6 (6000.0.62f1 LTS)
-**Architecture:** Component-based ROS 2 Bridge with UI Toolkit, Zero-Allocation Sensor Publishing Pipeline
-
-**Notes:**
-- **ROS 2 Integration:** Uses the optimized team fork of ROS-TCP-Connector (`v0.7.0-mcgill.3`) and ROS-TCP-Endpoint (`main-ros2-optimized`).
-- **Zero-GC Publishing:** Native JPEG encoding and ring-buffered message queues eliminate per-frame GC allocations during simulation runs.
+**Version:** Unity 6 (6000.0.62f1)
+**Architecture:** Component-based ROS Bridge with UI Toolkit
 
 ## Architecture
 
