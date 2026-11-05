@@ -46,8 +46,13 @@ namespace Sensors
             public RosMessageTypes.Geometry.Vector3Msg SizeRos;
             public RosMessageTypes.Geometry.PointMsg PosRos;
             public RosMessageTypes.Geometry.QuaternionMsg RotRos;
+            public VisionObjectMsg PrecreatedMsg;
         }
         public CachedObjectData[] cachedObjects { get; private set; }
+
+        private VisionObjectArrayMsg[] arrayMsgPool;
+        private int arrayPoolIdx = 0;
+        private VisionObjectMsg[] activeBuffer;
 
         protected override void Start()
         {
@@ -111,34 +116,57 @@ namespace Sensors
                 };
                 data.RotRos = odomRot.To<FLU>();
 
+                data.PrecreatedMsg = new VisionObjectMsg
+                {
+                    header = new RosMessageTypes.Std.HeaderMsg { stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+                    label = data.LabelString,
+                    id = label.gameObject.GetInstanceID(),
+                    confidence = defaultConfidence,
+                    size = data.SizeRos,
+                    has_orientation = true,
+                    pose = new RosMessageTypes.Geometry.PoseMsg
+                    {
+                        position = data.PosRos,
+                        orientation = data.RotRos
+                    },
+                    frames_since_last_seen = 0
+                };
+
                 cacheList.Add(data);
             }
 
             cachedObjects = cacheList.ToArray();
+            activeBuffer = new VisionObjectMsg[cachedObjects.Length];
+            arrayMsgPool = new VisionObjectArrayMsg[2]
+            {
+                new VisionObjectArrayMsg { header = new RosMessageTypes.Std.HeaderMsg { stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() } },
+                new VisionObjectArrayMsg { header = new RosMessageTypes.Std.HeaderMsg { stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() } }
+            };
         }
 
         public override void PublishMessage()
         {
             if (SimulationSettings.Instance != null && !SimulationSettings.Instance.PublishGTObjectMap) return;
-            if (cachedObjects == null || cachedObjects.Length == 0) return;
+            if (cachedObjects == null || cachedObjects.Length == 0 || arrayMsgPool == null) return;
 
             Transform referenceTransform = SimulationSettings.Instance?.AUVTransform;
             if (referenceTransform == null) return;
 
-            var msg = new VisionObjectArrayMsg();
+            var msg = arrayMsgPool[arrayPoolIdx];
+            arrayPoolIdx = 1 - arrayPoolIdx;
 
             // Generate standard ROS HeaderMsg
-            var stampMsg = ROSClock.GetROSTimestamp();
-            msg.header = new RosMessageTypes.Std.HeaderMsg
-            {
-                stamp = stampMsg,
-                frame_id = ROSSettings.Instance?.WorldFrameId ?? "pool_link"
-            };
+            ROSClock.PopulateROSTimestamp(msg.header.stamp);
+            string frameId = ROSSettings.Instance?.WorldFrameId ?? "pool_link";
+            msg.header.frame_id = frameId;
 
-            var objectsList = new List<VisionObjectMsg>(cachedObjects.Length);
+            int count = 0;
+            Vector3 refPos = referenceTransform.position;
+            float maxDistSq = maxDetectionDistance * maxDetectionDistance;
 
-            foreach (var cachedObj in cachedObjects)
+            for (int i = 0; i < cachedObjects.Length; i++)
             {
+                var cachedObj = cachedObjects[i];
                 var label = cachedObj.Labeling;
 
                 // Ensure object is active
@@ -146,30 +174,25 @@ namespace Sensors
                     continue;
 
                 // Ensure it's within detection range of AUV
-                float distance = Vector3.Distance(label.transform.position, referenceTransform.position);
-                if (distance > maxDetectionDistance)
+                Vector3 diff = label.transform.position - refPos;
+                if (diff.sqrMagnitude > maxDistSq)
                     continue;
 
-                var visionObj = new VisionObjectMsg
-                {
-                    header = msg.header,
-                    label = cachedObj.LabelString,
-                    id = label.gameObject.GetInstanceID(),
-                    confidence = defaultConfidence,
-                    size = cachedObj.SizeRos,
-                    has_orientation = true,
-                    pose = new RosMessageTypes.Geometry.PoseMsg
-                    {
-                        position = cachedObj.PosRos,
-                        orientation = cachedObj.RotRos
-                    },
-                    frames_since_last_seen = 0
-                };
+                var visionObj = cachedObj.PrecreatedMsg;
+                visionObj.header.stamp.sec = msg.header.stamp.sec;
+                visionObj.header.stamp.nanosec = msg.header.stamp.nanosec;
+                visionObj.header.frame_id = frameId;
+                visionObj.confidence = defaultConfidence;
 
-                objectsList.Add(visionObj);
+                activeBuffer[count++] = visionObj;
             }
 
-            msg.array = objectsList.ToArray();
+            if (msg.array == null || msg.array.Length != count)
+            {
+                msg.array = new VisionObjectMsg[count];
+            }
+            System.Array.Copy(activeBuffer, 0, msg.array, 0, count);
+
             ros.Publish(Topic, msg);
         }
     }

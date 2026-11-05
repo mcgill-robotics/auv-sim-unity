@@ -155,6 +155,11 @@ public class DVLPublisher : ROSPublisher
     private Vector3 localSensorOffset;
     private Vector3 currentSensorPos;
 
+    private DVLMsg[] dvlMsgPool;
+    private DVLDRMsg[] drMsgPool;
+    private OdometryMsg[] odomMsgPool;
+    private int dvlPoolIdx = 0;
+
     protected override void Start()
     {
         base.Start();
@@ -165,6 +170,54 @@ public class DVLPublisher : ROSPublisher
         dvlMsg = new DVLMsg();
         drMsg = new DVLDRMsg();
         odomMsg = new OdometryMsg();
+
+        dvlMsgPool = new DVLMsg[3];
+        drMsgPool = new DVLDRMsg[3];
+        odomMsgPool = new OdometryMsg[3];
+        for (int i = 0; i < 3; i++)
+        {
+            dvlMsgPool[i] = new DVLMsg
+            {
+                header = new HeaderMsg { frame_id = ROSSettings.Instance.DvlFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+                velocity = new Vector3Msg(),
+                covariance = new double[9],
+                beams = new DVLBeamMsg[4]
+            };
+            for (int b = 0; b < 4; b++)
+            {
+                dvlMsgPool[i].beams[b] = new DVLBeamMsg();
+            }
+
+            drMsgPool[i] = new DVLDRMsg
+            {
+                header = new HeaderMsg { frame_id = ROSSettings.Instance.WorldFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+                position = new Vector3Msg()
+            };
+
+            odomMsgPool[i] = new OdometryMsg
+            {
+                header = new HeaderMsg { frame_id = ROSSettings.Instance.WorldFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+                child_frame_id = ROSSettings.Instance.BaseLinkFrameId,
+                pose = new PoseWithCovarianceMsg
+                {
+                    pose = new PoseMsg
+                    {
+                        position = new PointMsg(),
+                        orientation = new QuaternionMsg()
+                    },
+                    covariance = new double[36]
+                },
+                twist = new TwistWithCovarianceMsg
+                {
+                    twist = new TwistMsg
+                    {
+                        linear = new Vector3Msg(),
+                        angular = new Vector3Msg()
+                    },
+                    covariance = new double[36]
+                }
+            };
+        }
 
         if (AuvRb != null)
         {
@@ -348,60 +401,98 @@ public class DVLPublisher : ROSPublisher
 
     public override void PublishMessage()
     {
-        var stamp = ROSClock.GetROSTimestamp();
-        
-        var pubDvlMsg = new DVLMsg
-        {
-            header = new HeaderMsg { stamp = stamp, frame_id = dvlMsg.header.frame_id },
-            time = dvlMsg.time,
-            velocity = new Vector3Msg { x = dvlMsg.velocity.x, y = dvlMsg.velocity.y, z = dvlMsg.velocity.z },
-            fom = dvlMsg.fom,
-            covariance = (double[])dvlMsg.covariance.Clone(),
-            altitude = dvlMsg.altitude,
-            velocity_valid = dvlMsg.velocity_valid,
-            status = dvlMsg.status,
-            form = dvlMsg.form,
-            time_of_validity = dvlMsg.time_of_validity,
-            time_of_transmission = dvlMsg.time_of_transmission,
-            beams = dvlMsg.beams != null ? (DVLBeamMsg[])dvlMsg.beams.Clone() : new DVLBeamMsg[0]
-        };
+        if (dvlMsgPool == null) return;
 
-        var pubDrMsg = new DVLDRMsg
-        {
-            header = new HeaderMsg { stamp = stamp, frame_id = drMsg.header.frame_id },
-            time = drMsg.time,
-            position = new Vector3Msg { x = drMsg.position.x, y = drMsg.position.y, z = drMsg.position.z },
-            pos_std = drMsg.pos_std,
-            roll = drMsg.roll,
-            pitch = drMsg.pitch,
-            yaw = drMsg.yaw,
-            status = drMsg.status,
-            format = drMsg.format
-        };
+        int idx = dvlPoolIdx;
+        dvlPoolIdx = (dvlPoolIdx + 1) % dvlMsgPool.Length;
 
-        var pubOdomMsg = new OdometryMsg
+        var pubDvlMsg = dvlMsgPool[idx];
+        var pubDrMsg = drMsgPool[idx];
+        var pubOdomMsg = odomMsgPool[idx];
+
+        // 1. Populate DVLMsg
+        ROSClock.PopulateROSTimestamp(pubDvlMsg.header.stamp);
+        pubDvlMsg.header.frame_id = dvlMsg.header.frame_id;
+        pubDvlMsg.time = dvlMsg.time;
+        pubDvlMsg.velocity.x = dvlMsg.velocity.x;
+        pubDvlMsg.velocity.y = dvlMsg.velocity.y;
+        pubDvlMsg.velocity.z = dvlMsg.velocity.z;
+        pubDvlMsg.fom = dvlMsg.fom;
+        if (dvlMsg.covariance != null && pubDvlMsg.covariance != null)
         {
-            header = new HeaderMsg { stamp = stamp, frame_id = odomMsg.header.frame_id },
-            child_frame_id = odomMsg.child_frame_id,
-            pose = new PoseWithCovarianceMsg
+            System.Buffer.BlockCopy(dvlMsg.covariance, 0, pubDvlMsg.covariance, 0, 9 * sizeof(double));
+        }
+        pubDvlMsg.altitude = dvlMsg.altitude;
+        pubDvlMsg.velocity_valid = dvlMsg.velocity_valid;
+        pubDvlMsg.status = dvlMsg.status;
+        pubDvlMsg.form = dvlMsg.form;
+        pubDvlMsg.time_of_validity = dvlMsg.time_of_validity;
+        pubDvlMsg.time_of_transmission = dvlMsg.time_of_transmission;
+        if (dvlMsg.beams != null && pubDvlMsg.beams != null)
+        {
+            for (int b = 0; b < 4 && b < dvlMsg.beams.Length; b++)
             {
-                pose = new PoseMsg
+                var srcBeam = dvlMsg.beams[b];
+                var dstBeam = pubDvlMsg.beams[b];
+                if (srcBeam != null && dstBeam != null)
                 {
-                    position = new PointMsg { x = odomMsg.pose.pose.position.x, y = odomMsg.pose.pose.position.y, z = odomMsg.pose.pose.position.z },
-                    orientation = new QuaternionMsg { x = odomMsg.pose.pose.orientation.x, y = odomMsg.pose.pose.orientation.y, z = odomMsg.pose.pose.orientation.z, w = odomMsg.pose.pose.orientation.w }
-                },
-                covariance = (double[])odomMsg.pose.covariance.Clone()
-            },
-            twist = new TwistWithCovarianceMsg
-            {
-                twist = new TwistMsg
-                {
-                    linear = new Vector3Msg { x = odomMsg.twist.twist.linear.x, y = odomMsg.twist.twist.linear.y, z = odomMsg.twist.twist.linear.z },
-                    angular = new Vector3Msg { x = odomMsg.twist.twist.angular.x, y = odomMsg.twist.twist.angular.y, z = odomMsg.twist.twist.angular.z }
-                },
-                covariance = (double[])odomMsg.twist.covariance.Clone()
+                    dstBeam.id = srcBeam.id;
+                    dstBeam.velocity = srcBeam.velocity;
+                    dstBeam.distance = srcBeam.distance;
+                    dstBeam.rssi = srcBeam.rssi;
+                    dstBeam.nsd = srcBeam.nsd;
+                    dstBeam.valid = srcBeam.valid;
+                }
             }
-        };
+        }
+
+        // 2. Populate DVLDRMsg
+        pubDrMsg.header.stamp.sec = pubDvlMsg.header.stamp.sec;
+        pubDrMsg.header.stamp.nanosec = pubDvlMsg.header.stamp.nanosec;
+        pubDrMsg.header.frame_id = drMsg.header.frame_id;
+        pubDrMsg.time = drMsg.time;
+        pubDrMsg.position.x = drMsg.position.x;
+        pubDrMsg.position.y = drMsg.position.y;
+        pubDrMsg.position.z = drMsg.position.z;
+        pubDrMsg.pos_std = drMsg.pos_std;
+        pubDrMsg.roll = drMsg.roll;
+        pubDrMsg.pitch = drMsg.pitch;
+        pubDrMsg.yaw = drMsg.yaw;
+        pubDrMsg.status = drMsg.status;
+        pubDrMsg.format = drMsg.format;
+
+        // 3. Populate OdometryMsg
+        pubOdomMsg.header.stamp.sec = pubDvlMsg.header.stamp.sec;
+        pubOdomMsg.header.stamp.nanosec = pubDvlMsg.header.stamp.nanosec;
+        pubOdomMsg.header.frame_id = odomMsg.header.frame_id;
+        pubOdomMsg.child_frame_id = odomMsg.child_frame_id;
+
+        pubOdomMsg.pose.pose.position.x = odomMsg.pose.pose.position.x;
+        pubOdomMsg.pose.pose.position.y = odomMsg.pose.pose.position.y;
+        pubOdomMsg.pose.pose.position.z = odomMsg.pose.pose.position.z;
+
+        pubOdomMsg.pose.pose.orientation.x = odomMsg.pose.pose.orientation.x;
+        pubOdomMsg.pose.pose.orientation.y = odomMsg.pose.pose.orientation.y;
+        pubOdomMsg.pose.pose.orientation.z = odomMsg.pose.pose.orientation.z;
+        pubOdomMsg.pose.pose.orientation.w = odomMsg.pose.pose.orientation.w;
+
+        if (odomMsg.pose.covariance != null && pubOdomMsg.pose.covariance != null)
+        {
+            System.Buffer.BlockCopy(odomMsg.pose.covariance, 0, pubOdomMsg.pose.covariance, 0, 36 * sizeof(double));
+        }
+
+        pubOdomMsg.twist.twist.linear.x = odomMsg.twist.twist.linear.x;
+        pubOdomMsg.twist.twist.linear.y = odomMsg.twist.twist.linear.y;
+        pubOdomMsg.twist.twist.linear.z = odomMsg.twist.twist.linear.z;
+
+        pubOdomMsg.twist.twist.angular.x = odomMsg.twist.twist.angular.x;
+        pubOdomMsg.twist.twist.angular.y = odomMsg.twist.twist.angular.y;
+        pubOdomMsg.twist.twist.angular.z = odomMsg.twist.twist.angular.z;
+
+        if (odomMsg.twist.covariance != null && pubOdomMsg.twist.covariance != null)
+        {
+            System.Buffer.BlockCopy(odomMsg.twist.covariance, 0, pubOdomMsg.twist.covariance, 0, 36 * sizeof(double));
+        }
 
         ros.Publish(Topic, pubDvlMsg);
         ros.Publish(ROSSettings.Instance.DVLDeadReckoningTopic, pubDrMsg);
@@ -809,8 +900,11 @@ public class DVLPublisher : ROSPublisher
                     
                     foreach (var r in beamArrowRenderers[i])
                     {
-                        r.material = mat;
-                        VisualizationUtils.SetColorProperty(r, col);
+                        if (r != null)
+                        {
+                            r.sharedMaterial = mat;
+                            VisualizationUtils.SetColorProperty(r, col);
+                        }
                     }
                 }
             }

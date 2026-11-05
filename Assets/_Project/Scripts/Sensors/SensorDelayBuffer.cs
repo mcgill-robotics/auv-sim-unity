@@ -37,7 +37,10 @@ public class SensorDelayBuffer : MonoBehaviour
     public float maxDvlPingInterval = 0.22f;
 
     private Rigidbody rb;
-    private List<RigidbodyStateSample> buffer = new List<RigidbodyStateSample>();
+    private const int BufferCapacity = 256;
+    private readonly RigidbodyStateSample[] ringBuffer = new RigidbodyStateSample[BufferCapacity];
+    private int head = 0;
+    private int count = 0;
 
     private float dvlPingTimer = 0f;
     private Vector3 lastPingPosition;
@@ -73,7 +76,8 @@ public class SensorDelayBuffer : MonoBehaviour
             Debug.Log($"[SensorDelayBuffer] Randomized latency to {delayTime * 1000f:F1}ms and DVL ping interval to {dvlPingInterval * 1000f:F1}ms.");
         }
 
-        buffer.Clear();
+        head = 0;
+        count = 0;
         dvlPingTimer = 0f;
         hasInitialPing = false;
 
@@ -116,15 +120,28 @@ public class SensorDelayBuffer : MonoBehaviour
             unthrottledVelocity = rb.linearVelocity // Unthrottled velocity (for IMU linear acceleration)
         };
 
-        buffer.Add(sample);
+        ringBuffer[head] = sample;
+        head = (head + 1) % BufferCapacity;
+        if (count < BufferCapacity)
+        {
+            count++;
+        }
     }
 
     private void PruneBuffer(float currentTime)
     {
         // Maintain up to 2.0 seconds of history, pruning older samples
-        while (buffer.Count > 1 && (currentTime - buffer[0].timestamp) > 2.0f)
+        while (count > 1)
         {
-            buffer.RemoveAt(0);
+            int oldestIdx = (head - count + BufferCapacity) % BufferCapacity;
+            if (currentTime - ringBuffer[oldestIdx].timestamp > 2.0f)
+            {
+                count--;
+            }
+            else
+            {
+                break;
+            }
         }
     }
 
@@ -136,7 +153,7 @@ public class SensorDelayBuffer : MonoBehaviour
     {
         if (delaySeconds < 0f) delaySeconds = delayTime;
 
-        if (buffer.Count == 0)
+        if (count == 0)
         {
             if (rb != null)
             {
@@ -155,16 +172,18 @@ public class SensorDelayBuffer : MonoBehaviour
 
         float targetTime = Time.time - delaySeconds;
 
-        int bestIndex = 0;
-        float minDiff = Mathf.Abs(buffer[0].timestamp - targetTime);
+        int newestIdx = (head - 1 + BufferCapacity) % BufferCapacity;
+        int bestIndex = newestIdx;
+        float minDiff = Mathf.Abs(ringBuffer[newestIdx].timestamp - targetTime);
 
-        for (int i = 1; i < buffer.Count; i++)
+        for (int i = 1; i < count; i++)
         {
-            float diff = Mathf.Abs(buffer[i].timestamp - targetTime);
-            if (diff < minDiff)
+            int idx = (head - 1 - i + BufferCapacity * 2) % BufferCapacity;
+            float diff = Mathf.Abs(ringBuffer[idx].timestamp - targetTime);
+            if (diff <= minDiff)
             {
                 minDiff = diff;
-                bestIndex = i;
+                bestIndex = idx;
             }
             else
             {
@@ -173,7 +192,7 @@ public class SensorDelayBuffer : MonoBehaviour
             }
         }
 
-        return buffer[bestIndex];
+        return ringBuffer[bestIndex];
     }
 
     /// <summary>

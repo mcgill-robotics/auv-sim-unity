@@ -33,6 +33,26 @@ public class ROSClock : ROSPublisher
         }
         return new RosMessageTypes.BuiltinInterfaces.TimeMsg();
     }
+
+    /// <summary>
+    /// Zero-allocation helper that populates an existing TimeMsg instance with the current ROS timestamp.
+    /// </summary>
+    public static void PopulateROSTimestamp(RosMessageTypes.BuiltinInterfaces.TimeMsg target)
+    {
+        if (target == null) return;
+        if (_instance != null)
+        {
+            int secs = (int)_instance.clockTimePassed;
+            uint nsecs = (uint)((_instance.clockTimePassed - secs) * 1e9);
+            target.sec = secs;
+            target.nanosec = nsecs;
+        }
+        else
+        {
+            target.sec = 0;
+            target.nanosec = 0;
+        }
+    }
     
     /// <summary>
     /// Returns the current ROS clock time in nanoseconds (high precision for ZED/async operations).
@@ -52,12 +72,18 @@ public class ROSClock : ROSPublisher
         return new ROSTime(_instance.clockTimePassed);
     }
 
+    private readonly ClockMsg[] clockMsgPool = new ClockMsg[3]
+    {
+        new ClockMsg { clock = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+        new ClockMsg { clock = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+        new ClockMsg { clock = new RosMessageTypes.BuiltinInterfaces.TimeMsg() }
+    };
+    private int clockPoolIdx = 0;
+
     protected override void Start()
     {
         _instance = this;
         base.Start();
-        clockMsg = new ClockMsg();
-        clockMsg.clock = new RosMessageTypes.BuiltinInterfaces.TimeMsg();
 
         // Sim time starts at 0 every play session. It used to be persisted in PlayerPrefs,
         // which made /clock continue from wherever the last session (on that machine) stopped.
@@ -81,10 +107,12 @@ public class ROSClock : ROSPublisher
         int secs = (int)clockTimePassed;
         uint nsecs = (uint)((clockTimePassed - secs) * 1e9);
         
-        clockMsg.clock.sec = secs;
-        clockMsg.clock.nanosec = nsecs;
+        var msg = clockMsgPool[clockPoolIdx];
+        clockPoolIdx = (clockPoolIdx + 1) % clockMsgPool.Length;
+        msg.clock.sec = secs;
+        msg.clock.nanosec = nsecs;
         
-        ros.Publish(Topic, clockMsg);
+        ros.Publish(Topic, msg);
     }
 
 }

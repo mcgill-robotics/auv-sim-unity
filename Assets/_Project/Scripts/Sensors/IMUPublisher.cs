@@ -164,13 +164,36 @@ public class IMUPublisher : ROSPublisher
         ros.RegisterPublisher<ImuMsg>(Topic);
     }
 
+    private ImuMsg[] imuMsgPool;
+    private int imuPoolIdx = 0;
+
     private void InitializeMessage()
     {
-        imuMsg = new ImuMsg();
-        imuMsg.header = new HeaderMsg { frame_id = ROSSettings.Instance.ImuFrameId };
-        imuMsg.orientation_covariance = new double[9];
-        imuMsg.angular_velocity_covariance = new double[9];
-        imuMsg.linear_acceleration_covariance = new double[9];
+        imuMsg = new ImuMsg
+        {
+            header = new HeaderMsg { frame_id = ROSSettings.Instance.ImuFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+            orientation = new QuaternionMsg(),
+            orientation_covariance = new double[9],
+            angular_velocity = new Vector3Msg(),
+            angular_velocity_covariance = new double[9],
+            linear_acceleration = new Vector3Msg(),
+            linear_acceleration_covariance = new double[9]
+        };
+
+        imuMsgPool = new ImuMsg[3];
+        for (int i = 0; i < imuMsgPool.Length; i++)
+        {
+            imuMsgPool[i] = new ImuMsg
+            {
+                header = new HeaderMsg { frame_id = ROSSettings.Instance.ImuFrameId, stamp = new RosMessageTypes.BuiltinInterfaces.TimeMsg() },
+                orientation = new QuaternionMsg(),
+                orientation_covariance = new double[9],
+                angular_velocity = new Vector3Msg(),
+                angular_velocity_covariance = new double[9],
+                linear_acceleration = new Vector3Msg(),
+                linear_acceleration_covariance = new double[9]
+            };
+        }
         SetCovarianceMatrices();
     }
 
@@ -259,38 +282,27 @@ public class IMUPublisher : ROSPublisher
 
     public override void PublishMessage()
     {
-        var stamp = ROSClock.GetROSTimestamp();
-        var msg = new ImuMsg
-        {
-            header = new HeaderMsg
-            {
-                stamp = stamp,
-                frame_id = ROSSettings.Instance.ImuFrameId
-            },
-            orientation = new QuaternionMsg
-            {
-                x = imuMsg.orientation.x,
-                y = imuMsg.orientation.y,
-                z = imuMsg.orientation.z,
-                w = imuMsg.orientation.w
-            },
-            orientation_covariance = (double[])imuMsg.orientation_covariance.Clone(),
-            angular_velocity = new Vector3Msg
-            {
-                x = imuMsg.angular_velocity.x,
-                y = imuMsg.angular_velocity.y,
-                z = imuMsg.angular_velocity.z
-            },
-            angular_velocity_covariance = (double[])imuMsg.angular_velocity_covariance.Clone(),
-            linear_acceleration = new Vector3Msg
-            {
-                x = imuMsg.linear_acceleration.x,
-                y = imuMsg.linear_acceleration.y,
-                z = imuMsg.linear_acceleration.z
-            },
-            linear_acceleration_covariance = (double[])imuMsg.linear_acceleration_covariance.Clone()
-        };
-        ros.Publish(Topic, msg);
+        if (imuMsgPool == null) return;
+        var pubMsg = imuMsgPool[imuPoolIdx];
+        imuPoolIdx = (imuPoolIdx + 1) % imuMsgPool.Length;
+
+        ROSClock.PopulateROSTimestamp(pubMsg.header.stamp);
+        pubMsg.header.frame_id = ROSSettings.Instance.ImuFrameId;
+
+        pubMsg.orientation.x = imuMsg.orientation.x;
+        pubMsg.orientation.y = imuMsg.orientation.y;
+        pubMsg.orientation.z = imuMsg.orientation.z;
+        pubMsg.orientation.w = imuMsg.orientation.w;
+
+        pubMsg.angular_velocity.x = imuMsg.angular_velocity.x;
+        pubMsg.angular_velocity.y = imuMsg.angular_velocity.y;
+        pubMsg.angular_velocity.z = imuMsg.angular_velocity.z;
+
+        pubMsg.linear_acceleration.x = imuMsg.linear_acceleration.x;
+        pubMsg.linear_acceleration.y = imuMsg.linear_acceleration.y;
+        pubMsg.linear_acceleration.z = imuMsg.linear_acceleration.z;
+
+        ros.Publish(Topic, pubMsg);
     }
     
     /// <summary>
@@ -372,60 +384,80 @@ public class IMUPublisher : ROSPublisher
                 LastOrientation = Quaternion.Inverse(SimulationOrigin.Instance.InitialRotation) * LastOrientation;
             }
             
-            imuMsg.orientation = LastOrientation.To<FLU>();
+            // Unity RUF to ROS FLU: x_flu = z, y_flu = -x, z_flu = y, w_flu = -w
+            imuMsg.orientation.x = LastOrientation.z;
+            imuMsg.orientation.y = -LastOrientation.x;
+            imuMsg.orientation.z = LastOrientation.y;
+            imuMsg.orientation.w = -LastOrientation.w;
         }
         else
         {
             // Raw IMU mode - orientation is unknown
             LastOrientation = Quaternion.identity;
-            imuMsg.orientation = new QuaternionMsg { x = 0, y = 0, z = 0, w = 0 };
+            imuMsg.orientation.x = 0;
+            imuMsg.orientation.y = 0;
+            imuMsg.orientation.z = 0;
+            imuMsg.orientation.w = 0;
         }
 
-        // 4. Populate message (ready for publishing)
-        imuMsg.linear_acceleration = noisyAccel.To<FLU>();
+        // 4. Populate message (ready for publishing) - Unity RUF to ROS FLU: (z, -x, y)
+        imuMsg.linear_acceleration.x = noisyAccel.z;
+        imuMsg.linear_acceleration.y = -noisyAccel.x;
+        imuMsg.linear_acceleration.z = noisyAccel.y;
         
         // Angular velocity is a PSEUDOVECTOR (axial vector, defined by cross product)
         // Standard To<FLU> is (z, -x, y) for position vectors.
         // For angular velocity, hand-rule flip affects axes differently:
-        //   - X axis (Forward): same physical axis, hand-rule flipped → negate (Roll)
-        //   - Y axis (Left): Unity X is Right, so FLU Y is -Unity X. Hand-rule flip + axis flip → cancels (Pitch)
-        //   - Z axis (Up): same physical axis, hand-rule flipped → negate (Yaw)
+        //   - X axis (Forward): same physical axis, hand-rule flipped -> negate (Roll)
+        //   - Y axis (Left): Unity X is Right, so FLU Y is -Unity X. Hand-rule flip + axis flip -> cancels (Pitch)
+        //   - Z axis (Up): same physical axis, hand-rule flipped -> negate (Yaw)
         //   Note: All angular data follows the RIGHT-HAND RULE.
-        imuMsg.angular_velocity = new Vector3Msg
-        {
-            x = -noisyAngVel.z,  // FLU X = -Unity Z (roll)
-            y = noisyAngVel.x,   // FLU Y = +Unity X (pitch) - two flips cancel
-            z = -noisyAngVel.y   // FLU Z = -Unity Y (yaw)
-        };
+        imuMsg.angular_velocity.x = -noisyAngVel.z;
+        imuMsg.angular_velocity.y = noisyAngVel.x;
+        imuMsg.angular_velocity.z = -noisyAngVel.y;
     }
 
     private void SetCovarianceMatrices()
     {
-        // Orientation covariance
-        if (publishOrientation)
-        {
-            float rollVar = (orientationNoiseRoll * Mathf.Deg2Rad) * (orientationNoiseRoll * Mathf.Deg2Rad);
-            float pitchVar = (orientationNoisePitch * Mathf.Deg2Rad) * (orientationNoisePitch * Mathf.Deg2Rad);
-            float yawVar = (orientationNoiseYaw * Mathf.Deg2Rad) * (orientationNoiseYaw * Mathf.Deg2Rad);
-            imuMsg.orientation_covariance[0] = rollVar;
-            imuMsg.orientation_covariance[4] = pitchVar;
-            imuMsg.orientation_covariance[8] = yawVar;
-        }
-        else
-        {
-            // Set first element to -1 to indicate orientation is unknown (ROS convention)
-            imuMsg.orientation_covariance[0] = -1.0;
-        }
-        
-        // Gyroscope covariance
-        double gyroVariance = gyroNoise * gyroNoise;
-        for (int i = 0; i < 9; i++) 
-            imuMsg.angular_velocity_covariance[i] = (i % 4 == 0) ? gyroVariance : 0.0;
+        if (imuMsg == null) return;
 
-        // Accelerometer covariance
-        double accelVariance = accelNoise * accelNoise;
-        for (int i = 0; i < 9; i++) 
-            imuMsg.linear_acceleration_covariance[i] = (i % 4 == 0) ? accelVariance : 0.0;
+        void ApplyCovariance(ImuMsg target)
+        {
+            // Orientation covariance
+            if (publishOrientation)
+            {
+                float rollVar = (orientationNoiseRoll * Mathf.Deg2Rad) * (orientationNoiseRoll * Mathf.Deg2Rad);
+                float pitchVar = (orientationNoisePitch * Mathf.Deg2Rad) * (orientationNoisePitch * Mathf.Deg2Rad);
+                float yawVar = (orientationNoiseYaw * Mathf.Deg2Rad) * (orientationNoiseYaw * Mathf.Deg2Rad);
+                target.orientation_covariance[0] = rollVar;
+                target.orientation_covariance[4] = pitchVar;
+                target.orientation_covariance[8] = yawVar;
+            }
+            else
+            {
+                // Set first element to -1 to indicate orientation is unknown (ROS convention)
+                target.orientation_covariance[0] = -1.0;
+            }
+            
+            // Gyroscope covariance
+            double gyroVariance = gyroNoise * gyroNoise;
+            for (int i = 0; i < 9; i++) 
+                target.angular_velocity_covariance[i] = (i % 4 == 0) ? gyroVariance : 0.0;
+
+            // Accelerometer covariance
+            double accelVariance = accelNoise * accelNoise;
+            for (int i = 0; i < 9; i++) 
+                target.linear_acceleration_covariance[i] = (i % 4 == 0) ? accelVariance : 0.0;
+        }
+
+        ApplyCovariance(imuMsg);
+        if (imuMsgPool != null)
+        {
+            for (int i = 0; i < imuMsgPool.Length; i++)
+            {
+                if (imuMsgPool[i] != null) ApplyCovariance(imuMsgPool[i]);
+            }
+        }
     }
 
     private void UpdateVisualization()
