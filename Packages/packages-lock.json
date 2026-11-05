@@ -167,11 +167,11 @@
       }
     },
     "com.unity.robotics.ros-tcp-connector": {
-      "version": "https://github.com/kaidalisohaib/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.1",
+      "version": "https://github.com/kaidalisohaib/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.2",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "32ea81376f51f923ec1c034c02f40f7b04dbb45c"
+      "hash": "0e8e48da6508c03eeda9ec8fa6abcaf27d05ed93"
     },
     "com.unity.searcher": {
       "version": "4.9.3",
