@@ -44,7 +44,10 @@ To use this module in a new scene or to generate datasets:
 ### 3. Generate Data
 1. You can enable `Test Mode` in the `BatchRunner` inspector and provide a `Test Batch Index` if you simply want to dial in your parameters visually over a short loop.
 2. Ensure your Unity Perception **DatasetCapture** options are correctly routed to your output folder and JSON dump options.
-3. Hit **Play** in the Unity Editor. The `BatchRunner` will sum up all iterations, take over the scenario loop, and smoothly apply boundaries and physical property changes as batches switch, outputting your dataset!
+3. Verify your Game View and Perception Camera resolution:
+   - **Front Camera**: 672×376 (16:9, matching ZED 2i).
+   - **Down Camera**: 640×480 (4:3, matching the downward camera). If converting down-cam datasets via `Tools > RoboSub > YOLO Converter`, set the tool's image resolution to 640×480.
+4. Hit **Play** in the Unity Editor. The `BatchRunner` will sum up all iterations, take over the scenario loop, and smoothly apply boundaries and physical property changes as batches switch, outputting your dataset!
 
 ---
 

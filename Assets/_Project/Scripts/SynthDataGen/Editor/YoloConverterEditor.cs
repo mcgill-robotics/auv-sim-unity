@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -379,7 +380,7 @@ public class YoloConverterWindow : EditorWindow
                         float normW = w / _resolution.x;
                         float normH = h / _resolution.y;
 
-                        txtContent += $"{yoloId} {centerX:F6} {centerY:F6} {normW:F6} {normH:F6}\n";
+                        txtContent += string.Format(CultureInfo.InvariantCulture, "{0} {1:F6} {2:F6} {3:F6} {4:F6}\n", yoloId, centerX, centerY, normW, normH);
                         filteredLabelCount++;
                         classCounts[yoloId] = classCounts.TryGetValue(yoloId, out int count) ? count + 1 : 1;
                     }
@@ -463,7 +464,7 @@ public class YoloConverterWindow : EditorWindow
                 {
                     float normX = pt.x / (float)width;
                     float normY = 1.0f - (pt.y / (float)height); // Unity Texture2D Y is bottom-up, YOLO Y is top-down
-                    line += $" {normX:F6} {normY:F6}";
+                    line += string.Format(CultureInfo.InvariantCulture, " {0:F6} {1:F6}", normX, normY);
                 }
                 txtContent += line + "\n";
 

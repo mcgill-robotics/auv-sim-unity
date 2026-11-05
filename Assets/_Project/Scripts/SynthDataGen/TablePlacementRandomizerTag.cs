@@ -186,10 +186,21 @@ namespace UnityEngine.Perception.Randomization.Randomizers.Tags
                     spawnCount = Math.Min(prefabConfigs.Count, nativeSamples.Length);
                 }
 
+                // Shuffle sample indices with Fisher-Yates to eliminate spatial bias
+                int[] sampleIndices = new int[nativeSamples.Length];
+                for (int s = 0; s < sampleIndices.Length; s++) sampleIndices[s] = s;
+                for (int s = sampleIndices.Length - 1; s > 0; s--)
+                {
+                    int swapIndex = randomState.NextInt(0, s + 1);
+                    int temp = sampleIndices[s];
+                    sampleIndices[s] = sampleIndices[swapIndex];
+                    sampleIndices[swapIndex] = temp;
+                }
+
                 // Spawn objects at generated positions
                 for (int i = 0; i < spawnCount; i++)
                 {
-                    var sample = nativeSamples[i];
+                    var sample = nativeSamples[sampleIndices[i]];
 
                     // Go through all prefabs at least once to guarantee at least one of 
                     // each is spawned (if spawnCount permits).

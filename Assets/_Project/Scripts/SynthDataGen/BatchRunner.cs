@@ -8,6 +8,7 @@ using ColorRgbParameter = UnityEngine.Perception.Randomization.Parameters.ColorR
 // Aliases
 using PerceptionFloatParameter = UnityEngine.Perception.Randomization.Parameters.FloatParameter;
 
+[DefaultExecutionOrder(-100)]
 public class BatchRunner : MonoBehaviour
 {
     [System.Serializable]
@@ -113,9 +114,10 @@ public class BatchRunner : MonoBehaviour
         if (testModeEnabled)
         {
             // Just run the single test batch
-            if (testBatchIndex >= 0 && testBatchIndex < batchConfigs.Count)
+            if (batchConfigs.Count > 0)
             {
-                var config = batchConfigs[testBatchIndex];
+                int safeIndex = Mathf.Clamp(testBatchIndex, 0, batchConfigs.Count - 1);
+                var config = batchConfigs[safeIndex];
                 _schedule.Add(new BatchRuntimeInfo
                 {
                     startIteration = 0,
