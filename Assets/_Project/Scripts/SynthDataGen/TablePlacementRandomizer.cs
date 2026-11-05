@@ -25,7 +25,6 @@ public class TablePlacementRandomizer : Randomizer
 
     // Find all tags in the scene and randomize their objects
     var tags = tagManager.Query<TablePlacementRandomizerTag>();
-    Debug.Log($"[TablePlacementRandomizer] Found {tags} tags to randomize.");
     foreach (TablePlacementRandomizerTag tag in tags)
     {
       // Pass a deterministic seed generated from the RandomState
@@ -36,12 +35,9 @@ public class TablePlacementRandomizer : Randomizer
   protected override void OnIterationEnd()
   {
     // Find all tags in the scene and clear their objects to ensure clean slate for next iteration
-
     var tags = tagManager.Query<TablePlacementRandomizerTag>();
-    Debug.Log($"[TablePlacementRandomizer] Clearing objects for all tags at end of iteration.");
     foreach (TablePlacementRandomizerTag tag in tags)
     {
-      Debug.Log($"[TablePlacementRandomizer] Clearing objects for tag {tag.name} at end of iteration.");
       tag.ClearObjects();
     }
   }
