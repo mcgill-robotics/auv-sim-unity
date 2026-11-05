@@ -160,8 +160,8 @@ public class DepthPublisher : ROSPublisher
 
     public override void PublishMessage()
     {
-        // data is already set in FixedUpdate -> CalculateDepth
-        ros.Publish(Topic, depthMsg);
+        // Publish fresh message instance for thread-safe serialization
+        ros.Publish(Topic, new Float32Msg(LastDepth));
     }
     
     private void UpdateVisualization()

@@ -14,8 +14,8 @@ namespace Utils
         /// </summary>
         public static float GenerateGaussian()
         {
-            // 1.0f - Random.value ensures u1 is never 0, preventing Log(0) = -Infinity
-            float u1 = 1.0f - Random.value;
+            // Clamp ensures u1 is strictly positive, preventing Log(0) = -Infinity / NaN
+            float u1 = Mathf.Max(1e-7f, 1.0f - Random.value);
             float u2 = Random.value;
             return Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
         }

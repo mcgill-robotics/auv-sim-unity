@@ -348,16 +348,64 @@ public class DVLPublisher : ROSPublisher
 
     public override void PublishMessage()
     {
-        // Update timestamp for publication
         var stamp = ROSClock.GetROSTimestamp();
-        dvlMsg.header.stamp = stamp;
         
-        drMsg.header.stamp = stamp;
-        odomMsg.header.stamp = stamp;
-        
-        ros.Publish(Topic, dvlMsg);
-        ros.Publish(ROSSettings.Instance.DVLDeadReckoningTopic, drMsg);
-        ros.Publish(ROSSettings.Instance.DVLOdometryTopic, odomMsg);
+        var pubDvlMsg = new DVLMsg
+        {
+            header = new HeaderMsg { stamp = stamp, frame_id = dvlMsg.header.frame_id },
+            time = dvlMsg.time,
+            velocity = new Vector3Msg { x = dvlMsg.velocity.x, y = dvlMsg.velocity.y, z = dvlMsg.velocity.z },
+            fom = dvlMsg.fom,
+            covariance = (double[])dvlMsg.covariance.Clone(),
+            altitude = dvlMsg.altitude,
+            velocity_valid = dvlMsg.velocity_valid,
+            status = dvlMsg.status,
+            form = dvlMsg.form,
+            time_of_validity = dvlMsg.time_of_validity,
+            time_of_transmission = dvlMsg.time_of_transmission,
+            beams = dvlMsg.beams != null ? (DVLBeamMsg[])dvlMsg.beams.Clone() : new DVLBeamMsg[0]
+        };
+
+        var pubDrMsg = new DVLDRMsg
+        {
+            header = new HeaderMsg { stamp = stamp, frame_id = drMsg.header.frame_id },
+            time = drMsg.time,
+            position = new Vector3Msg { x = drMsg.position.x, y = drMsg.position.y, z = drMsg.position.z },
+            pos_std = drMsg.pos_std,
+            roll = drMsg.roll,
+            pitch = drMsg.pitch,
+            yaw = drMsg.yaw,
+            status = drMsg.status,
+            format = drMsg.format
+        };
+
+        var pubOdomMsg = new OdometryMsg
+        {
+            header = new HeaderMsg { stamp = stamp, frame_id = odomMsg.header.frame_id },
+            child_frame_id = odomMsg.child_frame_id,
+            pose = new PoseWithCovarianceMsg
+            {
+                pose = new PoseMsg
+                {
+                    position = new PointMsg { x = odomMsg.pose.pose.position.x, y = odomMsg.pose.pose.position.y, z = odomMsg.pose.pose.position.z },
+                    orientation = new QuaternionMsg { x = odomMsg.pose.pose.orientation.x, y = odomMsg.pose.pose.orientation.y, z = odomMsg.pose.pose.orientation.z, w = odomMsg.pose.pose.orientation.w }
+                },
+                covariance = (double[])odomMsg.pose.covariance.Clone()
+            },
+            twist = new TwistWithCovarianceMsg
+            {
+                twist = new TwistMsg
+                {
+                    linear = new Vector3Msg { x = odomMsg.twist.twist.linear.x, y = odomMsg.twist.twist.linear.y, z = odomMsg.twist.twist.linear.z },
+                    angular = new Vector3Msg { x = odomMsg.twist.twist.angular.x, y = odomMsg.twist.twist.angular.y, z = odomMsg.twist.twist.angular.z }
+                },
+                covariance = (double[])odomMsg.twist.covariance.Clone()
+            }
+        };
+
+        ros.Publish(Topic, pubDvlMsg);
+        ros.Publish(ROSSettings.Instance.DVLDeadReckoningTopic, pubDrMsg);
+        ros.Publish(ROSSettings.Instance.DVLOdometryTopic, pubOdomMsg);
     }
 
     /// <summary>
@@ -367,11 +415,14 @@ public class DVLPublisher : ROSPublisher
     private void UpdateDvlMessageData()
     {
         ROSTime time = ROSClock.GetROSTime();
-        // time of validity is the center of the ping, which we approximate as the current time minus half the interval since the last publish (since the velocity is effectively averaged over that interval)
-        long timeOfValidity = time.GetMicroSec() - (lastPublishTime.GetMicroSec() / 1000 / 2);
+        long nowUs = time.GetMicroSec();
+        long lastUs = lastPublishTime.GetMicroSec();
+        // Time of validity is the center of the ping: now - (now - last) / 2
+        long timeOfValidity = nowUs - ((nowUs - lastUs) / 2);
 
         dvlMsg.header.frame_id = ROSSettings.Instance.DvlFrameId;
-        dvlMsg.time = lastPublishTime.GetMilliSec(); // Convert back to milliseconds for the message
+        // Reporting delta time since last report in milliseconds
+        dvlMsg.time = (double)(nowUs - lastUs) / 1000.0;
 
         dvlMsg.velocity = new Vector3Msg
         {
@@ -379,7 +430,8 @@ public class DVLPublisher : ROSPublisher
             y = RosVelocity.y,
             z = RosVelocity.z
         };
-        dvlMsg.fom = IsValid ? 100 : 0; // Figure of Merit based on validity
+        // Water Linked FOM is velocity uncertainty std dev in m/s (lower is better)
+        dvlMsg.fom = IsValid ? sigmaVelocityHorizontal : 10.0f;
         if (IsValid)
         {
             // 3. Velocity (Sensor Frame: FRD)
@@ -520,11 +572,16 @@ public class DVLPublisher : ROSPublisher
         
         Quaternion q = relativeRot;
         drOrientation = new Quaternion(-q.z, -q.x, q.y, q.w);
-        Vector3 drEuler = drOrientation.eulerAngles; // For debugging/UI
 
-        drMsg.roll = drEuler.x;
-        drMsg.pitch = drEuler.y;
-        drMsg.yaw = drEuler.z;
+        // Standard Tait-Bryan ZYX Euler angles from NED quaternion (roll around X, pitch around Y, yaw around Z)
+        float qx = drOrientation.x, qy = drOrientation.y, qz = drOrientation.z, qw = drOrientation.w;
+        float roll = Mathf.Atan2(2.0f * (qw * qx + qy * qz), 1.0f - 2.0f * (qx * qx + qy * qy)) * Mathf.Rad2Deg;
+        float pitch = Mathf.Asin(Mathf.Clamp(2.0f * (qw * qy - qz * qx), -1.0f, 1.0f)) * Mathf.Rad2Deg;
+        float yaw = Mathf.Atan2(2.0f * (qw * qz + qx * qy), 1.0f - 2.0f * (qy * qy + qz * qz)) * Mathf.Rad2Deg;
+
+        drMsg.roll = roll;
+        drMsg.pitch = pitch;
+        drMsg.yaw = yaw;
 
         // 4. Copy to Odometry
         odomMsg.pose.pose.position.x = drPositionNED.x;
@@ -535,8 +592,29 @@ public class DVLPublisher : ROSPublisher
         odomMsg.pose.pose.orientation.z = drOrientation.z;
         odomMsg.pose.pose.orientation.w = drOrientation.w;
 
-        // DR Pose Covariance - just set some defaults
-        drMsg.pos_std = 0.1f; // Small uncertainty
+        // Odometry pose covariance (6x6 diagonal: x, y, z, roll, pitch, yaw)
+        for (int k = 0; k < 36; k++) odomMsg.pose.covariance[k] = 0;
+        if (IsValid)
+        {
+            odomMsg.pose.covariance[0] = 0.01;
+            odomMsg.pose.covariance[7] = 0.01;
+            odomMsg.pose.covariance[14] = 0.01;
+            odomMsg.pose.covariance[21] = 0.001;
+            odomMsg.pose.covariance[28] = 0.001;
+            odomMsg.pose.covariance[35] = 0.001;
+        }
+        else
+        {
+            odomMsg.pose.covariance[0] = 10000;
+            odomMsg.pose.covariance[7] = 10000;
+            odomMsg.pose.covariance[14] = 10000;
+            odomMsg.pose.covariance[21] = 10000;
+            odomMsg.pose.covariance[28] = 10000;
+            odomMsg.pose.covariance[35] = 10000;
+        }
+
+        // DR Pose Covariance
+        drMsg.pos_std = IsValid ? 0.1f : 100f;
 
         drMsg.format = "simulation";
     }
