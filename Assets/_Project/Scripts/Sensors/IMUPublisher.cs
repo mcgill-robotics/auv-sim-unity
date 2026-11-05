@@ -259,9 +259,38 @@ public class IMUPublisher : ROSPublisher
 
     public override void PublishMessage()
     {
-        // Timestamp and publish the pre-calculated message
-        imuMsg.header.stamp = ROSClock.GetROSTimestamp();
-        ros.Publish(Topic, imuMsg);
+        var stamp = ROSClock.GetROSTimestamp();
+        var msg = new ImuMsg
+        {
+            header = new HeaderMsg
+            {
+                stamp = stamp,
+                frame_id = ROSSettings.Instance.ImuFrameId
+            },
+            orientation = new QuaternionMsg
+            {
+                x = imuMsg.orientation.x,
+                y = imuMsg.orientation.y,
+                z = imuMsg.orientation.z,
+                w = imuMsg.orientation.w
+            },
+            orientation_covariance = (double[])imuMsg.orientation_covariance.Clone(),
+            angular_velocity = new Vector3Msg
+            {
+                x = imuMsg.angular_velocity.x,
+                y = imuMsg.angular_velocity.y,
+                z = imuMsg.angular_velocity.z
+            },
+            angular_velocity_covariance = (double[])imuMsg.angular_velocity_covariance.Clone(),
+            linear_acceleration = new Vector3Msg
+            {
+                x = imuMsg.linear_acceleration.x,
+                y = imuMsg.linear_acceleration.y,
+                z = imuMsg.linear_acceleration.z
+            },
+            linear_acceleration_covariance = (double[])imuMsg.linear_acceleration_covariance.Clone()
+        };
+        ros.Publish(Topic, msg);
     }
     
     /// <summary>
@@ -323,12 +352,12 @@ public class IMUPublisher : ROSPublisher
         {
             if (simulateAHRS && enableNoise)
             {
-                // Apply AHRS-style orientation noise
+                // Apply AHRS-style orientation noise (Unity Euler: X=Pitch, Y=Yaw, Z=Roll)
                 float noiseRoll = Stochastic.GenerateGaussian() * orientationNoiseRoll;
                 float noisePitch = Stochastic.GenerateGaussian() * orientationNoisePitch;
                 float noiseYaw = Stochastic.GenerateGaussian() * orientationNoiseYaw;
                 
-                Quaternion noiseRotation = Quaternion.Euler(noiseRoll, noiseYaw, noisePitch);
+                Quaternion noiseRotation = Quaternion.Euler(noisePitch, noiseYaw, noiseRoll);
                 LastOrientation = trueOrientation * noiseRotation;
             }
             else
