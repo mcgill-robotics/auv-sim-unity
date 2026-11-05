@@ -129,9 +129,20 @@ public class PoolFloorPlacementRandomizer : Randomizer
             int spawnCount = nativeSamples.Length;
             if (maxObjectCount > 0) spawnCount = Mathf.Min(spawnCount, maxObjectCount);
 
+            // Shuffle sample indices with Fisher-Yates to eliminate spatial bias
+            int[] sampleIndices = new int[nativeSamples.Length];
+            for (int s = 0; s < sampleIndices.Length; s++) sampleIndices[s] = s;
+            for (int s = sampleIndices.Length - 1; s > 0; s--)
+            {
+                int k = RandomState.NextInt(0, s + 1);
+                int temp = sampleIndices[k];
+                sampleIndices[k] = sampleIndices[s];
+                sampleIndices[s] = temp;
+            }
+
             for (int i = 0; i < spawnCount; i++)
             {
-                var sample = nativeSamples[i];
+                var sample = nativeSamples[sampleIndices[i]];
 
                 // Go through all prefabs once to guarantee at least one of each is spawned (if spawnCount permits).
                 // Once we've spawned all of them at least once, pick randomly for the remaining duplicates.
