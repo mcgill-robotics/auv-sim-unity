@@ -95,26 +95,26 @@ public class SimulatorHUD : MonoBehaviour
         
         // Block ALL keyboard events unless typing in a text field
         root.RegisterCallback<KeyDownEvent>(evt => {
-            if (!isTyping()) { evt.PreventDefault(); evt.StopImmediatePropagation(); }
+            if (!isTyping()) { evt.StopImmediatePropagation(); }
         }, TrickleDown.TrickleDown);
         
         root.RegisterCallback<KeyUpEvent>(evt => {
-            if (!isTyping()) { evt.PreventDefault(); evt.StopImmediatePropagation(); }
+            if (!isTyping()) { evt.StopImmediatePropagation(); }
         }, TrickleDown.TrickleDown);
         
         // Block ALL navigation events unconditionally (arrow keys, tab, etc.)
         root.RegisterCallback<NavigationMoveEvent>(evt => {
-            evt.PreventDefault(); evt.StopImmediatePropagation();
+            evt.StopImmediatePropagation();
         }, TrickleDown.TrickleDown);
         
         // Block submit events (Space/Enter pressing buttons)
         root.RegisterCallback<NavigationSubmitEvent>(evt => {
-            evt.PreventDefault(); evt.StopImmediatePropagation();
+            evt.StopImmediatePropagation();
         }, TrickleDown.TrickleDown);
         
         // Block cancel events (Escape triggering UI)
         root.RegisterCallback<NavigationCancelEvent>(evt => {
-            evt.PreventDefault(); evt.StopImmediatePropagation();
+            evt.StopImmediatePropagation();
         }, TrickleDown.TrickleDown);
         
         // Auto-blur when clicking on non-input areas (releases focus back to game)
@@ -197,11 +197,11 @@ public class SimulatorHUD : MonoBehaviour
         RegisterDrawerTab("CameraDrawer-Tab", cameraDrawer, "Camera");
         
         // Load saved drawer states
-        ApplyDrawerState(configDrawer, SimulationSettings.Instance.DrawerConfigOpen);
-        ApplyDrawerState(controlsDrawer, SimulationSettings.Instance.DrawerControlsOpen);
-        ApplyDrawerState(telemetryDrawer, SimulationSettings.Instance.DrawerTelemetryOpen);
-        ApplyDrawerState(sensorsDrawer, SimulationSettings.Instance.DrawerSensorsOpen);
-        ApplyDrawerState(cameraDrawer, SimulationSettings.Instance.DrawerCameraOpen);
+        ApplyDrawerState(configDrawer, HudLayoutState.Current.ConfigOpen);
+        ApplyDrawerState(controlsDrawer, HudLayoutState.Current.ControlsOpen);
+        ApplyDrawerState(telemetryDrawer, HudLayoutState.Current.TelemetryOpen);
+        ApplyDrawerState(sensorsDrawer, HudLayoutState.Current.SensorsOpen);
+        ApplyDrawerState(cameraDrawer, HudLayoutState.Current.CameraOpen);
         
         // Log panel toggle
         if (logToggle != null && logPanel != null)
@@ -268,18 +268,16 @@ public class SimulatorHUD : MonoBehaviour
     
     private void SaveDrawerState(string drawerName, bool isOpen)
     {
-        if (SimulationSettings.Instance == null) return;
-        
+        var layout = HudLayoutState.Current;
         switch (drawerName)
         {
-            case "Config": SimulationSettings.Instance.DrawerConfigOpen = isOpen; break;
-            case "Controls": SimulationSettings.Instance.DrawerControlsOpen = isOpen; break;
-            case "Telemetry": SimulationSettings.Instance.DrawerTelemetryOpen = isOpen; break;
-            case "Sensors": SimulationSettings.Instance.DrawerSensorsOpen = isOpen; break;
-            case "Camera": SimulationSettings.Instance.DrawerCameraOpen = isOpen; break;
+            case "Config": layout.ConfigOpen = isOpen; break;
+            case "Controls": layout.ControlsOpen = isOpen; break;
+            case "Telemetry": layout.TelemetryOpen = isOpen; break;
+            case "Sensors": layout.SensorsOpen = isOpen; break;
+            case "Camera": layout.CameraOpen = isOpen; break;
         }
-        
-        SimulationSettings.Instance.SaveSettings();
+        HudLayoutState.Save();
     }
     
     private void ToggleLogPanel()
