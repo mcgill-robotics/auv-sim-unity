@@ -81,6 +81,8 @@ public class Thrusters : MonoBehaviour
     private double[] inputThrusterForces = new double[8];
     private float[] thrusterEfficiencyScalars = new float[8];
     private float[] currentThrusterLevels = new float[8];
+    private float lastRosCommandTime = -1f;
+    [SerializeField] private float commandTimeout = 0.5f;
 
 
     // Performance: State tracking to avoid redundant updates
@@ -155,11 +157,20 @@ public class Thrusters : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Zero out ROS forces if commands cease arriving
+        if (lastRosCommandTime >= 0f && Time.time - lastRosCommandTime > commandTimeout)
+        {
+            Array.Clear(rosThrusterForces, 0, rosThrusterForces.Length);
+        }
+
         for (int i = 0; i < thrusters.Length; i++)
         {
             if (thrusters[i].position.y >= 0) continue;
 
             float targetForce = (float)(rosThrusterForces[i] + inputThrusterForces[i]);
+
+            // Clamp target force asymmetrically to prevent integrator ramp windup beyond physical limits
+            targetForce = Mathf.Clamp(targetForce, -maxReverseForce, maxForwardForce);
 
             // 1. Apply Ramp-up (Motor Inertia) - command signal ramps toward target
             currentThrusterLevels[i] = Mathf.MoveTowards(currentThrusterLevels[i], targetForce, rampRate * Time.fixedDeltaTime);
@@ -174,7 +185,7 @@ public class Thrusters : MonoBehaviour
             // 3. Apply Efficiency Variance (Manufacturing variance / voltage drop)
             finalForce *= thrusterEfficiencyScalars[i];
 
-            // 4. Clamp asymmetrically based on physical limits!
+            // 4. Clamp asymmetrically based on physical limits
             finalForce = Mathf.Clamp(finalForce, -maxReverseForce, maxForwardForce);
 
             Vector3 worldForceDirection = thrusters[i].TransformDirection(Vector3.up);
@@ -252,12 +263,13 @@ public class Thrusters : MonoBehaviour
 
     private void HandleMovementInput()
     {
+        Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
+
         if (isFrozen) return;
 
-        // Ignore movement input if user is typing in HUD
+        // Ignore movement input if user is typing in HUD or text fields
+        if (!InputGate.GameKeysEnabled) return;
         if (SimulatorHUD.Instance != null && SimulatorHUD.Instance.IsInputFocused) return;
-
-        Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
 
         if (!Input.anyKey) return;
 
@@ -349,6 +361,7 @@ public class Thrusters : MonoBehaviour
 
     private void SetThrusterForces(ThrusterForcesMsg msg)
     {
+        lastRosCommandTime = Time.time;
         // Thruster order matches hardware configuration (CCL):
         // 0: back_right, 1: heave_back_right, 2: heave_front_right, 3: front_right
         // 4: front_left, 5: heave_front_left, 6: heave_back_left, 7: back_left
@@ -367,6 +380,7 @@ public class Thrusters : MonoBehaviour
     /// </summary>
     public void ResetState()
     {
+        lastRosCommandTime = -1f;
         Array.Clear(currentThrusterLevels, 0, currentThrusterLevels.Length);
         Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
         Array.Clear(rosThrusterForces, 0, rosThrusterForces.Length);
