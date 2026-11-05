@@ -88,6 +88,18 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.perception": {
+      "version": "https://github.com/kaidalisohaib/com.unity.perception-fork.git?path=/com.unity.perception#1.0.0-preview.1-mcgill.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.burst": "1.8.25",
+        "com.unity.collections": "2.6.2",
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.render-pipelines.core": "17.0.4"
+      },
+      "hash": "199421c804572fb250ba7618cf7a93a7a0740faf"
+    },
     "com.unity.performance.profile-analyzer": {
       "version": "1.2.3",
       "depth": 1,
@@ -153,6 +165,13 @@
         "com.unity.mathematics": "1.2.4",
         "com.unity.modules.terrain": "1.0.0"
       }
+    },
+    "com.unity.robotics.ros-tcp-connector": {
+      "version": "https://github.com/kaidalisohaib/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "32ea81376f51f923ec1c034c02f40f7b04dbb45c"
     },
     "com.unity.searcher": {
       "version": "4.9.3",
