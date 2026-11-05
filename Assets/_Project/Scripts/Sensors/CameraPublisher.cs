@@ -51,6 +51,7 @@ public class CameraPublisher : ROSPublisher
     private Texture2D encodingTexture;
     private byte[] cachedRawBuffer;
     private byte[] cachedFlippedBuffer;
+    private Unity.Collections.NativeArray<byte> cachedFlippedNative;
     private CompressedImageMsg[] compressedMsgPool;
     private int compressedPoolIdx = 0;
     private ImageMsg[] rawImgMsgPool;
@@ -326,31 +327,58 @@ public class CameraPublisher : ROSPublisher
 
         if (useJPEG)
         {
-            // JPEG encoding path - publish to /compressed topic using CompressedImageMsg
-            if (cachedRawBuffer == null || cachedRawBuffer.Length != rawData.Length)
-            {
-                cachedRawBuffer = new byte[rawData.Length];
-            }
-            rawData.CopyTo(cachedRawBuffer);
-            
-            // Load into texture and encode
-            if (encodingTexture != null)
-            {
-                encodingTexture.LoadRawTextureData(cachedRawBuffer);
-                encodingTexture.Apply();
-                
-                int quality = SimulationSettings.Instance.JPEGQuality;
-                var compMsg = compressedMsgPool[compressedPoolIdx];
-                compressedPoolIdx = 1 - compressedPoolIdx;
+            // Direct native JPEG encoding path - zero managed heap allocations
+            int quality = SimulationSettings.Instance.JPEGQuality;
+            int rowBytes = resolutionWidth * 3;
+            int totalBytes = resolutionWidth * resolutionHeight * 3;
 
-                compMsg.header.stamp.sec = pendingStamp.sec;
-                compMsg.header.stamp.nanosec = pendingStamp.nanosec;
-                compMsg.header.frame_id = currentFrameId;
-                compMsg.format = "jpeg";
-                compMsg.data = encodingTexture.EncodeToJPG(quality);
-
-                ros.Publish(compressedTopic, compMsg);
+            if (!cachedFlippedNative.IsCreated || cachedFlippedNative.Length != totalBytes)
+            {
+                if (cachedFlippedNative.IsCreated)
+                {
+                    cachedFlippedNative.Dispose();
+                }
+                cachedFlippedNative = new Unity.Collections.NativeArray<byte>(totalBytes, Unity.Collections.Allocator.Persistent);
             }
+
+            // Flip bottom-up readback buffer into top-down for standard JPEG orientation
+            for (int y = 0; y < resolutionHeight; y++)
+            {
+                int srcOffset = y * rowBytes;
+                int dstOffset = (resolutionHeight - 1 - y) * rowBytes;
+                Unity.Collections.NativeArray<byte>.Copy(rawData, srcOffset, cachedFlippedNative, dstOffset, rowBytes);
+            }
+
+            // Encode directly to native JPEG memory (0 managed GC alloc)
+            var jpegNative = ImageConversion.EncodeNativeArrayToJPG(
+                cachedFlippedNative,
+                UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8_SRGB,
+                (uint)resolutionWidth,
+                (uint)resolutionHeight,
+                (uint)rowBytes,
+                quality
+            );
+
+            int jpegLength = jpegNative.Length;
+            if (cachedRawBuffer == null || cachedRawBuffer.Length < jpegLength)
+            {
+                cachedRawBuffer = new byte[Mathf.Max(jpegLength * 2, 256 * 1024)];
+            }
+
+            Unity.Collections.NativeArray<byte>.Copy(jpegNative, 0, cachedRawBuffer, 0, jpegLength);
+            jpegNative.Dispose();
+
+            var compMsg = compressedMsgPool[compressedPoolIdx];
+            compressedPoolIdx = 1 - compressedPoolIdx;
+
+            compMsg.header.stamp.sec = pendingStamp.sec;
+            compMsg.header.stamp.nanosec = pendingStamp.nanosec;
+            compMsg.header.frame_id = currentFrameId;
+            compMsg.format = "jpeg";
+            compMsg.data = cachedRawBuffer;
+            compMsg.dataLength = jpegLength;
+
+            ros.Publish(compressedTopic, compMsg);
         }
         else
         {
@@ -548,6 +576,11 @@ public class CameraPublisher : ROSPublisher
         if (encodingTexture != null)
         {
             Destroy(encodingTexture);
+        }
+
+        if (cachedFlippedNative.IsCreated)
+        {
+            cachedFlippedNative.Dispose();
         }
     }
 }

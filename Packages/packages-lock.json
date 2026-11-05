@@ -89,7 +89,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.perception": {
-      "version": "https://github.com/kaidalisohaib/com.unity.perception-fork.git?path=/com.unity.perception#1.0.0-preview.1-mcgill.1",
+      "version": "https://github.com/mcgill-robotics/com.unity.perception-fork.git?path=/com.unity.perception#1.0.0-preview.1-mcgill.1",
       "depth": 0,
       "source": "git",
       "dependencies": {
@@ -167,11 +167,11 @@
       }
     },
     "com.unity.robotics.ros-tcp-connector": {
-      "version": "https://github.com/kaidalisohaib/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.2",
+      "version": "https://github.com/mcgill-robotics/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.3",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "0e8e48da6508c03eeda9ec8fa6abcaf27d05ed93"
+      "hash": "770f47909cabd3addf309f87deb4098aaba6ea27"
     },
     "com.unity.searcher": {
       "version": "4.9.3",

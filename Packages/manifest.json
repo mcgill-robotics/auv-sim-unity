@@ -1,10 +1,10 @@
 {
   "dependencies": {
     "com.unity.feature.development": "1.0.2",
-    "com.unity.perception": "https://github.com/kaidalisohaib/com.unity.perception-fork.git?path=/com.unity.perception#1.0.0-preview.1-mcgill.1",
+    "com.unity.perception": "https://github.com/mcgill-robotics/com.unity.perception-fork.git?path=/com.unity.perception#1.0.0-preview.1-mcgill.1",
     "com.unity.probuilder": "6.0.8",
     "com.unity.render-pipelines.high-definition": "17.0.4",
-    "com.unity.robotics.ros-tcp-connector": "https://github.com/kaidalisohaib/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.2",
+    "com.unity.robotics.ros-tcp-connector": "https://github.com/mcgill-robotics/ROS-TCP-Connector.git?path=/com.unity.robotics.ros-tcp-connector#v0.7.0-mcgill.3",
     "com.unity.shadergraph": "17.0.4",
     "com.unity.timeline": "1.8.9",
     "com.unity.toolchain.linux-x86_64": "2.0.11",
