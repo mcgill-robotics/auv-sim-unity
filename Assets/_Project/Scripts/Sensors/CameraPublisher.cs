@@ -151,6 +151,10 @@ public class CameraPublisher : ROSPublisher
         // Calculate Focal Length (fx, fy)
         // f = (height / 2) / tan(FOV / 2)
         double f = (resolutionHeight / 2.0) / Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        if (simulateRefraction)
+        {
+            f *= refractionScale;
+        }
         double cx = resolutionWidth / 2.0;
         double cy = resolutionHeight / 2.0;
 
@@ -286,6 +290,8 @@ public class CameraPublisher : ROSPublisher
         // Check if JPEG compression is enabled
         bool useJPEG = SimulationSettings.Instance != null && SimulationSettings.Instance.UseJPEGCompression;
         
+        string currentFrameId = cameraType == CameraType.Front ? ROSSettings.Instance.FrontCamFrameId : ROSSettings.Instance.DownCamFrameId;
+
         if (useJPEG)
         {
             // JPEG encoding path - publish to /compressed topic using CompressedImageMsg
@@ -302,26 +308,53 @@ public class CameraPublisher : ROSPublisher
                 encodingTexture.Apply();
                 
                 int quality = SimulationSettings.Instance.JPEGQuality;
-                compressedMessage.data = encodingTexture.EncodeToJPG(quality);
-                compressedMessage.header.stamp = stamp;
-                ros.Publish(compressedTopic, compressedMessage);
+                var compMsg = new CompressedImageMsg
+                {
+                    header = new HeaderMsg { stamp = stamp, frame_id = currentFrameId },
+                    format = "jpeg",
+                    data = encodingTexture.EncodeToJPG(quality)
+                };
+                ros.Publish(compressedTopic, compMsg);
             }
         }
         else
         {
             // Raw RGB8 path - publish to main topic using ImageMsg
-            if (message.data == null || message.data.Length != rawData.Length)
+            // Unity readback buffer is bottom-up; ROS REP 118 requires row 0 at the top
+            int rowBytes = resolutionWidth * 3;
+            byte[] flippedData = new byte[rawData.Length];
+            for (int y = 0; y < resolutionHeight; y++)
             {
-                message.data = new byte[rawData.Length];
+                int srcOffset = y * rowBytes;
+                int dstOffset = (resolutionHeight - 1 - y) * rowBytes;
+                Unity.Collections.NativeArray<byte>.Copy(rawData, srcOffset, flippedData, dstOffset, rowBytes);
             }
-            rawData.CopyTo(message.data);
-            message.header.stamp = stamp;
-            ros.Publish(Topic, message);
+
+            var imgMsg = new ImageMsg
+            {
+                header = new HeaderMsg { stamp = stamp, frame_id = currentFrameId },
+                encoding = "rgb8",
+                width = (uint)resolutionWidth,
+                height = (uint)resolutionHeight,
+                step = (uint)rowBytes,
+                data = flippedData
+            };
+            ros.Publish(Topic, imgMsg);
         }
 
         // Publish Camera Info with synced timestamp
-        cameraInfoMsg.header.stamp = stamp;
-        ros.Publish(cameraInfoTopic, cameraInfoMsg);
+        var infoMsg = new CameraInfoMsg
+        {
+            header = new HeaderMsg { stamp = stamp, frame_id = currentFrameId },
+            width = (uint)resolutionWidth,
+            height = (uint)resolutionHeight,
+            distortion_model = cameraInfoMsg.distortion_model,
+            D = (double[])cameraInfoMsg.D.Clone(),
+            K = (double[])cameraInfoMsg.K.Clone(),
+            R = (double[])cameraInfoMsg.R.Clone(),
+            P = (double[])cameraInfoMsg.P.Clone()
+        };
+        ros.Publish(cameraInfoTopic, infoMsg);
     }
 
     public override void PublishMessage()

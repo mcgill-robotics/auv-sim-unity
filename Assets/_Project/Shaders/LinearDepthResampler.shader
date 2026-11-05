@@ -37,25 +37,10 @@ Shader "Hidden/LinearDepthResampler"
                 uint2 pixelCoords = uint2(flippedUV * _ScreenSize.xy);
                 float depthRaw = LoadCameraDepth(pixelCoords);
                 
-                // Get linear Z depth (perpendicular distance from camera plane)
+                // Get linear Z depth (perpendicular distance from camera plane along optical axis, REP 118)
                 float linearZ = LinearEyeDepth(depthRaw, _ZBufferParams);
-                
-                // Reconstruct view-space position to get TRUE Euclidean distance
-                // UV to NDC: (0,1) -> (-1,1)
-                float2 ndc = flippedUV * 2.0 - 1.0;
-                
-                // Use inverse projection to get view-space ray direction
-                // _FrustumParams contains frustum info: x=1/tanHalfFOV, y=aspect*1/tanHalfFOV
-                // For HDRP, we use the projection matrix directly
-                float2 viewRay = ndc / float2(UNITY_MATRIX_P[0][0], UNITY_MATRIX_P[1][1]);
-                
-                // View-space position: ray * linearZ gives us the 3D position
-                float3 viewPos = float3(viewRay * linearZ, linearZ);
-                
-                // True Euclidean distance from camera origin (0,0,0 in view space)
-                float trueDistance = length(viewPos);
 
-                return float4(trueDistance, trueDistance, trueDistance, 1);
+                return float4(linearZ, linearZ, linearZ, 1);
             }
             ENDHLSL
         }

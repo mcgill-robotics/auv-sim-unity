@@ -319,12 +319,13 @@ public class CameraDepthPublisher : ROSPublisher
         if (depthRT == null || depthTexture2D == null || isReading) return;
         
         isReading = true;
+        var stamp = ROSClock.GetROSTimestamp();
         
         // Use async GPU readback to avoid stalling main thread
-        AsyncGPUReadback.Request(depthRT, 0, TextureFormat.RFloat, OnReadbackComplete);
+        AsyncGPUReadback.Request(depthRT, 0, TextureFormat.RFloat, req => OnReadbackComplete(req, stamp));
     }
     
-    private void OnReadbackComplete(AsyncGPUReadbackRequest request)
+    private void OnReadbackComplete(AsyncGPUReadbackRequest request, RosMessageTypes.BuiltinInterfaces.TimeMsg stamp)
     {
         isReading = false;
         
@@ -356,13 +357,13 @@ public class CameraDepthPublisher : ROSPublisher
         }
         
         // Publish with cached data
-        PublishOptimized();
+        PublishOptimized(stamp);
     }
     
     /// <summary>
     /// Optimized publish path that avoids GetRawTextureData() allocation.
     /// </summary>
-    private void PublishOptimized()
+    private void PublishOptimized(RosMessageTypes.BuiltinInterfaces.TimeMsg stamp)
     {
         if (cachedDepthData == null) return;
         
@@ -373,13 +374,34 @@ public class CameraDepthPublisher : ROSPublisher
             return;
         }
         
-        // 32FC1: Zero-allocation path - directly use cached buffer
-        depthMsg.data = cachedDepthData;
-        depthMsg.header.stamp = ROSClock.GetROSTimestamp();
-        ros.Publish(Topic, depthMsg);
+        // 32FC1: Clone buffer so background serialization doesn't race with GPU readback
+        byte[] publishData = new byte[cachedDepthData.Length];
+        System.Buffer.BlockCopy(cachedDepthData, 0, publishData, 0, cachedDepthData.Length);
+
+        var pubDepthMsg = new ImageMsg
+        {
+            header = new HeaderMsg { stamp = stamp, frame_id = ROSSettings.Instance.DepthCamFrameId },
+            height = (uint)publishHeight,
+            width = (uint)publishWidth,
+            encoding = encoding,
+            is_bigendian = depthMsg.is_bigendian,
+            step = (uint)(publishWidth * 4),
+            data = publishData
+        };
+        ros.Publish(Topic, pubDepthMsg);
         
-        cameraInfoMsg.header.stamp = depthMsg.header.stamp;
-        ros.Publish(cameraInfoTopic, cameraInfoMsg);
+        var pubInfoMsg = new CameraInfoMsg
+        {
+            header = new HeaderMsg { stamp = stamp, frame_id = ROSSettings.Instance.DepthCamFrameId },
+            height = (uint)publishHeight,
+            width = (uint)publishWidth,
+            distortion_model = cameraInfoMsg.distortion_model,
+            D = (double[])cameraInfoMsg.D.Clone(),
+            K = (double[])cameraInfoMsg.K.Clone(),
+            R = (double[])cameraInfoMsg.R.Clone(),
+            P = (double[])cameraInfoMsg.P.Clone()
+        };
+        ros.Publish(cameraInfoTopic, pubInfoMsg);
     }
 
     public override void PublishMessage()
