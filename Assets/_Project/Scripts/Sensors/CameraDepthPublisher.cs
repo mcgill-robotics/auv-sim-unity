@@ -428,7 +428,7 @@ public class CameraDepthPublisher : ROSPublisher
         pubDepthMsg.header.stamp.nanosec = pendingStamp.nanosec;
         pubDepthMsg.data = publishData;
 
-        ros.Publish(Topic, pubDepthMsg);
+        Publish(Topic, pubDepthMsg);
         
         if (infoMsgPool != null)
         {
@@ -438,7 +438,7 @@ public class CameraDepthPublisher : ROSPublisher
             pubInfoMsg.header.stamp.sec = pendingStamp.sec;
             pubInfoMsg.header.stamp.nanosec = pendingStamp.nanosec;
 
-            ros.Publish(cameraInfoTopic, pubInfoMsg);
+            Publish(cameraInfoTopic, pubInfoMsg);
         }
     }
 
@@ -466,10 +466,10 @@ public class CameraDepthPublisher : ROSPublisher
 
         depthMsg.data = depthData;
         depthMsg.header.stamp = ROSClock.GetROSTimestamp();
-        ros.Publish(Topic, depthMsg);
+        Publish(Topic, depthMsg);
 
         cameraInfoMsg.header.stamp = depthMsg.header.stamp;
-        ros.Publish(cameraInfoTopic, cameraInfoMsg);
+        Publish(cameraInfoTopic, cameraInfoMsg);
     }
 
     private void OnDestroy()

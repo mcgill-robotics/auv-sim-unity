@@ -302,7 +302,7 @@ public class IMUPublisher : ROSPublisher
         pubMsg.linear_acceleration.y = imuMsg.linear_acceleration.y;
         pubMsg.linear_acceleration.z = imuMsg.linear_acceleration.z;
 
-        ros.Publish(Topic, pubMsg);
+        Publish(pubMsg);
     }
     
     /// <summary>
