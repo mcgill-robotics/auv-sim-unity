@@ -161,7 +161,7 @@ public class GroundTruthPublisher : ROSPublisher
         twistMsg.twist.angular.y = angularVelLocal.x;
         twistMsg.twist.angular.z = -angularVelLocal.y;
 
-        ros.Publish(ROSSettings.Instance.GroundTruthTwistTopic, twistMsg);
+        Publish(ROSSettings.Instance.GroundTruthTwistTopic, twistMsg);
         
         // === ACCELERATION ===
         // Calculate acceleration via finite difference
@@ -186,7 +186,7 @@ public class GroundTruthPublisher : ROSPublisher
         accelMsg.accel.angular.y = angularAccelLocal.x;
         accelMsg.accel.angular.z = -angularAccelLocal.y;
 
-        ros.Publish(ROSSettings.Instance.GroundTruthAccelTopic, accelMsg);
+        Publish(ROSSettings.Instance.GroundTruthAccelTopic, accelMsg);
         
         // === ORIENTATION ===
         // Unity RUF -> ROS FLU: (z, -x, y, -w)
@@ -195,7 +195,7 @@ public class GroundTruthPublisher : ROSPublisher
         orientationMsg.quaternion.y = -rot.x;
         orientationMsg.quaternion.z = rot.y;
         orientationMsg.quaternion.w = -rot.w;
-        ros.Publish(ROSSettings.Instance.GroundTruthOrientationTopic, orientationMsg);
+        Publish(ROSSettings.Instance.GroundTruthOrientationTopic, orientationMsg);
         
         // === RELATIVE POSE ===
         // Relative Position (vector from start to current, ROTATED into start frame)
@@ -213,11 +213,11 @@ public class GroundTruthPublisher : ROSPublisher
         poseMsg.pose.orientation.z = relRot.y;
         poseMsg.pose.orientation.w = -relRot.w;
         
-        ros.Publish(ROSSettings.Instance.GroundTruthPoseTopic, poseMsg);
+        Publish(ROSSettings.Instance.GroundTruthPoseTopic, poseMsg);
         
         // === DEPTH ===
         // Depth as positive-down (negate Unity Y which is up)
         depthMsg.data = -AuvRb.position.y;
-        ros.Publish(ROSSettings.Instance.GroundTruthDepthTopic, depthMsg);
+        Publish(ROSSettings.Instance.GroundTruthDepthTopic, depthMsg);
     }
 }

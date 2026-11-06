@@ -193,7 +193,7 @@ namespace Sensors
             }
             System.Array.Copy(activeBuffer, 0, msg.array, 0, count);
 
-            ros.Publish(Topic, msg);
+            Publish(msg);
         }
     }
 

@@ -277,6 +277,10 @@ public class SimulationSettings : MonoBehaviour
         MigrateLegacyPlayerPrefs();
         LoadSettings();
 
+        // Ensure physics, sensor simulation, and ROS /clock keep publishing even when
+        // the Unity window loses OS focus (e.g. user interacting with terminal, RViz, or Foxglove).
+        Application.runInBackground = true;
+
         Application.targetFrameRate = SimulationTargetFrameRate;
         // At startup only an explicit size is applied; "Native" leaves the player's window alone.
         if (TryParseResolution(ScreenResolution, out _, out _))

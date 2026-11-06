@@ -494,9 +494,9 @@ public class DVLPublisher : ROSPublisher
             System.Buffer.BlockCopy(odomMsg.twist.covariance, 0, pubOdomMsg.twist.covariance, 0, 36 * sizeof(double));
         }
 
-        ros.Publish(Topic, pubDvlMsg);
-        ros.Publish(ROSSettings.Instance.DVLDeadReckoningTopic, pubDrMsg);
-        ros.Publish(ROSSettings.Instance.DVLOdometryTopic, pubOdomMsg);
+        Publish(Topic, pubDvlMsg);
+        Publish(ROSSettings.Instance.DVLDeadReckoningTopic, pubDrMsg);
+        Publish(ROSSettings.Instance.DVLOdometryTopic, pubOdomMsg);
     }
 
     /// <summary>

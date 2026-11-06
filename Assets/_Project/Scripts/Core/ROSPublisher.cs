@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
+using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 
 /// <summary>
 /// Base class for ROS publishers. Implements IROSPublisher and provides ROS connection,
@@ -68,8 +69,10 @@ public abstract class ROSPublisher : MonoBehaviour, IROSPublisher
         timeSinceLastPublish -= timeBetweenPublishes;
         if (timeSinceLastPublish >= timeBetweenPublishes) timeSinceLastPublish = 0f;
 
+        // Only publish when ROS is enabled in settings and actively connected,
+        // avoiding buffer overflow and stale backlog bursts when ROS is offline.
         bool rosEnabled = SimulationSettings.Instance == null || SimulationSettings.Instance.PublishROS;
-        if (shouldPublish && rosEnabled)
+        if (shouldPublish && rosEnabled && ROSConnection.IsConnected)
         {
             PublishMessage();
         }
@@ -84,6 +87,27 @@ public abstract class ROSPublisher : MonoBehaviour, IROSPublisher
     /// Publish a message to the ROS topic. Must be implemented by subclasses.
     /// </summary>
     public abstract void PublishMessage();
+
+    /// <summary>
+    /// Safely publish a message to the specified ROS topic.
+    /// Automatically drops the message when disconnected, eliminating the need for
+    /// individual sensor scripts to manually check ROSConnection.IsConnected.
+    /// </summary>
+    protected void Publish<T>(string topic, T message) where T : Message
+    {
+        if (ros != null && ROSConnection.IsConnected)
+        {
+            ros.Publish(topic, message);
+        }
+    }
+
+    /// <summary>
+    /// Safely publish a message to this publisher's default Topic.
+    /// </summary>
+    protected void Publish<T>(T message) where T : Message
+    {
+        Publish(Topic, message);
+    }
 
     /// <summary>
     /// Set the publish rate in Hz.

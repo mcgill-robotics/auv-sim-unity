@@ -112,7 +112,7 @@ public class ROSClock : ROSPublisher
         msg.clock.sec = secs;
         msg.clock.nanosec = nsecs;
         
-        ros.Publish(Topic, msg);
+        Publish(msg);
     }
 
 }

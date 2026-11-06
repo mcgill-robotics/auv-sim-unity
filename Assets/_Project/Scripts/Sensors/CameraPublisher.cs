@@ -51,7 +51,6 @@ public class CameraPublisher : ROSPublisher
     private Texture2D encodingTexture;
     private byte[] cachedRawBuffer;
     private byte[] cachedFlippedBuffer;
-    private Unity.Collections.NativeArray<byte> cachedFlippedNative;
     private CompressedImageMsg[] compressedMsgPool;
     private int compressedPoolIdx = 0;
     private ImageMsg[] rawImgMsgPool;
@@ -327,31 +326,15 @@ public class CameraPublisher : ROSPublisher
 
         if (useJPEG)
         {
-            // Direct native JPEG encoding path - zero managed heap allocations
+            // Direct native JPEG encoding path - zero managed heap allocations.
+            // EncodeNativeArrayToJPG natively expects Unity's GPU readback buffer layout
+            // and generates standard upright JPEG files automatically.
             int quality = SimulationSettings.Instance.JPEGQuality;
             int rowBytes = resolutionWidth * 3;
-            int totalBytes = resolutionWidth * resolutionHeight * 3;
-
-            if (!cachedFlippedNative.IsCreated || cachedFlippedNative.Length != totalBytes)
-            {
-                if (cachedFlippedNative.IsCreated)
-                {
-                    cachedFlippedNative.Dispose();
-                }
-                cachedFlippedNative = new Unity.Collections.NativeArray<byte>(totalBytes, Unity.Collections.Allocator.Persistent);
-            }
-
-            // Flip bottom-up readback buffer into top-down for standard JPEG orientation
-            for (int y = 0; y < resolutionHeight; y++)
-            {
-                int srcOffset = y * rowBytes;
-                int dstOffset = (resolutionHeight - 1 - y) * rowBytes;
-                Unity.Collections.NativeArray<byte>.Copy(rawData, srcOffset, cachedFlippedNative, dstOffset, rowBytes);
-            }
 
             // Encode directly to native JPEG memory (0 managed GC alloc)
             var jpegNative = ImageConversion.EncodeNativeArrayToJPG(
-                cachedFlippedNative,
+                rawData,
                 UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8_SRGB,
                 (uint)resolutionWidth,
                 (uint)resolutionHeight,
@@ -378,7 +361,7 @@ public class CameraPublisher : ROSPublisher
             compMsg.data = cachedRawBuffer;
             compMsg.dataLength = jpegLength;
 
-            ros.Publish(compressedTopic, compMsg);
+            Publish(compressedTopic, compMsg);
         }
         else
         {
@@ -404,7 +387,7 @@ public class CameraPublisher : ROSPublisher
             imgMsg.header.frame_id = currentFrameId;
             imgMsg.data = cachedFlippedBuffer;
 
-            ros.Publish(Topic, imgMsg);
+            Publish(Topic, imgMsg);
         }
 
         // Publish Camera Info with synced timestamp
@@ -417,7 +400,7 @@ public class CameraPublisher : ROSPublisher
             infoMsg.header.stamp.nanosec = pendingStamp.nanosec;
             infoMsg.header.frame_id = currentFrameId;
 
-            ros.Publish(cameraInfoTopic, infoMsg);
+            Publish(cameraInfoTopic, infoMsg);
         }
     }
 
@@ -576,11 +559,6 @@ public class CameraPublisher : ROSPublisher
         if (encodingTexture != null)
         {
             Destroy(encodingTexture);
-        }
-
-        if (cachedFlippedNative.IsCreated)
-        {
-            cachedFlippedNative.Dispose();
         }
     }
 }
