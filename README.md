@@ -206,25 +206,20 @@ Assets/
 - **Unity Editor:** Version `6000.0.62f1` LTS (Unity 6).
 - **ROS 2:** (Required for the ROS-TCP-Endpoint).
 
-### ⚠️ Important: ZED SDK & Plugin Setup
+### ZED SDK & Camera Streaming Setup
 
-*Strict requirement*: NVIDIA drivers must be version **< 590.x.x** for the ZED plugin to work. Ensure you have compatible drivers installed, and downgrade is necessary (newest versions are typically 590).
+The simulator supports two camera streaming pipelines:
 
-The simulator relies on the ZED SDK. Due to GitHub file size limits, the required binary files (`.dll` and `.so`) are **NOT** included in the repository.
+1. **ROS 2 Native Streaming (Default - No NVIDIA GPU or ZED SDK Required):**
+   - In `SimulationSettings.json` (or via the in-game UI), ensure `PublishROS: true` and `StreamZEDCamera: false`.
+   - Images are encoded and published over standard ROS 2 topics (`/zed/zed_node/rgb/color/rect/image/compressed`).
+   - Runs out of the box on **any** machine (Intel, AMD, Apple Silicon, or ARM64) without requiring CUDA, NVIDIA drivers, or the ZED SDK.
 
-**You must follow these steps or the project will have compile errors:**
-
-1. **Install ZED Drivers:**
-    You must install the **ZED SDK (v5.4)** on your computer for the camera drivers to work.
-    - [Download ZED SDK Here](https://www.stereolabs.com/developers/release/)
-
-2. **Add Missing Binaries:**
-    1. Download both `libsl_zed.so` and `sl_zed64.dll` from our Drive: [zed-bridge-plugin folder](https://drive.google.com/drive/folders/1vSMmt-lHEBNJbQY0uOj_WAM2HUnHQQhL?usp=drive_link)
-    2. Drag the `libsl_zed.so` and `sl_zed64.dll` files into your Unity project at this path:
-        `auv-sim-unity/Assets/Plugins/`
-    3. *Note: If asked, overwrite any existing files.*
-
-*The links to download these files were found in the [zed-isaac-sim](https://github.com/stereolabs/zed-isaac-sim) plugin github repo, more specifically in `build.sh` & `build.bat` scripts.*
+2. **Native ZED SDK Video Streaming (Optional - NVIDIA GPU Required):**
+   - If you want the simulator to broadcast directly to the ZED SDK streaming receiver over the network (`StreamZEDCamera: true`):
+   - Install the official [ZED SDK (v5.4)](https://www.stereolabs.com/developers/release/) on your system.
+   - **No manual file copying or plugin downloads required**: Unity dynamically links directly against the official ZED SDK runtime installed on your operating system (`/usr/local/zed/lib` on Linux, default PATH on Windows).
+   - *Note*: NVIDIA display driver version must be `< 590.x.x` for ZED SDK 5.4.x compatibility.
 
 ### Setup Steps
 
@@ -239,7 +234,7 @@ The simulator relies on the ZED SDK. Due to GitHub file size limits, the require
     ```
     > [!TIP]
     > If you already cloned without Git LFS installed, run `git lfs pull` inside the repository to fetch the actual binary assets.
-3. **Perform the ZED Plugin Setup (see above).**
+3. *(Optional)* If using native ZED video streaming, install the ZED SDK v5.4 on your OS.
 4. Open the project via Unity Hub.
 5. Allow Unity to import assets and compile scripts.
 6. In the Project window, open the primary scene at `Assets/_Project/Scenes/Main_Scenes/RoboSub2026.unity`.
