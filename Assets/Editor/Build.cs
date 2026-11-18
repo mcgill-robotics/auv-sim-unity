@@ -48,6 +48,21 @@ public static class BuildMenu
     [MenuItem("Build/Build Linux")]
     public static void BuildLinux() => Build($"Builds/StandaloneLinux64/{OutputName}.x86_64", BuildTarget.StandaloneLinux64);
 
+    [MenuItem("Build/Build Linux ARM64 (Embedded)")]
+    public static void BuildEmbeddedLinuxArm64()
+    {
+        if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.EmbeddedLinux, BuildTarget.EmbeddedLinux))
+        {
+            Debug.LogError("[BuildMenu] Embedded Linux (ARM64) is not installed or requires a Unity Industry license. On NVIDIA Jetson, run the StandaloneLinux64 player via Box64 (with native GPU passthrough) or connect remotely via ROS 2.");
+            return;
+        }
+
+        PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.EmbeddedLinux, false);
+        PlayerSettings.SetGraphicsAPIs(BuildTarget.EmbeddedLinux, new[] { UnityEngine.Rendering.GraphicsDeviceType.Vulkan });
+        EditorUserBuildSettings.selectedEmbeddedLinuxArchitecture = EmbeddedLinuxArchitecture.Arm64;
+        Build($"Builds/EmbeddedLinux_Arm64/{OutputName}", BuildTarget.EmbeddedLinux);
+    }
+
     [MenuItem("Build/Build Windows")]
     public static void BuildWindows() => Build($"Builds/StandaloneWindows64/{OutputName}.exe", BuildTarget.StandaloneWindows64);
 
