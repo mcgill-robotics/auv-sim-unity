@@ -14,12 +14,20 @@ public class CameraManager : MonoBehaviour
 
     [Tooltip("Follow camera GameObject that tracks the AUV (toggle with C key)")]
     public GameObject followCam;
+    [Tooltip("Follow camera GameObject that tracks the Sister AUV (toggle with Z key)")]
+    public GameObject followCamSister;
+    // Keep track of if the last active Camera was the Sister AUV or not
+    bool lastActiveCamSister = false;
+
+
 
     /// <summary>Raised whenever the active camera changes; the argument is true for the free camera.</summary>
     public event Action<bool> FreeCameraChanged;
 
     /// <summary>True while the free-roam camera is the active one.</summary>
     public bool IsFreeCameraActive => freeCam != null && freeCam.activeSelf;
+
+
 
     private void Awake()
     {
@@ -45,12 +53,19 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
-        KeyCode toggleKey = InputManager.Instance != null
+        KeyCode toggleKeyC = InputManager.Instance != null
             ? InputManager.Instance.GetKey(InputBindings.CameraToggle, KeyCode.C)
             : KeyCode.C;
-        if (InputGate.GetKeyDown(toggleKey))
+        if (InputGate.GetKeyDown(toggleKeyC))
         {
             ToggleCamera();
+        }
+        KeyCode toggleKeyZ = InputManager.Instance != null
+            ? InputManager.Instance.GetKey(InputBindings.CameraToggleSister, KeyCode.Z)
+            : KeyCode.Z;
+        if (InputGate.GetKeyDown(toggleKeyZ))
+        {
+            ToggleCameraSister();
         }
     }
 
@@ -58,21 +73,49 @@ public class CameraManager : MonoBehaviour
     {
         if (followCam != null && followCam.activeSelf)
         {
+            lastActiveCamSister = false;
+            ActivateFreeCam();
+        }
+        else if (followCamSister != null && followCamSister.activeSelf)
+        {
+            lastActiveCamSister = true;
             ActivateFreeCam();
         }
         else
         {
+            if (lastActiveCamSister == false)
+            {
+                ActivateFollowCam();
+
+            }
+            else
+            {
+                ActivateFollowCamSister();
+            }
+        }
+    }
+
+    public void ToggleCameraSister()
+    {
+        if (followCamSister != null && followCamSister.activeSelf)
+        {
             ActivateFollowCam();
+        }
+        else
+        {
+            ActivateFollowCamSister();
         }
     }
 
     public void ActivateFreeCam() => SetActiveCamera(freeCam);
     public void ActivateFollowCam() => SetActiveCamera(followCam);
+    public void ActivateFollowCamSister() => SetActiveCamera(followCamSister);
 
     private void SetActiveCamera(GameObject activeCam)
     {
         if (freeCam) freeCam.SetActive(freeCam == activeCam);
         if (followCam) followCam.SetActive(followCam == activeCam);
+        if (followCamSister) followCamSister.SetActive(followCamSister == activeCam);
         FreeCameraChanged?.Invoke(IsFreeCameraActive);
     }
 }

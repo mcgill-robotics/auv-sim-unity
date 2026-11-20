@@ -29,6 +29,9 @@ public static class InputBindings
     public const string CameraCycle = "cameraCycleKeybind";
     public const string CameraToggle = "cameraToggleKeybind";
 
+    public const string CameraToggleSister = "cameraToggleSisterKeybind";
+
+
     /// <summary>Default key for each binding.</summary>
     public static readonly IReadOnlyDictionary<string, KeyCode> Defaults = new Dictionary<string, KeyCode>
     {
@@ -41,7 +44,7 @@ public static class InputBindings
         { Freeze, KeyCode.Space },
         { Dropper, KeyCode.G }, { Gripper, KeyCode.H },
         { TorpedoLaunch, KeyCode.T }, { TorpedoReset, KeyCode.Y },
-        { CameraSnapshot, KeyCode.P }, { CameraCycle, KeyCode.V }, { CameraToggle, KeyCode.C },
+        { CameraSnapshot, KeyCode.P }, { CameraCycle, KeyCode.V }, { CameraToggle, KeyCode.C }, { CameraToggleSister, KeyCode.Z},
     };
 
     /// <summary>Bindings that drive the vehicle; the HUD releases UI focus when one is held.</summary>
