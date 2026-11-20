@@ -22694,7 +22694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   centerOfBuoyancy: {x: 0, y: 0.023, z: 0}
   centerOfMass: {x: 0, y: 0, z: 0}
-  overrideBuoyancyForce: 1
+  overrideBuoyancyForce: 0
   manualBuoyancyForce: 278.95
   ChassisCollider: {fileID: 2407960813864398789}
   FoamTopCollider: {fileID: 9112887098406822536}
@@ -23546,6 +23546,7 @@ MonoBehaviour:
   rampRate: 100
   efficiencyVariance: 0.3
   auvRbOverride: {fileID: 3812340994679331340}
+  commandTimeout: 0.5
 --- !u!1 &9135246509981760594
 GameObject:
   m_ObjectHideFlags: 0
