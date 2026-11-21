@@ -97,6 +97,14 @@ public class CameraManager : MonoBehaviour
 
     public void ToggleCameraSister()
     {
+        // Swap which AUV we are controlling if in free cam mode
+        if (freeCam.activeSelf)
+        {
+            lastActiveCamSister = !lastActiveCamSister;
+            return;
+        }
+
+        // If we are not in free cam mode switch which camera is active 
         if (followCamSister != null && followCamSister.activeSelf)
         {
             ActivateFollowCam();
@@ -117,5 +125,10 @@ public class CameraManager : MonoBehaviour
         if (followCam) followCam.SetActive(followCam == activeCam);
         if (followCamSister) followCamSister.SetActive(followCamSister == activeCam);
         FreeCameraChanged?.Invoke(IsFreeCameraActive);
+    }
+
+    public bool getActiveAUV()
+    {
+        return lastActiveCamSister;
     }
 }

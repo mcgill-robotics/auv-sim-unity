@@ -96,6 +96,10 @@ public class Thrusters : MonoBehaviour
     // Cached quality level to avoid repeated calls
     private int cachedQualityLevel;
 
+    // Used to keep track of the what the current active AUV Is 
+    private CameraManager cameraManager;
+    public bool isMainAUV = true; 
+
     private void Start()
     {
         roscon = ROSConnection.GetOrCreateInstance();
@@ -113,6 +117,8 @@ public class Thrusters : MonoBehaviour
 
         // Cache quality level
         cachedQualityLevel = QualitySettings.GetQualityLevel();
+
+        cameraManager = UnityEngine.Object.FindFirstObjectByType<CameraManager>();
     }
 
     public void UpdateQualityLevel(int newQualityLevel)
@@ -266,6 +272,8 @@ public class Thrusters : MonoBehaviour
         Array.Clear(inputThrusterForces, 0, inputThrusterForces.Length);
 
         if (isFrozen) return;
+        // Is this isn't the active AUV then we do not want it to listen to inputs
+        if (isMainAUV == cameraManager.getActiveAUV()) return;
 
         // Ignore movement input if user is typing in HUD or text fields
         if (!InputGate.GameKeysEnabled) return;
@@ -430,4 +438,5 @@ public class Thrusters : MonoBehaviour
     {
         if (arrowMat != null) Destroy(arrowMat);
     }
+
 }

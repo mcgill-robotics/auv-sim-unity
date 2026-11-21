@@ -455,7 +455,7 @@ MonoBehaviour:
   yMaxLimit: 80
   initialYaw: 0
   initialPitch: 7
-  resetOnEnable: 0
+  resetOnEnable: 1
   movementSmoothing: 10
   rotationSmoothing: 10
   collisionLayerMask:
@@ -3266,6 +3266,7 @@ MonoBehaviour:
   efficiencyVariance: 0.3
   auvRbOverride: {fileID: 0}
   commandTimeout: 0.5
+  isMainAUV: 1
 --- !u!1 &969918695
 GameObject:
   m_ObjectHideFlags: 0
@@ -3806,6 +3807,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1617627593661449929, guid: 4fffc9298c64e8a49862b60d06f5903b,
+        type: 3}
+      propertyPath: isMainAUV
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2974941786602966569, guid: 4fffc9298c64e8a49862b60d06f5903b,
         type: 3}
       propertyPath: m_LocalPosition.x
