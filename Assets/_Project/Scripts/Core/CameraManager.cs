@@ -127,8 +127,13 @@ public class CameraManager : MonoBehaviour
         FreeCameraChanged?.Invoke(IsFreeCameraActive);
     }
 
-    public bool getActiveAUV()
+    public bool getMainAUVIsActive()
     {
+        // If we are currently following one of the AUVs, return based on active camera
+        if (followCamSister != null && followCamSister.activeSelf) return true;
+        if (followCam != null && followCam.activeSelf) return false;
+
+        // Otherwise (in freeCam), use the last active target
         return lastActiveCamSister;
     }
 }

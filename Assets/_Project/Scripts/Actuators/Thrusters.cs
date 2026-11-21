@@ -273,7 +273,7 @@ public class Thrusters : MonoBehaviour
 
         if (isFrozen) return;
         // Is this isn't the active AUV then we do not want it to listen to inputs
-        if (isMainAUV == cameraManager.getActiveAUV()) return;
+        if (isMainAUV == cameraManager.getMainAUVIsActive()) return;
 
         // Ignore movement input if user is typing in HUD or text fields
         if (!InputGate.GameKeysEnabled) return;
